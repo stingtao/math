@@ -107,3 +107,17 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /animation:\s*none !important/);
 });
+
+test("ships a readable, safe-area-aware mobile learning interface", async () => {
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(header, /mobile-learner-nav/);
+  assert.match(header, /mobile-public-menu/);
+  assert.match(layout, /viewportFit:\s*"cover"/);
+  assert.match(css, /env\(safe-area-inset-bottom\)/);
+  assert.match(css, /@media \(max-width: 380px\)/);
+  assert.match(css, /-webkit-text-size-adjust:\s*100%/);
+  assert.match(css, /\.sheet-modal img \{[^}]*object-fit:\s*contain/);
+  assert.match(css, /\.katex-display \{[^}]*overflow-x:\s*auto/);
+});
