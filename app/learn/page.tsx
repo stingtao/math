@@ -2,7 +2,8 @@ import { LearningDashboard } from "../components/LearningDashboard";
 
 export const dynamic = "force-dynamic";
 
-export default async function LearnPage({ searchParams }: { searchParams: Promise<{ demo?: string }> }) {
+export default async function LearnPage({ searchParams }: { searchParams: Promise<{ demo?: string; grade?: string }> }) {
   const params = await searchParams;
-  return <LearningDashboard demo={params.demo === "1"} />;
+  const grade = [7, 8, 9].includes(Number(params.grade)) ? Number(params.grade) : 8;
+  return <LearningDashboard demo={params.demo === "1"} grade={grade} />;
 }

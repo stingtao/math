@@ -1,6 +1,8 @@
 # Math
 
-An English-language Grade 8 learning trail built around the promise “Small steps. Real progress.” The first release includes 13 Common Core regions, 52 short lessons, 13 boss quests, spaced review, daily rewards, anonymous identities, and opt-in weekly leagues.
+Math is a simple English learning site for Grades 7–9. Sting built it as a parent who likes math and wanted a quiet place for his child to learn, practice, and return for review.
+
+The site includes 31 four-lesson regions, 124 lessons, 31 mixed boss checks, spaced review, daily rewards, anonymous identities, an opt-in weekly leaderboard, and a public feedback board whose posts are not connected to learner accounts or progress.
 
 ## Local development
 
@@ -12,7 +14,17 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set a Google Web client ID in both `GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, then set a strong `AUTH_HMAC_SECRET`. Without a Google client ID, the local site offers a browser-only demo trail and does not persist progress.
+Set a Google Web client ID in both `GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, then set a strong random value for `AUTH_HMAC_SECRET`. Without a Google client ID, the site offers a browser-only demo and does not persist progress.
+
+## Cloudflare
+
+- Worker name: `math`
+- D1 database: `math-db`
+- D1 binding: `DB`
+- Live custom domain: `https://math.stingtao.info`
+- R2 is not required; the teaching and social images are versioned static assets.
+
+The database stores learning data under anonymous internal IDs. Google name, email, profile photo, and raw `sub` are not stored. Feedback rows contain no learner or account foreign key.
 
 ## Validation
 
@@ -21,26 +33,8 @@ npx tsc --noEmit
 npm run lint
 npm test
 npm run db:generate
+npx wrangler types --check
+npx wrangler deploy --dry-run
 ```
 
-`npm test` performs a production build, validates all 52 lessons and 260 reviewed questions, runs 26,000 seeded answer checks, confirms the 20 Quick Sheets are present, checks that the persistent schema contains no Google profile data, and verifies mutation/security controls.
-
-## Privacy and identity
-
-- Google ID tokens are verified server-side for signature, issuer, audience, and expiry.
-- Only the Google `sub` claim is used, and it is HMAC-derived before storage.
-- Google email, name, avatar, and raw `sub` are never stored.
-- Sessions use random opaque tokens; only SHA-256 token hashes are stored in D1.
-- Public identities are generated from a safe nickname dictionary and abstract avatar parts.
-- Weekly leaderboard participation is opt-in and exposes no internal learner ID.
-
-## Deployment bindings
-
-The Sites deployment declares a D1 binding named `DB` in `.openai/hosting.json`. Apply the SQL files in `drizzle/` and configure these production secrets/variables:
-
-- `GOOGLE_CLIENT_ID`
-- `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
-- `AUTH_HMAC_SECRET`
-- `SESSION_SECRET`
-
-After deployment, add the public host to the Google OAuth client’s Authorized JavaScript origins.
+`npm test` builds the production app, validates all 124 lessons and 620 reviewed questions, runs 62,000 seeded answer checks, confirms the 20 Grade 8 Quick Sheets, checks privacy boundaries, and verifies mutation/security controls.

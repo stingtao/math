@@ -12,9 +12,10 @@ export function PublicHeader() {
     <header className="topbar">
       <Brand />
       <nav className="topnav" aria-label="Main navigation">
-        <a href="/#how">How it works</a>
-        <a href="/#curriculum">Curriculum</a>
+        <a href="/#story">About</a>
+        <a href="/#curriculum">Grades 7–9</a>
         <a href="/leaderboard">Leaderboard</a>
+        <a href="/feedback">Feedback</a>
       </nav>
       <a className="sign-in-button" href="/#join">Sign in</a>
     </header>

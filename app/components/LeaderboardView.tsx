@@ -7,19 +7,8 @@ import type { AvatarSpec } from "@/lib/learner-state";
 
 type Entry = { rank: number; nickname: string; avatar: AvatarSpec; weeklyXp: number };
 
-const previewEntries: Entry[] = [
-  { rank: 1, nickname: "BrightFalcon208", avatar: { glyph: "spark", tone: "gold", frame: "halo" }, weeklyXp: 840 },
-  { rank: 2, nickname: "QuietOrbit731", avatar: { glyph: "orbit", tone: "violet", frame: "plain" }, weeklyXp: 765 },
-  { rank: 3, nickname: "KindSummit054", avatar: { glyph: "summit", tone: "teal", frame: "summit" }, weeklyXp: 710 },
-  { rank: 4, nickname: "SwiftRiver419", avatar: { glyph: "wave", tone: "blue", frame: "plain" }, weeklyXp: 640 },
-  { rank: 5, nickname: "CalmComet482", avatar: { glyph: "compass", tone: "coral", frame: "plain" }, weeklyXp: 590 },
-  { rank: 6, nickname: "WisePrism116", avatar: { glyph: "prism", tone: "violet", frame: "prism" }, weeklyXp: 545 },
-  { rank: 7, nickname: "NimbleCedar902", avatar: { glyph: "spark", tone: "teal", frame: "plain" }, weeklyXp: 480 },
-  { rank: 8, nickname: "BravePebble337", avatar: { glyph: "orbit", tone: "blue", frame: "plain" }, weeklyXp: 435 },
-];
-
 export function LeaderboardView() {
-  const [entries, setEntries] = useState<Entry[]>(previewEntries);
+  const [entries, setEntries] = useState<Entry[]>([]);
   const [week, setWeek] = useState("");
   const [scope, setScope] = useState<"public" | "your-league">("public");
   useEffect(() => {
@@ -36,7 +25,7 @@ export function LeaderboardView() {
     <main className="site-shell leaderboard-page">
       <PublicHeader />
       <section className="leaderboard-hero">
-        <div><span className="eyebrow">ANONYMOUS WEEKLY LEAGUE</span><h1>A little friendly momentum.</h1><p>Learning XP resets every Monday. Real names, grades, accuracy, profiles, and history never appear here.</p></div>
+        <div><span className="eyebrow">ANONYMOUS WEEKLY LEAGUE</span><h1>This week’s anonymous scores.</h1><p>Learning XP resets every Monday. Real names, grades, accuracy, profiles, and history never appear here.</p></div>
         <div className="league-clock"><span>THIS LEAGUE</span><strong>{week || "Current week"}</strong><small>Resets Monday · 00:00 UTC</small></div>
       </section>
       <section className="leaderboard-wrap">
@@ -44,7 +33,7 @@ export function LeaderboardView() {
           {[entries[1], entries[0], entries[2]].filter(Boolean).map((entry, index) => <article className={`podium-place podium-${index === 1 ? 1 : index === 0 ? 2 : 3}`} key={entry.nickname}><span className="podium-rank">{entry.rank}</span><Avatar avatar={entry.avatar} size="lg" label={`${entry.nickname}'s abstract avatar`} /><strong>{entry.nickname}</strong><span>{entry.weeklyXp} XP</span></article>)}
         </div>
         <div className="leaderboard-card">
-          <header><div><span className="section-kicker">THIS WEEK’S TRAILBLAZERS</span><h2>{scope === "your-league" ? "Your 30-person league" : "Public top 30"}</h2></div><span className="privacy-pill">✦ Anonymous by design</span></header>
+          <header><div><span className="section-kicker">WEEKLY RANKING</span><h2>{scope === "your-league" ? "Your 30-person league" : "Public top 30"}</h2></div><span className="privacy-pill">✦ Anonymous by design</span></header>
           <ol className="leaderboard-list">
             {entries.map((entry) => <li key={entry.nickname}><span className={`rank-number rank-${entry.rank}`}>{entry.rank}</span><Avatar avatar={entry.avatar} size="sm" /><strong>{entry.nickname}</strong><span className="xp-bar"><i style={{ width: `${Math.max(12, (entry.weeklyXp / entries[0].weeklyXp) * 100)}%` }} /></span><b>{entry.weeklyXp} XP</b></li>)}
           </ol>

@@ -1,5 +1,5 @@
 {
-  "name": "site-creator-vinext-starter",
+  "name": "math",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -12,7 +12,8 @@
     "test": "npm run build && npm run validate:content && node --test tests/*.test.mjs",
     "validate:content": "node --experimental-strip-types scripts/validate-curriculum.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "deploy:cloudflare": "npm run build && wrangler deploy --config dist/server/wrangler.json --keep-vars"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
@@ -22,8 +23,7 @@
     "react-dom": "19.2.6"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
-    "@cloudflare/workers-types": "^4.20260702.1",
+    "@cloudflare/vite-plugin": "^1.53.0",
     "@eslint/js": "9.39.4",
     "@next/eslint-plugin-next": "16.2.6",
     "@openai/sites-vite-plugin": "0.1.0",
@@ -45,7 +45,7 @@
     "typescript-eslint": "8.59.3",
     "vinext": "1.0.0-beta.2",
     "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "wrangler": "^4.124.0"
   },
   "type": "module"
 }

@@ -1,25 +1,21 @@
-/** Cloudflare Worker entry point for the vinext-starter template. */
+/** Cloudflare Worker entry point for Math. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 
-interface Env {
-  ASSETS: Fetcher;
-  DB: D1Database;
+interface WorkerEnv extends Cloudflare.Env {
   GOOGLE_CLIENT_ID: string;
   AUTH_HMAC_SECRET: string;
-  SESSION_SECRET: string;
-  IMAGES: {
-    input(stream: ReadableStream): {
-      transform(options: Record<string, unknown>): {
-        output(options: { format: string; quality: number }): Promise<{ response(): Response }>;
-      };
-    };
-  };
 }
 
-interface ExecutionContext {
-  waitUntil(promise: Promise<unknown>): void;
-  passThroughOnException(): void;
+function withSecurityHeaders(response: Response): Response {
+  const secured = new Response(response.body, response);
+  secured.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://accounts.google.com https://www.googleapis.com; frame-src https://accounts.google.com/gsi/; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  secured.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  secured.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  secured.headers.set("X-Content-Type-Options", "nosniff");
+  secured.headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  secured.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  return secured;
 }
 
 // Image security config. SVG sources with .svg extension auto-skip the
@@ -29,28 +25,24 @@ interface ExecutionContext {
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
 const worker = {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: WorkerEnv, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
-      return handleImageOptimization(request, {
+      const imageResponse = await handleImageOptimization(request, {
         fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
         transformImage: async (body, { width, format, quality }) => {
-          const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
+          const outputFormat = format as "image/jpeg" | "image/png" | "image/gif" | "image/webp" | "image/avif";
+          const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format: outputFormat, quality });
           return result.response();
         },
       }, allowedWidths);
+      return withSecurityHeaders(imageResponse);
     }
 
     const response = await handler.fetch(request, env, ctx);
-    const secured = new Response(response.body, response);
-    secured.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://accounts.google.com https://www.googleapis.com; frame-src https://accounts.google.com/gsi/; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
-    secured.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-    secured.headers.set("X-Content-Type-Options", "nosniff");
-    secured.headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-    secured.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-    return secured;
+    return withSecurityHeaders(response);
   },
 };
 

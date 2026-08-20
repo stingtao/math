@@ -28,7 +28,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const activeState = state;
   const completed = new Set(state.completedLessons.map((item) => item.id));
   const unlocked = region.lessons.every((item) => completed.has(item.id));
-  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Four small steps come first.</h1><p>Complete every lesson in {region.title}, then return for the mixed quest.</p><a className="primary-button" href={demo ? "/learn?demo=1" : "/learn"}>Back to your trail <span>→</span></a></section></main>;
+  const trailUrl = `/learn?grade=${region.grade}${demo ? "&demo=1" : ""}`;
+  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Four small steps come first.</h1><p>Complete every lesson in {region.title}, then return for the mixed quest.</p><a className="primary-button" href={trailUrl}>Back to your trail <span>→</span></a></section></main>;
 
   function check() {
     if (!answer.trim()) return;
@@ -79,16 +80,16 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setIndex(0); setAnswer(""); setAnswers([]); setHearts(3); setFeedback(""); setShowHint(false); setFailed(false); setRepair(0);
   }
 
-  if (cleared) return <main className={`boss-shell accent-${region.accent}`}><LearnerHeader state={state} demo={demo} /><section className="boss-victory"><div className="boss-medal">★</div><span className="section-kicker">REGION {region.id} CLEARED</span><h1>You connected the ideas.</h1><p>The boss was not about speed. It was proof that four small lessons can become one strong skill.</p><div className="earned-stars hearts-result">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div><div className="reward-strip"><span><strong>+100</strong> XP</span><span><strong>{hearts}/3</strong> hearts</span><span><strong>1</strong> badge</span></div><a className="primary-button" href={demo ? "/learn?demo=1" : "/learn"}>{region.id === 13 ? "View the complete trail" : "Open the next region"} <span>→</span></a></section></main>;
+  if (cleared) return <main className={`boss-shell accent-${region.accent}`}><LearnerHeader state={state} demo={demo} /><section className="boss-victory"><div className="boss-medal">★</div><span className="section-kicker">GRADE {region.grade} · REGION {region.order} CLEARED</span><h1>You connected the ideas.</h1><p>You worked through four lesson ideas in one mixed check.</p><div className="earned-stars hearts-result">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div><div className="reward-strip"><span><strong>+100</strong> XP</span><span><strong>{hearts}/3</strong> hearts</span><span><strong>1</strong> badge</span></div><a className="primary-button" href={trailUrl}>Back to Grade {region.grade} <span>→</span></a></section></main>;
 
   if (failed) return <main className="boss-shell"><LearnerHeader state={state} demo={demo} /><section className="repair-card"><span className="repair-icon">◇</span><span className="section-kicker">TRAIL CAMP</span><h1>Pause. Repair. Try again.</h1><p>No XP lost. Work through two tiny reminders, then return with three fresh hearts.</p><div className="repair-question"><span>{repair + 1} OF 2</span><strong>{repair === 0 ? region.lessons[Math.min(index, 3)].keyIdea : "A correction is progress, not a penalty."}</strong><p>{repair === 0 ? region.lessons[Math.min(index, 3)].exampleSteps[0] : "Take one breath, read the structure, then choose your first step."}</p></div><button className="primary-button" type="button" onClick={finishRepair}>{repair === 0 ? "Next reminder" : "Return with 3 hearts"} <span>→</span></button></section></main>;
 
   return (
     <main className={`boss-shell accent-${region.accent}`}>
       <LearnerHeader state={state} demo={demo} />
-      <div className="boss-topbar"><a href={demo ? "/learn?demo=1" : "/learn"}>← Leave quest</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
+      <div className="boss-topbar"><a href={trailUrl}>← Leave quest</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
-        <div className="boss-title"><span className="section-kicker">REGION {region.id} BOSS · ROUND {index + 1} OF 5</span><h1>{region.title}</h1><p>Four lesson checks. One mixed finish. No timer.</p></div>
+        <div className="boss-title"><span className="section-kicker">GRADE {region.grade} · REGION {region.order} · ROUND {index + 1} OF 5</span><h1>{region.title}</h1><p>Four lesson checks. One mixed finish. No timer.</p></div>
         <div className="boss-question-card">
           <span className="boss-topic">{question.lesson}</span>
           <h2>{question.prompt}</h2>

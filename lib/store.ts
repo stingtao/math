@@ -36,6 +36,26 @@ function randomNickname() {
   return `${pick(adjectives)}${pick(nouns)}${String(bytes[0] % 1000).padStart(3, "0")}`;
 }
 
+export async function listFeedback(limit = 50) {
+  await ensureSchema();
+  const result = await getStore().prepare("SELECT id, nickname, body, created_at FROM feedback_messages ORDER BY created_at DESC LIMIT ?")
+    .bind(Math.min(50, Math.max(1, limit))).all<{ id: string; nickname: string; body: string; created_at: string }>();
+  return result.results;
+}
+
+export async function createFeedback(requestKey: string | null, body: string) {
+  if (!requestKey || requestKey.length < 12 || requestKey.length > 120) throw new Error("A valid idempotency key is required.");
+  const message = body.trim().replace(/\s+/g, " ");
+  if (message.length < 3 || message.length > 600) throw new Error("Feedback must be between 3 and 600 characters.");
+  if (/https?:\/\/|www\./i.test(message)) throw new Error("Please leave links out of public feedback.");
+  await ensureSchema();
+  const id = crypto.randomUUID();
+  const requestKeyHash = await sha256(requestKey);
+  await getStore().prepare("INSERT OR IGNORE INTO feedback_messages (id, request_key_hash, nickname, body, created_at) VALUES (?, ?, ?, ?, ?)")
+    .bind(id, requestKeyHash, randomNickname(), message, new Date().toISOString()).run();
+  return id;
+}
+
 export function weekKey(date = new Date()) {
   const value = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const day = value.getUTCDay() || 7;
@@ -189,16 +209,16 @@ export async function completeReviewSet(learnerId: string, results: Array<{ less
   await ensureSchema();
   const db = getStore();
   const now = new Date();
-  const intervals = [3, 7, 14];
+  const intervals = [1, 3, 7, 14];
   for (const result of results) {
     const row = await db.prepare("SELECT stage FROM review_items WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
       .bind(learnerId, result.lessonId, result.questionId).first<{ stage: number }>();
     if (!row) continue;
-    if (result.correct && row.stage >= 2) {
+    if (result.correct && row.stage >= 3) {
       await db.prepare("DELETE FROM review_items WHERE learner_id = ? AND lesson_id = ? AND question_id = ?").bind(learnerId, result.lessonId, result.questionId).run();
     } else {
       const nextStage = result.correct ? row.stage + 1 : 0;
-      const days = result.correct ? intervals[Math.min(nextStage, intervals.length - 1)] : 1;
+      const days = result.correct ? intervals[Math.min(nextStage, intervals.length - 1)] : intervals[0];
       await db.prepare("UPDATE review_items SET stage = ?, due_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
         .bind(nextStage, new Date(now.getTime() + days * 86_400_000).toISOString(), learnerId, result.lessonId, result.questionId).run();
     }

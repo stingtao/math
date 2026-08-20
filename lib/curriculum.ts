@@ -1,3 +1,6 @@
+import { grade7Regions } from "./curriculum-grade7.ts";
+import { grade9Regions } from "./curriculum-grade9.ts";
+
 export type Accent = "blue" | "teal" | "coral" | "violet" | "gold";
 
 export type PracticeQuestion = {
@@ -10,6 +13,7 @@ export type PracticeQuestion = {
 
 export type LessonDefinition = {
   id: string;
+  grade: 7 | 8 | 9;
   slug: string;
   regionId: number;
   order: number;
@@ -27,6 +31,8 @@ export type LessonDefinition = {
 
 export type RegionDefinition = {
   id: number;
+  grade: 7 | 8 | 9;
+  order: number;
   slug: string;
   title: string;
   subtitle: string;
@@ -56,6 +62,7 @@ function lesson(
 ): LessonDefinition {
   return {
     id: `g8-r${regionId}-l${order}`,
+    grade: 8,
     regionId,
     order,
     slug,
@@ -78,7 +85,7 @@ function lesson(
   };
 }
 
-const regionSpecs: Array<Omit<RegionDefinition, "lessons"> & { lessons: LessonDefinition[] }> = [
+const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
   {
     id: 1,
     slug: "number-foundations",
@@ -575,8 +582,22 @@ const regionSpecs: Array<Omit<RegionDefinition, "lessons"> & { lessons: LessonDe
   },
 ];
 
-export const regions: RegionDefinition[] = regionSpecs;
+export const grade8Regions: RegionDefinition[] = regionSpecs.map((region, index) => ({ ...region, grade: 8, order: index + 1 }));
+export const gradeCurricula = [
+  { grade: 7 as const, title: "Grade 7", subtitle: "Ratios, rational numbers, equations, geometry, statistics, and probability", regions: grade7Regions },
+  { grade: 8 as const, title: "Grade 8", subtitle: "Real numbers, linear relationships, transformations, geometry, and data", regions: grade8Regions },
+  { grade: 9 as const, title: "Grade 9", subtitle: "Algebra I: equations, functions, systems, polynomials, quadratics, and modeling", regions: grade9Regions },
+];
+export const regions: RegionDefinition[] = gradeCurricula.flatMap((curriculum) => curriculum.regions);
 export const lessons: LessonDefinition[] = regions.flatMap((region) => region.lessons);
+
+export function getGradeCurriculum(grade: number) {
+  return gradeCurricula.find((curriculum) => curriculum.grade === grade) ?? gradeCurricula[1];
+}
+
+export function getGradeLessons(grade: number) {
+  return getGradeCurriculum(grade).regions.flatMap((region) => region.lessons);
+}
 
 export const lessonBySlug = new Map(lessons.map((item) => [item.slug, item]));
 export const lessonById = new Map(lessons.map((item) => [item.id, item]));
@@ -590,7 +611,8 @@ export function getRegion(id: number) {
 }
 
 export function nextLesson(current: LessonDefinition) {
-  return lessons[lessons.findIndex((item) => item.id === current.id) + 1];
+  const gradeLessons = getGradeLessons(current.grade);
+  return gradeLessons[gradeLessons.findIndex((item) => item.id === current.id) + 1];
 }
 
 function normalizeText(value: string) {
@@ -630,7 +652,7 @@ export function isAnswerCorrect(input: string, accepted: string) {
 }
 
 export const curriculumStats = {
-  grades: 1,
+  grades: gradeCurricula.length,
   regions: regions.length,
   lessons: lessons.length,
   bosses: regions.length,

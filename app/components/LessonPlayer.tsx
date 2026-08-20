@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import type { LessonDefinition } from "@/lib/curriculum";
-import { isAnswerCorrect, nextLesson } from "@/lib/curriculum";
+import { getGradeCurriculum, getGradeLessons, getRegion, isAnswerCorrect, nextLesson } from "@/lib/curriculum";
 import { completeDemoLesson, type LearnerState } from "@/lib/learner-state";
 import { ConceptVisual } from "./ConceptVisual";
 import { LearnerHeader } from "./Header";
@@ -28,13 +28,21 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const question = lesson.practice[questionIndex];
+  const region = getRegion(lesson.regionId);
   const completeMap = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
 
   if (loading) return <main className="loading-page" role="status"><div className="loading-mark">M</div><p>Opening your lesson…</p></main>;
   if (!state || error) return <LessonGate />;
   const activeState = state;
-  const isAvailable = completeMap.has(lesson.id) || state.nextLessonId === lesson.id || lesson.id === "g8-r1-l1";
-  if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">FOLLOW THE TRAIL</span><h1>This lesson is just ahead.</h1><p>Complete your current step first. The trail will bring you here next.</p><a className="primary-button" href={demo ? "/learn?demo=1" : "/learn"}>Back to your trail <span>→</span></a></section></main>;
+  const gradeLessons = getGradeLessons(lesson.grade);
+  const lessonPosition = gradeLessons.findIndex((item) => item.id === lesson.id);
+  const gradeCurriculum = getGradeCurriculum(lesson.grade);
+  const regionPosition = gradeCurriculum.regions.findIndex((item) => item.id === lesson.regionId);
+  const regionAvailable = regionPosition === 0 || state.clearedBosses.some((item) => item.regionId === gradeCurriculum.regions[regionPosition - 1]?.id);
+  const priorLessonComplete = lesson.order === 1 || completeMap.has(gradeLessons[lessonPosition - 1]?.id);
+  const isAvailable = completeMap.has(lesson.id) || regionAvailable && priorLessonComplete;
+  const trailUrl = `/learn?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
+  if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">FOLLOW THE TRAIL</span><h1>This lesson is just ahead.</h1><p>Complete your current step first. The trail will bring you here next.</p><a className="primary-button" href={trailUrl}>Back to your trail <span>→</span></a></section></main>;
 
   function advanceStage() { setStage((value) => Math.min(4, value + 1)); }
 
@@ -98,8 +106,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <div className="earned-stars" aria-label={`${stars} out of 3 stars`}>{"★".repeat(stars)}{"☆".repeat(3 - stars)}</div>
           <div className="reward-strip"><span><strong>+{40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0)}</strong> XP</span><span><strong>{stars}/3</strong> stars</span><span><strong>1</strong> step forward</span></div>
           <div className="celebration-actions">
-            <a className="secondary-button" href={demo ? "/learn?demo=1" : "/learn"}>Back to trail</a>
-            <a className="primary-button" href={regionFinished ? `${demo ? `/boss/${lesson.regionId}?demo=1` : `/boss/${lesson.regionId}`}` : `${demo ? `/learn/${following?.slug}?demo=1` : `/learn/${following?.slug}`}`}>{regionFinished ? "Enter the boss quest" : "Take the next step"} <span>→</span></a>
+            <a className="secondary-button" href={trailUrl}>Back to trail</a>
+            <a className="primary-button" href={regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`}>{regionFinished ? "Enter the boss quest" : "Take the next step"} <span>→</span></a>
           </div>
         </section>
       </main>
@@ -110,14 +118,14 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     <main className="learner-shell lesson-shell">
       <LearnerHeader state={state} demo={demo} />
       <div className="lesson-topline">
-        <a href={demo ? "/learn?demo=1" : "/learn"} className="back-link">← Trail</a>
+        <a href={trailUrl} className="back-link">← Trail</a>
         <div className="lesson-progress"><span style={{ width: `${((stage + (stage === 4 ? (questionIndex + 1) / 5 : 0)) / 5) * 100}%` }} /></div>
         <button className="sheet-button" type="button" disabled={!lesson.quickSheet} onClick={() => setSheetOpen(true)}>{lesson.quickSheet ? "Quick Sheet" : "Lesson notes"}</button>
       </div>
       <div className="lesson-layout">
         <aside className="lesson-sidebar">
-          <span className={`lesson-region-badge accent-${lesson.accent}`}>{String(lesson.regionId).padStart(2, "0")}</span>
-          <span className="section-kicker">REGION {lesson.regionId} · LESSON {lesson.order}</span>
+          <span className={`lesson-region-badge accent-${lesson.accent}`}>{String(region?.order ?? 1).padStart(2, "0")}</span>
+          <span className="section-kicker">GRADE {lesson.grade} · REGION {region?.order ?? 1} · LESSON {lesson.order}</span>
           <h1>{lesson.title}</h1>
           <p>{lesson.goal}</p>
           <ol className="stage-list">{stageLabels.map((label, index) => <li className={index < stage ? "done" : index === stage ? "active" : ""} key={label}><span>{index < stage ? "✓" : index + 1}</span>{label}</li>)}</ol>

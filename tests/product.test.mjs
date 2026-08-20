@@ -11,26 +11,31 @@ async function render(path = "/") {
     DB: undefined,
     GOOGLE_CLIENT_ID: "",
     AUTH_HMAC_SECRET: "test-only-hmac-secret",
-    SESSION_SECRET: "test-only-session-secret",
   }, { waitUntil() {}, passThroughOnException() {} });
 }
 
-test("server-renders the finished Math landing page", async () => {
+test("server-renders the Math Grades 7–9 landing page", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Math feels lighter/);
-  assert.match(html, /Small steps\. Real progress\./);
-  assert.match(html, /52/);
-  assert.match(html, /13/);
+  assert.match(html, /A simple place/);
+  assert.match(html, /Hi, I’m Sting/);
+  assert.match(html, /Grades 7, 8, and 9/);
+  assert.match(html, /124/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Building your site/);
   assert.match(html, /og\.png/);
 });
 
-test("ships the complete curriculum structure and all source sheets", async () => {
+test("ships all three curriculum files and all source sheets", async () => {
   const curriculum = await readFile(new URL("../lib/curriculum.ts", import.meta.url), "utf8");
   const lessonDefinitions = curriculum.match(/\blesson\(\d+,\s*\d+,/g) ?? [];
   assert.equal(lessonDefinitions.length, 52);
+  const grade7 = await readFile(new URL("../lib/curriculum-grade7.ts", import.meta.url), "utf8");
+  const grade9 = await readFile(new URL("../lib/curriculum-grade9.ts", import.meta.url), "utf8");
+  assert.match(grade7, /7\.RP\.A\.1/);
+  assert.match(grade7, /7\.SP\.C\.8/);
+  assert.match(grade9, /HSA\.REI\.C\.6/);
+  assert.match(grade9, /HSF\.LE\.A/);
   assert.match(curriculum, /8\.NS\.A\.1/);
   assert.match(curriculum, /8\.EE\.C\.8/);
   assert.match(curriculum, /8\.F\.A\.1/);
@@ -45,12 +50,20 @@ test("keeps real Google profile fields out of persistent schema", async () => {
   for (const forbidden of ["email", "full_name", "profile_photo", "google_sub"]) assert.doesNotMatch(schema, new RegExp(`["]${forbidden}["]`, "i"));
   assert.match(schema, /auth_key/);
   assert.match(schema, /leaderboard_opt_in/);
+  assert.match(schema, /feedback_messages/);
   assert.match(schema, /ON DELETE CASCADE|onDelete: "cascade"/i);
+});
+
+test("keeps feedback rows unlinkable from learner progress", async () => {
+  const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  const feedback = schema.slice(schema.indexOf("feedbackMessages"), schema.indexOf("leagueMembers"));
+  assert.doesNotMatch(feedback, /learnerId|learner_id|authKey|auth_key/);
+  assert.match(feedback, /requestKeyHash/);
 });
 
 test("guards authenticated mutations and production responses", async () => {
   const routes = await Promise.all([
-    "answer", "state", "review",
+    "answer", "state", "review", "feedback",
   ].map((name) => readFile(new URL(`../app/api/${name}/route.ts`, import.meta.url), "utf8")));
   for (const route of routes) {
     assert.match(route, /rejectCrossOriginMutation/);
@@ -60,4 +73,5 @@ test("guards authenticated mutations and production responses", async () => {
   assert.match(worker, /Content-Security-Policy/);
   assert.match(worker, /frame-ancestors 'none'/);
   assert.match(worker, /X-Content-Type-Options/);
+  assert.match(worker, /Strict-Transport-Security/);
 });

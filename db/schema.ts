@@ -95,6 +95,14 @@ export const mutationKeys = sqliteTable("mutation_keys", {
   createdAt: text("created_at").notNull(),
 }, (table) => [primaryKey({ columns: [table.learnerId, table.key] })]);
 
+export const feedbackMessages = sqliteTable("feedback_messages", {
+  id: text("id").primaryKey(),
+  requestKeyHash: text("request_key_hash").notNull(),
+  nickname: text("nickname").notNull(),
+  body: text("body").notNull(),
+  createdAt: text("created_at").notNull(),
+}, (table) => [uniqueIndex("idx_feedback_request_key").on(table.requestKeyHash), index("idx_feedback_created").on(table.createdAt)]);
+
 export const leagueMembers = sqliteTable("league_members", {
   weekKey: text("week_key").notNull(),
   leagueId: text("league_id").notNull(),

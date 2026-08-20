@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "math",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    { "pattern": "math.stingtao.info", "custom_domain": true }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "math-db",
+      "database_id": "e97cf990-9a75-4775-8761-698736ff0cc8",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "public"
+  },
+  "images": { "binding": "IMAGES" },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

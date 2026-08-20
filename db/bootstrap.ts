@@ -4,11 +4,10 @@ type RuntimeEnv = {
   DB?: D1Database;
   GOOGLE_CLIENT_ID?: string;
   AUTH_HMAC_SECRET?: string;
-  SESSION_SECRET?: string;
 };
 
 export function getRuntimeEnv() {
-  return env as unknown as RuntimeEnv;
+  return env as RuntimeEnv;
 }
 
 export function getStore() {
@@ -28,6 +27,7 @@ const schemaStatements = [
   `CREATE TABLE IF NOT EXISTS xp_events (id TEXT PRIMARY KEY, learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, kind TEXT NOT NULL, ref_id TEXT NOT NULL, xp INTEGER NOT NULL, week_key TEXT NOT NULL, created_at TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS daily_rewards (learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, local_date TEXT NOT NULL, reward_step INTEGER NOT NULL, tokens INTEGER NOT NULL, claimed_at TEXT NOT NULL, PRIMARY KEY (learner_id, local_date))`,
   `CREATE TABLE IF NOT EXISTS mutation_keys (learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, key TEXT NOT NULL, route TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (learner_id, key))`,
+  `CREATE TABLE IF NOT EXISTS feedback_messages (id TEXT PRIMARY KEY, request_key_hash TEXT NOT NULL UNIQUE, nickname TEXT NOT NULL, body TEXT NOT NULL, created_at TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS league_members (week_key TEXT NOT NULL, league_id TEXT NOT NULL, learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, joined_at TEXT NOT NULL, PRIMARY KEY (week_key, learner_id))`,
   `CREATE UNIQUE INDEX IF NOT EXISTS idx_learners_auth_key ON learners(auth_key)`,
   `CREATE INDEX IF NOT EXISTS idx_sessions_learner_id ON sessions(learner_id)`,
@@ -38,6 +38,7 @@ const schemaStatements = [
   `CREATE UNIQUE INDEX IF NOT EXISTS idx_xp_unique_award ON xp_events(learner_id, kind, ref_id)`,
   `CREATE INDEX IF NOT EXISTS idx_xp_week ON xp_events(week_key, learner_id)`,
   `CREATE INDEX IF NOT EXISTS idx_league_members_group ON league_members(week_key, league_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback_messages(created_at)`,
 ];
 
 let ready: Promise<void> | null = null;
