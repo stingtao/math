@@ -9,8 +9,15 @@ import { ConceptVisual } from "./ConceptVisual";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
+import { SuccessBurst } from "./SuccessBurst";
 
-const stageLabels = ["Goal", "See it", "Key idea", "Example", "Practice"];
+const stageLabels = [
+  { label: "Goal", icon: "◎" },
+  { label: "See it", icon: "◫" },
+  { label: "Key idea", icon: "◆" },
+  { label: "Example", icon: "→" },
+  { label: "Practice", icon: "✓" },
+];
 
 export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo: boolean }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -97,12 +104,13 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const regionFinished = lesson.order === 4;
     return (
       <main className="learner-shell celebration-page">
+        <SuccessBurst eventKey={`${lesson.id}-complete-${stars}`} large />
         <LearnerHeader state={state} demo={demo} />
         <section className={`celebration-card accent-${lesson.accent}`}>
           <div className="celebration-orbit"><span>✓</span><i /><i /></div>
           <span className="section-kicker">LESSON COMPLETE</span>
           <h1>That step is yours.</h1>
-          <p>You finished every correction in <strong>{lesson.title}</strong>. Accuracy earns stars; persistence moves the trail.</p>
+          <p><strong>{lesson.title}</strong> is complete. Corrections count.</p>
           <div className="earned-stars" aria-label={`${stars} out of 3 stars`}>{"★".repeat(stars)}{"☆".repeat(3 - stars)}</div>
           <div className="reward-strip"><span><strong>+{40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0)}</strong> XP</span><span><strong>{stars}/3</strong> stars</span><span><strong>1</strong> step forward</span></div>
           <div className="celebration-actions">
@@ -128,22 +136,22 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <span className="section-kicker">GRADE {lesson.grade} · REGION {region?.order ?? 1} · LESSON {lesson.order}</span>
           <h1>{lesson.title}</h1>
           <p>{lesson.goal}</p>
-          <ol className="stage-list">{stageLabels.map((label, index) => <li className={index < stage ? "done" : index === stage ? "active" : ""} key={label}><span>{index < stage ? "✓" : index + 1}</span>{label}</li>)}</ol>
+          <ol className="stage-list">{stageLabels.map((item, index) => <li className={index < stage ? "done" : index === stage ? "active" : ""} key={item.label}><span aria-hidden="true">{index < stage ? "✓" : item.icon}</span>{item.label}</li>)}</ol>
           <span className="standard-chip">{lesson.standard}</span>
         </aside>
 
         <section className="lesson-stage" aria-live="polite">
-          {stage === 0 && <StageCard kicker="LEARNING GOAL" title={lesson.goal} copy="You do not need to be fast. Read each step, try the questions, and use a hint whenever it helps." visual={<div className={`goal-mark accent-${lesson.accent}`}><span>01</span><i /></div>} onContinue={advanceStage} />}
-          {stage === 1 && <StageCard kicker="SEE IT" title="Build a picture before a rule." copy="Move through the visual, then describe what stays the same in your own words." visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} />}
-          {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} copy="Keep this sentence close. It is the shortest path through the questions ahead." visual={<div className={`key-idea-card accent-${lesson.accent}`}><span>KEY IDEA</span><strong>{lesson.keyIdea}</strong></div>} onContinue={advanceStage} />}
-          {stage === 3 && <StageCard kicker="WORKED EXAMPLE" title={lesson.example} copy="One step at a time—nothing hidden." visual={<ol className="example-steps">{lesson.exampleSteps.map((step, index) => <li key={step}><span>{index + 1}</span><p>{step}</p></li>)}</ol>} onContinue={advanceStage} />}
+          {stage === 0 && <StageCard kicker="GOAL" title={lesson.goal} copy="Read the goal. Take your time." visual={<div className={`goal-mark accent-${lesson.accent}`}><span>01</span><i /></div>} onContinue={advanceStage} />}
+          {stage === 1 && <StageCard kicker="SEE IT" title="Picture it first." copy="Use the diagram. Notice what stays the same." visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} />}
+          {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} copy="One sentence to remember." visual={<div className={`key-idea-card accent-${lesson.accent}`}><span>KEY IDEA</span><strong>{lesson.keyIdea}</strong></div>} onContinue={advanceStage} />}
+          {stage === 3 && <StageCard kicker="EXAMPLE" title={lesson.example} copy="Follow each step." visual={<ol className="example-steps">{lesson.exampleSteps.map((step, index) => <li key={step}><span>{index + 1}</span><p>{step}</p></li>)}</ol>} onContinue={advanceStage} />}
           {stage === 4 && (
             <div className="practice-stage">
               <div className="practice-heading"><div><span className="section-kicker">PRACTICE · {questionIndex + 1} OF {lesson.practice.length}</span><h2>{question.prompt}</h2></div><div className="practice-dots">{lesson.practice.map((item, index) => <span className={index < questionIndex ? "done" : index === questionIndex ? "active" : ""} key={item.id} />)}</div></div>
               {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} onClick={() => { setAnswer(choice); setFeedback(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
               {showHint && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <div className="feedback-card incorrect"><span>Not yet</span><p>Try this step: {question.hint}</p></div>}
-              {feedback === "correct" && <div className="feedback-card correct"><span>That works</span><p>You corrected the idea. That is what moves the trail.</p></div>}
+              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}`} /><div className="feedback-card correct"><span>Correct</span><p>Next question ready.</p></div></>}
               {errorMessage && <p className="form-error">{errorMessage}</p>}
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={continuePractice}>{questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
             </div>

@@ -6,5 +6,5 @@ export const metadata: Metadata = { title: "Anonymous Profile · Math", descript
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ demo?: string }> }) {
   const params = await searchParams;
-  return <ProfileView demo={params.demo === "1"} clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""} />;
+  return <ProfileView demo={params.demo === "1"} clientId={process.env.GOOGLE_CLIENT_ID ?? ""} />;
 }

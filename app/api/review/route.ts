@@ -1,6 +1,6 @@
 import { isAnswerCorrect, lessonById } from "@/lib/curriculum";
 import { rejectCrossOriginMutation } from "@/lib/http";
-import { claimMutation, completeReviewSet, getDueReviewItems, getLearnerState, learnerFromRequest } from "@/lib/store";
+import { claimMutation, completeReviewSet, getDueReviewItems, getLearnerState, learnerFromRequest, localDate } from "@/lib/store";
 
 export async function GET(request: Request) {
   const learner = await learnerFromRequest(request);
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const questions = due.flatMap((item) => {
     const lesson = lessonById.get(item.lesson_id);
     const question = lesson?.practice.find((entry) => entry.id === item.question_id);
-    return lesson && question ? [{ lessonId: lesson.id, lessonTitle: lesson.title, questionId: question.id, prompt: question.prompt, answer: question.answer, hint: question.hint, choices: question.choices }] : [];
+    return lesson && question ? [{ lessonId: lesson.id, lessonTitle: lesson.title, questionId: question.id, prompt: question.prompt, hint: question.hint, choices: question.choices }] : [];
   });
   return Response.json({ questions });
 }
@@ -19,13 +19,33 @@ export async function POST(request: Request) {
   if (crossOrigin) return crossOrigin;
   const learner = await learnerFromRequest(request);
   if (!learner) return Response.json({ error: "Sign in to continue." }, { status: 401 });
-  const body = await request.json() as { answers?: Array<{ lessonId: string; questionId: string; answer: string }> };
-  if (!body.answers?.length) return Response.json({ error: "No review answers were submitted." }, { status: 400 });
+  const body = await request.json() as {
+    action?: "check" | "complete";
+    lessonId?: string;
+    questionId?: string;
+    answer?: string;
+    answers?: Array<{ lessonId: string; questionId: string; answer: string }>;
+  };
+  const due = await getDueReviewItems(learner.id);
+  if (body.action === "check") {
+    const dueItem = due.find((item) => item.lesson_id === body.lessonId && item.question_id === body.questionId);
+    const question = dueItem ? lessonById.get(dueItem.lesson_id)?.practice.find((item) => item.id === dueItem.question_id) : null;
+    if (!question || typeof body.answer !== "string") return Response.json({ error: "That review question is not due." }, { status: 400 });
+    const correct = isAnswerCorrect(body.answer, question.answer);
+    return Response.json({ correct, hint: correct ? null : question.hint }, { headers: { "Cache-Control": "no-store" } });
+  }
+  if (body.action !== "complete" || !body.answers?.length) return Response.json({ error: "No review answers were submitted." }, { status: 400 });
+  if (body.answers.length !== due.length) return Response.json({ error: "Complete every question in today’s review set." }, { status: 400 });
+  const dueKeys = new Set(due.map((item) => `${item.lesson_id}:${item.question_id}`));
+  if (body.answers.some((entry) => !dueKeys.has(`${entry.lessonId}:${entry.questionId}`))) {
+    return Response.json({ error: "The review set changed. Reload and try again." }, { status: 409 });
+  }
   const results = body.answers.map((entry) => {
     const question = lessonById.get(entry.lessonId)?.practice.find((item) => item.id === entry.questionId);
     return { lessonId: entry.lessonId, questionId: entry.questionId, correct: Boolean(question && isAnswerCorrect(entry.answer, question.answer)) };
   });
+  if (results.some((entry) => !entry.correct)) return Response.json({ error: "Correct each review question before finishing." }, { status: 400 });
   const isNew = await claimMutation(learner.id, request.headers.get("Idempotency-Key"), "review");
-  if (isNew) await completeReviewSet(learner.id, results);
+  if (isNew) await completeReviewSet(learner.id, results, localDate(learner.timezone));
   return Response.json({ results, state: await getLearnerState(learner.id) });
 }

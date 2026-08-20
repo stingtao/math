@@ -70,6 +70,23 @@ export const bossProgress = sqliteTable("boss_progress", {
   clearedAt: text("cleared_at"),
 }, (table) => [primaryKey({ columns: [table.learnerId, table.regionId] })]);
 
+export const bossAttempts = sqliteTable("boss_attempts", {
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  regionId: integer("region_id").notNull(),
+  attemptId: text("attempt_id").notNull(),
+  currentQuestion: integer("current_question").notNull().default(0),
+  hearts: integer("hearts").notNull().default(3),
+  failed: integer("failed", { mode: "boolean" }).notNull().default(false),
+  failedQuestion: integer("failed_question"),
+  repairStep: integer("repair_step").notNull().default(0),
+  cleared: integer("cleared", { mode: "boolean" }).notNull().default(false),
+  startedAt: text("started_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.learnerId, table.regionId, table.attemptId] }),
+  index("idx_boss_attempts_learner").on(table.learnerId, table.updatedAt),
+]);
+
 export const xpEvents = sqliteTable("xp_events", {
   id: text("id").primaryKey(),
   learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),

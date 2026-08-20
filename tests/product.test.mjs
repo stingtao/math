@@ -63,7 +63,7 @@ test("keeps feedback rows unlinkable from learner progress", async () => {
 
 test("guards authenticated mutations and production responses", async () => {
   const routes = await Promise.all([
-    "answer", "state", "review", "feedback",
+    "answer", "state", "review", "feedback", "boss",
   ].map((name) => readFile(new URL(`../app/api/${name}/route.ts`, import.meta.url), "utf8")));
   for (const route of routes) {
     assert.match(route, /rejectCrossOriginMutation/);
@@ -74,4 +74,36 @@ test("guards authenticated mutations and production responses", async () => {
   assert.match(worker, /frame-ancestors 'none'/);
   assert.match(worker, /X-Content-Type-Options/);
   assert.match(worker, /Strict-Transport-Security/);
+});
+
+test("keeps progression and boss hearts server-authoritative", async () => {
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const stateRoute = await readFile(new URL("../app/api/state/route.ts", import.meta.url), "utf8");
+  const bossRoute = await readFile(new URL("../app/api/boss/route.ts", import.meta.url), "utf8");
+  const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  assert.match(store, /assertLessonUnlocked/);
+  assert.match(store, /assertBossUnlocked/);
+  assert.match(store, /UPDATE boss_attempts SET hearts/);
+  assert.match(store, /checkBossRepairAnswer/);
+  assert.match(schema, /bossAttempts/);
+  assert.match(bossRoute, /claimMutation/);
+  assert.doesNotMatch(stateRoute, /action: "completeBoss"/);
+});
+
+test("does not send review answers to authenticated clients", async () => {
+  const route = await readFile(new URL("../app/api/review/route.ts", import.meta.url), "utf8");
+  const getHandler = route.slice(route.indexOf("export async function GET"), route.indexOf("export async function POST"));
+  assert.doesNotMatch(getHandler, /answer:\s*question\.answer/);
+  assert.match(route, /action === "check"/);
+  assert.match(route, /results\.some\(\(entry\) => !entry\.correct\)/);
+});
+
+test("ships five extensible success patterns and reduced-motion handling", async () => {
+  const component = await readFile(new URL("../app/components/SuccessBurst.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  for (const pattern of ["orbit", "confetti", "ripple", "spark", "lift"]) assert.match(component, new RegExp(`"${pattern}"`));
+  assert.match(css, /\.success-confetti/);
+  assert.match(css, /\.success-ripple/);
+  assert.match(css, /prefers-reduced-motion/);
+  assert.match(css, /animation:\s*none !important/);
 });

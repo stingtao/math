@@ -1,5 +1,5 @@
 import { ensureSchema, getStore } from "@/db/bootstrap";
-import { lessons, regions } from "@/lib/curriculum";
+import { getGradeCurriculum, isAnswerCorrect, lessons, regions } from "@/lib/curriculum";
 import { getCookie, randomToken, sha256 } from "@/lib/security";
 
 const adjectives = ["Calm", "Bright", "Brave", "Clever", "Curious", "Gentle", "Kind", "Nimble", "Quiet", "Swift", "Wise", "Bold"];
@@ -63,11 +63,11 @@ export function weekKey(date = new Date()) {
   return value.toISOString().slice(0, 10);
 }
 
-function localDate(timezone: string) {
+export function localDate(timezone: string, date = new Date()) {
   try {
-    return new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    return new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
   } catch {
-    return new Date().toISOString().slice(0, 10);
+    return date.toISOString().slice(0, 10);
   }
 }
 
@@ -163,8 +163,35 @@ export async function getLearnerState(learnerId: string) {
   };
 }
 
+export async function assertLessonUnlocked(learnerId: string, lessonId: string) {
+  await ensureSchema();
+  const lesson = lessons.find((item) => item.id === lessonId);
+  if (!lesson) throw new Error("Lesson not found.");
+  const db = getStore();
+  const alreadyComplete = await db.prepare("SELECT 1 AS complete FROM lesson_progress WHERE learner_id = ? AND lesson_id = ?")
+    .bind(learnerId, lesson.id).first<{ complete: number }>();
+  if (alreadyComplete) return lesson;
+  const curriculum = getGradeCurriculum(lesson.grade);
+  const regionIndex = curriculum.regions.findIndex((item) => item.id === lesson.regionId);
+  const region = curriculum.regions[regionIndex];
+  if (!region) throw new Error("Lesson region not found.");
+  if (regionIndex > 0) {
+    const priorBoss = await db.prepare("SELECT cleared FROM boss_progress WHERE learner_id = ? AND region_id = ?")
+      .bind(learnerId, curriculum.regions[regionIndex - 1].id).first<{ cleared: number }>();
+    if (!priorBoss?.cleared) throw new Error("Clear the previous region boss first.");
+  }
+  if (lesson.order > 1) {
+    const priorLesson = region.lessons[lesson.order - 2];
+    const priorComplete = await db.prepare("SELECT 1 AS complete FROM lesson_progress WHERE learner_id = ? AND lesson_id = ?")
+      .bind(learnerId, priorLesson.id).first<{ complete: number }>();
+    if (!priorComplete) throw new Error("Complete the previous lesson first.");
+  }
+  return lesson;
+}
+
 export async function recordAnswer(learnerId: string, lessonId: string, questionId: string, correct: boolean, usedHint: boolean) {
   await ensureSchema();
+  await assertLessonUnlocked(learnerId, lessonId);
   const db = getStore();
   const now = new Date();
   const current = await db.prepare("SELECT first_correct, corrected, attempts, hints_used FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
@@ -176,7 +203,7 @@ export async function recordAnswer(learnerId: string, lessonId: string, question
     await db.prepare("UPDATE lesson_attempts SET corrected = ?, attempts = attempts + 1, hints_used = hints_used + ?, updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
       .bind(current.corrected || correct ? 1 : 0, usedHint ? 1 : 0, now.toISOString(), learnerId, lessonId, questionId).run();
   }
-  if (!correct) {
+  if (!correct || usedHint) {
     const due = new Date(now.getTime() + 86_400_000).toISOString();
     await db.prepare("INSERT INTO review_items (learner_id, lesson_id, question_id, stage, due_at) VALUES (?, ?, ?, 0, ?) ON CONFLICT(learner_id, lesson_id, question_id) DO UPDATE SET due_at = excluded.due_at")
       .bind(learnerId, lessonId, questionId, due).run();
@@ -205,7 +232,7 @@ export async function getDueReviewItems(learnerId: string) {
   return result.results;
 }
 
-export async function completeReviewSet(learnerId: string, results: Array<{ lessonId: string; questionId: string; correct: boolean }>) {
+export async function completeReviewSet(learnerId: string, results: Array<{ lessonId: string; questionId: string; correct: boolean }>, rewardDate: string) {
   await ensureSchema();
   const db = getStore();
   const now = new Date();
@@ -223,14 +250,13 @@ export async function completeReviewSet(learnerId: string, results: Array<{ less
         .bind(nextStage, new Date(now.getTime() + days * 86_400_000).toISOString(), learnerId, result.lessonId, result.questionId).run();
     }
   }
-  await awardXp(learnerId, "review", now.toISOString().slice(0, 10), 20);
+  await awardXp(learnerId, "review", rewardDate, 20);
 }
 
 export async function completeLesson(learnerId: string, lessonId: string) {
   await ensureSchema();
   const db = getStore();
-  const lesson = lessons.find((item) => item.id === lessonId);
-  if (!lesson) throw new Error("Lesson not found.");
+  const lesson = await assertLessonUnlocked(learnerId, lessonId);
   const summary = await db.prepare("SELECT COUNT(*) AS total, SUM(first_correct) AS first_correct, SUM(hints_used) AS hints FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND corrected = 1")
     .bind(learnerId, lessonId).first<{ total: number; first_correct: number; hints: number }>();
   if (Number(summary?.total ?? 0) < lesson.practice.length) throw new Error("Correct every practice question before completing the lesson.");
@@ -242,15 +268,138 @@ export async function completeLesson(learnerId: string, lessonId: string) {
   return { stars };
 }
 
-export async function completeBoss(learnerId: string, regionId: number, hearts: number) {
+type BossAttemptRow = {
+  learner_id: string;
+  region_id: number;
+  attempt_id: string;
+  current_question: number;
+  hearts: number;
+  failed: number;
+  failed_question: number | null;
+  repair_step: number;
+  cleared: number;
+  started_at: string;
+  updated_at: string;
+};
+
+function validateBossAttemptId(attemptId: string) {
+  if (!/^[A-Za-z0-9_-]{12,80}$/.test(attemptId)) throw new Error("Start a new boss attempt first.");
+}
+
+function publicBossAttempt(row: BossAttemptRow) {
+  return {
+    attemptId: row.attempt_id,
+    questionIndex: row.current_question,
+    hearts: row.hearts,
+    failed: Boolean(row.failed),
+    failedQuestion: row.failed_question,
+    repairStep: row.repair_step,
+    cleared: Boolean(row.cleared),
+  };
+}
+
+export async function assertBossUnlocked(learnerId: string, regionId: number) {
   await ensureSchema();
-  const db = getStore();
   const region = regions.find((item) => item.id === regionId);
   if (!region) throw new Error("Region not found.");
   const placeholders = region.lessons.map(() => "?").join(",");
-  const completed = await db.prepare(`SELECT COUNT(*) AS total FROM lesson_progress WHERE learner_id = ? AND lesson_id IN (${placeholders})`)
+  const completed = await getStore().prepare(`SELECT COUNT(*) AS total FROM lesson_progress WHERE learner_id = ? AND lesson_id IN (${placeholders})`)
     .bind(learnerId, ...region.lessons.map((item) => item.id)).first<{ total: number }>();
-  if (Number(completed?.total ?? 0) < 4) throw new Error("Complete all four lessons first.");
+  if (Number(completed?.total ?? 0) < region.lessons.length) throw new Error("Complete all four lessons first.");
+  return region;
+}
+
+export async function getActiveBossAttempt(learnerId: string, regionId: number) {
+  await ensureSchema();
+  const row = await getStore().prepare(`SELECT learner_id, region_id, attempt_id, current_question, hearts, failed, failed_question, repair_step, cleared, started_at, updated_at
+    FROM boss_attempts WHERE learner_id = ? AND region_id = ? AND cleared = 0 ORDER BY updated_at DESC LIMIT 1`)
+    .bind(learnerId, regionId).first<BossAttemptRow>();
+  return row ? publicBossAttempt(row) : null;
+}
+
+async function getOrCreateBossAttempt(learnerId: string, regionId: number, attemptId: string) {
+  validateBossAttemptId(attemptId);
+  await assertBossUnlocked(learnerId, regionId);
+  const db = getStore();
+  const active = await db.prepare(`SELECT learner_id, region_id, attempt_id, current_question, hearts, failed, failed_question, repair_step, cleared, started_at, updated_at
+    FROM boss_attempts WHERE learner_id = ? AND region_id = ? AND cleared = 0 ORDER BY updated_at DESC LIMIT 1`)
+    .bind(learnerId, regionId).first<BossAttemptRow>();
+  if (active) {
+    if (active.attempt_id !== attemptId) throw new Error("Continue the current boss attempt before starting another.");
+    return active;
+  }
+  const now = new Date().toISOString();
+  await db.prepare(`INSERT INTO boss_attempts
+    (learner_id, region_id, attempt_id, current_question, hearts, failed, repair_step, cleared, started_at, updated_at)
+    VALUES (?, ?, ?, 0, 3, 0, 0, 0, ?, ?)`).bind(learnerId, regionId, attemptId, now, now).run();
+  return {
+    learner_id: learnerId,
+    region_id: regionId,
+    attempt_id: attemptId,
+    current_question: 0,
+    hearts: 3,
+    failed: 0,
+    failed_question: null,
+    repair_step: 0,
+    cleared: 0,
+    started_at: now,
+    updated_at: now,
+  } satisfies BossAttemptRow;
+}
+
+export async function checkBossAnswer(learnerId: string, regionId: number, attemptId: string, questionIndex: number, answer: string) {
+  const region = await assertBossUnlocked(learnerId, regionId);
+  const questions = [...region.lessons.map((item) => item.practice[0]), region.lessons[0].practice[1]];
+  if (!Number.isInteger(questionIndex) || questionIndex < 0 || questionIndex >= questions.length) throw new Error("Boss question not found.");
+  const attempt = await getOrCreateBossAttempt(learnerId, regionId, attemptId);
+  if (attempt.failed) return { correct: false, hint: questions[attempt.current_question]?.hint ?? "Complete the repair questions first.", ...publicBossAttempt(attempt) };
+  if (attempt.current_question !== questionIndex) throw new Error("Continue from the current boss question.");
+  const correct = isAnswerCorrect(answer, questions[questionIndex].answer);
+  const db = getStore();
+  const now = new Date().toISOString();
+  if (!correct) {
+    const hearts = Math.max(0, attempt.hearts - 1);
+    const failed = hearts === 0;
+    await db.prepare("UPDATE boss_attempts SET hearts = ?, failed = ?, failed_question = CASE WHEN ? = 1 THEN ? ELSE failed_question END, updated_at = ? WHERE learner_id = ? AND region_id = ? AND attempt_id = ?")
+      .bind(hearts, failed ? 1 : 0, failed ? 1 : 0, questionIndex, now, learnerId, regionId, attemptId).run();
+    return { correct: false, hint: questions[questionIndex].hint, attemptId, questionIndex, hearts, failed, failedQuestion: failed ? questionIndex : attempt.failed_question, repairStep: attempt.repair_step, cleared: false };
+  }
+  const nextQuestion = questionIndex + 1;
+  const cleared = nextQuestion === questions.length;
+  await db.prepare("UPDATE boss_attempts SET current_question = ?, cleared = ?, updated_at = ? WHERE learner_id = ? AND region_id = ? AND attempt_id = ?")
+    .bind(nextQuestion, cleared ? 1 : 0, now, learnerId, regionId, attemptId).run();
+  if (cleared) await completeBoss(learnerId, regionId, attempt.hearts);
+  return { correct: true, hint: null, attemptId, questionIndex: nextQuestion, hearts: attempt.hearts, failed: false, failedQuestion: null, repairStep: 0, cleared };
+}
+
+export async function checkBossRepairAnswer(learnerId: string, regionId: number, attemptId: string, repairIndex: number, answer: string) {
+  const region = await assertBossUnlocked(learnerId, regionId);
+  validateBossAttemptId(attemptId);
+  const db = getStore();
+  const attempt = await db.prepare(`SELECT learner_id, region_id, attempt_id, current_question, hearts, failed, failed_question, repair_step, cleared, started_at, updated_at
+    FROM boss_attempts WHERE learner_id = ? AND region_id = ? AND attempt_id = ?`).bind(learnerId, regionId, attemptId).first<BossAttemptRow>();
+  if (!attempt || !attempt.failed || attempt.failed_question === null) throw new Error("This boss attempt does not need repair.");
+  if (repairIndex !== attempt.repair_step || repairIndex < 0 || repairIndex > 1) throw new Error("Complete the repair questions in order.");
+  const lesson = region.lessons[Math.min(attempt.failed_question, region.lessons.length - 1)];
+  const question = lesson.practice[repairIndex + 2];
+  const correct = isAnswerCorrect(answer, question.answer);
+  if (!correct) return { correct: false, hint: question.hint, ...publicBossAttempt(attempt), repaired: false };
+  const repaired = repairIndex === 1;
+  const now = new Date().toISOString();
+  if (repaired) {
+    await db.prepare("UPDATE boss_attempts SET current_question = 0, hearts = 3, failed = 0, failed_question = NULL, repair_step = 0, updated_at = ? WHERE learner_id = ? AND region_id = ? AND attempt_id = ?")
+      .bind(now, learnerId, regionId, attemptId).run();
+  } else {
+    await db.prepare("UPDATE boss_attempts SET repair_step = 1, updated_at = ? WHERE learner_id = ? AND region_id = ? AND attempt_id = ?")
+      .bind(now, learnerId, regionId, attemptId).run();
+  }
+  return { correct: true, hint: null, attemptId, questionIndex: repaired ? 0 : attempt.current_question, hearts: repaired ? 3 : attempt.hearts, failed: !repaired, failedQuestion: repaired ? null : attempt.failed_question, repairStep: repaired ? 0 : 1, cleared: false, repaired };
+}
+
+export async function completeBoss(learnerId: string, regionId: number, hearts: number) {
+  await ensureSchema();
+  const db = getStore();
+  await assertBossUnlocked(learnerId, regionId);
   await db.prepare("INSERT INTO boss_progress (learner_id, region_id, cleared, best_hearts, cleared_at) VALUES (?, ?, 1, ?, ?) ON CONFLICT(learner_id, region_id) DO UPDATE SET cleared = 1, best_hearts = MAX(best_hearts, excluded.best_hearts), cleared_at = COALESCE(cleared_at, excluded.cleared_at)")
     .bind(learnerId, regionId, hearts, new Date().toISOString()).run();
   await awardXp(learnerId, "boss", String(regionId), 100);

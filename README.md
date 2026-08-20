@@ -14,7 +14,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set a Google Web client ID in both `GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, then set a strong random value for `AUTH_HMAC_SECRET`. Without a Google client ID, the site offers a browser-only demo and does not persist progress.
+Set a Google Web client ID in the `GOOGLE_CLIENT_ID` Worker binding, then set a strong random value for `AUTH_HMAC_SECRET`. Without a Google client ID, the site offers a browser-only demo and does not persist progress.
 
 ## Cloudflare
 

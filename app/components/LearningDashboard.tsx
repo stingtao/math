@@ -6,6 +6,7 @@ import { saveDemoState } from "@/lib/learner-state";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
+import { SuccessBurst } from "./SuccessBurst";
 
 export function LearningDashboard({ demo, grade }: { demo: boolean; grade: number }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -55,13 +56,14 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   return (
     <main className="learner-shell">
       <LearnerHeader state={state} demo={demo} />
+      {rewardMessage.startsWith("+") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} />}
       {demo && <div className="demo-banner"><span>Preview mode</span><p>Your progress stays in this browser session.</p><a href="/#join">Use Google to keep it for next time</a></div>}
       <section className="dashboard-wrap">
         <nav className="grade-switcher" aria-label="Choose a grade">
           {[7, 8, 9].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${demo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
         </nav>
         <div className="dashboard-heading">
-          <div><span className="section-kicker">WELCOME BACK, {state.profile.nickname.toUpperCase()}</span><h1>Ready for one small win?</h1><p>Your trail is waiting exactly where you left it.</p></div>
+          <div><span className="section-kicker">{state.profile.nickname.toUpperCase()}</span><h1>Choose one next step.</h1><p>Your progress is saved here.</p></div>
           <div className="dashboard-summary">
             <div><strong>{state.totalXp}</strong><span>Total XP</span></div>
             <div><strong>{gradeCompleted}<small>/{gradeLessons.length}</small></strong><span>Grade {grade} lessons</span></div>
@@ -77,7 +79,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 
           <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : ""}`}>
             <div className="daily-card-top"><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">DAILY TRAIL REWARD</span></div>
-            <h2>{state.dailyRewardClaimed ? "Reward collected" : "A little boost for showing up."}</h2>
+            <h2>{state.dailyRewardClaimed ? "Reward collected" : "Today’s reward"}</h2>
             <div className="reward-calendar" aria-label="Seven-claim reward cycle">
               {[10, 12, 14, 16, 18, 20, 30].map((amount, index) => <span className={index + 1 < state.profile.rewardStep || state.dailyRewardClaimed && index + 1 === state.profile.rewardStep ? "done" : index + 1 === (state.profile.rewardStep % 7) + 1 ? "today" : ""} key={amount}>{index === 6 ? "◇" : amount}</span>)}
             </div>
@@ -87,7 +89,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         </div>
 
         <section className="trail-overview">
-          <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade}</span><h2>The full learning trail</h2></div><p>{curriculum.subtitle}. Finish every correction to move forward; stars do not block progress.</p></div>
+          <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade}</span><h2>Learning map</h2></div><p>Correct every question to continue. Stars do not block progress.</p></div>
           <div className="world-list">
             {curriculum.regions.map((region, regionIndex) => {
               const regionComplete = region.lessons.every((item) => completed.has(item.id));

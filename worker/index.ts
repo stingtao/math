@@ -3,7 +3,6 @@ import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } fr
 import handler from "vinext/server/app-router-entry";
 
 interface WorkerEnv extends Cloudflare.Env {
-  GOOGLE_CLIENT_ID: string;
   AUTH_HMAC_SECRET: string;
 }
 

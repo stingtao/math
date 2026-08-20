@@ -1,13 +1,11 @@
-import { isAnswerCorrect, regions } from "@/lib/curriculum";
 import { getRuntimeEnv } from "@/db/bootstrap";
 import { verifyGoogleCredential } from "@/lib/google-auth";
 import { rejectCrossOriginMutation } from "@/lib/http";
 import { clearSessionCookie, hmacIdentity } from "@/lib/security";
-import { claimDailyReward, claimMutation, completeBoss, completeLesson, deleteLearner, getLearnerState, learnerFromRequest, purchaseFrame, updateProfile } from "@/lib/store";
+import { claimDailyReward, claimMutation, completeLesson, deleteLearner, getLearnerState, learnerFromRequest, purchaseFrame, updateProfile } from "@/lib/store";
 
 type StateAction =
   | { action: "completeLesson"; lessonId: string }
-  | { action: "completeBoss"; regionId: number; answers: string[]; hearts: number }
   | { action: "claimDaily"; timezone: string }
   | { action: "reroll" }
   | { action: "leaderboard"; enabled: boolean }
@@ -26,16 +24,6 @@ export async function POST(request: Request) {
     if (body.action === "completeLesson") {
       const result = await completeLesson(learner.id, body.lessonId);
       return Response.json({ ...result, state: await getLearnerState(learner.id) });
-    }
-    if (body.action === "completeBoss") {
-      const region = regions.find((item) => item.id === body.regionId);
-      if (!region) throw new Error("Region not found.");
-      const questions = [...region.lessons.map((item) => item.practice[0]), region.lessons[0].practice[1]];
-      if (body.answers.length !== questions.length || questions.some((question, index) => !isAnswerCorrect(body.answers[index] ?? "", question.answer))) {
-        throw new Error("Finish every boss correction before clearing the quest.");
-      }
-      await completeBoss(learner.id, body.regionId, Math.max(1, Math.min(3, body.hearts)));
-      return Response.json({ state: await getLearnerState(learner.id) });
     }
     if (body.action === "claimDaily") {
       const reward = await claimDailyReward(learner.id, body.timezone || learner.timezone);
