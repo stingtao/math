@@ -1247,6 +1247,10 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .context-model-area-product .context-scene img { object-position: center 47%; }
 .context-model-parabola .context-scene img { object-position: center 47%; }
 .context-model-exponential .context-scene img { object-position: center 47%; }
+.context-model-scale-drawing .context-scene img { object-position: center 48%; }
+.context-model-random-sample .context-scene img { object-position: center 47%; }
+.context-model-arithmetic-sequence .context-scene img { object-position: center 48%; }
+.context-model-quadratic-roots .context-scene img { object-position: center 45%; }
 
 .ratio-context-model { width: min(480px, 100%); display: grid; grid-template-columns: 1fr 28px 1fr 28px 1.1fr; align-items: center; gap: 6px; }
 .ratio-context-model > span,
@@ -1316,6 +1320,51 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .exponential-context-model > span { width: min(58px, 15%); position: relative; display: grid; place-items: start center; border-radius: 9px 9px 0 0; color: white; background: linear-gradient(180deg, var(--coral), var(--violet)); }
 .exponential-context-model > span b { padding-top: 5px; font-size: 10px; }
 
+.scale-drawing-context-model { width: min(500px, 100%); display: grid; grid-template-columns: 1fr 22px 1fr 34px 1.25fr; align-items: center; gap: 8px; }
+.scale-drawing-context-model > span,
+.scale-drawing-context-model > strong { min-height: 66px; padding: 9px 10px; display: grid; place-items: center; align-content: center; gap: 3px; border-radius: 13px; background: #eaf1f5; }
+.scale-drawing-context-model > strong { color: white; background: var(--blue); }
+.scale-drawing-context-model b { font-size: 18px; }
+.scale-drawing-context-model small { color: var(--muted); font-size: 9px; font-weight: 800; text-align: center; }
+.scale-drawing-context-model > strong small { color: white; opacity: .86; }
+.scale-drawing-context-model > i,
+.scale-drawing-context-model > em { color: var(--blue); font-size: 17px; font-style: normal; font-weight: 900; text-align: center; }
+.scale-drawing-context-model > em { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+
+.random-sample-context-model { width: min(500px, 100%); display: grid; grid-template-columns: 1.2fr 90px .8fr; align-items: center; gap: 14px; }
+.sample-population,
+.sample-result { min-height: 91px; padding: 23px 13px 12px; position: relative; display: grid; grid-template-columns: repeat(5, 1fr); place-items: center; gap: 7px; border: 2px solid #cbdbe5; border-radius: 15px; background: #f1f6f8; }
+.sample-result { grid-template-columns: repeat(5, 1fr); border-color: #bfe0d7; background: #ebf8f4; }
+.random-sample-context-model small { position: absolute; left: 11px; top: 6px; color: var(--muted); font-size: 8px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.random-sample-context-model span { width: 16px; height: 16px; display: block; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 2px 5px rgb(23 50 79 / 18%); }
+.random-sample-context-model span[data-group="1"] { background: var(--teal); }
+.random-sample-context-model span[data-group="2"] { background: var(--coral); }
+.random-sample-context-model span[data-group="3"] { background: var(--violet); }
+.random-sample-context-model span[data-group="4"] { background: var(--gold); }
+.random-sample-context-model > i { min-height: 34px; display: grid; place-items: center; position: relative; color: var(--teal); font-size: 9px; font-style: normal; font-weight: 900; text-transform: uppercase; }
+.random-sample-context-model > i::before { content: ""; width: 100%; height: 4px; position: absolute; z-index: -1; border-radius: 99px; background: #c9ded9; }
+.random-sample-context-model > i::after { content: "›"; width: 28px; height: 28px; position: absolute; right: -2px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--teal); font-size: 20px; }
+
+.arithmetic-sequence-context-model { width: min(500px, 100%); display: grid; gap: 12px; justify-items: center; }
+.arithmetic-sequence-context-model > div { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; }
+.arithmetic-sequence-context-model > div > span { min-width: 0; display: grid; grid-template-columns: 1fr 28px; align-items: center; }
+.arithmetic-sequence-context-model > div > span:last-child { grid-template-columns: 1fr; }
+.arithmetic-sequence-context-model b { min-height: 48px; display: grid; place-items: center; border-radius: 13px; color: white; background: var(--violet); font-size: 18px; }
+.arithmetic-sequence-context-model i { color: var(--coral); font-size: 10px; font-style: normal; font-weight: 900; text-align: center; }
+.arithmetic-sequence-context-model > strong { padding: 8px 13px; border-radius: 10px; color: var(--navy); background: #edf2f5; font-size: 14px; }
+
+.quadratic-roots-context-model { width: min(430px, 100%); display: grid; grid-template-columns: minmax(230px, 1fr) auto; align-items: center; gap: 18px; }
+.quadratic-roots-context-model > div { width: 100%; height: 135px; position: relative; overflow: hidden; background-image: linear-gradient(#e0e8ed 1px, transparent 1px), linear-gradient(90deg, #e0e8ed 1px, transparent 1px); background-size: 29px 23px; }
+.quadratic-roots-context-model .root-axis-x,
+.quadratic-roots-context-model .root-axis-y { position: absolute; background: var(--navy); }
+.quadratic-roots-context-model .root-axis-x { left: 0; right: 0; bottom: 25px; height: 2px; }
+.quadratic-roots-context-model .root-axis-y { top: 0; bottom: 0; left: 47%; width: 2px; }
+.quadratic-roots-context-model .root-parabola { width: 180px; height: 96px; position: absolute; left: 47%; bottom: 24px; border: 4px solid var(--coral); border-bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; transform: translateX(-50%); }
+.quadratic-roots-context-model .root-point { width: 25px; height: 25px; position: absolute; bottom: 13px; display: grid; place-items: center; border: 3px solid white; border-radius: 50%; color: white; background: var(--teal); box-shadow: 0 3px 8px rgb(23 50 79 / 22%); font-size: 9px; }
+.quadratic-roots-context-model .root-point-one { left: calc(47% - 102px); }
+.quadratic-roots-context-model .root-point-two { left: calc(47% + 77px); }
+.quadratic-roots-context-model > strong { padding: 11px 12px; border-radius: 11px; color: white; background: var(--violet); font-size: 12px; white-space: nowrap; }
+
 @media (max-width: 760px) {
   .ratio-context-model { grid-template-columns: 1fr 22px 1fr 22px 1fr; }
   .ratio-context-model > span,
@@ -1327,6 +1376,17 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .area-product-context-model > div { width: 125px; height: 96px; }
   .area-product-context-model > strong { padding-inline: 8px; font-size: 12px; }
   .exponential-context-model { gap: 7px; }
+  .scale-drawing-context-model { grid-template-columns: 1fr 18px 1fr; }
+  .scale-drawing-context-model > em { grid-column: 1 / -1; height: 0; overflow: hidden; }
+  .scale-drawing-context-model > strong { grid-column: 1 / -1; width: 100%; min-height: 48px; }
+  .random-sample-context-model { grid-template-columns: 1fr 68px .72fr; gap: 8px; }
+  .sample-population,
+  .sample-result { gap: 4px; padding-inline: 8px; }
+  .random-sample-context-model span { width: 14px; height: 14px; }
+  .arithmetic-sequence-context-model b { min-height: 43px; font-size: 16px; }
+  .quadratic-roots-context-model { grid-template-columns: 1fr; gap: 8px; }
+  .quadratic-roots-context-model > div { height: 117px; }
+  .quadratic-roots-context-model > strong { width: 100%; text-align: center; }
 }
 
 @media (max-width: 420px) {
@@ -1339,6 +1399,16 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .area-product-context-model { grid-template-columns: 1fr; justify-items: center; gap: 9px; }
   .area-product-context-model > div { width: 170px; height: 91px; }
   .area-product-context-model > strong { width: 100%; }
+  .scale-drawing-context-model b { font-size: 16px; }
+  .random-sample-context-model { grid-template-columns: 1fr; }
+  .sample-population { min-height: 77px; grid-template-columns: repeat(10, 1fr); }
+  .sample-result { min-height: 62px; }
+  .random-sample-context-model > i { min-height: 23px; }
+  .random-sample-context-model > i::before { width: 4px; height: 100%; }
+  .random-sample-context-model > i::after { right: 50%; bottom: -3px; transform: translateX(50%) rotate(90deg); }
+  .arithmetic-sequence-context-model > div > span { grid-template-columns: 1fr 22px; }
+  .arithmetic-sequence-context-model b { min-height: 39px; font-size: 14px; }
+  .arithmetic-sequence-context-model i { font-size: 9px; }
 }
 
 /* Visible game loop, live star goals, and lesson-key rewards. */

@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential";
+  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -158,6 +158,34 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Equal multiplicative changes create growth that speeds up over time.",
     model: "exponential",
   },
+  "g7-scale-drawings": {
+    src: "/visuals/scale-drawing-studio-context.jpg",
+    alt: "A blueprint and a finished miniature building showing the same footprint at proportional sizes",
+    headline: "1 cm : 4 m · 6 cm represents 24 m",
+    copy: "A scale drawing multiplies every matching length by the same scale factor.",
+    model: "scale-drawing",
+  },
+  "g7-random-samples": {
+    src: "/visuals/random-sample-context.jpg",
+    alt: "A sampling machine drawing a mixed group of colored pieces from a much larger population",
+    headline: "random selection reduces bias",
+    copy: "Give every member a fair chance so the sample can represent the whole population.",
+    model: "random-sample",
+  },
+  "g9-arithmetic-sequences": {
+    src: "/visuals/arithmetic-sequence-context.jpg",
+    alt: "An architectural stair installation gaining an equal group of blocks on every new tier",
+    headline: "4, 7, 10, 13, … adds 3 each time",
+    copy: "A constant difference builds an arithmetic sequence one equal step at a time.",
+    model: "arithmetic-sequence",
+  },
+  "g9-quadratic-formula": {
+    src: "/visuals/quadratic-roots-context.jpg",
+    alt: "A symmetric parabolic arc meeting a horizontal field at two highlighted points",
+    headline: "x² − 2x − 3 = 0 → x = −1 or 3",
+    copy: "The quadratic formula finds the x-values where a parabola meets the horizontal axis.",
+    model: "quadratic-roots",
+  },
 };
 
 function mathFor(visual: string) {
@@ -218,6 +246,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "area-product" && <div className="area-product-context-model" aria-hidden="true"><div><span>x²</span><span>3x</span><span>2x</span><span>6</span></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("(x+2)(x+3)=x^2+5x+6", { throwOnError: false }) }} /></div>}
         {scene.model === "parabola" && <div className="parabola-context-model" aria-hidden="true"><i className="parabola-axis-x" /><i className="parabola-axis-y" /><span /><b dangerouslySetInnerHTML={{ __html: katex.renderToString("y=x^2-4", { throwOnError: false }) }} /></div>}
         {scene.model === "exponential" && <div className="exponential-context-model" aria-hidden="true">{[1, 2, 4, 8, 16].map((value, index) => <span style={{ height: `${24 + index * 16}px` }} key={value}><b>{value}</b></span>)}</div>}
+        {scene.model === "scale-drawing" && <div className="scale-drawing-context-model" aria-hidden="true"><span><b>1 cm</b><small>drawing</small></span><i>:</i><span><b>4 m</b><small>real size</small></span><em>so</em><strong><b>6 cm</b><small>× 4 = 24 m</small></strong></div>}
+        {scene.model === "random-sample" && <div className="random-sample-context-model" aria-hidden="true"><div className="sample-population"><small>population</small>{Array.from({ length: 20 }, (_, index) => <span data-group={index % 5} key={index} />)}</div><i>random draw</i><div className="sample-result"><small>sample</small>{[0, 3, 1, 4, 2].map((group, index) => <span data-group={group} key={`${group}-${index}`} />)}</div></div>}
+        {scene.model === "arithmetic-sequence" && <div className="arithmetic-sequence-context-model" aria-hidden="true"><div>{[4, 7, 10, 13].map((value, index) => <span key={value}><b>{value}</b>{index < 3 && <i>+3</i>}</span>)}</div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("a_n=4+3(n-1)", { throwOnError: false }) }} /></div>}
+        {scene.model === "quadratic-roots" && <div className="quadratic-roots-context-model" aria-hidden="true"><div><i className="root-axis-x" /><i className="root-axis-y" /><span className="root-parabola" /><b className="root-point root-point-one">−1</b><b className="root-point root-point-two">3</b></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("x^2-2x-3=0", { throwOnError: false }) }} /></div>}
       </div>
       <strong>{scene.headline}</strong>
       <p>{scene.copy}</p>
