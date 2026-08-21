@@ -1,4 +1,5 @@
 import type { LessonDefinition } from "@/lib/curriculum";
+import Image from "next/image";
 import katex from "katex";
 
 function mathFor(visual: string) {
@@ -13,6 +14,9 @@ function mathFor(visual: string) {
 
 export function ConceptVisual({ lesson }: { lesson: LessonDefinition }) {
   const visual = lesson.visual;
+  if (lesson.slug === "signed-numbers") {
+    return <div className="lesson-visual contextual-lesson-visual"><div className="context-scene"><Image src="/visuals/signed-numbers-context.png" width={1200} height={900} sizes="(max-width: 760px) 92vw, 650px" alt="A building with floors above and below street level, showing positive and negative positions around a central reference" /></div><div className="number-line-model context-number-line"><span>−4</span><span>−2</span><i>0</i><span>2</span><span>4</span><b /></div><strong>street level works like zero</strong><p>Above and below are opposite directions from the same reference point.</p></div>;
+  }
   if (visual.includes("fraction") || visual === "percent-grid" || visual === "place-value") {
     return <div className={`lesson-visual visual-${visual}`}><div className="fraction-model"><span /><span /><span className="empty" /><span className="empty" /></div><strong>{visual === "percent-grid" ? "25% = 25/100" : "3/4"}</strong><p>Equal-size parts make the relationship visible.</p></div>;
   }

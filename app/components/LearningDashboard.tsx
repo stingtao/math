@@ -7,6 +7,7 @@ import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
 import { SuccessBurst } from "./SuccessBurst";
+import { TopicIcon } from "./TopicIcon";
 
 export function LearningDashboard({ demo, grade }: { demo: boolean; grade: number }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -73,7 +74,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 
         <div className="dashboard-grid">
           <section className="next-card">
-            <div className={`next-visual accent-${nextLesson.accent}`} aria-hidden="true"><span>{String(curriculum.regions.find((item) => item.id === nextLesson.regionId)?.order ?? 1).padStart(2, "0")}</span><div className={`concept-mini concept-${nextLesson.visual}`}><i /><i /><i /></div></div>
+            <div className={`next-visual accent-${nextLesson.accent}`}><span>{String(curriculum.regions.find((item) => item.id === nextLesson.regionId)?.order ?? 1).padStart(2, "0")}</span><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="xl" label={`${nextLesson.title} topic icon`} /></div>
             <div className="next-copy"><span className="section-kicker">GRADE {grade} · UP NEXT</span><h2>{nextLesson.title}</h2><p>{nextLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP</span><span>☆ 3 stars</span></div><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Continue lesson <span aria-hidden="true">→</span></a></div>
           </section>
 
@@ -84,6 +85,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               {[10, 12, 14, 16, 18, 20, 30].map((amount, index) => <span className={index + 1 < state.profile.rewardStep || state.dailyRewardClaimed && index + 1 === state.profile.rewardStep ? "done" : index + 1 === (state.profile.rewardStep % 7) + 1 ? "today" : ""} key={amount}>{index === 6 ? "◇" : amount}</span>)}
             </div>
             <button className="secondary-button full-button" type="button" disabled={state.dailyRewardClaimed} onClick={claimReward}>{state.dailyRewardClaimed ? "Come back tomorrow" : "Claim today’s reward"}</button>
+            {rewardMessage.startsWith("+") && <div className="reward-callout" role="status"><span aria-hidden="true">✦</span><strong>{rewardMessage}</strong></div>}
             <p className="reward-note" aria-live="polite">{rewardMessage || `Miss a day? Your ${state.profile.rewardStep || 1}-step reward path will wait.`}</p>
           </aside>
         </div>
@@ -97,13 +99,13 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               const bossCleared = cleared.has(region.id);
               return (
                 <article className={`world-card accent-${region.accent} ${previousCleared ? "unlocked" : "world-locked"}`} key={region.id}>
-                  <header className="world-header"><span className="world-number">{String(region.order).padStart(2, "0")}</span><div><span>{region.standard}</span><h3>{region.title}</h3><p>{region.subtitle}</p></div><span className="world-status">{bossCleared ? "Cleared" : previousCleared ? `${region.lessons.filter((item) => completed.has(item.id)).length}/4` : "Locked"}</span></header>
+                  <header className="world-header"><div className="world-marker"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="md" label={`${region.title} region icon`} /><span className="world-number">{String(region.order).padStart(2, "0")}</span></div><div><span>{region.standard}</span><h3>{region.title}</h3><p>{region.subtitle}</p></div><span className="world-status">{bossCleared ? "Cleared" : previousCleared ? `${region.lessons.filter((item) => completed.has(item.id)).length}/4` : "Locked"}</span></header>
                   <div className="world-path">
                     {region.lessons.map((item, index) => {
                       const stars = completed.get(item.id);
                       const priorLessonComplete = index === 0 || completed.has(region.lessons[index - 1].id);
                       const available = previousCleared && (Boolean(stars) || priorLessonComplete);
-                      const content = <><span className="path-dot">{stars ? "✓" : String(index + 1).padStart(2, "0")}</span><span className="path-title">{item.title}</span><span className="path-stars" aria-label={stars ? `${stars} stars` : available ? "Ready" : "Locked"}>{stars ? `${"★".repeat(stars)}${"☆".repeat(3 - stars)}` : available ? "Ready →" : "·"}</span></>;
+                      const content = <><TopicIcon visual={item.visual} accent={item.accent} size="sm" /><span className="path-copy"><small>{stars ? "COMPLETE" : `LESSON ${String(index + 1).padStart(2, "0")}`}</small><span className="path-title">{item.title}</span></span><span className="path-stars" aria-label={stars ? `${stars} stars` : available ? "Ready" : "Locked"}>{stars ? `${"★".repeat(stars)}${"☆".repeat(3 - stars)}` : available ? "Ready →" : "·"}</span></>;
                       return available ? <a className={`path-lesson ${stars ? "complete" : "current"}`} href={`/learn/${item.slug}?grade=${grade}${demo ? "&demo=1" : ""}`} key={item.id}>{content}</a> : <div className="path-lesson locked" key={item.id}>{content}</div>;
                     })}
                     {regionComplete ? <a className={`boss-node ${bossCleared ? "complete" : "ready"}`} href={`/boss/${region.id}?grade=${grade}${demo ? "&demo=1" : ""}`}><span>★</span><strong>{bossCleared ? "Boss cleared" : "Boss ready"}</strong><small>{bossCleared ? "+100 XP earned" : "5 mixed questions"}</small></a> : <div className="boss-node locked"><span>☆</span><strong>Region boss</strong><small>Complete all 4 lessons</small></div>}

@@ -18,12 +18,12 @@ test("server-renders the Math Grades 7–9 landing page", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /A simple place/);
+  assert.match(html, /Small steps/);
   assert.match(html, /Hi, I’m Sting/);
   assert.match(html, /Grades 7, 8, and 9/);
   assert.match(html, /124/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Building your site/);
-  assert.match(html, /og\.png/);
+  assert.match(html, /og-v2\.png/);
 });
 
 test("ships all three curriculum files and all source sheets", async () => {
@@ -149,4 +149,30 @@ test("places a teen-treated AdSense unit between every page and the shared foote
   assert.match(worker, /'unsafe-eval'/);
   assert.equal(adsTxt.trim(), "google.com, pub-6452867962392355, DIRECT, f08c47fec0942fa0");
   assert.equal(packageJson.scripts.deploy, "npm run deploy:cloudflare");
+});
+
+test("ships a visual topic system across home, trail, lessons, and rewards", async () => {
+  const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const topicIcon = await readFile(new URL("../app/components/TopicIcon.tsx", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(home, /math-trail-hero\.png/);
+  assert.match(home, /learning-loop-grid/);
+  assert.match(home, /grade-card-visual/);
+  for (const family of ["parts", "graph", "shape", "solid", "data", "chance", "power", "algebra", "number"]) assert.match(topicIcon, new RegExp(`kind: "${family}"`));
+  assert.match(dashboard, /path-copy/);
+  assert.match(dashboard, /<TopicIcon visual=\{item\.visual\}/);
+  assert.match(lesson, /goal-concept/);
+  assert.match(lesson, /unlock-path/);
+  assert.match(lesson, /practiceEncouragement/);
+  assert.match(boss, /boss-unlock/);
+  assert.match(concept, /signed-numbers-context\.png/);
+  assert.match(css, /\.topic-icon-xl/);
+  assert.match(css, /\.learning-loop-grid/);
+  assert.match(css, /\.feedback-celebration/);
+  assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);
 });

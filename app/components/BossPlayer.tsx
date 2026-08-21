@@ -8,6 +8,7 @@ import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
 import { SuccessBurst } from "./SuccessBurst";
+import { TopicIcon } from "./TopicIcon";
 
 type BossAttempt = {
   attemptId: string;
@@ -41,6 +42,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const question = questions[Math.min(index, questions.length - 1)];
+  const questionLesson = region.lessons[Math.min(index, region.lessons.length - 1)];
   const repairLesson = region.lessons[Math.min(failedQuestion ?? index, region.lessons.length - 1)];
   const repairQuestion = repairLesson.practice[Math.min(repair + 2, repairLesson.practice.length - 1)];
 
@@ -192,7 +194,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setBusy(false);
   }
 
-  if (cleared) return <main className={`boss-shell accent-${region.accent}`}><SuccessBurst eventKey={`boss-${region.id}-complete`} large /><LearnerHeader state={state} demo={demo} /><section className="boss-victory"><div className="boss-medal">★</div><span className="section-kicker">GRADE {region.grade} · REGION {region.order} CLEARED</span><h1>Boss cleared.</h1><p>Five connected questions, complete.</p><div className="earned-stars hearts-result">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div><div className="reward-strip"><span><strong>+100</strong> XP</span><span><strong>{hearts}/3</strong> hearts</span><span><strong>1</strong> badge</span></div><a className="primary-button" href={trailUrl}>Back to Grade {region.grade} <span>→</span></a></section></main>;
+  if (cleared) return <main className={`boss-shell accent-${region.accent}`}><SuccessBurst eventKey={`boss-${region.id}-complete`} large /><LearnerHeader state={state} demo={demo} /><section className="boss-victory"><div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} boss cleared`} /><span aria-hidden="true">★</span></div><span className="section-kicker">GRADE {region.grade} · REGION {region.order} CLEARED</span><h1>Boss cleared.</h1><p>Five connected questions, complete. The next region is open.</p><div className="earned-stars hearts-result">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div><div className="unlock-path boss-unlock" aria-label="Boss cleared and next region unlocked"><span className="done"><b>✓</b> Boss cleared</span><i /><span><b>→</b> Next region unlocked</span></div><div className="reward-strip"><span><strong>+100</strong> XP</span><span><strong>{hearts}/3</strong> hearts</span><span><strong>1</strong> badge</span></div><a className="primary-button" href={trailUrl}>Back to Grade {region.grade} <span>→</span></a></section></main>;
 
   if (failed) return <main className="boss-shell"><LearnerHeader state={state} demo={demo} /><section className="repair-card"><span className="repair-icon">◇</span><span className="section-kicker">2-QUESTION REPAIR</span><h1>Fix the idea. Try again.</h1><p>No XP lost. Answer two focused questions to refill all three hearts.</p><div className="repair-question"><span>{repair + 1} OF 2 · {repairLesson.title}</span><strong>{repairQuestion.prompt}</strong>{repairQuestion.choices ? <div className="choice-grid">{repairQuestion.choices.map((choice) => <button className={repairAnswer === choice ? "selected" : ""} type="button" onClick={() => { setRepairAnswer(choice); setRepairFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={repairAnswer} onChange={(event) => { setRepairAnswer(event.target.value); setRepairFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void checkRepair(); }} placeholder="Type your answer" autoFocus /></label>}{repairFeedback === "incorrect" && <p>Not yet—{repairQuestion.hint}</p>}{repairFeedback === "correct" && <p>Correct. One repair complete.</p>}</div>{errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}<button className="primary-button" type="button" onClick={checkRepair} disabled={!repairAnswer.trim() || busy}>{busy ? "Checking…" : repair === 1 ? "Repair and retry" : "Check repair"} <span>→</span></button></section></main>;
 
@@ -201,14 +203,14 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       <LearnerHeader state={state} demo={demo} />
       <div className="boss-topbar"><a href={trailUrl}>← Leave</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
-        <div className="boss-title"><span className="section-kicker">GRADE {region.grade} · {index + 1} OF 5</span><h1>{region.title}</h1><p>No timer. Correct each answer to continue.</p></div>
+        <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF 5</span><h1>{region.title}</h1><p>No timer. Correct each answer to continue.</p></div></div>
         <div className="boss-question-card">
           <span className="boss-topic">{question.lesson}</span>
           <h2>{question.prompt}</h2>
           {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" onClick={() => { setAnswer(choice); setFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
           {showHint && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
           {feedback === "incorrect" && <div className="feedback-card incorrect"><span>Not yet</span><p>{question.hint}</p></div>}
-          {feedback === "correct" && <><SuccessBurst eventKey={`boss-${region.id}-${index}`} /><div className="feedback-card correct"><span>Correct</span><p>Next connection ready.</p></div></>}
+          {feedback === "correct" && <><SuccessBurst eventKey={`boss-${region.id}-${index}`} /><div className="feedback-card correct feedback-celebration"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{index + 1} of 5 complete. Your hearts stay full.</p></div><span className="momentum-chip">{index + 1}/5</span></div></>}
           {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)}>◇ Show hint</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === 4 ? "Finish boss" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>

@@ -10,6 +10,7 @@ import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
 import { SuccessBurst } from "./SuccessBurst";
+import { TopicIcon } from "./TopicIcon";
 
 const stageLabels = [
   { label: "Goal", icon: "◎" },
@@ -17,6 +18,14 @@ const stageLabels = [
   { label: "Key idea", icon: "◆" },
   { label: "Example", icon: "→" },
   { label: "Practice", icon: "✓" },
+];
+
+const practiceEncouragement = [
+  "You found the first foothold.",
+  "That method is taking shape.",
+  "Three corrected—momentum is building.",
+  "One more idea is connected.",
+  "You closed the loop.",
 ];
 
 export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo: boolean }) {
@@ -102,16 +111,19 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   if (finished) {
     const following = nextLesson(lesson);
     const regionFinished = lesson.order === 4;
+    const masteryMessage = stars === 3 ? "No-hint mastery" : stars === 2 ? "Strong first pass" : "Complete after corrections";
     return (
       <main className="learner-shell celebration-page">
         <SuccessBurst eventKey={`${lesson.id}-complete-${stars}`} large />
         <LearnerHeader state={state} demo={demo} />
         <section className={`celebration-card accent-${lesson.accent}`}>
-          <div className="celebration-orbit"><span>✓</span><i /><i /></div>
+          <div className="celebration-emblem"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} completed`} /><span aria-hidden="true">✓</span></div>
           <span className="section-kicker">LESSON COMPLETE</span>
           <h1>That step is yours.</h1>
           <p><strong>{lesson.title}</strong> is complete. Corrections count.</p>
           <div className="earned-stars" aria-label={`${stars} out of 3 stars`}>{"★".repeat(stars)}{"☆".repeat(3 - stars)}</div>
+          <strong className="mastery-message">{masteryMessage}</strong>
+          <div className="unlock-path" aria-label={regionFinished ? "Lesson complete and boss quest unlocked" : "Lesson complete and next lesson unlocked"}><span className="done"><b>✓</b> Lesson complete</span><i /><span><b>{regionFinished ? "★" : "→"}</b> {regionFinished ? "Boss quest unlocked" : "Next lesson unlocked"}</span></div>
           <div className="reward-strip"><span><strong>+{40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0)}</strong> XP</span><span><strong>{stars}/3</strong> stars</span><span><strong>1</strong> step forward</span></div>
           <div className="celebration-actions">
             <a className="secondary-button" href={trailUrl}>Back to trail</a>
@@ -132,7 +144,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       </div>
       <div className="lesson-layout">
         <aside className="lesson-sidebar">
-          <span className={`lesson-region-badge accent-${lesson.accent}`}>{String(region?.order ?? 1).padStart(2, "0")}</span>
+          <div className="lesson-region-identity"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="md" label={`${lesson.title} topic icon`} /><span className={`lesson-region-badge accent-${lesson.accent}`}>{String(region?.order ?? 1).padStart(2, "0")}</span></div>
           <span className="section-kicker">GRADE {lesson.grade} · REGION {region?.order ?? 1} · LESSON {lesson.order}</span>
           <h1>{lesson.title}</h1>
           <p>{lesson.goal}</p>
@@ -141,7 +153,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         </aside>
 
         <section className="lesson-stage" aria-live="polite">
-          {stage === 0 && <StageCard kicker="GOAL" title={lesson.goal} copy="Read the goal. Take your time." visual={<div className={`goal-mark accent-${lesson.accent}`}><span>01</span><i /></div>} onContinue={advanceStage} />}
+          {stage === 0 && <StageCard kicker="GOAL" title={lesson.goal} copy="Read the goal. Take your time." visual={<div className={`goal-concept accent-${lesson.accent}`}><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} concept`} /><span>Today’s focus</span><strong>{lesson.title}</strong></div>} onContinue={advanceStage} />}
           {stage === 1 && <StageCard kicker="SEE IT" title="Picture it first." copy="Use the diagram. Notice what stays the same." visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} />}
           {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} copy="One sentence to remember." visual={<div className={`key-idea-card accent-${lesson.accent}`}><span>KEY IDEA</span><strong>{lesson.keyIdea}</strong></div>} onContinue={advanceStage} />}
           {stage === 3 && <StageCard kicker="EXAMPLE" title={lesson.example} copy="Follow each step." visual={<ol className="example-steps">{lesson.exampleSteps.map((step, index) => <li key={step}><span>{index + 1}</span><p>{step}</p></li>)}</ol>} onContinue={advanceStage} />}
@@ -151,7 +163,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} onClick={() => { setAnswer(choice); setFeedback(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
               {showHint && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <div className="feedback-card incorrect"><span>Not yet</span><p>Try this step: {question.hint}</p></div>}
-              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}`} /><div className="feedback-card correct"><span>Correct</span><p>Next question ready.</p></div></>}
+              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}`} /><div className="feedback-card correct feedback-celebration"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{practiceEncouragement[questionIndex]}</strong><p>Question {questionIndex + 1} corrected. The next check is ready.</p></div><span className="momentum-chip">{questionIndex + 1}/{lesson.practice.length}</span></div></>}
               {errorMessage && <p className="form-error">{errorMessage}</p>}
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={continuePractice}>{questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
             </div>

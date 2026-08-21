@@ -1,15 +1,22 @@
+import Image from "next/image";
 import { GoogleSignIn } from "./components/GoogleSignIn";
 import { PublicHeader } from "./components/Header";
+import { TopicIcon } from "./components/TopicIcon";
 import { curriculumStats, gradeCurricula } from "@/lib/curriculum";
 
 export const dynamic = "force-dynamic";
 
-const trailStops = [
-  { number: "01", label: "Read one short explanation", tone: "blue", state: "complete" },
-  { number: "02", label: "Work through one example", tone: "teal", state: "current" },
-  { number: "03", label: "Correct five practice questions", tone: "violet", state: "locked" },
-  { number: "04", label: "Return later for review", tone: "gold", state: "locked" },
+const learningLoop = [
+  { number: "01", title: "See the idea", copy: "Start with a focused visual, then keep one sentence worth remembering.", visual: "fraction-bars", accent: "gold" as const, meta: "about 2 minutes" },
+  { number: "02", title: "Try five checks", copy: "Use a hint when you need it. Correct every miss without losing your place.", visual: "equation-steps", accent: "teal" as const, meta: "no countdown" },
+  { number: "03", title: "Unlock the trail", copy: "Earn stars, revisit weak ideas, and open a mixed boss after four lessons.", visual: "line-graph", accent: "violet" as const, meta: "progress that stays" },
 ];
+
+const gradeVisuals = {
+  7: { visual: "ratio-table", accent: "coral" as const },
+  8: { visual: "coordinate-plane", accent: "blue" as const },
+  9: { visual: "parabola", accent: "violet" as const },
+};
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";
@@ -19,16 +26,22 @@ export default function Home() {
     <section className="hero" id="top">
       <div className="hero-copy">
         <span className="eyebrow">MATH · GRADES 7–9</span>
-        <h1>A simple place<br />to learn math.</h1>
-        <p>Short lessons. Clear diagrams. Five practice questions. Review later.</p>
+        <h1>Small steps.<br />Real math progress.</h1>
+        <p>See one idea, work one example, and finish five focused questions. Every correction moves you forward.</p>
         <div className="hero-actions"><a className="primary-button" href="/learn?grade=8&demo=1">Try a lesson <span aria-hidden="true">→</span></a><a className="text-link" href="#story">Why I made this</a></div>
         <div className="hero-proof" aria-label="Course contents"><div><strong>{curriculumStats.grades}</strong><span>grade paths</span></div><div><strong>{curriculumStats.lessons}</strong><span>short lessons</span></div><div><strong>{curriculumStats.questions}</strong><span>practice checks</span></div></div>
       </div>
-      <div className="trail-card" aria-label="How a lesson works">
-        <div className="trail-card-header"><div><span className="mini-label">A USUAL STUDY SESSION</span><h2>One idea at a time</h2></div><span className="progress-pill">6–8 min</span></div>
-        <ol className="trail-list">{trailStops.map((stop, index) => <li className={`trail-stop ${stop.state}`} key={stop.number}><span className={`trail-node ${stop.tone}`} aria-hidden="true">{stop.state === "complete" ? "✓" : stop.number}</span>{index < trailStops.length - 1 && <span className="trail-line" aria-hidden="true" />}<div><span className="stop-kicker">STEP {stop.number}</span><strong>{stop.label}</strong></div>{stop.state === "current" && <span className="continue-chip">Next</span>}</li>)}</ol>
-        <div className="boss-preview"><span className="boss-icon" aria-hidden="true">★</span><div><span>AFTER FOUR LESSONS</span><strong>Try five mixed questions</strong></div></div>
+      <div className="hero-art" aria-label="A visual math trail from number lines and fractions to graphs, geometry, and an achievement star">
+        <div className="hero-art-frame"><Image src="/visuals/math-trail-hero.png" width={1280} height={853} priority sizes="(max-width: 860px) 100vw, 48vw" alt="A paper-cut math trail with a number line, fraction model, graph, triangle, and achievement star" /></div>
+        <span className="hero-float hero-float-time"><b>6–8</b><small>minutes</small></span>
+        <span className="hero-float hero-float-practice"><b>5</b><small>quick checks</small></span>
+        <span className="hero-float hero-float-boss"><b>★</b><small>boss unlocked</small></span>
       </div>
+    </section>
+
+    <section className="learning-loop-section" aria-labelledby="learning-loop-title">
+      <div className="section-heading split-heading"><div><span className="section-kicker">A CALM LEARNING LOOP</span><h2 id="learning-loop-title">Know what to do next.</h2></div><p>Each lesson uses the same short rhythm, so your attention stays on the math—not on finding the next button.</p></div>
+      <div className="learning-loop-grid">{learningLoop.map((item) => <article className={`loop-card accent-${item.accent}`} key={item.number}><div className="loop-card-top"><span>{item.number}</span><TopicIcon visual={item.visual} accent={item.accent} size="lg" label={`${item.title} illustration`} /></div><h3>{item.title}</h3><p>{item.copy}</p><small>{item.meta}</small></article>)}</div>
     </section>
 
     <section className="founder-section" id="story">
@@ -40,9 +53,10 @@ export default function Home() {
       <div className="section-heading split-heading"><div><span className="section-kicker">CHOOSE A GRADE</span><h2>Grades 7, 8, and 9</h2></div><p>Four lessons, then one mixed check. Google is only for saving progress.</p></div>
       <div className="grade-cards">{gradeCurricula.map((curriculum) => {
         const lessonCount = curriculum.regions.reduce((total, region) => total + region.lessons.length, 0);
-        return <article className={`grade-card grade-${curriculum.grade}`} key={curriculum.grade}><span>GRADE</span><strong>{curriculum.grade}</strong><h3>{curriculum.subtitle}</h3><p>{lessonCount} lessons · {curriculum.regions.length} mixed checks</p><a href={`/learn?grade=${curriculum.grade}&demo=1`}>Open Grade {curriculum.grade} <span>→</span></a></article>;
+        const gradeVisual = gradeVisuals[curriculum.grade];
+        return <article className={`grade-card grade-${curriculum.grade} accent-${gradeVisual.accent}`} key={curriculum.grade}><div className="grade-card-visual"><TopicIcon visual={gradeVisual.visual} accent={gradeVisual.accent} size="lg" label={`Grade ${curriculum.grade} math topics`} /><span>GRADE <strong>{curriculum.grade}</strong></span></div><h3>{curriculum.subtitle}</h3><p>{lessonCount} lessons · {curriculum.regions.length} mixed checks</p><a href={`/learn?grade=${curriculum.grade}&demo=1`}>Open Grade {curriculum.grade} <span>→</span></a></article>;
       })}</div>
-      <div className="region-grid compact-region-grid">{gradeCurricula.flatMap((curriculum) => curriculum.regions.slice(0, 2).map((region) => <article className={`region-card accent-${region.accent}`} key={region.id}><span className="region-index">G{curriculum.grade} · {String(region.order).padStart(2, "0")}</span><div className="region-symbol" aria-hidden="true">{region.order % 2 ? "◒" : "◆"}</div><h3>{region.title}</h3><p>{region.subtitle}</p><span className="region-meta">4 lessons · 1 mixed check</span></article>))}</div>
+      <div className="region-grid compact-region-grid">{gradeCurricula.flatMap((curriculum) => curriculum.regions.slice(0, 2).map((region) => <article className={`region-card accent-${region.accent}`} key={region.id}><div className="region-card-top"><span className="region-index">G{curriculum.grade} · {String(region.order).padStart(2, "0")}</span><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="md" label={`${region.title} topic icon`} /></div><h3>{region.title}</h3><p>{region.subtitle}</p><span className="region-meta">4 lessons · 1 mixed check</span></article>))}</div>
     </section>
 
     <section className="privacy-section">
