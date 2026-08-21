@@ -4,6 +4,17 @@ export type VisualLandmark = {
   lessonSlug: string;
 };
 
+export const grade7RegionLandmarks: Record<number, VisualLandmark> = {
+  701: { src: "/visuals/unit-rate-bike-context.jpg", alt: "Three bicycles and equal route sections model an amount per one unit", lessonSlug: "g7-unit-rates" },
+  702: { src: "/visuals/signed-numbers-context.png", alt: "Floors above and below street level model rational changes around zero", lessonSlug: "g7-add-rational-numbers" },
+  703: { src: "/visuals/equation-balance-context.jpg", alt: "A level balance models equivalent equation steps", lessonSlug: "g7-multi-step-equations-g7" },
+  704: { src: "/visuals/percent-market-context.jpg", alt: "A market display models percent change and everyday percent problems", lessonSlug: "g7-percent-change" },
+  705: { src: "/visuals/circle-fountain-context.jpg", alt: "A fountain highlights the radius, diameter, circumference, and area of a circle", lessonSlug: "g7-circle-measures" },
+  706: { src: "/visuals/prism-packing-context.jpg", alt: "A packing box built in equal layers models prism volume", lessonSlug: "g7-prism-volume" },
+  707: { src: "/visuals/scatter-field-context.jpg", alt: "A greenhouse experiment models observations, samples, center, and spread", lessonSlug: "g7-random-samples" },
+  708: { src: "/visuals/probability-arcade-context.jpg", alt: "A spinner, die, and trial tokens model probability and sample spaces", lessonSlug: "g7-probability-scale" },
+};
+
 export const grade8RegionLandmarks: Record<number, VisualLandmark> = {
   1: { src: "/visuals/signed-numbers-context.png", alt: "Floors above and below street level model positive and negative positions", lessonSlug: "signed-numbers" },
   2: { src: "/visuals/percent-market-context.jpg", alt: "A market wall split into equal tiles models a percent of a whole", lessonSlug: "percent" },
@@ -20,6 +31,28 @@ export const grade8RegionLandmarks: Record<number, VisualLandmark> = {
   13: { src: "/visuals/scatter-field-context.jpg", alt: "A greenhouse experiment models observations in a scatter plot", lessonSlug: "scatter-plots" },
 };
 
+export const grade9RegionLandmarks: Record<number, VisualLandmark> = {
+  901: { src: "/visuals/distributive-workshop-context.jpg", alt: "A structured workshop tray models the parts and properties of algebraic expressions", lessonSlug: "g9-algebraic-structure" },
+  902: { src: "/visuals/multistep-workshop-context.jpg", alt: "Nested workshop layers model solving linear equations one operation at a time", lessonSlug: "g9-multi-step-linear-equations" },
+  903: { src: "/visuals/slope-trail-context.jpg", alt: "A rising trail models slope and a linear relationship", lessonSlug: "g9-slope-from-points" },
+  904: { src: "/visuals/systems-transit-context.jpg", alt: "Two transit routes crossing at one station model a system’s shared solution", lessonSlug: "g9-systems-by-graphing-g9" },
+  905: { src: "/visuals/scientific-observatory-context.jpg", alt: "Nested scales model exponents, roots, and radical size", lessonSlug: "g9-integer-exponents-g9" },
+  906: { src: "/visuals/polynomial-tiles-context.jpg", alt: "One rectangle split into product areas models polynomial multiplication", lessonSlug: "g9-multiply-binomials" },
+  907: { src: "/visuals/polynomial-tiles-context.jpg", alt: "An aligned algebra tile rectangle models reversing multiplication through factoring", lessonSlug: "g9-factor-trinomials" },
+  908: { src: "/visuals/parabola-bridge-context.jpg", alt: "A symmetric bridge arch models the graph of a quadratic equation", lessonSlug: "g9-quadratic-graphs" },
+  909: { src: "/visuals/exponential-greenhouse-context.jpg", alt: "Greenhouse trays with doubling plants model exponential growth", lessonSlug: "g9-exponential-growth" },
+  910: { src: "/visuals/scatter-field-context.jpg", alt: "A greenhouse data experiment models scatter plots, residuals, and decisions", lessonSlug: "g9-scatter-models-g9" },
+};
+
+export const regionLandmarks: Record<number, VisualLandmark> = {
+  ...grade7RegionLandmarks,
+  ...grade8RegionLandmarks,
+  ...grade9RegionLandmarks,
+};
+
 export function getRegionLandmark(grade: number, regionId: number) {
-  return grade === 8 ? grade8RegionLandmarks[regionId] : undefined;
+  const landmark = regionLandmarks[regionId];
+  if (!landmark) return undefined;
+  const belongsToGrade = grade === 8 ? regionId < 100 : Math.floor(regionId / 100) === grade;
+  return belongsToGrade ? landmark : undefined;
 }

@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps";
+  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -102,6 +102,62 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Simplify the outer layers, then undo operations in reverse order.",
     model: "equation-steps",
   },
+  "g7-unit-rates": {
+    src: "/visuals/unit-rate-bike-context.jpg",
+    alt: "Three rental bicycles beside a route divided into equal travel sections and one highlighted single-bike comparison",
+    headline: "180 miles ÷ 3 hours = 60 mi/h",
+    copy: "Divide both quantities by the same value to find the amount for one unit.",
+    model: "ratio",
+  },
+  "g7-circle-measures": {
+    src: "/visuals/circle-fountain-context.jpg",
+    alt: "A circular city fountain with a center point, radius path, diameter path, and outer ring",
+    headline: "C = 2πr · A = πr²",
+    copy: "The radius controls both the distance around a circle and the space inside it.",
+    model: "circle",
+  },
+  "g7-prism-volume": {
+    src: "/visuals/prism-packing-context.jpg",
+    alt: "A transparent rectangular packing box built from three matching layers of gold parcels",
+    headline: "V = Bh",
+    copy: "Find one base layer, then stack that same area through the prism’s height.",
+    model: "prism",
+  },
+  "g7-probability-scale": {
+    src: "/visuals/probability-arcade-context.jpg",
+    alt: "A four-section spinner, a die, and repeated trial tokens at a modern probability arcade",
+    headline: "0 ≤ P(event) ≤ 1",
+    copy: "Probability moves from impossible at zero to certain at one.",
+    model: "probability-scale",
+  },
+  "g9-systems-by-graphing-g9": {
+    src: "/visuals/systems-transit-context.jpg",
+    alt: "Two straight transit routes crossing at one shared gold station",
+    headline: "the intersection satisfies both equations",
+    copy: "A solution to a system is the point that lies on both lines at once.",
+    model: "systems-crossing",
+  },
+  "g9-multiply-binomials": {
+    src: "/visuals/polynomial-tiles-context.jpg",
+    alt: "One rectangular algebra tile board divided into four aligned product regions",
+    headline: "(x + 2)(x + 3) = x² + 5x + 6",
+    copy: "Every part of one side multiplies every part of the other side.",
+    model: "area-product",
+  },
+  "g9-quadratic-graphs": {
+    src: "/visuals/parabola-bridge-context.jpg",
+    alt: "A symmetric bridge arch centered on a vertical gold line",
+    headline: "y = x² − 4",
+    copy: "A quadratic graph is symmetric around its axis and turns at its vertex.",
+    model: "parabola",
+  },
+  "g9-exponential-growth": {
+    src: "/visuals/exponential-greenhouse-context.jpg",
+    alt: "Four greenhouse trays with one, two, four, and eight glowing plants",
+    headline: "1, 2, 4, 8, 16, …",
+    copy: "Equal multiplicative changes create growth that speeds up over time.",
+    model: "exponential",
+  },
 };
 
 function mathFor(visual: string) {
@@ -154,6 +210,14 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "root-bracket" && <div className="root-bracket-context-model" aria-hidden="true"><span><small>√16</small><b>4</b></span><i><em>√20</em></i><span><small>√25</small><b>5</b></span></div>}
         {scene.model === "scientific-scale" && <div className="scientific-context-model" aria-hidden="true"><span>4,500,000</span><i>→</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("4.5\\times10^6", { throwOnError: false }) }} /><small>6 places</small></div>}
         {scene.model === "equation-steps" && <div className="equation-steps-context-model" aria-hidden="true">{["2(x + 3) = 14", "2x + 6 = 14", "2x = 8", "x = 4"].map((step, index) => <span key={step}><b>{step}</b>{index < 3 && <i>→</i>}</span>)}</div>}
+        {scene.model === "ratio" && <div className="ratio-context-model" aria-hidden="true"><span><b>180</b><small>miles</small></span><i>÷</i><span><b>3</b><small>hours</small></span><i>=</i><strong><b>60</b><small>mi/h</small></strong></div>}
+        {scene.model === "circle" && <div className="circle-context-model" aria-hidden="true"><span><i>r</i></span><div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("C=2\\pi r", { throwOnError: false }) }} /><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("A=\\pi r^2", { throwOnError: false }) }} /></div></div>}
+        {scene.model === "prism" && <div className="prism-context-model" aria-hidden="true"><div><span /><span /><span /></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("V=B\\cdot h", { throwOnError: false }) }} /></div>}
+        {scene.model === "probability-scale" && <div className="probability-context-model" aria-hidden="true"><div><span>0</span><i><b /></i><span>1</span></div><small>impossible</small><em>equally likely</em><small>certain</small></div>}
+        {scene.model === "systems-crossing" && <div className="systems-context-model" aria-hidden="true"><i className="system-axis-x" /><i className="system-axis-y" /><span className="system-line-one" /><span className="system-line-two" /><b /><em>one shared solution</em></div>}
+        {scene.model === "area-product" && <div className="area-product-context-model" aria-hidden="true"><div><span>x²</span><span>3x</span><span>2x</span><span>6</span></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("(x+2)(x+3)=x^2+5x+6", { throwOnError: false }) }} /></div>}
+        {scene.model === "parabola" && <div className="parabola-context-model" aria-hidden="true"><i className="parabola-axis-x" /><i className="parabola-axis-y" /><span /><b dangerouslySetInnerHTML={{ __html: katex.renderToString("y=x^2-4", { throwOnError: false }) }} /></div>}
+        {scene.model === "exponential" && <div className="exponential-context-model" aria-hidden="true">{[1, 2, 4, 8, 16].map((value, index) => <span style={{ height: `${24 + index * 16}px` }} key={value}><b>{value}</b></span>)}</div>}
       </div>
       <strong>{scene.headline}</strong>
       <p>{scene.copy}</p>
