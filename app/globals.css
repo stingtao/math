@@ -1468,3 +1468,77 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .quest-key-nodes { grid-template-columns: repeat(4, 30px) 1fr 35px; gap: 3px; }
   .quest-key-nodes span { width: 30px; height: 30px; }
 }
+
+/* Boss skill connections and Daily Review memory pulse. */
+.boss-connection-map { margin: 0 0 18px; padding: 18px 20px; border: 1px solid color-mix(in srgb, var(--accent) 22%, #d6e1e8); border-radius: 20px; background: linear-gradient(135deg, white, var(--accent-soft)); box-shadow: 0 10px 25px rgb(23 50 79 / 6%); }
+.boss-connection-map > header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.boss-connection-map > header > div { display: grid; gap: 3px; }
+.boss-connection-map > header span { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+.boss-connection-map > header strong { font-size: 12px; }
+.boss-connection-map > header small { flex: 0 0 auto; padding: 6px 9px; border-radius: 99px; color: var(--accent); background: white; font-size: 9px; font-weight: 900; }
+.boss-connection-nodes { margin-top: 15px; position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.boss-connection-nodes::before { content: ""; height: 3px; position: absolute; left: 7%; right: 7%; top: 24px; border-radius: 99px; background: #cbd7de; }
+.boss-connection-nodes > div { min-width: 0; min-height: 86px; position: relative; z-index: 1; padding: 5px; display: grid; justify-items: center; align-content: start; gap: 6px; text-align: center; }
+.boss-connection-nodes .topic-icon-sm { --topic-size: 48px; }
+.boss-connection-nodes > div > span { width: 19px; height: 19px; position: absolute; right: calc(50% - 29px); top: -1px; display: grid; place-items: center; border: 3px solid white; border-radius: 7px; color: #7c8f9f; background: #edf2f5; font-size: 7px; font-weight: 900; }
+.boss-connection-nodes > div small { max-width: 118px; overflow: hidden; color: var(--muted); font-size: 8px; line-height: 1.25; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.boss-connection-nodes > div.done > span { color: white; background: var(--teal); }
+.boss-connection-nodes > div.done .topic-icon { color: white; background: var(--teal); }
+.boss-connection-nodes > div.current { border-radius: 13px; background: white; box-shadow: 0 0 0 2px var(--accent), 0 7px 16px rgb(23 50 79 / 9%); }
+.boss-connection-nodes > div.current > span { color: white; background: var(--accent); }
+.boss-connection-nodes > div.upcoming { opacity: .58; }
+.boss-connection-nodes > div.mixed > span { color: #8a671b; background: #fff1c6; }
+.boss-connection-nodes > div.mixed.current,
+.boss-connection-nodes > div.mixed.done { box-shadow: 0 0 0 2px var(--gold), 0 7px 16px rgb(23 50 79 / 9%); }
+.boss-connection-nodes > div.mixed.done .topic-icon { color: white; background: var(--gold); }
+.boss-connection-map > p { margin: 9px 0 0; padding-top: 12px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #dce5ea; color: var(--muted); font-size: 10px; line-height: 1.4; }
+.boss-connection-map > p span { width: 25px; height: 25px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--accent); font-size: 8px; }
+.boss-recovery,
+.boss-link-feedback { margin-top: 23px; }
+
+.review-memory-meter { margin: 20px 0 16px; padding: 15px; border: 1px solid #d5e3df; border-radius: 17px; background: linear-gradient(145deg, white, #eaf7f3); box-shadow: 0 10px 23px rgb(23 50 79 / 5%); }
+.review-memory-meter > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.review-memory-meter > header > div { min-width: 0; display: grid; gap: 3px; }
+.review-memory-meter > header span { color: var(--teal); font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+.review-memory-meter > header strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.review-memory-meter > header small { flex: 0 0 auto; color: var(--teal); font-size: 11px; font-weight: 900; }
+.review-memory-nodes { margin-top: 13px; position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.review-memory-nodes::before { content: ""; height: 3px; position: absolute; left: 8%; right: 8%; top: 21px; border-radius: 99px; background: #cbdad6; }
+.review-memory-nodes > span { min-width: 0; position: relative; z-index: 1; display: grid; justify-items: center; }
+.review-memory-nodes .topic-icon-sm { --topic-size: 43px; }
+.review-memory-nodes > span > b { width: 18px; height: 18px; position: absolute; right: calc(50% - 27px); top: -3px; display: grid; place-items: center; border: 3px solid white; border-radius: 7px; color: #7e918b; background: #e9f0ee; font-size: 7px; }
+.review-memory-nodes > span.done .topic-icon { color: white; background: var(--teal); }
+.review-memory-nodes > span.done > b { color: white; background: var(--teal); }
+.review-memory-nodes > span.current .topic-icon { box-shadow: 0 0 0 3px #ccebe2, 0 7px 14px rgb(23 50 79 / 10%); }
+.review-memory-nodes > span.current > b { color: white; background: var(--blue); }
+.review-memory-nodes > span.upcoming { opacity: .52; }
+.review-memory-meter > p { margin: 12px 0 0; color: #56736a; font-size: 9px; line-height: 1.4; }
+.review-recovery { margin-top: 22px; }
+.review-feedback.recovered { border-color: #bfe4da; background: #e8f7f3; }
+
+@media (max-width: 760px) {
+  .boss-connection-map { padding: 16px 13px; }
+  .boss-connection-nodes { gap: 2px; }
+  .boss-connection-nodes .topic-icon-sm { --topic-size: 44px; }
+  .boss-connection-nodes > div { min-height: 76px; padding-inline: 1px; }
+  .boss-connection-nodes > div > span { right: calc(50% - 26px); }
+  .boss-connection-nodes > div small { max-width: 82px; font-size: 7px; }
+  .review-memory-meter { width: min(390px, 100%); }
+  .review-memory-meter > p { font-size: 11px; }
+}
+
+@media (max-width: 420px) {
+  .boss-connection-map > header { align-items: flex-start; }
+  .boss-connection-map > header strong { font-size: 11px; }
+  .boss-connection-map > header small { padding-inline: 7px; }
+  .boss-connection-nodes .topic-icon-sm { --topic-size: 39px; }
+  .boss-connection-nodes::before { top: 20px; }
+  .boss-connection-nodes > div { min-height: 68px; }
+  .boss-connection-nodes > div > span { width: 17px; height: 17px; right: calc(50% - 23px); }
+  .boss-connection-nodes > div small { max-width: 53px; }
+  .boss-connection-map > p { align-items: flex-start; font-size: 9px; }
+  .review-memory-meter { padding: 14px 12px; }
+  .review-memory-nodes { gap: 3px; }
+  .review-memory-nodes .topic-icon-sm { --topic-size: 40px; }
+  .review-memory-nodes > span > b { right: calc(50% - 24px); }
+}

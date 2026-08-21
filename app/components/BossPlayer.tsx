@@ -45,6 +45,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const questionLesson = region.lessons[Math.min(index, region.lessons.length - 1)];
   const repairLesson = region.lessons[Math.min(failedQuestion ?? index, region.lessons.length - 1)];
   const repairQuestion = repairLesson.practice[Math.min(repair + 2, repairLesson.practice.length - 1)];
+  const connectedLinks = index + (feedback === "correct" ? 1 : 0);
   const gradeCurriculum = getGradeCurriculum(region.grade);
   const isFinalRegion = gradeCurriculum.regions[gradeCurriculum.regions.length - 1]?.id === region.id;
 
@@ -207,13 +208,24 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       <div className="boss-topbar"><a href={trailUrl}>← Leave</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
         <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF 5</span><h1>{region.title}</h1><p>No timer. Correct each answer to continue.</p></div></div>
+        <div className="boss-connection-map" aria-label={`${connectedLinks} of 5 boss connections complete`}>
+          <header><div><span>CONNECTION MAP</span><strong>Four lesson skills + one mixed finish</strong></div><small>{connectedLinks}/5 linked</small></header>
+          <div className="boss-connection-nodes" role="list">
+            {questions.map((item, round) => {
+              const linkLesson = region.lessons[Math.min(round, region.lessons.length - 1)];
+              const status = round < connectedLinks ? "done" : round === connectedLinks ? "current" : "upcoming";
+              return <div className={`${status} ${round === questions.length - 1 ? "mixed" : ""}`} role="listitem" aria-label={`${item.lesson}: ${status === "done" ? "connected" : status === "current" ? "current question" : "upcoming"}`} key={`${item.id}-connection`}><TopicIcon visual={linkLesson.visual} accent={linkLesson.accent} size="sm" label="" /><span aria-hidden="true">{status === "done" ? "✓" : round === questions.length - 1 ? "★" : round + 1}</span><small>{item.lesson}</small></div>;
+            })}
+          </div>
+          <p><span aria-hidden="true">◆</span>{connectedLinks === 5 ? "All five ideas are connected." : `${5 - connectedLinks} ${5 - connectedLinks === 1 ? "connection" : "connections"} left. A correction keeps the map moving.`}</p>
+        </div>
         <div className="boss-question-card">
           <span className="boss-topic">{question.lesson}</span>
           <h2>{question.prompt}</h2>
           {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" onClick={() => { setAnswer(choice); setFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
-          {feedback === "incorrect" && <div className="feedback-card incorrect" role="status"><span>Not yet</span><p>{question.hint}</p></div>}
-          {feedback === "correct" && <><SuccessBurst eventKey={`boss-${region.id}-${index}`} /><div className="feedback-card correct feedback-celebration" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{index + 1} of 5 complete. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">{index + 1}/5</span></div></>}
+          {feedback === "incorrect" && <div className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—repair this connection.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. The same question stays open.` : "Two focused repairs will refill every heart."}</small></div></div>}
+          {feedback === "correct" && <><SuccessBurst eventKey={`boss-${region.id}-${index}`} /><div className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
           {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)}>◇ Show hint</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === 4 ? "Finish boss" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>
