@@ -28,6 +28,8 @@ const practiceEncouragement = [
   "You closed the loop.",
 ];
 
+const focusChargeLabels = ["Ready", "First spark", "Building rhythm", "Strong focus", "Almost clear", "Fully charged"];
+
 export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo: boolean }) {
   const { state, setState, loading, error } = useLearner(demo);
   const [stage, setStage] = useState(0);
@@ -44,6 +46,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const question = lesson.practice[questionIndex];
+  const correctedCount = questionIndex + (feedback === "correct" ? 1 : 0);
   const region = getRegion(lesson.regionId);
   const completeMap = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
 
@@ -112,6 +115,11 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const following = nextLesson(lesson);
     const regionFinished = lesson.order === 4;
     const masteryMessage = stars === 3 ? "No-hint mastery" : stars === 2 ? "Strong first pass" : "Complete after corrections";
+    const masteryNext = stars === 3
+      ? { title: "Mastery marker complete", copy: "This lesson is ready for spaced review. Your three-star marker stays on the trail." }
+      : stars === 2
+      ? { title: "One clean pass from mastery", copy: "A future no-hint review can turn this into a three-star skill." }
+      : { title: "The path stays open", copy: "Corrections finished the lesson. Daily Review will bring the useful steps back at the right time." };
     return (
       <main className="learner-shell celebration-page">
         <SuccessBurst eventKey={`${lesson.id}-complete-${stars}`} large />
@@ -123,6 +131,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <p><strong>{lesson.title}</strong> is complete. Corrections count.</p>
           <div className="earned-stars" aria-label={`${stars} out of 3 stars`}>{"★".repeat(stars)}{"☆".repeat(3 - stars)}</div>
           <strong className="mastery-message">{masteryMessage}</strong>
+          <div className="mastery-next-goal"><span aria-hidden="true">{stars === 3 ? "✦" : stars === 2 ? "↑" : "↻"}</span><div><small>NEXT MASTERY GOAL</small><strong>{masteryNext.title}</strong><p>{masteryNext.copy}</p></div></div>
           <div className="unlock-path" aria-label={regionFinished ? "Lesson complete and boss quest unlocked" : "Lesson complete and next lesson unlocked"}><span className="done"><b>✓</b> Lesson complete</span><i /><span><b>{regionFinished ? "★" : "→"}</b> {regionFinished ? "Boss quest unlocked" : "Next lesson unlocked"}</span></div>
           <div className="reward-strip"><span><strong>+{40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0)}</strong> XP</span><span><strong>{stars}/3</strong> stars</span><span><strong>1</strong> step forward</span></div>
           <div className="celebration-actions">
@@ -160,10 +169,11 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           {stage === 4 && (
             <div className="practice-stage">
               <div className="practice-heading"><div><span className="section-kicker">PRACTICE · {questionIndex + 1} OF {lesson.practice.length}</span><h2>{question.prompt}</h2></div><div className="practice-dots">{lesson.practice.map((item, index) => <span className={index < questionIndex ? "done" : index === questionIndex ? "active" : ""} key={item.id} />)}</div></div>
+              <div className={`practice-charge accent-${lesson.accent}`} aria-label={`Focus charge: ${correctedCount} of ${lesson.practice.length} questions corrected`}><div><span>FOCUS CHARGE</span><strong>{focusChargeLabels[correctedCount]}</strong></div><div className="charge-cells" aria-hidden="true">{lesson.practice.map((item, index) => <i className={index < correctedCount ? "done" : index === correctedCount ? "current" : ""} key={item.id}>{index < correctedCount ? "✓" : index + 1}</i>)}</div><small>{correctedCount}/{lesson.practice.length}</small></div>
               {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} onClick={() => { setAnswer(choice); setFeedback(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
               {showHint && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <div className="feedback-card incorrect"><span>Not yet</span><p>Try this step: {question.hint}</p></div>}
-              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}`} /><div className="feedback-card correct feedback-celebration"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{practiceEncouragement[questionIndex]}</strong><p>Question {questionIndex + 1} corrected. The next check is ready.</p></div><span className="momentum-chip">{questionIndex + 1}/{lesson.practice.length}</span></div></>}
+              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}`} /><div className="feedback-card correct feedback-celebration"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{practiceEncouragement[questionIndex]}</strong><p>Question {questionIndex + 1} corrected. The next check is ready.</p></div><span className="momentum-chip">Focus {correctedCount}/{lesson.practice.length}</span></div></>}
               {errorMessage && <p className="form-error">{errorMessage}</p>}
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={continuePractice}>{questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
             </div>

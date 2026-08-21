@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { getGradeCurriculum, getGradeLessons } from "@/lib/curriculum";
+import { getRegionLandmark } from "@/lib/visual-landmarks";
 import { saveDemoState } from "@/lib/learner-state";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
@@ -135,9 +137,10 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               const regionComplete = region.lessons.every((item) => completed.has(item.id));
               const previousCleared = regionIndex === 0 || cleared.has(curriculum.regions[regionIndex - 1].id);
               const bossCleared = cleared.has(region.id);
+              const landmark = getRegionLandmark(grade, region.id);
               return (
                 <article className={`world-card accent-${region.accent} ${previousCleared ? "unlocked" : "world-locked"}`} id={`region-${region.id}`} key={region.id}>
-                  <header className="world-header"><div className="world-marker"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="md" label={`${region.title} region icon`} /><span className="world-number">{String(region.order).padStart(2, "0")}</span></div><div><span>{region.standard}</span><h3>{region.title}</h3><p>{region.subtitle}</p></div><span className="world-status">{bossCleared ? "Cleared" : previousCleared ? `${region.lessons.filter((item) => completed.has(item.id)).length}/4` : "Locked"}</span></header>
+                  <header className={`world-header ${landmark ? "with-landmark" : ""}`}><div className="world-marker"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="md" label={`${region.title} region icon`} /><span className="world-number">{String(region.order).padStart(2, "0")}</span></div><div className="world-copy"><span>{region.standard}</span><h3>{region.title}</h3><p>{region.subtitle}</p></div>{landmark && <div className="world-landmark"><Image src={landmark.src} width={360} height={240} sizes="(max-width: 760px) 86vw, 140px" alt={landmark.alt} /><span aria-hidden="true">VISUAL LANDMARK</span></div>}<span className="world-status">{bossCleared ? "Cleared" : previousCleared ? `${region.lessons.filter((item) => completed.has(item.id)).length}/4` : "Locked"}</span></header>
                   <div className="world-path">
                     {region.lessons.map((item, index) => {
                       const stars = completed.get(item.id);

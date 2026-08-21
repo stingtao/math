@@ -154,6 +154,9 @@ test("places a teen-treated AdSense unit between every page and the shared foote
 test("ships a visual topic system across home, trail, lessons, and rewards", async () => {
   const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const topicIcon = await readFile(new URL("../app/components/TopicIcon.tsx", import.meta.url), "utf8");
+  const topicIconCatalog = await readFile(new URL("../lib/topic-icons.ts", import.meta.url), "utf8");
+  const landmarks = await readFile(new URL("../lib/visual-landmarks.ts", import.meta.url), "utf8");
+  const contentValidator = await readFile(new URL("../scripts/validate-curriculum.ts", import.meta.url), "utf8");
   const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
@@ -164,12 +167,20 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /math-trail-hero\.png/);
   assert.match(home, /learning-loop-grid/);
   assert.match(home, /grade-card-visual/);
-  for (const family of ["parts", "graph", "shape", "solid", "data", "chance", "power", "algebra", "number"]) assert.match(topicIcon, new RegExp(`kind: "${family}"`));
+  for (const family of ["parts", "ratio", "chance", "data", "graph", "shape", "solid", "power", "algebra", "number", "steps"]) assert.match(topicIconCatalog, new RegExp(`kind: "${family}"`));
+  assert.match(topicIcon, /data-visual=\{visual\}/);
+  assert.match(topicIconCatalog, /topicIconSpecs/);
+  assert.match(topicIconCatalog, /"scientific-ops"/);
+  assert.match(topicIconCatalog, /"solution-types"/);
+  assert.match(contentValidator, /Every lesson visual must have a specific topic icon/);
   assert.match(dashboard, /path-copy/);
   assert.match(dashboard, /<TopicIcon visual=\{item\.visual\}/);
   assert.match(lesson, /goal-concept/);
   assert.match(lesson, /unlock-path/);
   assert.match(lesson, /practiceEncouragement/);
+  assert.match(lesson, /practice-charge/);
+  assert.match(lesson, /FOCUS CHARGE/);
+  assert.match(lesson, /mastery-next-goal/);
   assert.match(boss, /boss-unlock/);
   for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg", "equation-balance-context.jpg", "irrational-garden-context.jpg", "scientific-observatory-context.jpg", "multistep-workshop-context.jpg"]) {
     assert.match(concept, new RegExp(visual.replace(".", "\\.")));
@@ -188,6 +199,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /visibleRegions\.map/);
   assert.match(dashboard, /aria-expanded=\{showFullMap\}/);
   assert.match(dashboard, /id=\{`region-\$\{region\.id\}`\}/);
+  assert.match(dashboard, /world-landmark/);
+  assert.match(dashboard, /getRegionLandmark/);
+  assert.match(landmarks, /grade8RegionLandmarks/);
+  assert.equal((landmarks.match(/^\s+\d+: \{ src:/gm) ?? []).length, 13);
   assert.match(css, /\.topic-icon-xl/);
   assert.match(css, /\.learning-loop-grid/);
   assert.match(css, /\.feedback-celebration/);
@@ -204,6 +219,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.equation-steps-context-model/);
   assert.match(css, /\.math-world-grid/);
   assert.match(css, /\.math-world-proof/);
+  assert.match(css, /\.world-landmark/);
+  assert.match(css, /\.practice-charge/);
+  assert.match(css, /\.charge-cells/);
+  assert.match(css, /\.mastery-next-goal/);
   assert.match(review, /review-finish-emblem/);
   assert.match(review, /Memory strengthened/);
   assert.match(review, /<TopicIcon visual=\{questionLesson\.visual\}/);
