@@ -18,6 +18,13 @@ const gradeVisuals = {
   9: { visual: "parabola", accent: "violet" as const },
 };
 
+const mathWorldScenes = [
+  { title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.png", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
+  { title: "Rules that connect", copy: "Follow one bike-rental rule through a situation, table, graph, and equation.", image: "/visuals/function-kiosk-context.jpg", lesson: "function-representations", visual: "function-machine", accent: "teal" as const },
+  { title: "The diagonal shortcut", copy: "Turn a route across the city into a right triangle you can measure.", image: "/visuals/pythagorean-city-context.jpg", lesson: "pythagorean-theorem", visual: "right-triangle", accent: "coral" as const },
+  { title: "Volume in layers", copy: "See a cylinder as equal circular layers stacked through its height.", image: "/visuals/cylinder-tank-context.jpg", lesson: "cylinder-volume", visual: "cylinder", accent: "gold" as const },
+];
+
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";
   return <main className="site-shell">
@@ -42,6 +49,12 @@ export default function Home() {
     <section className="learning-loop-section" aria-labelledby="learning-loop-title">
       <div className="section-heading split-heading"><div><span className="section-kicker">A CALM LEARNING LOOP</span><h2 id="learning-loop-title">Know what to do next.</h2></div><p>Each lesson uses the same short rhythm, so your attention stays on the math—not on finding the next button.</p></div>
       <div className="learning-loop-grid">{learningLoop.map((item) => <article className={`loop-card accent-${item.accent}`} key={item.number}><div className="loop-card-top"><span>{item.number}</span><TopicIcon visual={item.visual} accent={item.accent} size="lg" label={`${item.title} illustration`} /></div><h3>{item.title}</h3><p>{item.copy}</p><small>{item.meta}</small></article>)}</div>
+    </section>
+
+    <section className="math-world-section" aria-labelledby="math-world-title">
+      <div className="section-heading split-heading"><div><span className="section-kicker">MATH IN THE WORLD</span><h2 id="math-world-title">See the reason before the rule.</h2></div><p>Each part of Grade 8 has a visual landmark that turns an abstract idea into something you can picture.</p></div>
+      <div className="math-world-grid">{mathWorldScenes.map((scene, index) => <a className={`math-world-card accent-${scene.accent} scene-${index + 1}`} href={`/learn/${scene.lesson}?grade=8&demo=1`} key={scene.lesson}><div className="math-world-image"><Image src={scene.image} width={1200} height={800} sizes="(max-width: 760px) 92vw, (max-width: 1100px) 46vw, 520px" alt="" /><span><TopicIcon visual={scene.visual} accent={scene.accent} size="md" label="" /></span></div><div className="math-world-copy"><small>EXPLORE A 6–8 MINUTE LESSON</small><h3>{scene.title}</h3><p>{scene.copy}</p><strong>See this idea <span aria-hidden="true">→</span></strong></div></a>)}</div>
+      <div className="math-world-proof"><strong>13 / 13</strong><span><b>Grade 8 regions now have a real-world visual landmark.</b> Exact diagrams and math stay clear and readable on every screen.</span><i aria-hidden="true">✓</i></div>
     </section>
 
     <section className="founder-section" id="story">

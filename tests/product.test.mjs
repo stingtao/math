@@ -171,12 +171,19 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /unlock-path/);
   assert.match(lesson, /practiceEncouragement/);
   assert.match(boss, /boss-unlock/);
-  for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg"]) {
+  for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg", "equation-balance-context.jpg", "irrational-garden-context.jpg", "scientific-observatory-context.jpg", "multistep-workshop-context.jpg"]) {
     assert.match(concept, new RegExp(visual.replace(".", "\\.")));
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
     assert.ok(asset.byteLength > 10_000);
   }
-  for (const model of ["number-line", "percent", "slope", "triangle", "scatter", "distribute", "function", "transform", "volume"]) assert.match(concept, new RegExp(`model: "${model}"`));
+  for (const model of ["number-line", "percent", "slope", "triangle", "scatter", "distribute", "function", "transform", "volume", "balance", "root-bracket", "scientific-scale", "equation-steps"]) assert.match(concept, new RegExp(`model: "${model}"`));
+  const contextSceneSource = concept.slice(concept.indexOf("const contextScenes"), concept.indexOf("function mathFor"));
+  for (const representative of ["signed-numbers", "percent", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "scatter-plots"]) {
+    assert.match(contextSceneSource, new RegExp(`[" ]${representative}[":]`));
+  }
+  assert.match(home, /mathWorldScenes/);
+  assert.match(home, /math-world-grid/);
+  assert.match(home, /13 \/ 13/);
   assert.match(dashboard, /CURRENT QUEST/);
   assert.match(dashboard, /visibleRegions\.map/);
   assert.match(dashboard, /aria-expanded=\{showFullMap\}/);
@@ -191,6 +198,12 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.function-context-model/);
   assert.match(css, /\.transform-context-model/);
   assert.match(css, /\.volume-context-model/);
+  assert.match(css, /\.balance-context-model/);
+  assert.match(css, /\.root-bracket-context-model/);
+  assert.match(css, /\.scientific-context-model/);
+  assert.match(css, /\.equation-steps-context-model/);
+  assert.match(css, /\.math-world-grid/);
+  assert.match(css, /\.math-world-proof/);
   assert.match(review, /review-finish-emblem/);
   assert.match(review, /Memory strengthened/);
   assert.match(review, /<TopicIcon visual=\{questionLesson\.visual\}/);

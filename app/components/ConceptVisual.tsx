@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume";
+  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -74,6 +74,34 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Find the circular base area, then stack that area through the full height.",
     model: "volume",
   },
+  "one-step-equations": {
+    src: "/visuals/equation-balance-context.jpg",
+    alt: "A level balance with one mystery box and three gold cubes on the left, and seven matching cubes on the right",
+    headline: "x + 3 = 7 → x = 4",
+    copy: "Remove the same amount from both sides to keep the equation balanced.",
+    model: "balance",
+  },
+  "approximating-irrationals": {
+    src: "/visuals/irrational-garden-context.jpg",
+    alt: "A two-by-four rectangular garden crossed by a diagonal coral measuring cable",
+    headline: "4 < √20 < 5",
+    copy: "Bracket a root between the square roots of its neighboring perfect squares.",
+    model: "root-bracket",
+  },
+  "scientific-notation": {
+    src: "/visuals/scientific-observatory-context.jpg",
+    alt: "An observatory sightline passing through shrinking scale rings toward a distant planet",
+    headline: "4,500,000 = 4.5 × 10⁶",
+    copy: "Move the decimal to make one leading digit, then count the places.",
+    model: "scientific-scale",
+  },
+  "multi-step-equations": {
+    src: "/visuals/multistep-workshop-context.jpg",
+    alt: "A workshop sequence removing outer sleeves from two identical mystery boxes one layer at a time",
+    headline: "2(x + 3) = 14 → x = 4",
+    copy: "Simplify the outer layers, then undo operations in reverse order.",
+    model: "equation-steps",
+  },
 };
 
 function mathFor(visual: string) {
@@ -122,6 +150,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "function" && <div className="function-context-model" aria-hidden="true"><span><b>0</b><b>1</b><b>2</b></span><i>→</i><em>×2 + 1</em><i>→</i><span><b>1</b><b>3</b><b>5</b></span></div>}
         {scene.model === "transform" && <div className="transform-context-model" aria-hidden="true"><i className="transform-axis-x" /><i className="transform-axis-y" /><span className="transform-shape-one" /><span className="transform-shape-two" /><em>(+3, +2)</em></div>}
         {scene.model === "volume" && <div className="volume-context-model" aria-hidden="true"><span className="volume-shell" /><i className="volume-top" /><i className="volume-bottom" /><b className="volume-radius">r</b><b className="volume-height">h</b></div>}
+        {scene.model === "balance" && <div className="balance-context-model" aria-hidden="true"><div><span>x + 3</span><i>=</i><span>7</span></div><div><em>−3</em><b>same change</b><em>−3</em></div><strong>x = 4</strong></div>}
+        {scene.model === "root-bracket" && <div className="root-bracket-context-model" aria-hidden="true"><span><small>√16</small><b>4</b></span><i><em>√20</em></i><span><small>√25</small><b>5</b></span></div>}
+        {scene.model === "scientific-scale" && <div className="scientific-context-model" aria-hidden="true"><span>4,500,000</span><i>→</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("4.5\\times10^6", { throwOnError: false }) }} /><small>6 places</small></div>}
+        {scene.model === "equation-steps" && <div className="equation-steps-context-model" aria-hidden="true">{["2(x + 3) = 14", "2x + 6 = 14", "2x = 8", "x = 4"].map((step, index) => <span key={step}><b>{step}</b>{index < 3 && <i>→</i>}</span>)}</div>}
       </div>
       <strong>{scene.headline}</strong>
       <p>{scene.copy}</p>
