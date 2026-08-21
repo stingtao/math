@@ -161,6 +161,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
+  const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
   const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
@@ -265,6 +266,15 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.repair-progress/);
   assert.match(css, /\.boss-connection-map/);
   assert.match(css, /\.boss-connection-nodes/);
+  assert.match(profile, /achievementSpecs/);
+  assert.match(profile, /PRIVATE ACHIEVEMENT SHELF/);
+  for (const achievement of ["First Step", "Twelve Sparks", "Boss Link", "Steady Week", "Trail Builder", "Boss Pathfinder"]) assert.match(profile, new RegExp(achievement));
+  assert.match(profile, /Only you see this shelf/);
+  assert.match(profile, /Achievements are not added to the leaderboard/);
+  assert.match(css, /\.achievement-section/);
+  assert.match(css, /\.achievement-grid/);
+  assert.match(css, /\.achievement-badge/);
+  assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.achievement-grid/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-tracker/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);

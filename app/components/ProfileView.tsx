@@ -13,6 +13,15 @@ const frames = [
   { id: "prism", label: "Prism Frame", cost: 90 },
 ];
 
+const achievementSpecs = [
+  { id: "first-step", title: "First Step", copy: "Finish one lesson.", glyph: "→", tone: "blue", source: "lessons", target: 1, unit: "lesson" },
+  { id: "star-spark", title: "Twelve Sparks", copy: "Collect twelve lesson stars.", glyph: "✦", tone: "gold", source: "stars", target: 12, unit: "star" },
+  { id: "boss-link", title: "Boss Link", copy: "Clear your first mixed boss.", glyph: "★", tone: "coral", source: "bosses", target: 1, unit: "boss" },
+  { id: "steady-week", title: "Steady Week", copy: "Reach a seven-day learning rhythm.", glyph: "▲", tone: "teal", source: "streak", target: 7, unit: "day" },
+  { id: "trail-builder", title: "Trail Builder", copy: "Complete twenty lessons.", glyph: "◆", tone: "violet", source: "lessons", target: 20, unit: "lesson" },
+  { id: "boss-pathfinder", title: "Boss Pathfinder", copy: "Clear eight region bosses.", glyph: "◎", tone: "blue", source: "bosses", target: 8, unit: "boss" },
+] as const;
+
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error } = useLearner(demo);
   const [message, setMessage] = useState("");
@@ -20,6 +29,14 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   if (loading) return <main className="loading-page" role="status"><div className="loading-mark">✦</div><p>Opening your anonymous profile…</p></main>;
   if (!state || error) return <main className="auth-gate"><div className="auth-card"><span className="auth-orbit">✦</span><h1>Sign in to view your profile.</h1><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
   const activeState = state;
+  const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
+  const achievementValues = { lessons: state.completedLessons.length, stars: totalStars, bosses: state.clearedBosses.length, streak: state.profile.longestStreak };
+  const achievements = achievementSpecs.map((item) => {
+    const value = achievementValues[item.source];
+    return { ...item, value, unlocked: value >= item.target, progress: Math.min(100, Math.round(value / item.target * 100)) };
+  });
+  const unlockedAchievements = achievements.filter((item) => item.unlocked).length;
+  const nextAchievement = achievements.find((item) => !item.unlocked);
 
   async function action(payload: Record<string, unknown>) {
     if (demo) return null;
@@ -66,6 +83,13 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
           <button className="secondary-button" type="button" disabled={state.profile.rerollUsed} onClick={reroll}>{state.profile.rerollUsed ? "Free reroll used" : "Reroll once"}</button>
         </div>
         <div className="profile-stats"><article><span>◆</span><strong>{state.totalXp}</strong><small>Total XP</small></article><article><span>▲</span><strong>{state.profile.longestStreak}</strong><small>Longest streak</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Lessons complete</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Bosses cleared</small></article></div>
+
+        <section className="achievement-section" aria-labelledby="achievement-heading">
+          <header><div><span className="section-kicker">PRIVATE ACHIEVEMENT SHELF</span><h2 id="achievement-heading">Your progress has landmarks.</h2><p>Badges appear automatically from lessons, stars, bosses, and your longest rhythm.</p></div><span className="achievement-count"><strong>{unlockedAchievements}</strong> / {achievements.length} unlocked</span></header>
+          {nextAchievement ? <div className={`next-achievement accent-${nextAchievement.tone}`}><span className="achievement-badge" aria-hidden="true"><b>{nextAchievement.glyph}</b><i /></span><div><small>UP NEXT</small><strong>{nextAchievement.title}</strong><p>{nextAchievement.copy}</p></div><div className="next-achievement-progress"><span><b>{nextAchievement.value}</b> / {nextAchievement.target} {nextAchievement.unit}{nextAchievement.target === 1 ? "" : "s"}</span><i><b style={{ width: `${nextAchievement.progress}%` }} /></i></div></div> : <div className="next-achievement shelf-complete"><span className="achievement-badge" aria-hidden="true"><b>✓</b><i /></span><div><small>SHELF COMPLETE</small><strong>Every current badge is yours.</strong><p>Keep exploring—the next trail landmark can arrive in a future update.</p></div></div>}
+          <div className="achievement-grid" role="list">{achievements.map((item) => <article className={`achievement-card accent-${item.tone} ${item.unlocked ? "unlocked" : "locked"}`} role="listitem" aria-label={`${item.title}: ${item.unlocked ? "unlocked" : `${item.value} of ${item.target}`}`} key={item.id}><span className="achievement-badge" aria-hidden="true"><b>{item.glyph}</b><i /></span><div><h3>{item.title}</h3><p>{item.copy}</p></div><div className="achievement-card-status"><span>{item.unlocked ? "UNLOCKED" : `${item.value}/${item.target}`}</span><i><b style={{ width: `${item.progress}%` }} /></i></div></article>)}</div>
+          <footer><span aria-hidden="true">◇</span><p><strong>Only you see this shelf.</strong> Achievements are not added to the leaderboard or a public profile.</p></footer>
+        </section>
 
         <div className="profile-grid">
           <section className="locker-card">
