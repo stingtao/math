@@ -7,6 +7,7 @@ import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
 import { SuccessBurst } from "./SuccessBurst";
+import { TopicIcon } from "./TopicIcon";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; choices?: string[] };
 
@@ -22,6 +23,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const question = questions[index];
+  const questionLesson = question ? lessonById.get(question.lessonId) : undefined;
+  const reviewAnchorLesson = questions[0] ? lessonById.get(questions[0].lessonId) : undefined;
 
   const demoQuestions = useMemo(() => {
     if (!state) return [];
@@ -79,7 +82,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     setFinished(true);
   }
 
-  if (finished) return <main className="learner-shell"><SuccessBurst eventKey="daily-review-complete" large /><LearnerHeader state={state} demo={demo} /><section className="review-finish"><div className="review-ring"><span>+20</span><small>XP</small></div><span className="section-kicker">DAILY REVIEW COMPLETE</span><h1>Review complete.</h1><p>Today’s ideas will return later.</p><a className="primary-button" href={demo ? "/learn?demo=1" : "/learn"}>Back to your trail <span>→</span></a></section></main>;
+  if (finished) return <main className="learner-shell"><SuccessBurst eventKey="daily-review-complete" large /><LearnerHeader state={state} demo={demo} /><section className="review-finish">{reviewAnchorLesson && <div className="review-finish-emblem"><TopicIcon visual={reviewAnchorLesson.visual} accent={reviewAnchorLesson.accent} size="xl" label="Daily Review completed" /><span aria-hidden="true">✓</span></div>}<span className="section-kicker">DAILY REVIEW COMPLETE</span><h1>Memory strengthened.</h1><p>You recalled {questions.length} ideas today. They will return on the spaced-review path when practice matters most.</p><div className="review-finish-reward"><span><strong>+20</strong> XP</span><span><strong>{questions.length}/{questions.length}</strong> recalled</span><span><strong>1–14</strong> day cycle</span></div><div className="review-memory-path" aria-label="Today complete and future reviews scheduled"><span className="done"><b>✓</b> Today complete</span><i /><span><b>◇</b> Next recall scheduled</span></div><a className="primary-button" href={demo ? "/learn?demo=1" : "/learn"}>Back to your trail <span>→</span></a></section></main>;
 
   return (
     <main className="learner-shell review-shell">
@@ -87,10 +90,10 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       <section className="review-layout">
         <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Today’s five.</h1><p>Review at 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><small>Complete the set: +20 XP.</small></aside>
         <div className="review-card">
-          <header><div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div><span>{index + 1}/{questions.length}</span></header>
+          <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div><span>{index + 1}/{questions.length}</span></header>
           {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" onClick={() => { setAnswer(choice); setFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") check(); }} placeholder="Type your answer" autoFocus /></label>}
-          {feedback === "incorrect" && <div className="feedback-card incorrect"><span>Not yet</span><p>{question.hint}</p></div>}
-          {feedback === "correct" && <><SuccessBurst eventKey={`review-${question.lessonId}-${question.questionId}`} /><div className="feedback-card correct"><span>Correct</span><p>Next review ready.</p></div></>}
+          {feedback === "incorrect" && <div className="feedback-card incorrect" role="status"><span>Not yet</span><p>{question.hint}</p></div>}
+          {feedback === "correct" && <><SuccessBurst eventKey={`review-${question.lessonId}-${question.questionId}`} /><div className="feedback-card correct feedback-celebration review-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Memory strengthened.</strong><p>{index + 1} of {questions.length} recalled. Keep the rhythm going.</p></div><span className="momentum-chip">{index + 1}/{questions.length}</span></div></>}
           {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><span className="review-dots">{questions.map((item, dot) => <i className={dot < index ? "done" : dot === index ? "active" : ""} key={`${item.lessonId}-${dot}`} />)}</span>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === questions.length - 1 ? "Finish review" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>

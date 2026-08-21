@@ -157,6 +157,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
   const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
@@ -170,8 +171,12 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /unlock-path/);
   assert.match(lesson, /practiceEncouragement/);
   assert.match(boss, /boss-unlock/);
-  for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg"]) assert.match(concept, new RegExp(visual.replace(".", "\\.")));
-  for (const model of ["number-line", "percent", "slope", "triangle", "scatter"]) assert.match(concept, new RegExp(`model: "${model}"`));
+  for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg"]) {
+    assert.match(concept, new RegExp(visual.replace(".", "\\.")));
+    const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
+    assert.ok(asset.byteLength > 10_000);
+  }
+  for (const model of ["number-line", "percent", "slope", "triangle", "scatter", "distribute", "function", "transform", "volume"]) assert.match(concept, new RegExp(`model: "${model}"`));
   assert.match(dashboard, /CURRENT QUEST/);
   assert.match(dashboard, /visibleRegions\.map/);
   assert.match(dashboard, /aria-expanded=\{showFullMap\}/);
@@ -182,6 +187,18 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.quest-tracker/);
   assert.match(css, /\.percent-context-grid/);
   assert.match(css, /\.scatter-model/);
+  assert.match(css, /\.distribute-context-model/);
+  assert.match(css, /\.function-context-model/);
+  assert.match(css, /\.transform-context-model/);
+  assert.match(css, /\.volume-context-model/);
+  assert.match(review, /review-finish-emblem/);
+  assert.match(review, /Memory strengthened/);
+  assert.match(review, /<TopicIcon visual=\{questionLesson\.visual\}/);
+  assert.match(boss, /isFinalRegion/);
+  assert.match(boss, /repair-progress/);
+  assert.match(boss, /showHint && feedback !== "incorrect"/);
+  assert.match(css, /\.review-memory-path/);
+  assert.match(css, /\.repair-progress/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-tracker/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);
 });

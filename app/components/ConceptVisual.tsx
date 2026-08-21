@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "scatter";
+  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -45,6 +45,34 @@ const contextScenes: Record<string, ContextScene> = {
     headline: "look for the overall pattern",
     copy: "Each point is one observation. Together, the points can reveal a relationship.",
     model: "scatter",
+  },
+  "distributive-property": {
+    src: "/visuals/distributive-workshop-context.jpg",
+    alt: "Four identical workshop trays, each split into one group of blue gears and one group of two coral parts",
+    headline: "4(x + 2) = 4x + 8",
+    copy: "Four copies of a whole group means four copies of every part inside it.",
+    model: "distribute",
+  },
+  "function-representations": {
+    src: "/visuals/function-kiosk-context.jpg",
+    alt: "A bike-rental rule machine connecting inputs with a route, a table, and a bar display",
+    headline: "one function, many representations",
+    copy: "A rule, table, graph, and real situation can all describe the same relationship.",
+    model: "function",
+  },
+  "coordinate-transformations": {
+    src: "/visuals/transform-plaza-context.jpg",
+    alt: "Congruent triangular sculptures slid, reflected, and rotated across a tiled plaza",
+    headline: "every point follows the same rule",
+    copy: "A coordinate rule moves each vertex predictably while preserving the figure.",
+    model: "transform",
+  },
+  "cylinder-volume": {
+    src: "/visuals/cylinder-tank-context.jpg",
+    alt: "A transparent cylindrical water tank filling upward in equal layers with radius and height guides",
+    headline: "V = πr²h",
+    copy: "Find the circular base area, then stack that area through the full height.",
+    model: "volume",
   },
 };
 
@@ -90,6 +118,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "slope" && <div className="coordinate-model context-coordinate"><span className="axis-x" /><span className="axis-y" /><i className="point-one" /><i className="point-two" /><b /><em className="slope-run">run</em><em className="slope-rise">rise</em></div>}
         {scene.model === "triangle" && <div className="shape-model context-triangle"><span /><span /><span /><i aria-hidden="true" /></div>}
         {scene.model === "scatter" && <div className="scatter-model" aria-hidden="true"><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /></div>}
+        {scene.model === "distribute" && <div className="distribute-context-model" aria-hidden="true"><span dangerouslySetInnerHTML={{ __html: katex.renderToString("4(x+2)", { throwOnError: false }) }} /><i>→</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("4x+8", { throwOnError: false }) }} /></div>}
+        {scene.model === "function" && <div className="function-context-model" aria-hidden="true"><span><b>0</b><b>1</b><b>2</b></span><i>→</i><em>×2 + 1</em><i>→</i><span><b>1</b><b>3</b><b>5</b></span></div>}
+        {scene.model === "transform" && <div className="transform-context-model" aria-hidden="true"><i className="transform-axis-x" /><i className="transform-axis-y" /><span className="transform-shape-one" /><span className="transform-shape-two" /><em>(+3, +2)</em></div>}
+        {scene.model === "volume" && <div className="volume-context-model" aria-hidden="true"><span className="volume-shell" /><i className="volume-top" /><i className="volume-bottom" /><b className="volume-radius">r</b><b className="volume-height">h</b></div>}
       </div>
       <strong>{scene.headline}</strong>
       <p>{scene.copy}</p>
