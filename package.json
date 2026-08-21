@@ -13,6 +13,7 @@
     "validate:content": "node --experimental-strip-types scripts/validate-curriculum.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
+    "deploy": "npm run deploy:cloudflare",
     "deploy:cloudflare": "npm run build && wrangler deploy --config dist/server/wrangler.json --keep-vars"
   },
   "dependencies": {

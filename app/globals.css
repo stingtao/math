@@ -165,6 +165,11 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .privacy-visual { min-height: 390px; position: relative; display: grid; place-items: center; border-radius: 38% 62% 58% 42% / 45% 35% 65% 55%; background: #e7eef3; }.privacy-visual::before, .privacy-visual::after { content: ""; position: absolute; border: 1px dashed #aebdca; border-radius: 50%; }.privacy-visual::before { inset: 50px; }.privacy-visual::after { inset: 105px; }.privacy-orbit { position: relative; z-index: 2; width: 108px; height: 108px; border-radius: 31px; display: grid; place-items: center; color: white; background: var(--navy); font-size: 38px; box-shadow: 0 18px 40px rgb(23 50 79 / 20%); }.privacy-visual > div i { position: absolute; z-index: 3; width: 30px; height: 30px; border: 7px solid white; border-radius: 50%; background: var(--blue); }.privacy-visual > div i:nth-child(1) { top: 35px; right: 115px; }.privacy-visual > div i:nth-child(2) { bottom: 50px; left: 90px; background: var(--coral); }.privacy-visual > div i:nth-child(3) { right: 45px; bottom: 105px; background: var(--gold); }
 .join-section { width: min(1180px, calc(100% - 48px)); margin: 10px auto 100px; padding: 70px; border-radius: 28px; display: grid; grid-template-columns: 1fr 420px; align-items: center; gap: 80px; background: var(--navy); color: white; overflow: hidden; }.join-copy h2 { margin: 12px 0; font-size: 53px; letter-spacing: -.05em; }.join-copy p { max-width: 560px; color: #bdd0df; line-height: 1.7; }.join-section .section-kicker { color: #7fb3ff; }.join-card { position: relative; padding: 28px; border-radius: 20px; color: var(--navy); background: white; box-shadow: 0 20px 50px rgb(0 0 0 / 20%); }.join-star { position: absolute; right: 22px; top: 20px; color: var(--gold); font-size: 25px; }.join-card h3 { margin: 0 0 8px; font-size: 22px; }.join-card > p { margin: 0 0 22px; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .google-signin { display: grid; gap: 13px; }.google-signin small { color: #718397; font-size: 10px; line-height: 1.45; }.age-check { display: flex; align-items: flex-start; gap: 9px; color: #4d647a; font-size: 12px; line-height: 1.4; }.age-check input { margin-top: 2px; accent-color: var(--blue); }.google-button-slot { min-height: 44px; display: grid; place-items: center; }.google-button-slot.disabled { border: 1px dashed #cbd8e2; border-radius: 6px; color: #8a9aaa; font-size: 12px; }.signin-status { margin: 0; color: var(--coral); font-size: 11px; }.fallback-signin > span { color: #8797a7; font-size: 10px; }
+.page-content { min-height: 50vh; }
+.ad-section { width: min(1180px, calc(100% - 48px)); margin: 36px auto 0; padding: 22px 0 28px; border-top: 1px solid var(--line); }
+.ad-label { margin-bottom: 10px; display: block; color: #8392a0; font-size: 10px; font-weight: 750; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
+.ad-frame { min-height: 180px; padding: 12px; overflow: hidden; border-radius: 18px; background: #eef3f6; }
+.adsbygoogle { width: 100%; min-height: 156px; }
 .site-footer { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 35px 0 45px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto auto; gap: 65px; align-items: center; }.site-footer > div p { margin: 8px 0 0 46px; color: var(--muted); font-size: 11px; }.site-footer nav { display: flex; gap: 24px; color: var(--muted); font-size: 12px; }.site-footer > span { color: #8999a8; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; }
 
 /* Anonymous identity */
@@ -356,6 +361,10 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 @media (max-width: 760px) {
   body { background: #f3f7f9; }
   .site-shell { overflow: clip; }
+  .ad-section { width: calc(100% - 28px); margin-top: 24px; padding: 18px 0 22px; }
+  .ad-frame { min-height: 132px; padding: 8px; border-radius: 14px; }
+  .adsbygoogle { min-height: 116px; }
+  body:has(.mobile-learner-nav) .site-footer { padding-bottom: calc(105px + env(safe-area-inset-bottom)); }
 
   /* Public navigation stays available without crowding the header. */
   .topbar { width: calc(100% - 28px); height: 68px; position: relative; z-index: 40; }
@@ -652,6 +661,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .privacy-section,
   .join-section,
   .site-footer,
+  .ad-section,
   .dashboard-wrap,
   .lesson-layout,
   .profile-wrap,

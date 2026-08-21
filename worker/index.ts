@@ -7,8 +7,20 @@ interface WorkerEnv extends Cloudflare.Env {
 }
 
 function withSecurityHeaders(response: Response): Response {
-  const secured = new Response(response.body, response);
-  secured.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://accounts.google.com https://www.googleapis.com; frame-src https://accounts.google.com/gsi/; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  const nonce = crypto.randomUUID().replaceAll("-", "");
+  let secured = new Response(response.body, response);
+
+  if (secured.headers.get("content-type")?.includes("text/html") && typeof HTMLRewriter !== "undefined") {
+    secured = new HTMLRewriter()
+      .on("script", {
+        element(element) {
+          element.setAttribute("nonce", nonce);
+        },
+      })
+      .transform(secured);
+  }
+
+  secured.headers.set("Content-Security-Policy", `default-src 'self'; object-src 'none'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https://accounts.google.com/gsi/client https://pagead2.googlesyndication.com https: http:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https:; frame-src https:; worker-src 'self' blob: https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
   secured.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   secured.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
   secured.headers.set("X-Content-Type-Options", "nosniff");

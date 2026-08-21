@@ -121,3 +121,32 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.sheet-modal img \{[^}]*object-fit:\s*contain/);
   assert.match(css, /\.katex-display \{[^}]*overflow-x:\s*auto/);
 });
+
+test("places a teen-treated AdSense unit between every page and the shared footer", async () => {
+  const adUnit = await readFile(new URL("../app/components/AdUnit.tsx", import.meta.url), "utf8");
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const legal = await readFile(new URL("../app/components/LegalPage.tsx", import.meta.url), "utf8");
+  const worker = await readFile(new URL("../worker/index.ts", import.meta.url), "utf8");
+  const adsTxt = await readFile(new URL("../public/ads.txt", import.meta.url), "utf8");
+  const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+
+  assert.match(adUnit, /ca-pub-6452867962392355/);
+  assert.match(adUnit, /2899407297/);
+  assert.match(adUnit, /data-ad-format="autorelaxed"/);
+  assert.match(adUnit, /data-tag-for-age-treatment="2"/);
+  assert.match(layout, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js/);
+  assert.match(layout, /google-adsense-account/);
+  assert.ok(layout.indexOf("{children}") < layout.indexOf("<AdUnit"));
+  assert.ok(layout.indexOf("<AdUnit") < layout.indexOf("<SiteFooter"));
+  assert.doesNotMatch(home, /<footer className="site-footer"/);
+  assert.doesNotMatch(home, /No ads or behavior tracking/);
+  assert.match(legal, /Google AdSense/);
+  assert.match(legal, /policies\.google\.com\/technologies\/partner-sites/);
+  assert.match(worker, /pagead2\.googlesyndication\.com/);
+  assert.match(worker, /HTMLRewriter/);
+  assert.match(worker, /'strict-dynamic'/);
+  assert.match(worker, /'unsafe-eval'/);
+  assert.equal(adsTxt.trim(), "google.com, pub-6452867962392355, DIRECT, f08c47fec0942fa0");
+  assert.equal(packageJson.scripts.deploy, "npm run deploy:cloudflare");
+});

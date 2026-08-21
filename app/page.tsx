@@ -47,14 +47,12 @@ export default function Home() {
 
     <section className="privacy-section">
       <div className="privacy-visual" aria-hidden="true"><span className="privacy-orbit">✦</span><div><i /><i /><i /></div></div>
-      <div className="privacy-copy"><span className="section-kicker">SIMPLE AND ANONYMOUS</span><h2>I don’t want to know who owns each score.</h2><p>Google helps you return. Math does not save your Google name, email, photo, or original account ID.</p><p>The leaderboard shows only a random nickname, abstract avatar, rank, and weekly XP.</p><ul><li>No ads or behavior tracking</li><li>No searchable profiles</li><li>Leaderboard is opt-in</li><li>Feedback is separate from progress</li></ul><a className="text-link" href="/privacy">Read the privacy page</a></div>
+      <div className="privacy-copy"><span className="section-kicker">SIMPLE AND ANONYMOUS</span><h2>I don’t want to know who owns each score.</h2><p>Google helps you return. Math does not save your Google name, email, photo, or original account ID.</p><p>The leaderboard shows only a random nickname, abstract avatar, rank, and weekly XP.</p><ul><li>Ads stay separate from learning records</li><li>No searchable profiles</li><li>Leaderboard is opt-in</li><li>Feedback is separate from progress</li></ul><a className="text-link" href="/privacy">Read the privacy page</a></div>
     </section>
 
     <section className="join-section" id="join">
       <div className="join-copy"><span className="section-kicker">SAVE FOR NEXT TIME</span><h2>Google is only for returning.</h2><p>You receive a random nickname and abstract avatar. Google profile details are not saved.</p><p>Or <a href="/learn?grade=8&demo=1">try the demo</a>.</p></div>
       <div className="join-card"><span className="join-star" aria-hidden="true">✦</span><h3>Continue with Google</h3><p>For learners age 13 or older in this first version.</p><GoogleSignIn clientId={clientId} /></div>
     </section>
-
-    <footer className="site-footer"><div><span className="brand"><span className="brand-mark" aria-hidden="true">M</span><span>Math</span></span><p>Made by Sting, a parent who likes math.</p></div><nav aria-label="Footer navigation"><a href="/feedback">Feedback</a><a href="/leaderboard">Leaderboard</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav><span>Grades 7–9 · English</span></footer>
   </main>;
 }

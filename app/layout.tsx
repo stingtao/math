@@ -3,6 +3,10 @@ import { Manrope } from "next/font/google";
 import { headers } from "next/headers";
 import "katex/dist/katex.min.css";
 import "./globals.css";
+import { AdUnit } from "./components/AdUnit";
+import { SiteFooter } from "./components/SiteFooter";
+
+const ADSENSE_CLIENT = "ca-pub-6452867962392355";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -41,11 +45,19 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          crossOrigin="anonymous"
+        />
       </head>
       <body
         className={`${manrope.variable} antialiased`}
       >
-        {children}
+        <div className="page-content">{children}</div>
+        <AdUnit />
+        <SiteFooter />
       </body>
     </html>
   );
