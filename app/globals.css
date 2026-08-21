@@ -871,3 +871,128 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .path-lesson { grid-template-columns: 44px minmax(0, 1fr) auto; }
   .path-stars { max-width: 68px; }
 }
+
+/* Guided quests and real-world lesson context. */
+.contextual-lesson-visual { overflow: hidden; }
+.context-scene { aspect-ratio: 3 / 2; }
+.context-scene img { height: 100%; max-height: none; }
+.context-model-percent .context-scene img { object-position: center 34%; }
+.context-model-slope .context-scene img { object-position: center 40%; }
+.context-model-triangle .context-scene img { object-position: center 45%; }
+.context-model-scatter .context-scene img { object-position: center 46%; }
+.context-math-card {
+  width: min(560px, 92%);
+  min-height: 112px;
+  margin-top: -44px;
+  padding: 16px 22px;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d9e4eb;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 13px 30px rgb(23 50 79 / 13%);
+  backdrop-filter: blur(8px);
+}
+.context-math-card .context-number-line { width: 100%; margin: 0; padding: 0; box-shadow: none; }
+.percent-context-grid { width: min(300px, 100%); aspect-ratio: 5 / 2; display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr); gap: 2px; }
+.percent-context-grid span { min-width: 0; border-radius: 2px; background: #e2eaf0; }
+.percent-context-grid span.filled { background: var(--coral); }
+.context-coordinate { width: 250px; height: 132px; background-size: 25px 22px; }
+.context-coordinate .axis-x { top: 109px; }
+.context-coordinate .axis-y { left: 29px; }
+.context-coordinate .point-one { left: 47px; top: 82px; }
+.context-coordinate .point-two { right: 38px; bottom: 82px; }
+.context-coordinate b { width: 185px; left: 54px; top: 85px; transform: rotate(-25deg); }
+.context-coordinate em { position: absolute; color: var(--muted); font-size: 10px; font-style: normal; font-weight: 800; }
+.context-coordinate .slope-run { left: 118px; bottom: 3px; }
+.context-coordinate .slope-rise { left: 4px; top: 38px; writing-mode: vertical-rl; transform: rotate(180deg); }
+.context-triangle { height: 135px; transform: scale(.86); }
+.context-triangle i { width: 17px; height: 17px; position: absolute; left: 38px; bottom: 28px; border-top: 2px solid var(--navy); border-right: 2px solid var(--navy); }
+.scatter-model { width: min(330px, 100%); height: 145px; position: relative; border-left: 2px solid var(--navy); border-bottom: 2px solid var(--navy); background-image: linear-gradient(#e2e9ee 1px, transparent 1px), linear-gradient(90deg, #e2e9ee 1px, transparent 1px); background-size: 33px 29px; }
+.scatter-model span { width: 13px; height: 13px; position: absolute; border: 3px solid white; border-radius: 50%; background: var(--violet); box-shadow: 0 2px 5px rgb(23 50 79 / 18%); }
+.scatter-model span:nth-child(1) { left: 8%; bottom: 16%; }.scatter-model span:nth-child(2) { left: 18%; bottom: 34%; }.scatter-model span:nth-child(3) { left: 27%; bottom: 26%; }.scatter-model span:nth-child(4) { left: 37%; bottom: 49%; }.scatter-model span:nth-child(5) { left: 47%; bottom: 43%; }.scatter-model span:nth-child(6) { left: 55%; bottom: 64%; }.scatter-model span:nth-child(7) { left: 66%; bottom: 56%; }.scatter-model span:nth-child(8) { left: 74%; bottom: 76%; }.scatter-model span:nth-child(9) { left: 83%; bottom: 65%; }.scatter-model span:nth-child(10) { left: 91%; bottom: 86%; }
+
+.quest-tracker {
+  margin-top: 24px;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 245px;
+  align-items: center;
+  gap: 28px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, #dbe5ed);
+  border-radius: 22px;
+  background: linear-gradient(130deg, white 55%, var(--accent-soft));
+  box-shadow: 0 14px 34px rgb(23 50 79 / 7%);
+}
+.quest-visual { width: 104px; height: 104px; position: relative; display: grid; place-items: center; }
+.quest-visual .topic-icon { transform: rotate(-4deg); }
+.quest-visual > span { width: 30px; height: 25px; position: absolute; right: -2px; bottom: 0; display: grid; place-items: center; border: 3px solid white; border-radius: 8px; color: white; background: var(--accent); box-shadow: 0 4px 10px rgb(23 50 79 / 18%); font-size: 9px; font-weight: 900; }
+.quest-copy h2 { margin: 6px 0 5px; font-size: 27px; letter-spacing: -.04em; }
+.quest-copy > p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.quest-progress { height: 6px; margin: 15px 0 14px; overflow: hidden; border-radius: 999px; background: #e5ebef; }
+.quest-progress span { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width .3s ease; }
+.quest-nodes { display: flex; align-items: center; gap: 7px; }
+.quest-node { width: 30px; height: 30px; display: grid; flex: 0 0 auto; place-items: center; border: 1px solid #d6e0e7; border-radius: 10px; color: #8697a6; background: #f1f4f6; font-size: 10px; font-weight: 900; }
+.quest-node.done { color: white; border-color: var(--accent); background: var(--accent); }
+.quest-node.current { color: var(--accent); border: 2px solid var(--accent); background: white; box-shadow: 0 0 0 4px var(--accent-soft); }
+.quest-connector { width: 28px; height: 2px; margin-inline: 2px; background: #cbd7df; }
+.quest-boss-node { color: #9f7823; border-color: #e7ce84; background: #fff7db; }
+.quest-boss-node.current { color: #9f7823; border-color: var(--gold); box-shadow: 0 0 0 4px #fff1bf; }
+.quest-action { min-width: 0; display: grid; gap: 8px; }
+.quest-action > span { color: var(--accent); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
+.quest-action > strong { min-height: 40px; font-size: 14px; line-height: 1.4; }
+.quest-action .primary-button { min-height: 48px; display: flex; align-items: center; justify-content: space-between; }
+.map-controls { max-width: 360px; display: grid; justify-items: end; gap: 10px; text-align: right; }
+.map-controls p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.map-controls button { min-height: 44px; padding: 9px 14px; border: 1px solid #cbd9e2; border-radius: 11px; color: var(--navy); background: white; font-size: 12px; font-weight: 800; }
+.map-controls button:hover { border-color: var(--blue); color: var(--blue); }
+.map-window-note { margin: -10px 0 17px; padding: 11px 14px; display: flex; align-items: center; gap: 9px; border-radius: 12px; color: #526b80; background: #eaf1f5; font-size: 12px; }
+.map-window-note span { color: var(--blue); font-size: 16px; }
+.world-card { scroll-margin-top: 95px; }
+
+@media (max-width: 980px) {
+  .quest-tracker { grid-template-columns: 92px minmax(0, 1fr); }
+  .quest-visual { width: 88px; height: 88px; }
+  .quest-visual .topic-icon-lg { --topic-size: 76px; }
+  .quest-action { grid-column: 2; grid-template-columns: 1fr auto; align-items: center; }
+  .quest-action > span { grid-column: 1; }
+  .quest-action > strong { min-height: 0; }
+  .quest-action .primary-button { grid-column: 2; grid-row: 1 / 3; min-width: 180px; }
+}
+
+@media (max-width: 760px) {
+  .contextual-lesson-visual { padding: 9px 9px 20px; }
+  .context-scene { max-height: none; border-radius: 15px; }
+  .context-scene img { max-height: none; }
+  .context-math-card { width: 94%; min-height: 98px; margin-top: -28px; padding: 13px 15px; }
+  .contextual-lesson-visual > strong { padding-inline: 8px; font-size: 21px; }
+  .contextual-lesson-visual > p { max-width: 35ch; padding-inline: 8px; font-size: 14px; line-height: 1.5; }
+  .percent-context-grid { width: min(270px, 100%); }
+  .scatter-model { height: 125px; }
+  .quest-tracker { padding: 21px 18px; grid-template-columns: 72px minmax(0, 1fr); gap: 17px; }
+  .quest-visual { width: 70px; height: 70px; }
+  .quest-visual .topic-icon-lg { --topic-size: 64px; }
+  .quest-copy h2 { font-size: 24px; }
+  .quest-copy > p { font-size: 14px; }
+  .quest-action { grid-column: 1 / -1; grid-template-columns: 1fr; }
+  .quest-action > span, .quest-action > strong, .quest-action .primary-button { grid-column: 1; grid-row: auto; }
+  .quest-action .primary-button { width: 100%; }
+  .map-controls { max-width: none; justify-items: start; text-align: left; }
+  .map-controls p { font-size: 14px; }
+  .map-controls button { width: 100%; }
+  .map-window-note { font-size: 13px; line-height: 1.45; }
+}
+
+@media (max-width: 420px) {
+  .context-coordinate { transform: scale(.86); }
+  .context-triangle { transform: scale(.75); }
+  .quest-tracker { grid-template-columns: 58px minmax(0, 1fr); padding-inline: 15px; }
+  .quest-visual { width: 56px; height: 56px; }
+  .quest-visual .topic-icon-lg { --topic-size: 54px; }
+  .quest-visual > span { right: -5px; bottom: -5px; }
+  .quest-nodes { gap: 5px; }
+  .quest-node { width: 28px; height: 28px; }
+  .quest-connector { width: 14px; }
+}

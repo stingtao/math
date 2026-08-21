@@ -12,6 +12,7 @@ import { TopicIcon } from "./TopicIcon";
 export function LearningDashboard({ demo, grade }: { demo: boolean; grade: number }) {
   const { state, setState, loading, error } = useLearner(demo);
   const [rewardMessage, setRewardMessage] = useState("");
+  const [showFullMap, setShowFullMap] = useState(false);
 
   const completed = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
   const cleared = useMemo(() => new Set(state?.clearedBosses.map((item) => item.regionId) ?? []), [state]);
@@ -20,6 +21,21 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const nextLesson = gradeLessons.find((item) => !completed.has(item.id)) ?? gradeLessons[gradeLessons.length - 1];
   const gradeCompleted = gradeLessons.filter((item) => completed.has(item.id)).length;
   const gradeBosses = curriculum.regions.filter((item) => cleared.has(item.id)).length;
+  const activeRegionIndexRaw = curriculum.regions.findIndex((item) => !cleared.has(item.id));
+  const gradeComplete = activeRegionIndexRaw === -1;
+  const activeRegionIndex = activeRegionIndexRaw === -1 ? Math.max(0, curriculum.regions.length - 1) : activeRegionIndexRaw;
+  const activeRegion = curriculum.regions[activeRegionIndex];
+  const activeDone = activeRegion.lessons.filter((item) => completed.has(item.id)).length;
+  const activeNextLesson = activeRegion.lessons.find((item) => !completed.has(item.id));
+  const activeBossReady = activeDone === activeRegion.lessons.length;
+  const focusedStart = Math.max(0, activeRegionIndex - 1);
+  const focusedEnd = Math.min(curriculum.regions.length, activeRegionIndex + 2);
+  const visibleRegions = showFullMap ? curriculum.regions : curriculum.regions.slice(focusedStart, focusedEnd);
+  const questHref = gradeComplete
+    ? `/review?grade=${grade}${demo ? "&demo=1" : ""}`
+    : activeBossReady
+    ? `/boss/${activeRegion.id}?grade=${grade}${demo ? "&demo=1" : ""}`
+    : `/learn/${activeNextLesson?.slug ?? activeRegion.lessons[0].slug}?grade=${grade}${demo ? "&demo=1" : ""}`;
 
   if (loading) return <LoadingTrail />;
   if (!state || error) return <SignInGate />;
@@ -90,15 +106,37 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           </aside>
         </div>
 
+        <section className={`quest-tracker accent-${activeRegion.accent}`} aria-labelledby="current-quest-heading">
+          <div className="quest-visual"><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="lg" label={`${activeRegion.title} current quest`} /><span>{String(activeRegion.order).padStart(2, "0")}</span></div>
+          <div className="quest-copy">
+            <span className="section-kicker">CURRENT QUEST · {activeRegion.standard}</span>
+            <h2 id="current-quest-heading">{activeRegion.title}</h2>
+            <p>{gradeComplete ? `Grade ${grade} trail cleared. Daily Review will keep your strongest skills fresh.` : activeBossReady ? "All four lessons are complete. Your boss quest is ready—take your time and use all three hearts." : `${activeRegion.lessons.length - activeDone} short ${activeRegion.lessons.length - activeDone === 1 ? "lesson" : "lessons"} until the boss quest. Corrections count as progress.`}</p>
+            <div className="quest-progress" aria-label={`${activeDone} of ${activeRegion.lessons.length} lessons complete`}><span style={{ width: `${activeDone / activeRegion.lessons.length * 100}%` }} /></div>
+            <div className="quest-nodes" aria-label="Current quest progress">
+              {activeRegion.lessons.map((item, index) => {
+                const done = completed.has(item.id);
+                const current = !done && item.id === activeNextLesson?.id;
+                return <span className={`quest-node ${done ? "done" : current ? "current" : "locked"}`} aria-label={`${item.title}: ${done ? "complete" : current ? "next" : "locked"}`} key={item.id}>{done ? "✓" : index + 1}</span>;
+              })}
+              <i className="quest-connector" aria-hidden="true" />
+              <span className={`quest-node quest-boss-node ${gradeComplete ? "done" : activeBossReady ? "current" : "locked"}`} aria-label={`Boss quest: ${gradeComplete ? "complete" : activeBossReady ? "ready" : "locked"}`}>★</span>
+            </div>
+          </div>
+          <div className="quest-action"><span>{gradeComplete ? "TRAIL CLEARED" : activeBossReady ? "BOSS READY" : `STEP ${activeDone + 1} OF ${activeRegion.lessons.length}`}</span><strong>{gradeComplete ? "Keep your mastery moving" : activeBossReady ? "5 mixed questions" : activeNextLesson?.title}</strong><a className="primary-button" href={questHref}>{gradeComplete ? "Open Daily Review" : activeBossReady ? "Start boss quest" : "Continue quest"} <span aria-hidden="true">→</span></a></div>
+        </section>
+
         <section className="trail-overview">
-          <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade}</span><h2>Learning map</h2></div><p>Correct every question to continue. Stars do not block progress.</p></div>
-          <div className="world-list">
-            {curriculum.regions.map((region, regionIndex) => {
+          <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade}</span><h2>Learning map</h2></div><div className="map-controls"><p>{showFullMap ? `Showing all ${curriculum.regions.length} regions.` : "Showing your current region and nearby trail."} Stars do not block progress.</p><button type="button" aria-expanded={showFullMap} aria-controls="grade-map" onClick={() => setShowFullMap((value) => !value)}>{showFullMap ? "Focus on current quest" : `Show full Grade ${grade} map`}</button></div></div>
+          {!showFullMap && <p className="map-window-note" role="status"><span aria-hidden="true">◎</span> A focused map keeps your next step close. You can open the full trail anytime.</p>}
+          <div className="world-list" id="grade-map">
+            {visibleRegions.map((region) => {
+              const regionIndex = curriculum.regions.findIndex((item) => item.id === region.id);
               const regionComplete = region.lessons.every((item) => completed.has(item.id));
               const previousCleared = regionIndex === 0 || cleared.has(curriculum.regions[regionIndex - 1].id);
               const bossCleared = cleared.has(region.id);
               return (
-                <article className={`world-card accent-${region.accent} ${previousCleared ? "unlocked" : "world-locked"}`} key={region.id}>
+                <article className={`world-card accent-${region.accent} ${previousCleared ? "unlocked" : "world-locked"}`} id={`region-${region.id}`} key={region.id}>
                   <header className="world-header"><div className="world-marker"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="md" label={`${region.title} region icon`} /><span className="world-number">{String(region.order).padStart(2, "0")}</span></div><div><span>{region.standard}</span><h3>{region.title}</h3><p>{region.subtitle}</p></div><span className="world-status">{bossCleared ? "Cleared" : previousCleared ? `${region.lessons.filter((item) => completed.has(item.id)).length}/4` : "Locked"}</span></header>
                   <div className="world-path">
                     {region.lessons.map((item, index) => {
