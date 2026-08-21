@@ -195,6 +195,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /mathWorldScenes/);
   assert.match(home, /math-world-grid/);
   assert.match(home, /13 \/ 13/);
+  assert.match(home, /game-loop-board/);
+  assert.match(home, /Four lesson keys, then the boss/);
+  assert.match(home, /RECOVERY COUNTS/);
   assert.match(dashboard, /CURRENT QUEST/);
   assert.match(dashboard, /visibleRegions\.map/);
   assert.match(dashboard, /aria-expanded=\{showFullMap\}/);
@@ -232,6 +235,16 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.world-landmark/);
   assert.match(css, /\.practice-charge/);
   assert.match(css, /\.charge-cells/);
+  assert.match(lesson, /practice-star-path/);
+  assert.match(lesson, /Stars describe this run—they never block progress/);
+  assert.match(lesson, /quest-key-card/);
+  assert.match(lesson, /First-try spark!/);
+  assert.match(lesson, /Recovery complete!/);
+  assert.match(css, /\.game-loop-board/);
+  assert.match(css, /\.game-quest-path/);
+  assert.match(css, /\.practice-star-path/);
+  assert.match(css, /\.quest-key-card/);
+  assert.match(css, /\.recovery-feedback/);
   assert.match(css, /\.mastery-next-goal/);
   assert.match(review, /review-finish-emblem/);
   assert.match(review, /Memory strengthened/);
@@ -242,5 +255,6 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.review-memory-path/);
   assert.match(css, /\.repair-progress/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-tracker/);
+  assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);
 });

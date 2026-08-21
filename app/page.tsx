@@ -12,6 +12,13 @@ const learningLoop = [
   { number: "03", title: "Unlock the trail", copy: "Earn stars, revisit weak ideas, and open a mixed boss after four lessons.", visual: "line-graph", accent: "violet" as const, meta: "progress that stays" },
 ];
 
+const questPreview = [
+  { title: "Read symbols", visual: "symbols", accent: "blue" as const },
+  { title: "Move around zero", visual: "number-line", accent: "coral" as const },
+  { title: "Predict the sign", visual: "sign-grid", accent: "coral" as const },
+  { title: "Choose the first step", visual: "steps", accent: "blue" as const },
+];
+
 const gradeVisuals = {
   7: { visual: "ratio-table", accent: "coral" as const },
   8: { visual: "coordinate-plane", accent: "blue" as const },
@@ -49,6 +56,26 @@ export default function Home() {
     <section className="learning-loop-section" aria-labelledby="learning-loop-title">
       <div className="section-heading split-heading"><div><span className="section-kicker">A CALM LEARNING LOOP</span><h2 id="learning-loop-title">Know what to do next.</h2></div><p>Each lesson uses the same short rhythm, so your attention stays on the math—not on finding the next button.</p></div>
       <div className="learning-loop-grid">{learningLoop.map((item) => <article className={`loop-card accent-${item.accent}`} key={item.number}><div className="loop-card-top"><span>{item.number}</span><TopicIcon visual={item.visual} accent={item.accent} size="lg" label={`${item.title} illustration`} /></div><h3>{item.title}</h3><p>{item.copy}</p><small>{item.meta}</small></article>)}</div>
+    </section>
+
+    <section className="game-loop-section" aria-labelledby="game-loop-title">
+      <div className="section-heading split-heading"><div><span className="section-kicker">PROGRESS YOU CAN SEE</span><h2 id="game-loop-title">Every small win opens something.</h2></div><p>Lessons collect quest keys. Corrections charge progress. Four keys open a mixed boss—with no timer and unlimited retries.</p></div>
+      <div className="game-loop-board">
+        <div className="game-quest-card accent-blue">
+          <header><div><span className="section-kicker">REGION 01 · NUMBER FOUNDATIONS</span><h3>Four lesson keys, then the boss.</h3></div><strong>3 / 4</strong></header>
+          <div className="game-quest-path" aria-label="Three of four lesson keys collected; one lesson and the boss remain">
+            {questPreview.map((item, index) => <div className={index < 3 ? "collected" : "next"} key={item.title}><TopicIcon visual={item.visual} accent={item.accent} size="sm" label="" /><span aria-hidden="true">{index < 3 ? "✓" : index + 1}</span><small>{item.title}</small></div>)}
+            <i aria-hidden="true" />
+            <div className="game-boss-node"><b aria-hidden="true">★</b><small>Mixed boss</small></div>
+          </div>
+          <footer><span><b>ONE STEP LEFT</b> Corrections still collect the key.</span><span className="game-xp-chip">+40 XP</span></footer>
+        </div>
+        <div className="game-feedback-stack">
+          <article className="game-feedback-card game-correction-card"><span aria-hidden="true">↻</span><div><small>RECOVERY COUNTS</small><h3>Not yet becomes now I see it.</h3><p>Use a hint, correct the step, and keep moving.</p></div><strong>✓</strong></article>
+          <article className="game-feedback-card game-stars-card"><span aria-hidden="true">✦</span><div><small>STARS EXPLAIN THE RUN</small><h3>Completion is always one star.</h3><p>First tries and no-hint runs add mastery stars; they never lock the next lesson.</p></div><strong>★★★</strong></article>
+          <article className="game-feedback-card game-review-card"><span aria-hidden="true">◇</span><div><small>MEMORY PATH</small><h3>Review returns at the right time.</h3><p>Up to five questions revisit useful ideas after 1, 3, 7, and 14 days.</p></div><strong>1·3·7·14</strong></article>
+        </div>
+      </div>
     </section>
 
     <section className="math-world-section" aria-labelledby="math-world-title">
