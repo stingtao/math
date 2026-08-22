@@ -2382,3 +2382,74 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .reward-calendar span i { width: 24px; height: 24px; }
   .reward-calendar span b { font-size: 10px; }
 }
+
+/* Lesson settlement keeps the win, route progress, and one next action above optional details. */
+.celebration-card { width: min(760px, calc(100% - 40px)); }
+.settlement-summary { width: min(580px, 100%); margin: 26px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.settlement-summary > span { min-width: 0; min-height: 92px; padding: 13px 10px; display: grid; place-items: center; align-content: center; gap: 4px; border: 1px solid #d9e3e9; border-radius: 15px; background: #f8fafb; }
+.settlement-summary > span > b { min-height: 26px; display: grid; place-items: center; color: var(--accent); font-size: 21px; line-height: 1; }
+.settlement-summary > span > strong { color: var(--navy); font-size: 10px; line-height: 1.3; text-align: center; }
+.settlement-summary > span > small { color: var(--muted); font-size: 8px; line-height: 1.3; text-align: center; }
+.settlement-summary .settlement-key { border-color: #c4e2da; background: #eff9f6; }
+.settlement-summary .settlement-key > b { width: 27px; height: 27px; border-radius: 9px; color: white; background: var(--teal); font-size: 13px; }
+.settlement-summary .settlement-stars > b { color: var(--gold); font-size: 17px; letter-spacing: 2px; }
+.settlement-summary .settlement-xp { border-color: color-mix(in srgb, var(--accent) 24%, #d9e3e9); background: var(--accent-soft); }
+.settlement-summary .settlement-xp > b { font-size: 24px; }
+.settlement-summary .settlement-xp.quiet { border-color: #d9e3e9; background: #f5f7f9; }
+.settlement-summary .settlement-xp.quiet > b { color: #6e8190; }
+.celebration-card .quest-key-card { margin-top: 13px; background: white; }
+.settlement-next { width: min(580px, 100%); margin: 13px auto 0; padding: 17px 18px; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 15px; border: 1px solid color-mix(in srgb, var(--accent) 28%, #d8e2e9); border-radius: 17px; background: linear-gradient(115deg, white, var(--accent-soft)); text-align: left; }
+.settlement-next .topic-icon-md { --topic-size: 54px; }
+.settlement-boss-icon { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 17px; color: white; background: var(--gold); box-shadow: 0 8px 18px rgb(176 127 24 / 18%); font-size: 23px; font-weight: 900; }
+.settlement-next > div { min-width: 0; display: grid; gap: 3px; }
+.settlement-next small { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+.settlement-next strong { font-size: 15px; line-height: 1.3; }
+.settlement-next p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+.settlement-details { width: min(580px, 100%); margin: 13px auto 0; overflow: hidden; border: 1px solid #d9e3e9; border-radius: 15px; background: #f8fafb; text-align: left; }
+.settlement-details > summary { min-height: 62px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; gap: 15px; list-style: none; cursor: pointer; }
+.settlement-details > summary::-webkit-details-marker { display: none; }
+.settlement-details > summary:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 32%, transparent); outline-offset: -3px; }
+.settlement-details > summary > span { min-width: 0; display: grid; gap: 3px; }
+.settlement-details > summary strong { font-size: 11px; }
+.settlement-details > summary small { color: var(--muted); font-size: 8px; line-height: 1.35; }
+.settlement-details > summary > b { width: 29px; height: 29px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; color: var(--accent); background: white; font-size: 15px; transition: transform .2s ease; }
+.settlement-details[open] > summary > b { transform: rotate(180deg); }
+.settlement-details-body { padding: 0 13px 13px; border-top: 1px solid #e1e8ec; }
+.settlement-details .mastery-next-goal,
+.settlement-details .reward-receipt { width: 100%; margin-top: 13px; }
+.settlement-save-note { width: min(580px, 100%); margin: 16px auto 18px !important; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f746e !important; font-size: 10px; line-height: 1.4 !important; }
+.settlement-save-note > span { width: 22px; height: 22px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--teal); font-size: 10px; font-weight: 900; }
+.settlement-save-note strong { color: #087965; }
+.celebration-actions.settlement-actions { width: min(580px, 100%); margin: 0 auto; display: grid; grid-template-columns: 1.25fr .75fr; align-items: stretch; gap: 9px; }
+.settlement-actions a { min-height: 50px; }
+
+@media (max-width: 760px) {
+  .celebration-card { width: calc(100% - 28px); margin: 32px auto; padding: 34px 17px; }
+  .settlement-summary { margin-top: 22px; grid-template-columns: 1fr; gap: 7px; }
+  .settlement-summary > span { min-height: 72px; padding: 11px 13px; grid-template-columns: 35px minmax(0, 1fr) auto; grid-template-rows: auto auto; place-items: initial; align-items: center; gap: 2px 10px; text-align: left; }
+  .settlement-summary > span > b { min-height: 0; grid-row: 1 / 3; justify-self: center; }
+  .settlement-summary > span > strong { align-self: end; font-size: 13px; text-align: left; }
+  .settlement-summary > span > small { align-self: start; font-size: 10px; text-align: left; }
+  .settlement-summary .settlement-xp > b { font-size: 20px; }
+  .settlement-summary .settlement-stars > b { font-size: 15px; }
+  .settlement-next { padding: 15px; grid-template-columns: 50px minmax(0, 1fr); gap: 13px; }
+  .settlement-next .topic-icon-md { --topic-size: 50px; }
+  .settlement-boss-icon { width: 50px; height: 50px; }
+  .settlement-next small { font-size: 9px; }
+  .settlement-next strong { font-size: 17px; }
+  .settlement-next p { font-size: 12px; }
+  .settlement-details > summary { min-height: 68px; }
+  .settlement-details > summary strong { font-size: 13px; }
+  .settlement-details > summary small { font-size: 10px; }
+  .settlement-save-note { align-items: flex-start; font-size: 12px; }
+  .celebration-actions.settlement-actions { grid-template-columns: 1fr; }
+  .settlement-actions a { width: 100%; min-height: 52px; }
+}
+
+@media (max-width: 380px) {
+  .celebration-card { width: calc(100% - 20px); padding-inline: 13px; }
+  .settlement-next { grid-template-columns: 45px minmax(0, 1fr); padding-inline: 12px; }
+  .settlement-next .topic-icon-md { --topic-size: 45px; }
+  .settlement-boss-icon { width: 45px; height: 45px; }
+  .settlement-details-body { padding-inline: 9px; }
+}
