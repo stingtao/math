@@ -3039,3 +3039,66 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .solid-compare-context-model > footer { grid-template-columns: 1fr; justify-items: center; gap: 2px; text-align: center; }
   .solid-compare-context-model > footer strong { justify-self: center; font-size: 17px; }
 }
+
+/* Signed rational-number models separate direction, sign, and magnitude. */
+.context-model-signed-sum .context-scene img,
+.context-model-signed-change .context-scene img { object-position: center 48%; }
+.context-model-subtract-opposite .context-scene img,
+.context-model-signed-rational-quotient .context-scene img { object-position: center 53%; }
+.context-model-signed-sum .context-math-card,
+.context-model-subtract-opposite .context-math-card,
+.context-model-signed-rational-quotient .context-math-card,
+.context-model-signed-change .context-math-card { width: min(625px, 95%); }
+.signed-sum-context-model { width: 100%; display: grid; grid-template-columns: .72fr 1.28fr; gap: 9px; }
+.signed-sum-context-model small,
+.rational-flow-context-model small { color: var(--muted); font-size: 8px; font-weight: 900; letter-spacing: .06em; line-height: 1.3; text-transform: uppercase; }
+.signed-sum-context-model strong,
+.rational-flow-context-model strong { color: var(--navy); font-size: 16px; }
+.signed-sum-context-model > header { min-height: 76px; grid-row: 1 / 3; padding: 10px; display: grid; place-items: center; align-content: center; gap: 5px; border-radius: 13px; color: white; background: var(--blue); }
+.signed-sum-context-model > header small,
+.signed-sum-context-model > header strong { color: white; }
+.signed-sum-context-model > header strong { font-size: 22px; }
+.signed-sum-context-model > div { display: grid; grid-template-columns: 1fr 30px 1fr; align-items: center; gap: 6px; }
+.signed-sum-context-model > div > span,
+.signed-sum-context-model > footer > span { min-width: 0; min-height: 56px; padding: 7px; display: grid; place-items: center; align-content: center; gap: 4px; border: 1px solid #e8cac7; border-radius: 11px; background: #fff3f1; text-align: center; }
+.signed-sum-context-model > div > span:last-child { border-color: #bfded7; background: #edf8f5; }
+.signed-sum-context-model > div > b { color: var(--muted); font-size: 9px; text-align: center; }
+.signed-sum-context-model > footer { display: grid; grid-template-columns: 1fr 22px 1fr; align-items: center; gap: 6px; }
+.signed-sum-context-model > footer > span { min-height: 50px; border-color: #d7e1e8; background: #f7fafb; }
+.signed-sum-context-model > footer > span:last-child { border: 2px solid var(--coral); background: #fff3f1; }
+.signed-sum-context-model > footer > span:last-child strong { color: var(--coral); font-size: 19px; }
+.signed-sum-context-model > footer > i { color: var(--coral); font-size: 15px; font-style: normal; font-weight: 900; text-align: center; }
+
+.rational-flow-context-model { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.rational-flow-context-model > span { min-width: 0; min-height: 72px; padding: 9px 21px 9px 9px; position: relative; display: grid; place-items: center; align-content: center; gap: 6px; border: 1px solid #d6e1e8; border-radius: 12px; background: #f7fafb; text-align: center; }
+.rational-flow-context-model > span:first-child { border-color: #c9d9ed; background: #eef4fc; }
+.rational-flow-context-model > span:last-child { border: 2px solid var(--teal); background: #eef8f5; }
+.rational-flow-context-model > span:last-child strong { color: var(--teal); font-size: 18px; }
+.rational-flow-context-model > span > strong { max-width: 100%; overflow-x: auto; scrollbar-width: thin; }
+.rational-flow-context-model > span > i { position: absolute; right: 6px; top: 50%; color: var(--blue); font-size: 13px; font-style: normal; font-weight: 900; transform: translateY(-50%); }
+.signed-rational-quotient-context-model,
+.signed-change-context-model { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.signed-rational-quotient-context-model > span:nth-child(2) { border-color: #e9cbc8; background: #fff3f1; }
+.signed-rational-quotient-context-model > span:nth-child(3) { border-color: #ead89f; background: #fff9e8; }
+.signed-rational-quotient-context-model > span > strong { font-size: 13px; }
+.signed-change-context-model > span:nth-child(2) { border-color: #e9cbc8; background: #fff3f1; }
+.signed-change-context-model > span:nth-child(3) { border-color: #d5cae7; background: #f5f1fb; }
+
+@media (max-width: 520px) {
+  .context-model-signed-sum .context-math-card,
+  .context-model-subtract-opposite .context-math-card,
+  .context-model-signed-rational-quotient .context-math-card,
+  .context-model-signed-change .context-math-card { width: 94%; padding-inline: 11px; }
+  .signed-sum-context-model { grid-template-columns: 1fr; }
+  .signed-sum-context-model > header { min-height: 55px; grid-row: auto; }
+  .signed-sum-context-model > div > span,
+  .signed-sum-context-model > footer > span { min-height: 52px; }
+  .rational-flow-context-model,
+  .signed-rational-quotient-context-model,
+  .signed-change-context-model { grid-template-columns: 1fr; gap: 7px; }
+  .rational-flow-context-model > span { min-height: 51px; grid-template-columns: minmax(106px, .82fr) minmax(0, 1.18fr); justify-items: start; padding: 8px 11px; text-align: left; }
+  .rational-flow-context-model > span > strong { justify-self: end; font-size: 16px; }
+  .rational-flow-context-model > span > i { display: none; }
+  .signed-sum-context-model small,
+  .rational-flow-context-model small { font-size: 9px; }
+}

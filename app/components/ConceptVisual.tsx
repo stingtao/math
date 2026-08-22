@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -96,6 +96,46 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["r=2,\\;h=9", "V_{cyl}=36\\pi", "V_{cone}=12\\pi", "36\\pi-12\\pi=24\\pi"],
     mathStepLabels: ["same dimensions", "cylinder", "cone", "difference"],
     modelLabel: "Math model: with radius two and height nine, the cylinder volume is thirty-six pi and the cone volume is twelve pi, so their difference is twenty-four pi",
+  },
+  "g7-add-rational-numbers": {
+    src: "/visuals/signed-numbers-context.png",
+    alt: "A building uses street level as zero with positions above and below it",
+    headline: "compare directions and distances from zero",
+    copy: "Different signs pull in opposite directions, so subtract the distances and keep the farther sign.",
+    model: "signed-sum",
+    mathSteps: ["-7+3", "|-7|=7", "|3|=3", "7-3=4", "-4"],
+    mathStepLabels: ["sum", "negative distance", "positive distance", "difference", "farther side wins"],
+    modelLabel: "Math model: negative seven plus three compares distances seven and three, subtracts to get four, and stays negative because seven is farther from zero",
+  },
+  "g7-subtract-rational-numbers": {
+    src: "/visuals/operations-sequence-context.jpg",
+    alt: "An ordered tabletop workflow turns a starting set of tokens into one organized result",
+    headline: "subtracting means add the opposite",
+    copy: "Change the operation and the sign together, then solve the addition you already know.",
+    model: "subtract-opposite",
+    mathSteps: ["4-(-3)", "4+(+3)", "7"],
+    mathStepLabels: ["subtraction", "add the opposite", "result"],
+    modelLabel: "Math model: four minus negative three rewrites as four plus positive three, which equals seven",
+  },
+  "g7-multiply-divide-rationals": {
+    src: "/visuals/operations-sequence-context.jpg",
+    alt: "Distinct tabletop stations process abstract values in a deliberate order",
+    headline: "decide the sign, then calculate the size",
+    copy: "Different signs make the quotient negative; dividing by a fraction means multiply by its reciprocal.",
+    model: "signed-rational-quotient",
+    mathSteps: ["(-\\frac34)\\div\\frac12", "\\text{different signs}\\Rightarrow-", "\\frac34\\times\\frac21=\\frac32", "-\\frac32"],
+    mathStepLabels: ["quotient", "sign", "magnitude", "result"],
+    modelLabel: "Math model: negative three fourths divided by positive one half has a negative sign; three fourths times two gives three halves, so the result is negative three halves",
+  },
+  "g7-rational-word-problems": {
+    src: "/visuals/signed-numbers-context.png",
+    alt: "A building shows positions above and below a shared zero at street level",
+    headline: "translate the change before calculating",
+    copy: "A descent is a negative change: start at five, change by negative twelve, and finish at negative seven.",
+    model: "signed-change",
+    mathSteps: ["5\\text{ m}", "-12\\text{ m}", "5+(-12)", "-7\\text{ m}"],
+    mathStepLabels: ["start", "signed change", "equation", "finish"],
+    modelLabel: "Math model: start at five meters, descend twelve meters, write five plus negative twelve, and finish at negative seven meters",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -830,6 +870,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "negative-distribute" && <NegativeDistributeModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "root-inverse" && <RootInverseModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "solid-compare" && <SolidCompareModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "signed-sum" && <SignedSumModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "subtract-opposite" && <RationalFlowModel className="subtract-opposite-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "signed-rational-quotient" && <RationalFlowModel className="signed-rational-quotient-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "signed-change" && <RationalFlowModel className="signed-change-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -939,4 +983,14 @@ function SolidCompareModel({ steps, labels }: { steps: string[]; labels: string[
   const [dimensions, cylinder, cone, difference] = steps;
   if (!dimensions || !cylinder || !cone || !difference) return null;
   return <div className="solid-compare-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={dimensions} /></header><div><span><small>{labels[1]}</small><i className="solid-cylinder-mark" /><MathStep value={cylinder} /></span><span><small>{labels[2]}</small><i className="solid-cone-mark" /><MathStep value={cone} /></span></div><footer><small>{labels[3]}</small><MathStep value={difference} /></footer></div>;
+}
+
+function SignedSumModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [sum, negativeDistance, positiveDistance, difference, result] = steps;
+  if (!sum || !negativeDistance || !positiveDistance || !difference || !result) return null;
+  return <div className="signed-sum-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={sum} /></header><div><span><small>{labels[1]}</small><MathStep value={negativeDistance} /></span><b>vs.</b><span><small>{labels[2]}</small><MathStep value={positiveDistance} /></span></div><footer><span><small>{labels[3]}</small><MathStep value={difference} /></span><i>→</i><span><small>{labels[4]}</small><MathStep value={result} /></span></footer></div>;
+}
+
+function RationalFlowModel({ className, steps, labels }: { className: string; steps: string[]; labels: string[] }) {
+  return <div className={`rational-flow-context-model ${className}`} aria-hidden="true">{steps.map((step, index) => <span key={step}><small>{labels[index]}</small><MathStep value={step} />{index < steps.length - 1 && <i>→</i>}</span>)}</div>;
 }
