@@ -11,6 +11,7 @@ import { MomentumRun } from "./MomentumRun";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 import { mathInputMode } from "@/lib/math-input";
+import { LearningLoading, LearningSignInGate } from "./LearningGate";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; choices?: string[] };
 
@@ -57,8 +58,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     }).catch(() => setReady(true));
   }, [demo, demoQuestions, state]);
 
-  if (loading || !ready) return <main className="loading-page" role="status"><div className="loading-mark">◇</div><p>Gathering today’s review…</p></main>;
-  if (!state || error) return <main className="auth-gate"><div className="auth-card"><span className="auth-orbit">◇</span><h1>Sign in to open Daily Review.</h1><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
+  if (loading || !ready) return <LearningLoading glyph="◇" tone="teal" kicker="BUILDING YOUR MEMORY ROUTE" title="Gathering today’s review…" detail="Up to five useful ideas are being chosen from your private learning history." />;
+  if (!state || error) return <LearningSignInGate glyph="◇" kicker="PRIVATE MEMORY ROUTE" title="Sign in to open Daily Review." detail="Only your anonymous account can see which ideas are ready to revisit." />;
   const activeState = state;
   if (!questions.length) return (
     <main className="learner-shell">

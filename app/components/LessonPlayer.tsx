@@ -17,6 +17,7 @@ import { TopicIcon } from "./TopicIcon";
 import { achievementTotalsForState, achievementUnlockedBetween } from "@/lib/achievements";
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { mathInputMode } from "@/lib/math-input";
+import { LearningLoading, LearningSignInGate } from "./LearningGate";
 
 const stageLabels = [
   { label: "Goal", icon: "◎" },
@@ -85,7 +86,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [sheetOpen]);
 
-  if (loading) return <main className="loading-page" role="status"><div className="loading-mark">M</div><p>Opening your lesson…</p></main>;
+  if (loading) return <LearningLoading glyph="M" tone="blue" kicker="SETTING UP YOUR STEP" title="Opening your lesson…" detail="Your goal, example, and practice path are almost ready." />;
   if (!state || error) return <LessonGate />;
   const activeState = state;
   const gradeLessons = getGradeLessons(lesson.grade);
@@ -338,5 +339,5 @@ function StageCard({ kicker, title, copy, visual, onContinue }: { kicker: string
 }
 
 function LessonGate() {
-  return <main className="auth-gate"><a className="brand" href="/"><span className="brand-mark">M</span><span>Math</span></a><div className="auth-card"><span className="auth-orbit">✦</span><span className="section-kicker">SAVE YOUR LEARNING</span><h1>Sign in before the lesson.</h1><p>This keeps progress connected to your anonymous trail.</p><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
+  return <LearningSignInGate glyph="✦" kicker="SAVE YOUR LEARNING" title="Sign in before the lesson." detail="This keeps progress connected to your anonymous trail." />;
 }

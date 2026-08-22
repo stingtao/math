@@ -14,6 +14,7 @@ import { TopicIcon } from "./TopicIcon";
 import { achievementTotalsForState, achievementUnlockedBetween, getNextAchievement, type AchievementSpec } from "@/lib/achievements";
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { getQuestMilestone } from "@/lib/quest-milestone";
+import { LearningLoading, LearningSignInGate } from "./LearningGate";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
@@ -324,9 +325,9 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 }
 
 function LoadingTrail() {
-  return <main className="loading-page" role="status"><div className="loading-mark">M</div><p>Finding your next small step…</p></main>;
+  return <LearningLoading glyph="M" tone="blue" kicker="SCOUTING YOUR TRAIL" title="Finding your next small step…" detail="Your progress, rewards, and closest milestone are being lined up." />;
 }
 
 function SignInGate() {
-  return <main className="auth-gate"><a className="brand" href="/"><span className="brand-mark">M</span><span>Math</span></a><div className="auth-card"><span className="auth-orbit">✦</span><span className="section-kicker">YOUR TRAIL IS PRIVATE</span><h1>Sign in to keep learning.</h1><p>Your lessons and progress stay behind your anonymous profile.</p><a className="primary-button" href="/#join">Continue with Google <span>→</span></a><small>Math never stores your Google name, email, or photo.</small></div></main>;
+  return <LearningSignInGate glyph="✦" kicker="YOUR TRAIL IS PRIVATE" title="Sign in to keep learning." detail="Your lessons and progress stay behind your anonymous profile." />;
 }

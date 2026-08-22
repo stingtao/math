@@ -9,6 +9,7 @@ import { mutationHeaders } from "./mutation";
 import { avatarFrameCatalog } from "@/lib/avatar-frames";
 import { SuccessBurst } from "./SuccessBurst";
 import { evaluateAchievements } from "@/lib/achievements";
+import { LearningLoading, LearningSignInGate } from "./LearningGate";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -16,8 +17,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [busyFrame, setBusyFrame] = useState("");
   const [frameCelebrationKey, setFrameCelebrationKey] = useState("");
-  if (loading) return <main className="loading-page" role="status"><div className="loading-mark">✦</div><p>Opening your anonymous profile…</p></main>;
-  if (!state || error) return <main className="auth-gate"><div className="auth-card"><span className="auth-orbit">✦</span><h1>Sign in to view your profile.</h1><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
+  if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR PRIVATE BASE" title="Loading your anonymous profile…" detail="Your trail identity, frames, and private milestones are almost ready." />;
+  if (!state || error) return <LearningSignInGate glyph="✦" kicker="YOUR PROFILE IS PRIVATE" title="Sign in to view your profile." detail="Your anonymous identity and learning milestones are visible only to you." />;
   const activeState = state;
   const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
   const achievementValues = { lessons: state.completedLessons.length, stars: totalStars, bosses: state.clearedBosses.length, streak: state.profile.longestStreak };

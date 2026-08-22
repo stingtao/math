@@ -112,6 +112,18 @@ test("makes Quick Sheets readable and actionable on small screens", async () => 
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.sheet-actions a \{ min-width: 0; min-height: 52px/);
 });
 
+test("uses one visual loading and private sign-in language across learning flows", async () => {
+  const stateComponent = await readFile(new URL("../app/components/LearningGate.tsx", import.meta.url), "utf8");
+  const flowFiles = await Promise.all(["LessonPlayer", "BossPlayer", "ReviewPlayer", "ProfileView", "LearningDashboard"].map((name) => readFile(new URL(`../app/components/${name}.tsx`, import.meta.url), "utf8")));
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(stateComponent, /aria-live="polite"/);
+  assert.match(stateComponent, /Your Google name, email, and photo never appear/);
+  for (const source of flowFiles) assert.match(source, /LearningLoading|LearningSignInGate/);
+  assert.match(css, /\.learning-loading-card/);
+  assert.match(css, /\.learning-loading-route i/);
+  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.learning-sign-in-gate \.auth-card \.primary-button \{ width: 100%; min-height: 54px/);
+});
+
 test("keeps real Google profile fields out of persistent schema", async () => {
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
   for (const forbidden of ["email", "full_name", "profile_photo", "google_sub"]) assert.doesNotMatch(schema, new RegExp(`["]${forbidden}["]`, "i"));

@@ -12,6 +12,7 @@ import { TopicIcon } from "./TopicIcon";
 import { achievementTotalsForState, achievementUnlockedBetween, type AchievementSpec } from "@/lib/achievements";
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { mathInputMode } from "@/lib/math-input";
+import { LearningLoading, LearningSignInGate } from "./LearningGate";
 
 type BossAttempt = {
   attemptId: string;
@@ -92,8 +93,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     return () => { active = false; };
   }, [demo, questions.length, region.id, state, unlocked]);
 
-  if (loading || unlocked && !attemptReady) return <main className="loading-page" role="status"><div className="loading-mark">★</div><p>Preparing the check…</p></main>;
-  if (!state || error) return <main className="auth-gate"><div className="auth-card"><span className="auth-orbit">★</span><h1>Sign in to open this check.</h1><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
+  if (loading || unlocked && !attemptReady) return <LearningLoading glyph="★" tone="gold" kicker="OPENING THE BOSS GATE" title="Preparing the check…" detail="Five mixed challenges and three hearts are being set in place." />;
+  if (!state || error) return <LearningSignInGate glyph="★" kicker="PRIVATE BOSS PROGRESS" title="Sign in to open this check." detail="Your attempts and recovery practice stay connected to your anonymous trail." />;
   const activeState = state;
   const trailUrl = `/learn?grade=${region.grade}${demo ? "&demo=1" : ""}`;
   const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${demo ? "&demo=1" : ""}` : `/learn/${nextRegion.lessons[0].slug}?grade=${region.grade}${demo ? "&demo=1" : ""}`;
