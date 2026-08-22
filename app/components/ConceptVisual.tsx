@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay";
+  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -249,6 +249,41 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Absolute value measures distance from zero, so the same positive distance can point in two directions.",
     model: "number-line",
   },
+  "g7-constructing-triangles": {
+    src: "/visuals/triangle-builder-context.jpg",
+    alt: "A triangular frame built from exactly three rigid measuring beams joined at three vertices",
+    headline: "3 + 4 > 5, so the sides can meet",
+    copy: "Every pair of side lengths must reach farther than the remaining side before a triangle can close.",
+    model: "triangle-build",
+  },
+  "g7-cross-sections": {
+    src: "/visuals/cross-section-studio-context.jpg",
+    alt: "One transparent cylinder intersected by one horizontal plane with a circular cross-section highlighted",
+    headline: "horizontal slice of a cylinder → circle",
+    copy: "A cross-section is the flat shape where the slicing plane passes through the solid.",
+    model: "cross-section",
+  },
+  "coordinate-distance": {
+    src: "/visuals/coordinate-route-context.jpg",
+    alt: "Two locations on a square city grid connected by horizontal and vertical legs and one diagonal shortcut",
+    headline: "3² + 4² = 5²",
+    copy: "The coordinate changes make the legs of a right triangle; the distance is its diagonal.",
+    model: "coordinate-distance",
+  },
+  "sphere-volume": {
+    src: "/visuals/sphere-tank-context.jpg",
+    alt: "A transparent spherical tank with one center marker and one straight radius guide to its surface",
+    headline: "V = ⁴⁄₃πr³",
+    copy: "One radius controls the sphere in every direction, so its volume grows with the cube of r.",
+    model: "sphere-volume",
+  },
+  "g9-difference-squares": {
+    src: "/visuals/difference-squares-workshop-context.jpg",
+    alt: "A smaller square tile lifted from a matching recess in one larger square board",
+    headline: "a² − b² = (a − b)(a + b)",
+    copy: "Remove one square area from another, then recognize the two side-length factors that remain.",
+    model: "difference-squares",
+  },
 };
 
 function mathFor(visual: string) {
@@ -292,6 +327,7 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "slope" && <div className="coordinate-model context-coordinate"><span className="axis-x" /><span className="axis-y" /><i className="point-one" /><i className="point-two" /><b /><em className="slope-run">run</em><em className="slope-rise">rise</em></div>}
         {scene.model === "triangle" && <div className="shape-model context-triangle"><span /><span /><span /><i aria-hidden="true" /></div>}
+        {scene.model === "triangle-build" && <div className="triangle-build-context-model" aria-hidden="true"><div className="triangle-build-frame"><span className="triangle-side-three"><b>3</b></span><span className="triangle-side-four"><b>4</b></span><span className="triangle-side-five"><b>5</b></span><i className="triangle-vertex-one" /><i className="triangle-vertex-two" /><i className="triangle-vertex-three" /></div><strong>3 + 4 &gt; 5 · triangle closes</strong></div>}
         {scene.model === "angles" && <div className="angles-context-model" aria-hidden="true"><i className="angle-line-one" /><i className="angle-line-two" /><span className="angle-x">x°</span><span className="angle-65">65°</span><b>180°</b></div>}
         {scene.model === "scatter" && <div className="scatter-model" aria-hidden="true"><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /></div>}
         {scene.model === "distribute" && <div className="distribute-context-model" aria-hidden="true"><span dangerouslySetInnerHTML={{ __html: katex.renderToString("4(x+2)", { throwOnError: false }) }} /><i>→</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("4x+8", { throwOnError: false }) }} /></div>}
@@ -299,6 +335,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "transform" && <div className="transform-context-model" aria-hidden="true"><i className="transform-axis-x" /><i className="transform-axis-y" /><span className="transform-shape-one" /><span className="transform-shape-two" /><em>(+3, +2)</em></div>}
         {scene.model === "volume" && <div className="volume-context-model" aria-hidden="true"><span className="volume-shell" /><i className="volume-top" /><i className="volume-bottom" /><b className="volume-radius">r</b><b className="volume-height">h</b></div>}
         {scene.model === "cone-volume" && <div className="cone-volume-context-model" aria-hidden="true"><div className="cone-model-group"><span /><span /><span /></div><i>→</i><div className="cone-cylinder-model"><span /><b>3 × cone</b></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("V_{cone}=\\tfrac13\\pi r^2h", { throwOnError: false }) }} /></div>}
+        {scene.model === "sphere-volume" && <div className="sphere-volume-context-model" aria-hidden="true"><div className="sphere-volume-orb"><span /><i><b>r</b></i></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("V=\\tfrac43\\pi r^3", { throwOnError: false }) }} /></div>}
+        {scene.model === "cross-section" && <div className="cross-section-context-model" aria-hidden="true"><div className="cross-section-solid"><span /><i /><b /></div><strong>horizontal slice <i>→</i> circle</strong></div>}
+        {scene.model === "coordinate-distance" && <div className="coordinate-distance-context-model" aria-hidden="true"><div className="coordinate-distance-grid"><i className="distance-run"><b>3</b></i><i className="distance-rise"><b>4</b></i><i className="distance-diagonal"><b>5</b></i><span className="distance-start" /><span className="distance-end" /><em /></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("d=\\sqrt{3^2+4^2}=5", { throwOnError: false }) }} /></div>}
+        {scene.model === "difference-squares" && <div className="difference-squares-context-model" aria-hidden="true"><div className="difference-square"><span>a²</span><i>b²</i></div><b>→</b><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("a^2-b^2=(a-b)(a+b)", { throwOnError: false }) }} /></div>}
         {scene.model === "balance" && <div className="balance-context-model" aria-hidden="true"><div><span>x + 3</span><i>=</i><span>7</span></div><div><em>−3</em><b>same change</b><em>−3</em></div><strong>x = 4</strong></div>}
         {scene.model === "root-bracket" && <div className="root-bracket-context-model" aria-hidden="true"><span><small>√16</small><b>4</b></span><i><em>√20</em></i><span><small>√25</small><b>5</b></span></div>}
         {scene.model === "scientific-scale" && <div className="scientific-context-model" aria-hidden="true"><span>4,500,000</span><i>→</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("4.5\\times10^6", { throwOnError: false }) }} /><small>6 places</small></div>}

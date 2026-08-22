@@ -34,6 +34,8 @@ const mathWorldScenes = [
   { grade: 9, title: "Two landing points", copy: "Connect a parabolic path with the two roots that make a quadratic equal zero.", image: "/visuals/quadratic-roots-context.jpg", lesson: "g9-quadratic-formula", visual: "formula", accent: "violet" as const },
   { grade: 7, title: "One crossing, linked angles", copy: "Match opposite angles, then use a straight line to find the missing measure.", image: "/visuals/angle-plaza-context.jpg", lesson: "g7-angle-equations", visual: "angles", accent: "coral" as const },
   { grade: 8, title: "Three cones fill one cylinder", copy: "Compare shapes with the same base and height to see where the one-third comes from.", image: "/visuals/cone-measure-context.jpg", lesson: "cone-volume", visual: "cone", accent: "blue" as const },
+  { grade: 7, title: "A solid hides a flat shape", copy: "Move one slicing plane through a cylinder and reveal the exact cross-section inside.", image: "/visuals/cross-section-studio-context.jpg", lesson: "g7-cross-sections", visual: "cross-section", accent: "violet" as const },
+  { grade: 9, title: "One square comes out", copy: "See a difference of square areas before turning it into two matching algebraic factors.", image: "/visuals/difference-squares-workshop-context.jpg", lesson: "g9-difference-squares", visual: "area-model", accent: "coral" as const },
 ];
 
 export default function Home() {
