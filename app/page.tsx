@@ -35,10 +35,11 @@ const mathWorldScenes = [
   { grade: 8, title: "Start at b, then follow m", copy: "Plot the intercept first, then repeat one rise-and-run step to build a straight line.", image: "/visuals/graphing-line-city-context.jpg", lesson: "graphing-lines", visual: "line-graph", accent: "blue" as const },
   { grade: 8, title: "One input, one destination", copy: "Follow each route through a rule and see why a function never sends one input two ways.", image: "/visuals/function-routing-context.jpg", lesson: "function-rules", visual: "mapping", accent: "teal" as const },
   { grade: 8, title: "Same shape, one scale factor", copy: "Project every vertex from one center and enlarge all corresponding sides consistently.", image: "/visuals/dilation-studio-context.jpg", lesson: "dilations-similarity", visual: "dilation", accent: "coral" as const },
+  { grade: 8, title: "Three ways two lines can relate", copy: "See why a system can have one solution, no solution, or infinitely many shared points.", image: "/visuals/solution-cases-gallery-context.jpg", lesson: "solution-types", visual: "solution-types", accent: "blue" as const },
   { grade: 9, title: "Measure every miss from the line", copy: "Use vertical residual distances to judge whether a fitted line captures the data pattern.", image: "/visuals/residual-observatory-context.jpg", lesson: "g9-correlation-residuals", visual: "residual", accent: "violet" as const },
 ];
 
-const expandedSceneCount = 49;
+const expandedSceneCount = 50;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";

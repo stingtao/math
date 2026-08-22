@@ -22,7 +22,7 @@ export const grade8RegionLandmarks: Record<number, VisualLandmark> = {
   4: { src: "/visuals/distributive-workshop-context.jpg", alt: "Repeated workshop trays model distributing a factor to every term", lessonSlug: "distributive-property" },
   5: { src: "/visuals/irrational-garden-context.jpg", alt: "A rectangular garden diagonal models an irrational square root", lessonSlug: "approximating-irrationals" },
   6: { src: "/visuals/scientific-observatory-context.jpg", alt: "Shrinking observatory scale rings model powers of ten", lessonSlug: "scientific-notation" },
-  7: { src: "/visuals/multistep-workshop-context.jpg", alt: "Nested workshop containers model undoing equation steps in reverse", lessonSlug: "multi-step-equations" },
+  7: { src: "/visuals/solution-cases-gallery-context.jpg", alt: "Three route displays model lines meeting once, never meeting, or sharing the same path", lessonSlug: "solution-types" },
   8: { src: "/visuals/slope-trail-context.jpg", alt: "A rising mountain trail models vertical change over horizontal change", lessonSlug: "slope-rate" },
   9: { src: "/visuals/function-kiosk-context.jpg", alt: "A rental kiosk connects one function rule with several representations", lessonSlug: "function-representations" },
   10: { src: "/visuals/transform-plaza-context.jpg", alt: "Triangular sculptures model translations, reflections, and rotations", lessonSlug: "coordinate-transformations" },

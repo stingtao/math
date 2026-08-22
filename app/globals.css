@@ -1491,6 +1491,25 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .systems-context-model > b { width: 17px; height: 17px; position: absolute; z-index: 2; left: 50%; top: 49%; border: 4px solid white; border-radius: 50%; background: var(--gold); box-shadow: 0 3px 8px rgb(23 50 79 / 20%); transform: translate(-50%, -50%); }
 .systems-context-model > em { position: absolute; z-index: 3; left: 50%; bottom: 8px; padding: 5px 8px; border-radius: 8px; color: white; background: var(--navy); font-size: 9px; font-style: normal; font-weight: 900; transform: translateX(-50%); }
 
+.solution-cases-context-model { width: min(590px, 100%); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.solution-cases-context-model > div { min-width: 0; padding: 9px 9px 10px; display: grid; justify-items: center; gap: 4px; border: 1px solid #d7e2e9; border-radius: 13px; background: #f6f9fa; }
+.solution-cases-context-model > div > span { width: 100%; height: 67px; position: relative; overflow: hidden; border-radius: 9px; background-color: white; background-image: linear-gradient(#e8eef2 1px, transparent 1px), linear-gradient(90deg, #e8eef2 1px, transparent 1px); background-size: 18px 17px; }
+.solution-cases-context-model > div > span > i,
+.solution-cases-context-model > div > span > b { width: 125%; height: 4px; position: absolute; left: -12%; top: 50%; display: block; border-radius: 99px; background: var(--blue); transform-origin: center; }
+.solution-case-one > span > i { transform: rotate(22deg); }
+.solution-case-one > span > b { background: var(--coral); transform: rotate(-22deg); }
+.solution-case-one > span::after { content: ""; width: 13px; height: 13px; position: absolute; left: 50%; top: 50%; border: 3px solid white; border-radius: 50%; background: var(--gold); box-shadow: 0 2px 6px rgb(23 50 79 / 20%); transform: translate(-50%, -50%); }
+.solution-case-none > span > i { top: 35%; transform: rotate(-12deg); }
+.solution-case-none > span > b { top: 67%; background: var(--coral); transform: rotate(-12deg); }
+.solution-case-many > span > i,
+.solution-case-many > span > b { transform: rotate(-12deg); }
+.solution-case-many > span > i { height: 7px; background: var(--blue); }
+.solution-case-many > span > b { height: 7px; z-index: 2; background: repeating-linear-gradient(90deg, transparent 0 10px, var(--coral) 10px 20px); }
+.solution-cases-context-model small { color: var(--blue); font-size: 8px; font-weight: 900; letter-spacing: .08em; text-align: center; }
+.solution-case-none small { color: var(--coral); }
+.solution-case-many small { color: var(--violet); letter-spacing: .04em; }
+.solution-cases-context-model strong { color: var(--navy); font-size: 10px; line-height: 1.2; text-align: center; }
+
 .area-product-context-model { width: min(480px, 100%); display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 24px; }
 .area-product-context-model > div { width: 150px; height: 105px; display: grid; grid-template-columns: 2fr 1.3fr; grid-template-rows: 2fr 1fr; overflow: hidden; border: 3px solid var(--navy); border-radius: 10px; }
 .area-product-context-model span { display: grid; place-items: center; border: 1px solid white; color: white; font-size: 12px; font-weight: 900; }
@@ -1631,6 +1650,11 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .probability-context-model { grid-template-columns: 62px 1fr 62px; }
   .systems-context-model,
   .parabola-context-model { height: 126px; }
+  .solution-cases-context-model { gap: 5px; }
+  .solution-cases-context-model > div { padding: 6px 5px 7px; border-radius: 10px; }
+  .solution-cases-context-model > div > span { height: 54px; background-size: 14px 14px; }
+  .solution-cases-context-model small { min-height: 19px; display: grid; place-items: center; font-size: 7px; }
+  .solution-cases-context-model strong { font-size: 9px; }
   .area-product-context-model { grid-template-columns: 1fr; justify-items: center; gap: 9px; }
   .area-product-context-model > div { width: 170px; height: 91px; }
   .area-product-context-model > strong { width: 100%; }

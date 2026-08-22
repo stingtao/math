@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -101,6 +101,13 @@ const contextScenes: Record<string, ContextScene> = {
     headline: "2(x + 3) = 14 → x = 4",
     copy: "Simplify the outer layers, then undo operations in reverse order.",
     model: "equation-steps",
+  },
+  "solution-types": {
+    src: "/visuals/solution-cases-gallery-context.jpg",
+    alt: "Three side-by-side route displays: two routes crossing once, two parallel routes that never meet, and two routes sharing the same entire path",
+    headline: "one intersection, none, or the same line",
+    copy: "After simplifying both equations, compare their lines: they can meet once, never meet, or match at every point.",
+    model: "solution-cases",
   },
   "g7-unit-rates": {
     src: "/visuals/unit-rate-bike-context.jpg",
@@ -418,6 +425,7 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "prism" && <div className="prism-context-model" aria-hidden="true"><div><span /><span /><span /></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("V=B\\cdot h", { throwOnError: false }) }} /></div>}
         {scene.model === "probability-scale" && <div className="probability-context-model" aria-hidden="true"><div><span>0</span><i><b /></i><span>1</span></div><small>impossible</small><em>equally likely</em><small>certain</small></div>}
         {scene.model === "systems-crossing" && <div className="systems-context-model" aria-hidden="true"><i className="system-axis-x" /><i className="system-axis-y" /><span className="system-line-one" /><span className="system-line-two" /><b /><em>one shared solution</em></div>}
+        {scene.model === "solution-cases" && <div className="solution-cases-context-model" aria-hidden="true"><div className="solution-case-one"><span><i /><b /></span><small>ONE</small><strong>meet once</strong></div><div className="solution-case-none"><span><i /><b /></span><small>NONE</small><strong>parallel lines</strong></div><div className="solution-case-many"><span><i /><b /></span><small>INFINITELY MANY</small><strong>same line</strong></div></div>}
         {scene.model === "area-product" && <div className="area-product-context-model" aria-hidden="true"><div><span>x²</span><span>3x</span><span>2x</span><span>6</span></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("(x+2)(x+3)=x^2+5x+6", { throwOnError: false }) }} /></div>}
         {scene.model === "parabola" && <div className="parabola-context-model" aria-hidden="true"><i className="parabola-axis-x" /><i className="parabola-axis-y" /><span /><b dangerouslySetInnerHTML={{ __html: katex.renderToString("y=x^2-4", { throwOnError: false }) }} /></div>}
         {scene.model === "exponential" && <div className="exponential-context-model" aria-hidden="true">{[1, 2, 4, 8, 16].map((value, index) => <span style={{ height: `${24 + index * 16}px` }} key={value}><b>{value}</b></span>)}</div>}
