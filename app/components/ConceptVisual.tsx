@@ -7,19 +7,75 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
 };
 
 const contextScenes: Record<string, ContextScene> = {
+  "math-symbols": {
+    src: "/visuals/operations-sequence-context.jpg",
+    alt: "A calm tabletop math lab with distinct stations that turn loose shapes into an organized result",
+    headline: "a symbol is an instruction, not decoration",
+    copy: "Name the relationship first, then read the two sides in order.",
+    model: "symbol-meaning",
+    modelLabel: "Math model: less than, greater than, less than or equal to, and not equal each give a different instruction; negative four is less than negative one",
+  },
   "signed-numbers": {
     src: "/visuals/signed-numbers-context.png",
     alt: "A building with floors above and below street level, showing positive and negative positions around a central reference",
     headline: "street level works like zero",
     copy: "Above and below are opposite directions from the same reference point.",
     model: "number-line",
+  },
+  "sign-rules": {
+    src: "/visuals/operations-sequence-context.jpg",
+    alt: "Four distinct operation stations guide abstract tokens through one ordered workflow",
+    headline: "predict the sign before finding the size",
+    copy: "Same signs make a positive product. Different signs make a negative product.",
+    model: "sign-pairs",
+    modelLabel: "Math model: positive times positive and negative times negative are positive; positive times negative and negative times positive are negative; negative six times negative five is positive thirty",
+  },
+  "order-of-operations": {
+    src: "/visuals/operations-sequence-context.jpg",
+    alt: "A left-to-right sequence of grouping, power, repeated-operation, and combining stations",
+    headline: "choose the next operation, not the nearest one",
+    copy: "Handle groups and exponents first, then multiply or divide, then add or subtract.",
+    model: "operation-order",
+    mathSteps: ["2+3\\times4^2", "4^2=16", "3\\times16=48", "2+48=50"],
+    mathStepLabels: ["expression", "exponent", "multiply", "add"],
+    modelLabel: "Math model: in two plus three times four squared, evaluate four squared as sixteen, multiply three by sixteen to get forty-eight, then add two to get fifty",
+  },
+  decimals: {
+    src: "/visuals/decimal-pattern-context.jpg",
+    alt: "A whole board passes through magnifying frames into finer subdivisions beside a looping pattern track",
+    headline: "each place to the right is ten times smaller",
+    copy: "Read 0.35 as three tenths and five hundredths, then connect it to thirty-five hundredths.",
+    model: "place-value",
+    mathSteps: ["0.35", "3\\text{ tenths}+5\\text{ hundredths}", "\\frac{35}{100}=\\frac7{20}"],
+    mathStepLabels: ["decimal", "place-value meaning", "fraction form"],
+    modelLabel: "Math model: zero point three five means three tenths plus five hundredths, which is thirty-five hundredths or seven twentieths",
+  },
+  "repeating-decimals": {
+    src: "/visuals/decimal-pattern-context.jpg",
+    alt: "Magnifying frames reveal finer subdivisions while a colored block pattern continues around a connected loop",
+    headline: "the bar marks the block that repeats forever",
+    copy: "Follow only the digits under the bar, then connect the repeating pattern to its exact fraction.",
+    model: "repeating-decimal",
+    mathSteps: ["0.\\overline{3}", "0.333\\ldots", "\\frac13"],
+    mathStepLabels: ["bar notation", "repeating pattern", "exact fraction"],
+    modelLabel: "Math model: zero point three with a bar over the three means zero point three three three continuing forever, which equals one third",
+  },
+  "negative-distribution": {
+    src: "/visuals/distributive-workshop-context.jpg",
+    alt: "Repeated workshop trays show one outside group being applied to every object inside each tray",
+    headline: "the negative factor must reach every term",
+    copy: "Multiply the outside factor by each term, keeping the exponent attached to its variable.",
+    model: "negative-distribute",
+    mathSteps: ["-3(x^2+y^3)", "-3\\cdot x^2=-3x^2", "-3\\cdot y^3=-3y^3", "-3x^2-3y^3"],
+    mathStepLabels: ["start", "first term", "second term", "result"],
+    modelLabel: "Math model: negative three times the group x squared plus y cubed distributes to negative three x squared and negative three y cubed, giving negative three x squared minus three y cubed",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -746,6 +802,12 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
       <div className="context-scene"><Image src={scene.src} width={1200} height={800} sizes="(max-width: 760px) 92vw, 720px" alt={scene.alt} /></div>
       <div className="context-math-card" aria-label={scene.modelLabel ?? `Math model: ${scene.headline}`}>
         {scene.model === "number-line" && <div className="number-line-model context-number-line"><span>−4</span><span>−2</span><i>0</i><span>2</span><span>4</span><b /></div>}
+        {scene.model === "symbol-meaning" && <SymbolMeaningModel />}
+        {scene.model === "sign-pairs" && <SignPairsModel />}
+        {scene.model === "operation-order" && <OperationOrderModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "place-value" && <PlaceValueModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "repeating-decimal" && <RepeatingDecimalModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "negative-distribute" && <NegativeDistributeModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -809,4 +871,40 @@ function TermStructureModel({ steps, labels }: { steps: string[]; labels: string
   const [source, ...parts] = steps;
   if (!source) return null;
   return <div className="term-structure-context-model" aria-hidden="true"><header><small>{labels[0]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(source, { throwOnError: false }) }} /></header><div>{parts.map((step, index) => <span key={`${step}-${index}`}><small>{labels[index + 1]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(step, { throwOnError: false }) }} /></span>)}</div></div>;
+}
+
+function MathStep({ value }: { value: string }) {
+  return <strong dangerouslySetInnerHTML={{ __html: katex.renderToString(value, { throwOnError: false }) }} />;
+}
+
+function SymbolMeaningModel() {
+  const symbols = [["<", "less than"], [">", "greater than"], ["\\le", "less or equal"], ["\\ne", "not equal"]];
+  return <div className="symbol-meaning-context-model" aria-hidden="true"><div>{symbols.map(([symbol, label]) => <span key={symbol}><MathStep value={symbol} /><small>{label}</small></span>)}</div><footer><MathStep value="-4<-1" /><small>−4 is farther left</small></footer></div>;
+}
+
+function SignPairsModel() {
+  const pairs = [["(+)\\cdot(+)", "+", "same"], ["(-)\\cdot(-)", "+", "same"], ["(+)\\cdot(-)", "-", "different"], ["(-)\\cdot(+)", "-", "different"]];
+  return <div className="sign-pairs-context-model" aria-hidden="true"><div>{pairs.map(([pair, result, label]) => <span key={pair}><small>{label} signs</small><MathStep value={pair} /><i>→</i><MathStep value={result} /></span>)}</div><footer><MathStep value="(-6)(-5)=+30" /><small>sign first · size second</small></footer></div>;
+}
+
+function OperationOrderModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [source, ...work] = steps;
+  if (!source) return null;
+  return <div className="operation-order-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={source} /></header><div>{work.map((step, index) => <span key={step}><small>{index + 1} · {labels[index + 1]}</small><MathStep value={step} />{index < work.length - 1 && <i>→</i>}</span>)}</div></div>;
+}
+
+function PlaceValueModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [decimal, meaning, fraction] = steps;
+  if (!decimal || !meaning || !fraction) return null;
+  return <div className="place-value-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={decimal} /></header><div><span><small>tenths</small><b>3</b></span><span><small>hundredths</small><b>5</b></span></div><footer><span><small>{labels[1]}</small><MathStep value={meaning} /></span><i>→</i><span><small>{labels[2]}</small><MathStep value={fraction} /></span></footer></div>;
+}
+
+function RepeatingDecimalModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  return <div className="repeating-decimal-context-model" aria-hidden="true">{steps.map((step, index) => <span key={step}><small>{labels[index]}</small><MathStep value={step} />{index === 1 && <em><i>3</i><i>3</i><i>3</i><i>↻</i></em>}{index < steps.length - 1 && <b>→</b>}</span>)}</div>;
+}
+
+function NegativeDistributeModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [source, first, second, result] = steps;
+  if (!source || !first || !second || !result) return null;
+  return <div className="negative-distribute-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={source} /></header><div><span><small>{labels[1]}</small><MathStep value={first} /></span><span><small>{labels[2]}</small><MathStep value={second} /></span></div><footer><small>{labels[3]}</small><MathStep value={result} /></footer></div>;
 }

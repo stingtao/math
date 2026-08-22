@@ -26,6 +26,7 @@ const gradeVisuals = {
 };
 
 const mathWorldScenes = [
+  { grade: 8, title: "Read the instruction first", copy: "Move through a deliberate operation sequence so grouping, powers, multiplication, and addition happen in the right order.", image: "/visuals/operations-sequence-context.jpg", lesson: "order-of-operations", visual: "steps", accent: "blue" as const },
   { grade: 8, title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.png", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
   { grade: 8, title: "Different pieces, same amount", copy: "Line up equal wholes to see why six eighths and three fourths name the same length.", image: "/visuals/fraction-workshop-context.jpg", lesson: "fractions", visual: "fraction-bars", accent: "gold" as const },
   { grade: 8, title: "Put the value in its place", copy: "Insert one known value into every matching variable slot, then evaluate the operations in order.", image: "/visuals/substitution-machine-context.jpg", lesson: "substitution", visual: "substitute", accent: "teal" as const },
@@ -43,10 +44,11 @@ const mathWorldScenes = [
   { grade: 7, title: "A boundary and every value beyond it", copy: "See how an open or closed point sets the edge while an arrow shows the entire solution set.", image: "/visuals/inequality-trail-context.jpg", lesson: "g7-inequalities-g7", visual: "inequality-line", accent: "coral" as const },
   { grade: 9, title: "Measure every miss from the line", copy: "Use vertical residual distances to judge whether a fitted line captures the data pattern.", image: "/visuals/residual-observatory-context.jpg", lesson: "g9-correlation-residuals", visual: "residual", accent: "violet" as const },
   { grade: 8, title: "Only matching terms combine", copy: "Sort square terms, linear terms, and constants into matching families before combining their coefficients.", image: "/visuals/like-terms-sorting-context.jpg", lesson: "combining-like-terms", visual: "term-groups", accent: "blue" as const },
+  { grade: 8, title: "Zoom in, then follow the loop", copy: "See place values become finer through each magnifying step, then trace the block that repeats without ending.", image: "/visuals/decimal-pattern-context.jpg", lesson: "repeating-decimals", visual: "decimal", accent: "violet" as const },
   { grade: 7, title: "Center and spread tell the story", copy: "Compare a typical value and the amount of variation instead of judging two groups by one number.", image: "/visuals/distribution-comparison-context.jpg", lesson: "g7-compare-distributions", visual: "box-plots", accent: "teal" as const },
 ];
 
-const expandedSceneCount = 92;
+const expandedSceneCount = 98;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";
