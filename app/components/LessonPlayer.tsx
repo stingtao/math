@@ -85,6 +85,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const priorLessonComplete = lesson.order === 1 || completeMap.has(gradeLessons[lessonPosition - 1]?.id);
   const isAvailable = completeMap.has(lesson.id) || regionAvailable && priorLessonComplete;
   const trailUrl = `/learn?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
+  const lessonProgressPercent = Math.round(((stage + (stage === 4 ? correctedCount / lesson.practice.length : 0)) / stageLabels.length) * 100);
+  const currentStageLabel = stage === 4 ? `Practice ${questionIndex + 1} of ${lesson.practice.length}` : stageLabels[stage].label;
   if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">FOLLOW THE TRAIL</span><h1>This lesson is just ahead.</h1><p>Complete your current step first. The trail will bring you here next.</p><a className="primary-button" href={trailUrl}>Back to your trail <span>→</span></a></section></main>;
 
   function advanceStage() { setStage((value) => Math.min(4, value + 1)); }
@@ -271,8 +273,12 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       <LearnerHeader state={state} demo={demo} />
       <div className="lesson-topline">
         <a href={trailUrl} className="back-link">← Trail</a>
-        <div className="lesson-progress"><span style={{ width: `${((stage + (stage === 4 ? (questionIndex + 1) / 5 : 0)) / 5) * 100}%` }} /></div>
+        <div className="lesson-progress" role="progressbar" aria-label={`Lesson progress: ${currentStageLabel}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={lessonProgressPercent}><span style={{ width: `${lessonProgressPercent}%` }} /></div>
         <button className="sheet-button" type="button" disabled={!lesson.quickSheet} onClick={() => setSheetOpen(true)}>{lesson.quickSheet ? "Quick Sheet" : "Lesson notes"}</button>
+      </div>
+      <div className={`lesson-mobile-status accent-${lesson.accent}`} aria-label={`Quest step ${stage + 1} of ${stageLabels.length}: ${currentStageLabel}`}>
+        <div className="lesson-mobile-topic"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="sm" label="" /><span><small>QUEST STEP {stage + 1} OF {stageLabels.length}</small><strong>{currentStageLabel}</strong></span></div>
+        <div className="lesson-mobile-steps" aria-hidden="true">{stageLabels.map((item, index) => <i className={index < stage ? "done" : index === stage ? "active" : ""} key={item.label}>{index < stage ? "✓" : index + 1}</i>)}</div>
       </div>
       <div className="lesson-layout">
         <aside className="lesson-sidebar">

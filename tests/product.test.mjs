@@ -283,6 +283,7 @@ test("keeps answer chains optional while preserving the best run", () => {
 
 test("ships a readable, safe-area-aware mobile learning interface", async () => {
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(header, /mobile-learner-nav/);
@@ -293,6 +294,13 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /-webkit-text-size-adjust:\s*100%/);
   assert.match(css, /\.sheet-modal img \{[^}]*object-fit:\s*contain/);
   assert.match(css, /\.katex-display \{[^}]*overflow-x:\s*auto/);
+  assert.match(lesson, /lesson-mobile-status/);
+  assert.match(lesson, /QUEST STEP \{stage \+ 1\} OF \{stageLabels\.length\}/);
+  assert.match(lesson, /role="progressbar"/);
+  assert.match(lesson, /aria-valuenow=\{lessonProgressPercent\}/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.lesson-mobile-status \{[^}]*display: grid/);
+  assert.match(css, /\.lesson-sidebar \.stage-list,[\s\S]*\.lesson-sidebar \.standard-chip \{ display: none/);
+  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.lesson-mobile-status \{[^}]*grid-template-columns: 1fr/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {

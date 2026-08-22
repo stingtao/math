@@ -3436,3 +3436,30 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .model-choice-context-model > span strong { justify-self: end; }
   .model-choice-context-model > span em { justify-self: end; }
 }
+
+/* Mobile lessons keep the current quest step visible without a tall sidebar checklist. */
+.lesson-mobile-status { display: none; }
+
+@media (max-width: 760px) {
+  .lesson-mobile-status { width: min(720px, calc(100% - 48px)); margin: 16px auto 0; padding: 12px 14px; display: grid; grid-template-columns: minmax(190px, 1fr) minmax(220px, .9fr); align-items: center; gap: 14px; border: 1px solid color-mix(in srgb, var(--accent) 24%, #d8e2e8); border-radius: 17px; background: linear-gradient(110deg, white, var(--accent-soft)); box-shadow: 0 8px 20px rgb(23 50 79 / 5%); }
+  .lesson-mobile-topic { min-width: 0; display: flex; align-items: center; gap: 10px; }
+  .lesson-mobile-topic > span { min-width: 0; display: grid; gap: 2px; }
+  .lesson-mobile-topic small { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .09em; }
+  .lesson-mobile-topic strong { overflow: hidden; font-size: 14px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+  .lesson-mobile-steps { min-width: 0; position: relative; display: grid; grid-template-columns: repeat(5, minmax(28px, 1fr)); gap: 6px; }
+  .lesson-mobile-steps::before { content: ""; height: 3px; position: absolute; left: 8%; right: 8%; top: 15px; border-radius: 99px; background: #d6e0e5; }
+  .lesson-mobile-steps i { width: 31px; height: 31px; position: relative; z-index: 1; justify-self: center; display: grid; place-items: center; border: 2px solid #d1dce2; border-radius: 10px; color: #7d8e9b; background: white; font-size: 9px; font-style: normal; font-weight: 900; }
+  .lesson-mobile-steps i.done { color: white; border-color: var(--teal); background: var(--teal); }
+  .lesson-mobile-steps i.active { color: white; border-color: var(--accent); background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .lesson-layout { padding-top: 20px; gap: 18px; }
+  .lesson-sidebar { padding-top: 0; }
+  .lesson-sidebar .stage-list,
+  .lesson-sidebar .standard-chip { display: none; }
+}
+
+@media (max-width: 520px) {
+  .lesson-mobile-status { width: calc(100% - 28px); grid-template-columns: 1fr; gap: 10px; }
+  .lesson-mobile-topic .topic-icon { --topic-size: 40px; }
+  .lesson-mobile-steps { width: 100%; }
+  .lesson-layout { padding-top: 16px; }
+}
