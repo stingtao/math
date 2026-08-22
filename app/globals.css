@@ -3255,3 +3255,88 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .sample-space-context-model > div { width: 100%; grid-template-columns: repeat(2, 1fr); }
   .sample-space-context-model > div > span { min-height: 50px; }
 }
+
+/* Grade 9 linear modeling connects formulas, line forms, and systems. */
+.context-model-literal-equation .context-scene img,
+.context-model-line-forms .context-scene img,
+.context-model-system-substitution .context-scene img,
+.context-model-system-model .context-scene img { object-position: center 51%; }
+.context-model-literal-equation .context-math-card,
+.context-model-line-forms .context-math-card,
+.context-model-system-substitution .context-math-card,
+.context-model-system-model .context-math-card { width: min(630px, 95%); }
+.literal-equation-context-model,
+.system-substitution-context-model { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+.literal-equation-context-model > span,
+.system-substitution-context-model > span { min-width: 0; min-height: 72px; padding: 9px 20px 9px 8px; position: relative; display: grid; place-items: center; align-content: center; gap: 6px; border: 1px solid #d5e1e8; border-radius: 12px; background: #f7fafb; text-align: center; }
+.literal-equation-context-model > span:first-child,
+.system-substitution-context-model > span:first-child { border-color: #c7d9ed; background: #eef4fc; }
+.literal-equation-context-model > span:last-child,
+.system-substitution-context-model > span:last-child { border: 2px solid var(--teal); background: #eef8f5; }
+.literal-equation-context-model small,
+.line-forms-context-model small,
+.system-substitution-context-model small,
+.system-model-context-model small { color: var(--muted); font-size: 8px; font-weight: 900; letter-spacing: .06em; line-height: 1.3; text-transform: uppercase; }
+.literal-equation-context-model strong,
+.system-substitution-context-model strong { max-width: 100%; overflow-x: auto; color: var(--navy); font-size: 14px; scrollbar-width: thin; }
+.literal-equation-context-model > span:last-child strong,
+.system-substitution-context-model > span:last-child strong { color: var(--teal); font-size: 16px; }
+.literal-equation-context-model > span > i,
+.system-substitution-context-model > span > i { position: absolute; right: 5px; top: 50%; color: var(--blue); font-size: 12px; font-style: normal; font-weight: 900; transform: translateY(-50%); }
+
+.line-forms-context-model { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.line-forms-context-model > span { min-width: 0; min-height: 75px; padding: 9px 19px 9px 9px; position: relative; display: grid; place-items: center; align-content: center; gap: 7px; border: 1px solid #cbdbee; border-radius: 12px; background: #eef4fc; text-align: center; }
+.line-forms-context-model > span:nth-child(2) { border-color: #bfe1d8; background: #eef8f5; }
+.line-forms-context-model > span:last-child { border-color: #d7cbe8; background: #f5f1fb; }
+.line-forms-context-model strong { max-width: 100%; overflow-x: auto; color: var(--navy); font-size: 15px; scrollbar-width: thin; }
+.line-forms-context-model > span > i { position: absolute; right: 5px; top: 50%; color: var(--violet); font-size: 13px; font-style: normal; font-weight: 900; transform: translateY(-50%); }
+
+.system-substitution-context-model { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.system-substitution-context-model > span { padding-inline: 7px 17px; }
+.system-substitution-context-model strong { font-size: 12px; }
+.system-substitution-context-model > span:nth-child(3) { border-color: #e6d39c; background: #fff8e6; }
+.system-substitution-context-model > span:nth-child(4) { border-color: #d7cbe8; background: #f5f1fb; }
+
+.system-model-context-model { width: 100%; display: grid; grid-template-columns: .7fr 1.3fr; gap: 8px; }
+.system-model-context-model > header { grid-row: 1 / 3; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.system-model-context-model > header > span { min-width: 0; padding: 8px 6px; display: grid; place-items: center; align-content: center; gap: 4px; border-radius: 11px; color: white; background: var(--blue); text-align: center; }
+.system-model-context-model > header > span:last-child { background: var(--coral); }
+.system-model-context-model > header small,
+.system-model-context-model > header strong { color: white; }
+.system-model-context-model > header strong { font-size: 13px; }
+.system-model-context-model > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.system-model-context-model > div > span { min-width: 0; min-height: 58px; padding: 7px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid #cad9e8; border-radius: 11px; background: #eef4fb; text-align: center; }
+.system-model-context-model > div > span:last-child { border-color: #e4d19b; background: #fff8e5; }
+.system-model-context-model > div strong { max-width: 100%; overflow-x: auto; color: var(--navy); font-size: 13px; scrollbar-width: thin; }
+.system-model-context-model > footer { min-height: 49px; padding: 8px 12px; display: grid; grid-template-columns: minmax(75px, auto) minmax(0, 1fr); align-items: center; gap: 9px; border-radius: 11px; color: white; background: var(--teal); }
+.system-model-context-model > footer small,
+.system-model-context-model > footer strong { color: white; }
+.system-model-context-model > footer strong { justify-self: end; font-size: 16px; }
+
+@media (max-width: 520px) {
+  .context-model-literal-equation .context-math-card,
+  .context-model-line-forms .context-math-card,
+  .context-model-system-substitution .context-math-card,
+  .context-model-system-model .context-math-card { width: 94%; padding-inline: 11px; }
+  .literal-equation-context-model,
+  .line-forms-context-model,
+  .system-substitution-context-model { grid-template-columns: 1fr; gap: 7px; }
+  .literal-equation-context-model > span,
+  .line-forms-context-model > span,
+  .system-substitution-context-model > span { min-height: 50px; grid-template-columns: minmax(108px, .82fr) minmax(0, 1.18fr); justify-items: start; padding: 8px 11px; text-align: left; }
+  .literal-equation-context-model > span strong,
+  .line-forms-context-model > span strong,
+  .system-substitution-context-model > span strong { justify-self: end; font-size: 16px; }
+  .literal-equation-context-model > span > i,
+  .line-forms-context-model > span > i,
+  .system-substitution-context-model > span > i { display: none; }
+  .system-model-context-model { grid-template-columns: 1fr; }
+  .system-model-context-model > header { min-height: 53px; grid-row: auto; }
+  .system-model-context-model > div > span { min-height: 51px; }
+  .system-model-context-model > footer { grid-template-columns: 1fr; justify-items: center; gap: 2px; text-align: center; }
+  .system-model-context-model > footer strong { justify-self: center; }
+  .literal-equation-context-model small,
+  .line-forms-context-model small,
+  .system-substitution-context-model small,
+  .system-model-context-model small { font-size: 9px; }
+}

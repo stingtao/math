@@ -367,12 +367,12 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
     assert.ok(asset.byteLength < 550_000, `${visual} should remain mobile-friendly`);
   }
-  for (const model of ["number-line", "symbol-meaning", "sign-pairs", "operation-order", "place-value", "repeating-decimal", "negative-distribute", "root-inverse", "solid-compare", "signed-sum", "subtract-opposite", "signed-rational-quotient", "signed-change", "proportion-table", "origin-proportion", "word-equation", "scale-area", "composite-area", "experimental-probability", "sample-space", "percent", "fraction-equivalence", "fraction-addition", "substitution", "power-steps", "term-structure", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-location", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "solution-cases", "inequality-range", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay", "number-kinds", "system-elimination", "distribution-compare", "rational-exponent", "growth-compare", "simple-interest", "graph-line", "dilation", "residuals"]) assert.match(concept, new RegExp(`model: "${model}"`));
+  for (const model of ["number-line", "symbol-meaning", "sign-pairs", "operation-order", "place-value", "repeating-decimal", "negative-distribute", "root-inverse", "solid-compare", "signed-sum", "subtract-opposite", "signed-rational-quotient", "signed-change", "proportion-table", "origin-proportion", "word-equation", "scale-area", "composite-area", "experimental-probability", "sample-space", "literal-equation", "line-forms", "system-substitution", "system-model", "percent", "fraction-equivalence", "fraction-addition", "substitution", "power-steps", "term-structure", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-location", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "solution-cases", "inequality-range", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay", "number-kinds", "system-elimination", "distribution-compare", "rational-exponent", "growth-compare", "simple-interest", "graph-line", "dilation", "residuals"]) assert.match(concept, new RegExp(`model: "${model}"`));
   const contextSceneSource = concept.slice(concept.indexOf("const contextScenes"), concept.indexOf("function mathFor"));
-  assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 111);
+  assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 116);
   const expandedSceneCount = Number(home.match(/const expandedSceneCount = (\d+);/)?.[1]);
-  assert.equal(expandedSceneCount, 111);
-  for (const representative of ["math-symbols", "signed-numbers", "sign-rules", "order-of-operations", "decimals", "negative-distribution", "repeating-decimals", "square-cube-roots", "mixed-volume", "percent", "fractions", "adding-fractions", "substitution", "g9-evaluate-formulas", "algebra-language", "combining-like-terms", "g7-equivalent-expressions", "g7-proportional-tables", "g7-proportional-graphs", "g7-add-rational-numbers", "g7-subtract-rational-numbers", "g7-multiply-divide-rationals", "g7-rational-word-problems", "g7-equation-word-models", "g7-scale-area", "g7-composite-area", "g7-experimental-probability", "g7-sample-spaces", "g9-algebraic-structure", "g9-polynomial-vocabulary", "g9-add-subtract-polynomials", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "rational-irrational", "systems-algebra", "graphing-lines", "function-rules", "dilations-similarity", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g7-compare-distributions", "g7-simple-interest", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula", "g9-rational-exponents", "g9-linear-vs-exponential", "g9-correlation-residuals"]) {
+  assert.equal(expandedSceneCount, 116);
+  for (const representative of ["math-symbols", "signed-numbers", "sign-rules", "order-of-operations", "decimals", "negative-distribution", "repeating-decimals", "square-cube-roots", "mixed-volume", "percent", "fractions", "adding-fractions", "substitution", "g9-evaluate-formulas", "algebra-language", "combining-like-terms", "g7-equivalent-expressions", "g7-proportional-tables", "g7-proportional-graphs", "g7-add-rational-numbers", "g7-subtract-rational-numbers", "g7-multiply-divide-rationals", "g7-rational-word-problems", "g7-equation-word-models", "g7-scale-area", "g7-composite-area", "g7-experimental-probability", "g7-sample-spaces", "g9-algebraic-structure", "g9-literal-equations", "g9-linear-equation-forms", "g9-systems-substitution-g9", "g9-systems-elimination-g9", "g9-system-models", "g9-polynomial-vocabulary", "g9-add-subtract-polynomials", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "rational-irrational", "systems-algebra", "graphing-lines", "function-rules", "dilations-similarity", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g7-compare-distributions", "g7-simple-interest", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula", "g9-rational-exponents", "g9-linear-vs-exponential", "g9-correlation-residuals"]) {
     assert.match(contextSceneSource, new RegExp(`[" ]${representative}[":]`));
   }
   for (const exactModel of [
@@ -387,6 +387,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
     'mathSteps: ["(-\\\\frac34)\\\\div\\\\frac12", "\\\\text{different signs}\\\\Rightarrow-", "\\\\frac34\\\\times\\\\frac21=\\\\frac32", "-\\\\frac32"]',
     'mathSteps: ["5\\\\text{ m}", "-12\\\\text{ m}", "5+(-12)", "-7\\\\text{ m}"]',
     'mathSteps: ["r=\\\\text{rides}", "4r", "+3", "4r+3=19", "r=4"]',
+    'mathSteps: ["A=lw", "\\\\frac{A}{l}=\\\\frac{lw}{l}", "\\\\frac{A}{l}=w", "w=\\\\frac{A}{l}"]',
+    'mathSteps: ["y=2x", "x+y=9", "x+2x=9", "x=3", "(x,y)=(3,6)"]',
+    'mathSteps: ["a=\\\\text{adults}", "s=\\\\text{students}", "a+s=20", "10a+6s=152", "(a,s)=(8,12)"]',
     'mathSteps: ["3x+5", "3", "x", "5"]',
     'mathSteps: ["3x+2+5x-1", "(3+5)x+(2-1)", "8x+1"]',
     'mathSteps: ["3x+6", "3(x+2)"',
@@ -462,6 +465,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(concept, /composite-area-context-model/);
   assert.match(concept, /experimental-probability-context-model/);
   assert.match(concept, /sample-space-context-model/);
+  assert.match(concept, /literal-equation-context-model/);
+  assert.match(concept, /line-forms-context-model/);
+  assert.match(concept, /system-substitution-context-model/);
+  assert.match(concept, /system-model-context-model/);
   assert.match(concept, /coordinate-location-context-model/);
   assert.match(css, /\.solution-cases-context-model/);
   assert.match(css, /\.inequality-range-context-model/);
@@ -490,6 +497,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.composite-area-context-model/);
   assert.match(css, /\.experimental-probability-context-model/);
   assert.match(css, /\.sample-space-context-model/);
+  assert.match(css, /\.literal-equation-context-model/);
+  assert.match(css, /\.line-forms-context-model/);
+  assert.match(css, /\.system-substitution-context-model/);
+  assert.match(css, /\.system-model-context-model/);
+  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.literal-equation-context-model,[\s\S]*\.system-substitution-context-model \{ grid-template-columns: 1fr/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.composite-area-context-model,[\s\S]*\.sample-space-context-model \{ grid-template-columns: 1fr/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.proportion-table-context-model,[\s\S]*\.word-equation-context-model \{ grid-template-columns: 1fr/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.rational-flow-context-model,[\s\S]*grid-template-columns: 1fr/);

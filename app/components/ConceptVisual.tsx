@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "scale-area" | "composite-area" | "experimental-probability" | "sample-space" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "scale-area" | "composite-area" | "experimental-probability" | "sample-space" | "literal-equation" | "line-forms" | "system-substitution" | "system-model" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -194,6 +194,52 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Two coin flips create four ordered outcomes: HH, HT, TH, and TT.",
     model: "sample-space",
     modelLabel: "Math model: two coin flips have the sample space head head, head tail, tail head, and tail tail, with four equally likely outcomes",
+  },
+  "g9-literal-equations": {
+    src: "/visuals/multistep-workshop-context.jpg",
+    alt: "A workshop removes matching outer layers from an equation one operation at a time",
+    headline: "isolate the chosen letter with inverse operations",
+    copy: "Treat the other letters as known quantities and make the same legal change to both sides.",
+    model: "literal-equation",
+    mathSteps: ["A=lw", "\\frac{A}{l}=\\frac{lw}{l}", "\\frac{A}{l}=w", "w=\\frac{A}{l}"],
+    mathStepLabels: ["formula", "divide both sides by l", "cancel l", "chosen subject"],
+    modelLabel: "Math model: starting with A equals l times w, divide both sides by l, cancel l on the right, and get w equals A divided by l",
+  },
+  "g9-linear-equation-forms": {
+    src: "/visuals/graphing-line-city-context.jpg",
+    alt: "One straight route crosses a coordinate city with a marked starting point and constant slope",
+    headline: "different forms describe the same line",
+    copy: "Point-slope highlights a known point, slope-intercept highlights m and b, and standard form groups x and y.",
+    model: "line-forms",
+    modelLabel: "Math model: y minus five equals three times x minus two, y equals three x minus one, and three x minus y equals one are equivalent forms of the same line",
+  },
+  "g9-systems-substitution-g9": {
+    src: "/visuals/substitution-machine-context.jpg",
+    alt: "One known expression enters a matching variable slot and passes through an ordered calculation",
+    headline: "replace a variable with an equal expression",
+    copy: "Since y equals 2x, every y can be replaced by 2x before solving and back-substituting.",
+    model: "system-substitution",
+    mathSteps: ["y=2x", "x+y=9", "x+2x=9", "x=3", "(x,y)=(3,6)"],
+    mathStepLabels: ["replacement", "second equation", "substitute", "solve x", "back-substitute"],
+    modelLabel: "Math model: use y equals two x in x plus y equals nine, giving x plus two x equals nine, x equals three, and the solution three comma six",
+  },
+  "g9-systems-elimination-g9": {
+    src: "/visuals/elimination-workshop-context.jpg",
+    alt: "Two equation strips align opposite variable terms so one pair disappears when added",
+    headline: "opposite coefficients cancel when equations add",
+    copy: "Align like terms, add vertically, solve the remaining variable, then substitute back.",
+    model: "system-elimination",
+    modelLabel: "Math model: x plus y equals seven and x minus y equals one add to two x equals eight, giving the solution four comma three",
+  },
+  "g9-system-models": {
+    src: "/visuals/systems-transit-context.jpg",
+    alt: "Two transit conditions cross at one shared solution point",
+    headline: "two unknowns need two independent conditions",
+    copy: "Define adults and students, translate the total count and total cost, then solve their shared system.",
+    model: "system-model",
+    mathSteps: ["a=\\text{adults}", "s=\\text{students}", "a+s=20", "10a+6s=152", "(a,s)=(8,12)"],
+    mathStepLabels: ["unknown 1", "unknown 2", "head count", "ticket total", "solution"],
+    modelLabel: "Math model: let a be adults and s be students; a plus s equals twenty and ten a plus six s equals one hundred fifty-two, so a is eight and s is twelve",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -939,6 +985,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "composite-area" && <CompositeAreaModel />}
         {scene.model === "experimental-probability" && <ExperimentalProbabilityModel />}
         {scene.model === "sample-space" && <SampleSpaceModel />}
+        {scene.model === "literal-equation" && <LiteralEquationModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "line-forms" && <LineFormsModel />}
+        {scene.model === "system-substitution" && <SystemSubstitutionModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "system-model" && <SystemModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -1088,4 +1138,23 @@ function ExperimentalProbabilityModel() {
 
 function SampleSpaceModel() {
   return <div className="sample-space-context-model" aria-hidden="true"><header><span>FIRST FLIP</span><i>H</i><i>T</i></header><div><small>SECOND FLIP</small>{["HH", "HT", "TH", "TT"].map((outcome) => <span key={outcome}><b>{outcome}</b><em>1 of 4</em></span>)}</div><footer>S = &#123;HH, HT, TH, TT&#125;</footer></div>;
+}
+
+function LiteralEquationModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  return <div className="literal-equation-context-model" aria-hidden="true">{steps.map((step, index) => <span key={step}><small>{labels[index]}</small><MathStep value={step} />{index < steps.length - 1 && <i>→</i>}</span>)}</div>;
+}
+
+function LineFormsModel() {
+  const forms = [["point-slope", "y-5=3(x-2)"], ["slope-intercept", "y=3x-1"], ["standard", "3x-y=1"]];
+  return <div className="line-forms-context-model" aria-hidden="true">{forms.map(([label, form], index) => <span key={label}><small>{label}</small><MathStep value={form} />{index < forms.length - 1 && <i>=</i>}</span>)}</div>;
+}
+
+function SystemSubstitutionModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  return <div className="system-substitution-context-model" aria-hidden="true">{steps.map((step, index) => <span key={step}><small>{labels[index]}</small><MathStep value={step} />{index < steps.length - 1 && <i>→</i>}</span>)}</div>;
+}
+
+function SystemModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [adult, student, count, cost, solution] = steps;
+  if (!adult || !student || !count || !cost || !solution) return null;
+  return <div className="system-model-context-model" aria-hidden="true"><header><span><small>{labels[0]}</small><MathStep value={adult} /></span><span><small>{labels[1]}</small><MathStep value={student} /></span></header><div><span><small>{labels[2]}</small><MathStep value={count} /></span><span><small>{labels[3]}</small><MathStep value={cost} /></span></div><footer><small>{labels[4]}</small><MathStep value={solution} /></footer></div>;
 }
