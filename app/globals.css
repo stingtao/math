@@ -3456,7 +3456,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .lesson-mobile-status { width: min(720px, calc(100% - 48px)); margin: 16px auto 0; padding: 12px 14px; display: grid; grid-template-columns: minmax(190px, 1fr) minmax(220px, .9fr); align-items: center; gap: 14px; border: 1px solid color-mix(in srgb, var(--accent) 24%, #d8e2e8); border-radius: 17px; background: linear-gradient(110deg, white, var(--accent-soft)); box-shadow: 0 8px 20px rgb(23 50 79 / 5%); }
   .lesson-mobile-topic { min-width: 0; display: flex; align-items: center; gap: 10px; }
   .lesson-mobile-topic > span { min-width: 0; display: grid; gap: 2px; }
-  .lesson-mobile-topic small { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .09em; }
+  .lesson-mobile-topic small { color: var(--accent); font-size: 10px; font-weight: 900; letter-spacing: .07em; }
   .lesson-mobile-topic strong { overflow: hidden; font-size: 14px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
   .lesson-mobile-steps { min-width: 0; position: relative; display: grid; grid-template-columns: repeat(5, minmax(28px, 1fr)); gap: 6px; }
   .lesson-mobile-steps::before { content: ""; height: 3px; position: absolute; left: 8%; right: 8%; top: 15px; border-radius: 99px; background: #d6e0e5; }
@@ -3470,7 +3470,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .review-mobile-status { width: min(720px, calc(100% - 48px)); margin: 16px auto 0; padding: 14px; display: grid; gap: 12px; border: 1px solid color-mix(in srgb, var(--accent) 24%, #d5e1e7); border-radius: 18px; background: linear-gradient(120deg, white, var(--accent-soft)); box-shadow: 0 9px 22px rgb(23 50 79 / 6%); }
   .review-mobile-status > header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
   .review-mobile-status > header > div { min-width: 0; display: grid; gap: 3px; }
-  .review-mobile-status > header small { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .09em; }
+  .review-mobile-status > header small { color: var(--accent); font-size: 10px; font-weight: 900; letter-spacing: .07em; }
   .review-mobile-status > header strong { overflow: hidden; font-size: 14px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
   .review-mobile-status > header > b { flex: 0 0 auto; padding: 6px 9px; border-radius: 99px; color: white; background: var(--accent); font-size: 10px; }
   .review-mobile-nodes { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
@@ -3500,4 +3500,5 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .review-mobile-nodes .topic-icon-sm { --topic-size: 40px; }
   .review-mobile-nodes::before { top: 20px; }
   .review-mobile-nodes > span > b { right: calc(50% - 24px); }
+  .context-math-card.context-math-card small { font-size: 10px; line-height: 1.3; }
 }

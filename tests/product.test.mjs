@@ -316,6 +316,9 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.review-mobile-status \{[^}]*display: grid/);
   assert.match(css, /\.review-layout > aside \{ display: none/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.review-mobile-status \{[^}]*width: calc\(100% - 28px\)/);
+  assert.match(css, /\.context-math-card\.context-math-card small \{ font-size: 10px; line-height: 1\.3/);
+  assert.match(css, /\.lesson-mobile-topic small \{[^}]*font-size: 10px/);
+  assert.match(css, /\.review-mobile-status > header small \{[^}]*font-size: 10px/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {
