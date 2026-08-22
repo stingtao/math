@@ -27,6 +27,7 @@ const gradeVisuals = {
 
 const mathWorldScenes = [
   { grade: 8, title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.png", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
+  { grade: 8, title: "Different pieces, same amount", copy: "Line up equal wholes to see why six eighths and three fourths name the same length.", image: "/visuals/fraction-workshop-context.jpg", lesson: "fractions", visual: "fraction-bars", accent: "gold" as const },
   { grade: 7, title: "Every face counts", copy: "Unfold a package, match every face, and turn a solid into areas you can add.", image: "/visuals/surface-area-packaging-context.jpg", lesson: "g7-surface-area", visual: "net", accent: "coral" as const },
   { grade: 8, title: "Two questions, four groups", copy: "Sort one survey by two categories, then compare groups using the right total.", image: "/visuals/two-way-survey-context.jpg", lesson: "two-way-tables", visual: "two-way", accent: "gold" as const },
   { grade: 7, title: "Chance happens in stages", copy: "Follow two independent events and see why their probabilities multiply.", image: "/visuals/compound-events-lab-context.jpg", lesson: "g7-compound-events", visual: "tree", accent: "violet" as const },
@@ -40,7 +41,7 @@ const mathWorldScenes = [
   { grade: 9, title: "Measure every miss from the line", copy: "Use vertical residual distances to judge whether a fitted line captures the data pattern.", image: "/visuals/residual-observatory-context.jpg", lesson: "g9-correlation-residuals", visual: "residual", accent: "violet" as const },
 ];
 
-const expandedSceneCount = 70;
+const expandedSceneCount = 72;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";

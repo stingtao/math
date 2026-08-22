@@ -1929,6 +1929,43 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .boss-victory-actions { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
 .boss-victory-actions > a { min-height: 49px; }
 
+/* Equivalent fractions keep the whole fixed and make every subdivision countable. */
+.context-model-fraction-equivalence .context-scene img,
+.context-model-fraction-addition .context-scene img { object-position: center 50%; }
+.fraction-strip { min-width: 0; height: 28px; display: grid; overflow: hidden; border: 2px solid var(--navy); border-radius: 8px; background: #f3f6f8; }
+.fraction-strip > i { min-width: 0; display: block; border-right: 1px solid rgb(23 50 79 / 28%); background: #f3f6f8; }
+.fraction-strip > i:last-child { border-right: 0; }
+.fraction-eighths { grid-template-columns: repeat(8, 1fr); }
+.fraction-quarters { grid-template-columns: repeat(4, 1fr); }
+.fraction-sixths { grid-template-columns: repeat(6, 1fr); }
+.fraction-equivalence-context-model { width: min(500px, 100%); display: grid; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); align-items: center; gap: 10px; }
+.fraction-equivalence-context-model > div { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 7px; }
+.fraction-equivalence-context-model small { grid-column: 1 / -1; color: var(--muted); font-size: 9px; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+.fraction-equivalence-context-model .fraction-eighths > i.filled { background: var(--coral); }
+.fraction-equivalence-context-model .fraction-quarters > i.filled { background: var(--teal); }
+.fraction-equivalence-context-model strong { min-width: 34px; color: var(--navy); font-size: 17px; }
+.fraction-equivalence-context-model > b { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; color: white; background: var(--gold); font-size: 15px; }
+.fraction-addition-context-model { width: min(510px, 100%); display: grid; gap: 11px; }
+.fraction-addition-context-model > header { display: flex; align-items: center; justify-content: center; gap: 9px; color: var(--navy); font-size: 16px; font-weight: 850; }
+.fraction-addition-context-model > header i { padding: 4px 8px; border-radius: 8px; color: #087965; background: #e4f5f0; font-size: 8px; font-style: normal; letter-spacing: .06em; text-transform: uppercase; }
+.fraction-addition-context-model > header i::after { content: " →"; }
+.fraction-addition-context-model > div { min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 21px; }
+.fraction-addition-part { min-width: 0; position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; }
+.fraction-addition-part > .fraction-strip { width: 100%; height: 25px; }
+.fraction-addition-part > .fraction-strip > i.filled { background: var(--blue); }
+.fraction-addition-part:nth-child(3) > .fraction-strip > i.filled { background: var(--teal); }
+.fraction-addition-part > small { min-width: 31px; color: var(--navy); font-size: 13px; font-weight: 850; }
+.fraction-addition-part > b { width: 22px; height: 22px; position: absolute; right: -22px; top: 2px; display: grid; place-items: center; color: var(--coral); font-size: 17px; }
+
+@media (max-width: 520px) {
+  .fraction-equivalence-context-model { grid-template-columns: 1fr; gap: 7px; }
+  .fraction-equivalence-context-model > b { justify-self: center; }
+  .fraction-equivalence-context-model > div { grid-template-columns: minmax(0, 1fr) 42px; }
+  .fraction-addition-context-model > div { grid-template-columns: 1fr; gap: 8px; }
+  .fraction-addition-part > b { right: auto; left: 50%; top: auto; bottom: -14px; z-index: 2; border-radius: 7px; background: white; transform: translateX(-50%); }
+  .fraction-addition-context-model > header { font-size: 15px; }
+}
+
 .review-memory-meter { margin: 20px 0 16px; padding: 15px; border: 1px solid #d5e3df; border-radius: 17px; background: linear-gradient(145deg, white, #eaf7f3); box-shadow: 0 10px 23px rgb(23 50 79 / 5%); }
 .review-memory-meter > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .review-memory-meter > header > div { min-width: 0; display: grid; gap: 3px; }
