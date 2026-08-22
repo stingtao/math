@@ -8,7 +8,7 @@ import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
 import { avatarFrameCatalog } from "@/lib/avatar-frames";
 import { SuccessBurst } from "./SuccessBurst";
-import { achievementSpecs } from "@/lib/achievements";
+import { evaluateAchievements } from "@/lib/achievements";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -21,10 +21,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const activeState = state;
   const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
   const achievementValues = { lessons: state.completedLessons.length, stars: totalStars, bosses: state.clearedBosses.length, streak: state.profile.longestStreak };
-  const achievements = achievementSpecs.map((item) => {
-    const value = achievementValues[item.source];
-    return { ...item, value, unlocked: value >= item.target, progress: Math.min(100, Math.round(value / item.target * 100)) };
-  });
+  const achievements = evaluateAchievements(achievementValues);
   const unlockedAchievements = achievements.filter((item) => item.unlocked).length;
   const nextAchievement = achievements.find((item) => !item.unlocked);
   const ownedFrames = new Set(["plain", ...state.profile.ownedFrames, state.profile.avatar.frame]);

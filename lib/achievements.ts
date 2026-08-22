@@ -9,6 +9,22 @@ export const achievementSpecs = [
 
 export type AchievementTotals = Record<(typeof achievementSpecs)[number]["source"], number>;
 
+export function evaluateAchievements(totals: AchievementTotals) {
+  return achievementSpecs.map((item) => {
+    const value = totals[item.source];
+    return {
+      ...item,
+      value,
+      unlocked: value >= item.target,
+      progress: Math.min(100, Math.round(value / item.target * 100)),
+    };
+  });
+}
+
+export function getNextAchievement(totals: AchievementTotals) {
+  return evaluateAchievements(totals).find((item) => !item.unlocked) ?? null;
+}
+
 export function achievementUnlockedBetween(previous: AchievementTotals, current: AchievementTotals) {
   return achievementSpecs.filter((item) => previous[item.source] < item.target && current[item.source] >= item.target).at(-1) ?? null;
 }

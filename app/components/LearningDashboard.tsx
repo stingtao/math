@@ -11,6 +11,7 @@ import { mutationHeaders } from "./mutation";
 import { Avatar } from "./Avatar";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
+import { getNextAchievement } from "@/lib/achievements";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
@@ -55,6 +56,13 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 
   if (loading) return <LoadingTrail />;
   if (!state || error) return <SignInGate />;
+  const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
+  const nextPrivateAchievement = getNextAchievement({
+    lessons: state.completedLessons.length,
+    stars: totalStars,
+    bosses: state.clearedBosses.length,
+    streak: state.profile.longestStreak,
+  });
 
   async function claimReward() {
     if (state!.dailyRewardClaimed || rewardPending) return;
@@ -247,7 +255,16 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               <span className={`quest-node quest-boss-node ${gradeComplete ? "done" : activeBossReady ? "current" : "locked"}`} aria-label={`Boss quest: ${gradeComplete ? "complete" : activeBossReady ? "ready" : "locked"}`}>★</span>
             </div>
           </div>
-          <div className="quest-action"><span>{gradeComplete ? reviewBatchSize > 0 ? "REVIEW READY" : "TRAIL CLEARED" : activeBossReady ? "BOSS READY" : `STEP ${activeDone + 1} OF ${activeRegion.lessons.length}`}</span><strong>{gradeComplete ? reviewBatchSize > 0 ? `${reviewBatchSize} quick ${reviewBatchSize === 1 ? "recall" : "recalls"}` : "Nothing due today" : activeBossReady ? "5 mixed questions" : activeNextLesson?.title}</strong><a className={gradeComplete && reviewBatchSize === 0 ? "secondary-button" : "primary-button"} href={questHref}>{gradeComplete ? reviewBatchSize > 0 ? "Open Daily Review" : "Browse completed lessons" : activeBossReady ? "Start boss quest" : "Continue quest"} <span aria-hidden="true">{gradeComplete && reviewBatchSize === 0 ? "↓" : "→"}</span></a></div>
+          <div className="quest-action">
+            <span>{gradeComplete ? reviewBatchSize > 0 ? "REVIEW READY" : "TRAIL CLEARED" : activeBossReady ? "BOSS READY" : `STEP ${activeDone + 1} OF ${activeRegion.lessons.length}`}</span>
+            <strong>{gradeComplete ? reviewBatchSize > 0 ? `${reviewBatchSize} quick ${reviewBatchSize === 1 ? "recall" : "recalls"}` : "Nothing due today" : activeBossReady ? "5 mixed questions" : activeNextLesson?.title}</strong>
+            <a className={gradeComplete && reviewBatchSize === 0 ? "secondary-button" : "primary-button"} href={questHref}>{gradeComplete ? reviewBatchSize > 0 ? "Open Daily Review" : "Browse completed lessons" : activeBossReady ? "Start boss quest" : "Continue quest"} <span aria-hidden="true">{gradeComplete && reviewBatchSize === 0 ? "↓" : "→"}</span></a>
+            {nextPrivateAchievement ? <a className={`quest-landmark accent-${nextPrivateAchievement.tone}`} href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`} aria-label={`Next private landmark: ${nextPrivateAchievement.title}, ${nextPrivateAchievement.value} of ${nextPrivateAchievement.target} ${nextPrivateAchievement.unit}${nextPrivateAchievement.target === 1 ? "" : "s"}`}>
+              <span className="quest-landmark-glyph" aria-hidden="true">{nextPrivateAchievement.glyph}</span>
+              <span className="quest-landmark-copy"><small>NEXT PRIVATE LANDMARK</small><strong>{nextPrivateAchievement.title}</strong><span>{nextPrivateAchievement.value}/{nextPrivateAchievement.target} {nextPrivateAchievement.unit}{nextPrivateAchievement.target === 1 ? "" : "s"}</span><span className="quest-landmark-meter" role="progressbar" aria-label={`${nextPrivateAchievement.title} progress`} aria-valuemin={0} aria-valuemax={nextPrivateAchievement.target} aria-valuenow={Math.min(nextPrivateAchievement.value, nextPrivateAchievement.target)}><i style={{ width: `${nextPrivateAchievement.progress}%` }} /></span></span>
+              <b aria-hidden="true">→</b>
+            </a> : <a className="quest-landmark shelf-complete" href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`}><span className="quest-landmark-glyph" aria-hidden="true">✓</span><span className="quest-landmark-copy"><small>PRIVATE LANDMARKS</small><strong>Shelf complete</strong><span>Every current badge is yours.</span></span><b aria-hidden="true">→</b></a>}
+          </div>
         </section>
 
         <section className="trail-overview">

@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -63,6 +63,84 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["x=-3", "x^2-2x", "(-3)^2-2(-3)", "15"],
     mathStepLabels: ["known value", "formula", "replace every x", "result"],
     modelLabel: "Math model: x is negative three; x squared minus two x becomes negative three squared minus two times negative three, which equals fifteen",
+  },
+  powers: {
+    src: "/visuals/exponent-lab-context.jpg",
+    alt: "Four identical teal factor blocks moving into one grouping chamber and leaving as one compact layered power block",
+    headline: "a power is a compact count of equal factors",
+    copy: "Keep the base the same and let the exponent count how many times it is used as a factor.",
+    model: "power-steps",
+    mathSteps: ["x\\cdot x\\cdot x\\cdot x", "x^4", "2^4=16"],
+    mathStepLabels: ["four equal factors", "compact power", "evaluate an example"],
+    modelLabel: "Math model: x times x times x times x is written as x to the fourth power; two to the fourth power equals sixteen",
+  },
+  "exponent-rules": {
+    src: "/visuals/exponent-lab-context.jpg",
+    alt: "Four identical teal factor blocks moving into one grouping chamber and leaving as one compact layered power block",
+    headline: "same base means the factor counts can combine",
+    copy: "When powers with the same base multiply, every equal factor joins one longer product.",
+    model: "power-steps",
+    mathSteps: ["x^2\\cdot x^3", "x^{2+3}", "x^5"],
+    mathStepLabels: ["same base", "add factor counts", "combined power"],
+    modelLabel: "Math model: x squared times x cubed becomes x to the two plus three power, which is x to the fifth power",
+  },
+  "exponents-parentheses": {
+    src: "/visuals/exponent-lab-context.jpg",
+    alt: "Four identical teal factor blocks moving into one grouping chamber and leaving as one compact layered power block",
+    headline: "parentheses decide what the exponent repeats",
+    copy: "Treat the entire parenthesized value as the base before multiplying its copies.",
+    model: "power-steps",
+    mathSteps: ["(-3)^2", "(-3)(-3)", "9"],
+    mathStepLabels: ["whole base", "repeat it twice", "positive result"],
+    modelLabel: "Math model: negative three in parentheses squared means negative three times negative three, which equals positive nine",
+  },
+  "zero-negative-exponents": {
+    src: "/visuals/exponent-lab-context.jpg",
+    alt: "Four identical teal factor blocks moving into one grouping chamber and leaving as one compact layered power block",
+    headline: "a negative exponent moves the power to the denominator",
+    copy: "The exponent tells how many reciprocal factors remain; it does not make the base negative.",
+    model: "power-steps",
+    mathSteps: ["x^{-2}", "\\frac{1}{x^2}", "x=3\\Rightarrow\\frac19"],
+    mathStepLabels: ["negative exponent", "take the reciprocal", "evaluate an example"],
+    modelLabel: "Math model: x to the negative second power equals one over x squared; when x is three, the value is one ninth",
+  },
+  "scientific-operations": {
+    src: "/visuals/scientific-observatory-context.jpg",
+    alt: "An observatory sightline passing through scale rings toward a distant planet",
+    headline: "multiply the leading numbers and combine the powers of ten",
+    copy: "Keep the coefficient work separate from the exponent rule, then normalize the result if needed.",
+    model: "power-steps",
+    mathSteps: ["(3\\times10^4)(2\\times10^3)", "(3\\cdot2)10^{4+3}", "6\\times10^7"],
+    mathStepLabels: ["multiply", "group each part", "scientific notation"],
+    modelLabel: "Math model: three times ten to the fourth multiplied by two times ten cubed becomes six times ten to the seventh",
+  },
+  "g9-integer-exponents-g9": {
+    src: "/visuals/exponent-lab-context.jpg",
+    alt: "Four identical teal factor blocks moving into one grouping chamber and leaving as one compact layered power block",
+    headline: "quotients remove matching factors",
+    copy: "With the same nonzero base, division cancels equal factors, so subtract the exponents.",
+    model: "power-steps",
+    mathSteps: ["\\frac{a^5}{a^2}", "a^{5-2}", "a^3"],
+    mathStepLabels: ["same base", "subtract counts", "factors left"],
+    modelLabel: "Math model: a to the fifth divided by a squared becomes a to the five minus two power, which is a cubed",
+  },
+  "g9-multiply-monomials": {
+    src: "/visuals/exponent-lab-context.jpg",
+    alt: "Four identical teal factor blocks moving into one grouping chamber and leaving as one compact layered power block",
+    headline: "multiply coefficients; combine equal variable factors",
+    copy: "Numbers multiply with numbers while powers of the same variable use the exponent rule.",
+    model: "power-steps",
+    mathSteps: ["3x^2\\cdot2x^3", "(3\\cdot2)x^{2+3}", "6x^5"],
+    mathStepLabels: ["two monomials", "group like factors", "simplify"],
+    modelLabel: "Math model: three x squared times two x cubed becomes three times two times x to the two plus three power, which is six x to the fifth",
+  },
+  "coordinate-plane": {
+    src: "/visuals/coordinate-route-context.jpg",
+    alt: "A tiled city route moving horizontally from a central origin and then vertically to one marked destination",
+    headline: "x moves first, then y",
+    copy: "Start at the origin, use the x-coordinate for the horizontal move, then use y for the vertical move.",
+    model: "coordinate-location",
+    modelLabel: "Math model: start at zero zero, move right three units, then up two units to locate the point three comma two",
   },
   "slope-rate": {
     src: "/visuals/slope-trail-context.jpg",
@@ -612,6 +690,7 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
         {scene.model === "substitution" && <div className="substitution-context-model" aria-hidden="true">{scene.mathSteps?.map((step, index) => <span className="substitution-context-step" key={step}><small>{scene.mathStepLabels?.[index]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(step, { throwOnError: false }) }} /></span>)}</div>}
+        {scene.model === "power-steps" && <div className="power-context-model" aria-hidden="true">{scene.mathSteps?.map((step, index) => <span className="power-context-step" key={step}><small>{scene.mathStepLabels?.[index]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(step, { throwOnError: false }) }} />{index < (scene.mathSteps?.length ?? 0) - 1 && <i>→</i>}</span>)}</div>}
         {scene.model === "slope" && <div className="coordinate-model context-coordinate"><span className="axis-x" /><span className="axis-y" /><i className="point-one" /><i className="point-two" /><b /><em className="slope-run">run</em><em className="slope-rise">rise</em></div>}
         {scene.model === "triangle" && <div className="shape-model context-triangle"><span /><span /><span /><i aria-hidden="true" /></div>}
         {scene.model === "triangle-build" && <div className="triangle-build-context-model" aria-hidden="true"><div className="triangle-build-frame"><span className="triangle-side-three"><b>3</b></span><span className="triangle-side-four"><b>4</b></span><span className="triangle-side-five"><b>5</b></span><i className="triangle-vertex-one" /><i className="triangle-vertex-two" /><i className="triangle-vertex-three" /></div><strong>3 + 4 &gt; 5 · triangle closes</strong></div>}
@@ -624,6 +703,7 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "cone-volume" && <div className="cone-volume-context-model" aria-hidden="true"><div className="cone-model-group"><span /><span /><span /></div><i>→</i><div className="cone-cylinder-model"><span /><b>3 × cone</b></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("V_{cone}=\\tfrac13\\pi r^2h", { throwOnError: false }) }} /></div>}
         {scene.model === "sphere-volume" && <div className="sphere-volume-context-model" aria-hidden="true"><div className="sphere-volume-orb"><span /><i><b>r</b></i></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("V=\\tfrac43\\pi r^3", { throwOnError: false }) }} /></div>}
         {scene.model === "cross-section" && <div className="cross-section-context-model" aria-hidden="true"><div className="cross-section-solid"><span /><i /><b /></div><strong>horizontal slice <i>→</i> circle</strong></div>}
+        {scene.model === "coordinate-location" && <div className="coordinate-location-context-model" aria-hidden="true"><div className="coordinate-location-grid"><i className="location-axis-x" /><i className="location-axis-y" /><span className="location-run"><b>right 3</b></span><span className="location-rise"><b>up 2</b></span><em className="location-origin">0</em><em className="location-point">(3, 2)</em></div><strong><small>ORDERED PAIR</small><span>x first · y second</span></strong></div>}
         {scene.model === "coordinate-distance" && <div className="coordinate-distance-context-model" aria-hidden="true"><div className="coordinate-distance-grid"><i className="distance-run"><b>3</b></i><i className="distance-rise"><b>4</b></i><i className="distance-diagonal"><b>5</b></i><span className="distance-start" /><span className="distance-end" /><em /></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("d=\\sqrt{3^2+4^2}=5", { throwOnError: false }) }} /></div>}
         {scene.model === "difference-squares" && <div className="difference-squares-context-model" aria-hidden="true"><div className="difference-square"><span>a²</span><i>b²</i></div><b>→</b><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("a^2-b^2=(a-b)(a+b)", { throwOnError: false }) }} /></div>}
         {scene.model === "balance" && <div className="balance-context-model" aria-hidden="true"><div><span>x + 3</span><i>=</i><span>7</span></div><div><em>−3</em><b>same change</b><em>−3</em></div><strong>x = 4</strong></div>}

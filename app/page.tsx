@@ -29,12 +29,14 @@ const mathWorldScenes = [
   { grade: 8, title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.png", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
   { grade: 8, title: "Different pieces, same amount", copy: "Line up equal wholes to see why six eighths and three fourths name the same length.", image: "/visuals/fraction-workshop-context.jpg", lesson: "fractions", visual: "fraction-bars", accent: "gold" as const },
   { grade: 8, title: "Put the value in its place", copy: "Insert one known value into every matching variable slot, then evaluate the operations in order.", image: "/visuals/substitution-machine-context.jpg", lesson: "substitution", visual: "substitute", accent: "teal" as const },
+  { grade: 8, title: "Four factors, one power", copy: "Gather repeated copies of the same base, then use the exponent as a compact factor count.", image: "/visuals/exponent-lab-context.jpg", lesson: "powers", visual: "powers", accent: "violet" as const },
   { grade: 7, title: "Every face counts", copy: "Unfold a package, match every face, and turn a solid into areas you can add.", image: "/visuals/surface-area-packaging-context.jpg", lesson: "g7-surface-area", visual: "net", accent: "coral" as const },
   { grade: 8, title: "Two questions, four groups", copy: "Sort one survey by two categories, then compare groups using the right total.", image: "/visuals/two-way-survey-context.jpg", lesson: "two-way-tables", visual: "two-way", accent: "gold" as const },
   { grade: 7, title: "Chance happens in stages", copy: "Follow two independent events and see why their probabilities multiply.", image: "/visuals/compound-events-lab-context.jpg", lesson: "g7-compound-events", visual: "tree", accent: "violet" as const },
   { grade: 9, title: "The same fraction remains", copy: "Watch stored energy shrink by one fixed multiplier at every step.", image: "/visuals/exponential-decay-energy-context.jpg", lesson: "g9-exponential-decay", visual: "decay", accent: "teal" as const },
   { grade: 7, title: "Interest grows in equal steps", copy: "Separate the starting principal from the same simple-interest addition earned each year.", image: "/visuals/simple-interest-growth-context.jpg", lesson: "g7-simple-interest", visual: "formula", accent: "gold" as const },
   { grade: 8, title: "Start at b, then follow m", copy: "Plot the intercept first, then repeat one rise-and-run step to build a straight line.", image: "/visuals/graphing-line-city-context.jpg", lesson: "graphing-lines", visual: "line-graph", accent: "blue" as const },
+  { grade: 8, title: "x first, then y", copy: "Begin at the origin, move horizontally with x, and finish vertically with y to locate one point.", image: "/visuals/coordinate-route-context.jpg", lesson: "coordinate-plane", visual: "coordinate", accent: "blue" as const },
   { grade: 8, title: "One input, one destination", copy: "Follow each route through a rule and see why a function never sends one input two ways.", image: "/visuals/function-routing-context.jpg", lesson: "function-rules", visual: "mapping", accent: "teal" as const },
   { grade: 8, title: "Same shape, one scale factor", copy: "Project every vertex from one center and enlarge all corresponding sides consistently.", image: "/visuals/dilation-studio-context.jpg", lesson: "dilations-similarity", visual: "dilation", accent: "coral" as const },
   { grade: 8, title: "Three ways two lines can relate", copy: "See why a system can have one solution, no solution, or infinitely many shared points.", image: "/visuals/solution-cases-gallery-context.jpg", lesson: "solution-types", visual: "solution-types", accent: "blue" as const },
@@ -42,7 +44,7 @@ const mathWorldScenes = [
   { grade: 9, title: "Measure every miss from the line", copy: "Use vertical residual distances to judge whether a fitted line captures the data pattern.", image: "/visuals/residual-observatory-context.jpg", lesson: "g9-correlation-residuals", visual: "residual", accent: "violet" as const },
 ];
 
-const expandedSceneCount = 78;
+const expandedSceneCount = 86;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";
