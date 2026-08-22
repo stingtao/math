@@ -6,6 +6,7 @@ import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
 import { mathInputMode } from "../lib/math-input.ts";
 import { getQuestMilestone } from "../lib/quest-milestone.ts";
+import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
   assert.equal(mathInputMode("12"), "decimal");
@@ -405,6 +406,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   const topicIconCatalog = await readFile(new URL("../lib/topic-icons.ts", import.meta.url), "utf8");
   const landmarks = await readFile(new URL("../lib/visual-landmarks.ts", import.meta.url), "utf8");
   const contentValidator = await readFile(new URL("../scripts/validate-curriculum.ts", import.meta.url), "utf8");
+  const visualOptimizer = await readFile(new URL("../scripts/optimize-context-visuals.mjs", import.meta.url), "utf8");
   const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
@@ -424,6 +426,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(topicIconCatalog, /"scientific-ops"/);
   assert.match(topicIconCatalog, /"solution-types"/);
   assert.match(contentValidator, /Every lesson visual must have a specific topic icon/);
+  assert.match(visualOptimizer, /width: 1200, height: 800/);
+  assert.match(visualOptimizer, /width: 1280, height: 853/);
+  assert.match(visualOptimizer, /width: 1200, height: 900/);
+  assert.match(visualOptimizer, /webp\(\{ quality: 78/);
+  assert.match(visualOptimizer, /maximumBytes = 100_000/);
   assert.match(dashboard, /path-copy/);
   assert.match(dashboard, /<TopicIcon visual=\{item\.visual\}/);
   assert.match(lesson, /goal-concept/);
@@ -433,12 +440,14 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /FOCUS CHARGE/);
   assert.match(lesson, /mastery-next-goal/);
   assert.match(boss, /boss-victory-map/);
-  for (const visual of ["signed-numbers-context.webp", "operations-sequence-context.jpg", "decimal-pattern-context.jpg", "percent-market-context.jpg", "fraction-workshop-context.jpg", "substitution-machine-context.jpg", "exponent-lab-context.jpg", "like-terms-sorting-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg", "equation-balance-context.jpg", "irrational-garden-context.jpg", "scientific-observatory-context.jpg", "multistep-workshop-context.jpg", "unit-rate-bike-context.jpg", "circle-fountain-context.jpg", "prism-packing-context.jpg", "probability-arcade-context.jpg", "systems-transit-context.jpg", "solution-cases-gallery-context.jpg", "inequality-trail-context.jpg", "polynomial-tiles-context.jpg", "parabola-bridge-context.jpg", "exponential-greenhouse-context.jpg", "scale-drawing-studio-context.jpg", "random-sample-context.jpg", "arithmetic-sequence-context.jpg", "quadratic-roots-context.jpg", "surface-area-packaging-context.jpg", "compound-events-lab-context.jpg", "two-way-survey-context.jpg", "exponential-decay-energy-context.jpg", "discount-studio-context.jpg", "angle-plaza-context.jpg", "cone-measure-context.jpg", "geometric-sequence-lab-context.jpg", "absolute-transit-context.jpg", "triangle-builder-context.jpg", "cross-section-studio-context.jpg", "coordinate-route-context.jpg", "sphere-tank-context.jpg", "difference-squares-workshop-context.jpg", "distribution-comparison-context.jpg", "real-number-sort-context.jpg", "elimination-workshop-context.jpg", "rational-exponent-lab-context.jpg", "growth-comparison-context.jpg", "simple-interest-growth-context.jpg", "graphing-line-city-context.jpg", "function-routing-context.jpg", "dilation-studio-context.jpg", "residual-observatory-context.jpg"]) {
+  for (const visual of ["signed-numbers-context.webp", "operations-sequence-context.webp", "decimal-pattern-context.webp", "percent-market-context.webp", "fraction-workshop-context.webp", "substitution-machine-context.webp", "exponent-lab-context.webp", "like-terms-sorting-context.webp", "slope-trail-context.webp", "pythagorean-city-context.webp", "scatter-field-context.webp", "distributive-workshop-context.webp", "function-kiosk-context.webp", "transform-plaza-context.webp", "cylinder-tank-context.webp", "equation-balance-context.webp", "irrational-garden-context.webp", "scientific-observatory-context.webp", "multistep-workshop-context.webp", "unit-rate-bike-context.webp", "circle-fountain-context.webp", "prism-packing-context.webp", "probability-arcade-context.webp", "systems-transit-context.webp", "solution-cases-gallery-context.webp", "inequality-trail-context.webp", "polynomial-tiles-context.webp", "parabola-bridge-context.webp", "exponential-greenhouse-context.webp", "scale-drawing-studio-context.webp", "random-sample-context.webp", "arithmetic-sequence-context.webp", "quadratic-roots-context.webp", "surface-area-packaging-context.webp", "compound-events-lab-context.webp", "two-way-survey-context.webp", "exponential-decay-energy-context.webp", "discount-studio-context.webp", "angle-plaza-context.webp", "cone-measure-context.webp", "geometric-sequence-lab-context.webp", "absolute-transit-context.webp", "triangle-builder-context.webp", "cross-section-studio-context.webp", "coordinate-route-context.webp", "sphere-tank-context.webp", "difference-squares-workshop-context.webp", "distribution-comparison-context.webp", "real-number-sort-context.webp", "elimination-workshop-context.webp", "rational-exponent-lab-context.webp", "growth-comparison-context.webp", "simple-interest-growth-context.webp", "graphing-line-city-context.webp", "function-routing-context.webp", "dilation-studio-context.webp", "residual-observatory-context.webp"]) {
     assert.match(concept, new RegExp(visual.replace(".", "\\.")));
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
     assert.ok(asset.byteLength > 10_000);
+    assert.ok(asset.byteLength < 100_000, `${visual} should stay below 100 KB for mobile delivery`);
+    assert.equal((await sharp(asset).metadata()).format, "webp", `${visual} should use WebP`);
   }
-  for (const visual of ["operations-sequence-context.jpg", "decimal-pattern-context.jpg", "fraction-workshop-context.jpg", "substitution-machine-context.jpg", "exponent-lab-context.jpg", "like-terms-sorting-context.jpg", "triangle-builder-context.jpg", "cross-section-studio-context.jpg", "coordinate-route-context.jpg", "sphere-tank-context.jpg", "difference-squares-workshop-context.jpg", "distribution-comparison-context.jpg", "real-number-sort-context.jpg", "elimination-workshop-context.jpg", "rational-exponent-lab-context.jpg", "growth-comparison-context.jpg", "simple-interest-growth-context.jpg", "graphing-line-city-context.jpg", "function-routing-context.jpg", "dilation-studio-context.jpg", "residual-observatory-context.jpg", "solution-cases-gallery-context.jpg", "inequality-trail-context.jpg"]) {
+  for (const visual of ["operations-sequence-context.webp", "decimal-pattern-context.webp", "fraction-workshop-context.webp", "substitution-machine-context.webp", "exponent-lab-context.webp", "like-terms-sorting-context.webp", "triangle-builder-context.webp", "cross-section-studio-context.webp", "coordinate-route-context.webp", "sphere-tank-context.webp", "difference-squares-workshop-context.webp", "distribution-comparison-context.webp", "real-number-sort-context.webp", "elimination-workshop-context.webp", "rational-exponent-lab-context.webp", "growth-comparison-context.webp", "simple-interest-growth-context.webp", "graphing-line-city-context.webp", "function-routing-context.webp", "dilation-studio-context.webp", "residual-observatory-context.webp", "solution-cases-gallery-context.webp", "inequality-trail-context.webp"]) {
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
     assert.ok(asset.byteLength < 550_000, `${visual} should remain mobile-friendly`);
   }
@@ -496,24 +505,24 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /curriculumStats\.lessons/);
   assert.match(home, /Every lesson has a distinct visual topic marker/);
   assert.match(home, /GRADE \{scene\.grade\}/);
-  assert.match(home, /surface-area-packaging-context\.jpg/);
-  assert.match(home, /compound-events-lab-context\.jpg/);
-  assert.match(home, /two-way-survey-context\.jpg/);
-  assert.match(home, /exponential-decay-energy-context\.jpg/);
-  assert.match(home, /simple-interest-growth-context\.jpg/);
-  assert.match(home, /graphing-line-city-context\.jpg/);
-  assert.match(home, /function-routing-context\.jpg/);
-  assert.match(home, /dilation-studio-context\.jpg/);
-  assert.match(home, /residual-observatory-context\.jpg/);
-  assert.match(home, /solution-cases-gallery-context\.jpg/);
-  assert.match(home, /inequality-trail-context\.jpg/);
-  assert.match(home, /fraction-workshop-context\.jpg/);
-  assert.match(home, /substitution-machine-context\.jpg/);
-  assert.match(home, /exponent-lab-context\.jpg/);
-  assert.match(home, /like-terms-sorting-context\.jpg/);
-  assert.match(home, /operations-sequence-context\.jpg/);
-  assert.match(home, /decimal-pattern-context\.jpg/);
-  assert.match(home, /distribution-comparison-context\.jpg/);
+  assert.match(home, /surface-area-packaging-context\.webp/);
+  assert.match(home, /compound-events-lab-context\.webp/);
+  assert.match(home, /two-way-survey-context\.webp/);
+  assert.match(home, /exponential-decay-energy-context\.webp/);
+  assert.match(home, /simple-interest-growth-context\.webp/);
+  assert.match(home, /graphing-line-city-context\.webp/);
+  assert.match(home, /function-routing-context\.webp/);
+  assert.match(home, /dilation-studio-context\.webp/);
+  assert.match(home, /residual-observatory-context\.webp/);
+  assert.match(home, /solution-cases-gallery-context\.webp/);
+  assert.match(home, /inequality-trail-context\.webp/);
+  assert.match(home, /fraction-workshop-context\.webp/);
+  assert.match(home, /substitution-machine-context\.webp/);
+  assert.match(home, /exponent-lab-context\.webp/);
+  assert.match(home, /like-terms-sorting-context\.webp/);
+  assert.match(home, /operations-sequence-context\.webp/);
+  assert.match(home, /decimal-pattern-context\.webp/);
+  assert.match(home, /distribution-comparison-context\.webp/);
   assert.match(home, /Put the value in its place/);
   assert.match(home, /Four factors, one power/);
   assert.match(home, /Only matching terms combine/);
