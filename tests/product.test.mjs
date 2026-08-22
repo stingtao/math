@@ -331,6 +331,8 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.game-feedback-card small \{ font-size: 10px/);
   assert.match(css, /\.game-feedback-card h3 \{ font-size: 18px/);
   assert.match(css, /\.game-feedback-card p \{ font-size: 14px/);
+  assert.match(css, /a,[\s\S]*button,[\s\S]*summary \{ touch-action: manipulation/);
+  assert.match(css, /\.site-footer nav a,[\s\S]*\.privacy-settings-card > \.text-link,[\s\S]*\.legal-wrap > footer a \{[\s\S]*min-height: 44px/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {

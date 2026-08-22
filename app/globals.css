@@ -3527,3 +3527,26 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .game-feedback-card h3 { font-size: 18px; }
   .game-feedback-card p { font-size: 14px; }
 }
+
+/* Secondary mobile actions keep a full thumb-sized hit area, too. */
+@media (max-width: 760px) {
+  a,
+  button,
+  summary { touch-action: manipulation; }
+
+  .hero-actions .text-link,
+  .site-footer nav a,
+  .demo-banner a,
+  .leaderboard-card > footer a,
+  .league-view-note a,
+  .privacy-settings-card > .text-link,
+  .legal-wrap > footer a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .site-footer nav { gap: 4px 20px; }
+  .leaderboard-card > footer a,
+  .league-view-note a { align-self: stretch; }
+}
