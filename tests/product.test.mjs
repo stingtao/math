@@ -277,11 +277,16 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   for (const model of ["number-line", "percent", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay"]) assert.match(concept, new RegExp(`model: "${model}"`));
   const contextSceneSource = concept.slice(concept.indexOf("const contextScenes"), concept.indexOf("function mathFor"));
   assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 39);
+  const expandedSceneCount = Number(home.match(/const expandedSceneCount = (\d+);/)?.[1]);
+  assert.equal(expandedSceneCount, 39);
   for (const representative of ["signed-numbers", "percent", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula"]) {
     assert.match(contextSceneSource, new RegExp(`[" ]${representative}[":]`));
   }
   assert.match(home, /mathWorldScenes/);
   assert.match(home, /math-world-grid/);
+  assert.match(home, /math-world-mobile-cue/);
+  assert.match(home, /loading="lazy"/);
+  assert.match(home, /full scenes/);
   assert.match(home, /curriculumStats\.lessons/);
   assert.match(home, /Every lesson has a distinct visual topic marker/);
   assert.match(home, /GRADE \{scene\.grade\}/);
@@ -363,6 +368,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.difference-squares-context-model/);
   assert.match(css, /\.math-world-grid/);
   assert.match(css, /\.math-world-proof/);
+  assert.match(css, /scroll-snap-type: x mandatory/);
+  assert.match(css, /scroll-snap-align: start/);
+  assert.match(css, /overflow-x: auto/);
   assert.match(css, /\.world-landmark/);
   assert.match(css, /\.welcome-trail-guide/);
   assert.match(css, /\.welcome-route-step/);

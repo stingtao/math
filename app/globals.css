@@ -1249,8 +1249,13 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .math-world-copy h3 { margin: 12px 0 8px; font-size: 25px; letter-spacing: -.035em; }
 .math-world-copy p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
 .math-world-copy > strong { margin-top: auto; padding-top: 23px; color: var(--accent); font-size: 12px; }
+.math-world-mobile-cue { display: none; }
 .math-world-proof { width: min(860px, calc(100% - 48px)); margin: 32px auto 0; padding: 21px 24px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; border: 1px solid #bfded5; border-radius: 20px; background: #f0faf7; box-shadow: 0 10px 26px rgb(17 113 91 / 7%); }
-.math-world-proof > strong { color: var(--teal); font-size: 28px; letter-spacing: -.04em; }
+.math-world-proof-stats { display: flex; align-items: center; gap: 13px; }
+.math-world-proof-stats > span { min-width: 76px; display: grid; gap: 2px; }
+.math-world-proof-stats > span + span { padding-left: 13px; border-left: 1px solid #c8dfd8; }
+.math-world-proof-stats strong { color: var(--teal); font-size: 24px; line-height: 1; letter-spacing: -.04em; }
+.math-world-proof-stats small { color: #4e756b; font-size: 7px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .math-world-proof > span { display: grid; gap: 3px; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .math-world-proof > span b { color: var(--navy); font-size: 13px; }
 .math-world-proof > i { width: 37px; height: 37px; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--teal); font-style: normal; font-weight: 900; }
@@ -1273,25 +1278,35 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .equation-steps-context-model i { right: -13px; }
   .equation-steps-context-model > span:nth-child(2) i { right: 50%; top: auto; bottom: -15px; transform: translateX(50%) rotate(90deg); }
   .math-world-section { padding: 74px 0 78px; }
-  .math-world-grid { width: calc(100% - 28px); grid-template-columns: 1fr; gap: 14px; }
+  .math-world-mobile-cue { width: calc(100% - 28px); margin: -8px auto 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; font-weight: 850; }
+  .math-world-mobile-cue b { color: var(--blue); font-size: 13px; }
+  .math-world-mobile-cue i { color: var(--blue); font-style: normal; }
+  .math-world-grid { width: 100%; margin: 0; padding: 0 14px 18px; display: flex; gap: 14px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-padding-inline: 14px; scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: #b8c7d0 transparent; }
   .math-world-card,
   .math-world-card.scene-1,
   .math-world-card.scene-2,
   .math-world-card.scene-3,
-  .math-world-card.scene-4 { grid-column: 1; }
+  .math-world-card.scene-4 { flex: 0 0 min(86vw, 380px); grid-column: auto; scroll-snap-align: start; scroll-snap-stop: always; }
   .math-world-image { aspect-ratio: 1.55; }
-  .math-world-copy { min-height: 215px; padding: 23px 22px 21px; }
+  .math-world-copy { min-height: 205px; padding: 23px 22px 21px; }
   .math-world-copy h3 { font-size: 23px; }
   .math-world-copy p { font-size: 15px; }
-  .math-world-proof { width: calc(100% - 28px); padding: 18px; grid-template-columns: auto 1fr; gap: 13px; }
+  .math-world-proof { width: calc(100% - 28px); margin-top: 16px; padding: 18px; grid-template-columns: 1fr; gap: 13px; }
+  .math-world-proof-stats { justify-content: flex-start; }
   .math-world-proof > i { display: none; }
 }
 
 @media (max-width: 380px) {
   .scientific-context-model > span,
   .scientific-context-model > strong { min-height: 42px; padding-inline: 5px; font-size: 11px; }
-  .math-world-grid,
+  .math-world-grid { padding-inline: 10px; scroll-padding-inline: 10px; }
+  .math-world-mobile-cue,
   .math-world-proof { width: calc(100% - 20px); }
+  .math-world-card,
+  .math-world-card.scene-1,
+  .math-world-card.scene-2,
+  .math-world-card.scene-3,
+  .math-world-card.scene-4 { flex-basis: 88vw; }
 }
 
 /* Distinct lesson symbols, region postcards, and visible practice momentum. */
