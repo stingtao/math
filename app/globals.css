@@ -1064,6 +1064,22 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .repair-progress > i { height: 2px; background: #cfdae2; }
 .repair-progress > b { justify-self: end; padding: 8px 11px; border-radius: 10px; color: #9b3e38; background: #fff0ee; font-size: 11px; }
 .repair-progress em { margin-inline: 4px; color: var(--muted); font-style: normal; }
+.repair-checkpoint { margin: 16px 0 8px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border: 1px solid #bfe2d8; border-radius: 15px; color: #087965; background: linear-gradient(135deg, #eff9f6, #f8fcfb); text-align: left; box-shadow: 0 8px 22px rgb(17 113 91 / 8%); }
+.repair-checkpoint > span { width: 36px; height: 36px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--teal); font-size: 17px; font-weight: 900; }
+.repair-checkpoint strong { display: block; font-size: 15px; }
+.repair-checkpoint p { margin: 3px 0 0; color: #477267; font-size: 13px; }
+.repair-restored-card { width: min(720px, calc(100% - 40px)); margin: 75px auto; padding: 52px; border: 1px solid #cfe4dc; border-radius: 28px; text-align: center; background: radial-gradient(circle at 50% 0, rgb(226 248 241 / 80%), white 42%); box-shadow: 0 24px 70px rgb(23 50 79 / 10%); }
+.repair-restored-emblem { width: 156px; height: 156px; margin: 0 auto 28px; position: relative; display: grid; place-items: center; }
+.repair-restored-emblem > span { width: 48px; height: 48px; position: absolute; right: -1px; bottom: 4px; display: grid; place-items: center; border: 5px solid white; border-radius: 17px; color: white; background: var(--coral); box-shadow: 0 8px 18px rgb(215 87 76 / 25%); font-size: 22px; }
+.repair-restored-card h1 { margin: 10px 0 12px; font-size: 44px; letter-spacing: -.05em; }
+.repair-restored-card > p { max-width: 520px; margin: 0 auto; color: var(--muted); font-size: 15px; line-height: 1.6; }
+.restored-hearts { margin: 22px 0 4px; color: var(--coral); font-size: 37px; letter-spacing: 8px; filter: drop-shadow(0 6px 8px rgb(215 87 76 / 18%)); }
+.repair-restored-path { margin: 24px 0 28px; display: grid; grid-template-columns: 1fr 28px 1fr 28px 1fr; align-items: center; gap: 6px; color: #087965; font-size: 11px; font-weight: 850; }
+.repair-restored-path > span,
+.repair-restored-path > strong { min-height: 50px; padding: 9px 10px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid #cce7df; border-radius: 13px; background: #eff9f6; }
+.repair-restored-path b { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--teal); }
+.repair-restored-path > strong { color: #9b3e38; border-color: #f1d2ce; background: #fff0ee; letter-spacing: .03em; }
+.repair-restored-path > i { height: 2px; border-radius: 99px; background: linear-gradient(90deg, var(--teal), var(--coral)); }
 
 @media (max-width: 760px) {
   .review-question-heading { gap: 11px; }
@@ -1078,6 +1094,26 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .review-memory-path > i { width: 2px; height: 18px; justify-self: center; }
   .repair-progress { grid-template-columns: 34px 1fr 34px; }
   .repair-progress > b { grid-column: 1 / -1; justify-self: stretch; margin-top: 8px; text-align: center; }
+  .repair-checkpoint { padding: 13px 14px; }
+  .repair-checkpoint strong { font-size: 15px; }
+  .repair-checkpoint p { font-size: 14px; }
+  .repair-restored-card { width: calc(100% - 28px); margin: 42px auto; padding: 38px 20px; border-radius: 22px; }
+  .repair-restored-emblem { width: 132px; height: 132px; }
+  .repair-restored-emblem .topic-icon-xl { --topic-size: 126px; }
+  .repair-restored-emblem > span { width: 42px; height: 42px; }
+  .repair-restored-card h1 { font-size: 37px; }
+  .repair-restored-card > p { font-size: 16px; }
+  .repair-restored-path { grid-template-columns: 1fr; gap: 7px; }
+  .repair-restored-path > i { width: 2px; height: 15px; justify-self: center; }
+  .repair-restored-card > .primary-button { width: 100%; min-height: 54px; font-size: 15px; }
+}
+
+@media (max-width: 420px) {
+  .repair-restored-card { padding-inline: 17px; }
+  .repair-restored-card h1 { font-size: 34px; line-height: 1.05; }
+  .restored-hearts { font-size: 32px; letter-spacing: 6px; }
+  .repair-restored-path > span,
+  .repair-restored-path > strong { min-height: 46px; }
 }
 
 /* A real-world landmark for every Grade 8 region. */

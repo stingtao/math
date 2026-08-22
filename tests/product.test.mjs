@@ -270,6 +270,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(review, /Memory recovered!/);
   assert.match(boss, /isFinalRegion/);
   assert.match(boss, /repair-progress/);
+  assert.match(boss, /repairRestored/);
+  assert.match(boss, /First repair locked in/);
+  assert.match(boss, /All three hearts restored/);
+  assert.match(boss, /Retry boss with full hearts/);
+  assert.match(boss, /boss-\$\{region\.id\}-hearts-restored/);
   assert.match(boss, /showHint && feedback !== "incorrect"/);
   assert.match(boss, /boss-connection-map/);
   assert.match(boss, /CONNECTION MAP/);
@@ -278,6 +283,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.review-memory-meter/);
   assert.match(css, /\.review-memory-nodes/);
   assert.match(css, /\.repair-progress/);
+  assert.match(css, /\.repair-checkpoint/);
+  assert.match(css, /\.repair-restored-card/);
+  assert.match(css, /\.repair-restored-path/);
   assert.match(css, /\.boss-connection-map/);
   assert.match(css, /\.boss-connection-nodes/);
   assert.match(profile, /achievementSpecs/);

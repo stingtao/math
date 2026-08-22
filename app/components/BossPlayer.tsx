@@ -37,6 +37,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const [repair, setRepair] = useState(0);
   const [repairAnswer, setRepairAnswer] = useState("");
   const [repairFeedback, setRepairFeedback] = useState<"" | "correct" | "incorrect">("");
+  const [repairCheckpoint, setRepairCheckpoint] = useState(false);
+  const [repairRestored, setRepairRestored] = useState(false);
   const [cleared, setCleared] = useState(false);
   const [serverCleared, setServerCleared] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -167,6 +169,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setRepair(0);
     setRepairAnswer("");
     setRepairFeedback("");
+    setRepairCheckpoint(false);
+    setRepairRestored(false);
   }
 
   async function checkRepair() {
@@ -176,8 +180,16 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     if (demo) {
       const correct = isAnswerCorrect(repairAnswer, repairQuestion.answer);
       setRepairFeedback(correct ? "correct" : "incorrect");
-      if (correct && repair === 0) { setRepair(1); setRepairAnswer(""); setRepairFeedback(""); }
-      else if (correct) resetAfterRepair();
+      if (correct && repair === 0) {
+        setRepair(1);
+        setRepairAnswer("");
+        setRepairFeedback("");
+        setRepairCheckpoint(true);
+      } else if (correct) {
+        setHearts(3);
+        setFailed(false);
+        setRepairRestored(true);
+      }
       setBusy(false);
       return;
     }
@@ -188,19 +200,70 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     });
     const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; repaired?: boolean; error?: string; attempt?: BossAttempt | null };
     if (!response.ok) setErrorMessage(body.error ?? "We could not check that repair answer.");
-    else if (body.attempt) applyAttempt(body.attempt);
+    else if (body.attempt) {
+      applyAttempt(body.attempt);
+      if (body.attempt.failed && body.attempt.repairStep === 1) setRepairCheckpoint(true);
+      if (!body.attempt.failed && body.attempt.hearts === 3 && repair === 1) setRepairRestored(true);
+    }
     else {
       applyAttempt(body);
       setRepairFeedback(body.correct ? "correct" : "incorrect");
-      if (body.correct && body.repaired) resetAfterRepair();
-      else if (body.correct) { setRepair(1); setRepairAnswer(""); setRepairFeedback(""); }
+      if (body.correct && body.repaired) setRepairRestored(true);
+      else if (body.correct) {
+        setRepair(1);
+        setRepairAnswer("");
+        setRepairFeedback("");
+        setRepairCheckpoint(true);
+      }
     }
     setBusy(false);
   }
 
   if (cleared) return <main className={`boss-shell accent-${region.accent}`}><SuccessBurst eventKey={`boss-${region.id}-complete`} large /><LearnerHeader state={state} demo={demo} /><section className="boss-victory"><div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} boss cleared`} /><span aria-hidden="true">★</span></div><span className="section-kicker">GRADE {region.grade} · REGION {region.order} CLEARED</span><h1>{isFinalRegion ? `Grade ${region.grade} trail cleared.` : "Boss cleared."}</h1><p>{isFinalRegion ? "Every region is complete. Daily Review will keep the whole trail ready to use." : "Five connected questions, complete. The next region is open."}</p><div className="earned-stars hearts-result">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div><div className="unlock-path boss-unlock" aria-label={isFinalRegion ? "Boss cleared and Daily Review unlocked" : "Boss cleared and next region unlocked"}><span className="done"><b>✓</b> Boss cleared</span><i /><span><b>→</b> {isFinalRegion ? "Daily Review ready" : "Next region unlocked"}</span></div><div className="reward-strip"><span><strong>+100</strong> XP</span><span><strong>{hearts}/3</strong> hearts</span><span><strong>1</strong> badge</span></div><a className="primary-button" href={victoryUrl}>{isFinalRegion ? "Open Daily Review" : `Back to Grade ${region.grade}`} <span>→</span></a></section></main>;
 
-  if (failed) return <main className="boss-shell"><LearnerHeader state={state} demo={demo} /><section className="repair-card"><div className="repair-emblem"><TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="lg" label={`${repairLesson.title} repair`} /><span aria-hidden="true">◇</span></div><span className="section-kicker">2-QUESTION REPAIR</span><h1>Fix the idea. Try again.</h1><p>No XP lost. Answer two focused questions to refill all three hearts.</p><div className="repair-progress" aria-label={`${repair} of 2 repair questions complete`}><span className={repair > 0 ? "done" : "active"}>{repair > 0 ? "✓" : "1"}</span><i /><span className={repair > 0 ? "active" : "locked"}>2</span><b>Complete both <em>→</em> ♥♥♥</b></div><div className="repair-question"><span>{repair + 1} OF 2 · {repairLesson.title}</span><strong>{repairQuestion.prompt}</strong>{repairQuestion.choices ? <div className="choice-grid">{repairQuestion.choices.map((choice) => <button className={repairAnswer === choice ? "selected" : ""} type="button" onClick={() => { setRepairAnswer(choice); setRepairFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={repairAnswer} onChange={(event) => { setRepairAnswer(event.target.value); setRepairFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void checkRepair(); }} placeholder="Type your answer" autoFocus /></label>}{repairFeedback === "incorrect" && <p role="status">Not yet—{repairQuestion.hint}</p>}{repairFeedback === "correct" && <p role="status">Correct. One repair complete.</p>}</div>{errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}<button className="primary-button" type="button" onClick={checkRepair} disabled={!repairAnswer.trim() || busy}>{busy ? "Checking…" : repair === 1 ? "Repair and retry" : "Check repair"} <span>→</span></button></section></main>;
+  if (repairRestored) return (
+    <main className={`boss-shell accent-${region.accent}`}>
+      <SuccessBurst eventKey={`boss-${region.id}-hearts-restored`} large />
+      <LearnerHeader state={state} demo={demo} />
+      <section className="repair-restored-card" aria-live="polite">
+        <div className="repair-restored-emblem">
+          <TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="xl" label={`${repairLesson.title} repaired`} />
+          <span aria-hidden="true">♥</span>
+        </div>
+        <span className="section-kicker">REPAIR COMPLETE · 2 OF 2</span>
+        <h1>All three hearts restored.</h1>
+        <p>You corrected the idea. The boss restarts at question 1 with no XP lost.</p>
+        <div className="restored-hearts" aria-label="Three hearts restored">♥♥♥</div>
+        <div className="repair-restored-path" aria-label="Both repairs complete and three hearts ready">
+          <span><b>✓</b> Repair 1</span><i /><span><b>✓</b> Repair 2</span><i /><strong>♥♥♥ Ready</strong>
+        </div>
+        <button className="primary-button" type="button" onClick={resetAfterRepair}>Retry boss with full hearts <span>→</span></button>
+      </section>
+    </main>
+  );
+
+  if (failed) return (
+    <main className={`boss-shell accent-${region.accent}`}>
+      {repairCheckpoint && <SuccessBurst eventKey={`boss-repair-${region.id}-1`} />}
+      <LearnerHeader state={state} demo={demo} />
+      <section className="repair-card">
+        <div className="repair-emblem"><TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="lg" label={`${repairLesson.title} repair`} /><span aria-hidden="true">◇</span></div>
+        <span className="section-kicker">2-QUESTION REPAIR</span>
+        <h1>Fix the idea. Try again.</h1>
+        <p>No XP lost. Answer two focused questions to refill all three hearts.</p>
+        <div className="repair-progress" aria-label={`${repair} of 2 repair questions complete`}><span className={repair > 0 ? "done" : "active"}>{repair > 0 ? "✓" : "1"}</span><i /><span className={repair > 0 ? "active" : "locked"}>2</span><b>Complete both <em>→</em> ♥♥♥</b></div>
+        {repairCheckpoint && <div className="repair-checkpoint" role="status"><span aria-hidden="true">✓</span><div><strong>First repair locked in.</strong><p>One more answer restores ♥♥♥.</p></div></div>}
+        <div className="repair-question">
+          <span>{repair + 1} OF 2 · {repairLesson.title}</span>
+          <strong>{repairQuestion.prompt}</strong>
+          {repairQuestion.choices ? <div className="choice-grid">{repairQuestion.choices.map((choice) => <button className={repairAnswer === choice ? "selected" : ""} type="button" onClick={() => { setRepairAnswer(choice); setRepairFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={repairAnswer} onChange={(event) => { setRepairAnswer(event.target.value); setRepairFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void checkRepair(); }} placeholder="Type your answer" autoFocus /></label>}
+          {repairFeedback === "incorrect" && <p role="status">Not yet—{repairQuestion.hint}</p>}
+        </div>
+        {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
+        <button className="primary-button" type="button" onClick={checkRepair} disabled={!repairAnswer.trim() || busy}>{busy ? "Checking…" : repair === 1 ? "Restore all hearts" : "Check repair"} <span>→</span></button>
+      </section>
+    </main>
+  );
 
   return (
     <main className={`boss-shell accent-${region.accent}`}>
