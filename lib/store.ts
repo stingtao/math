@@ -414,8 +414,8 @@ export async function checkBossAnswer(learnerId: string, regionId: number, attem
   const cleared = nextQuestion === questions.length;
   await db.prepare("UPDATE boss_attempts SET current_question = ?, cleared = ?, updated_at = ? WHERE learner_id = ? AND region_id = ? AND attempt_id = ?")
     .bind(nextQuestion, cleared ? 1 : 0, now, learnerId, regionId, attemptId).run();
-  if (cleared) await completeBoss(learnerId, regionId, attempt.hearts);
-  return { correct: true, hint: null, attemptId, questionIndex: nextQuestion, hearts: attempt.hearts, failed: false, failedQuestion: null, repairStep: 0, cleared };
+  const xpEarned = cleared ? await completeBoss(learnerId, regionId, attempt.hearts) : 0;
+  return { correct: true, hint: null, attemptId, questionIndex: nextQuestion, hearts: attempt.hearts, failed: false, failedQuestion: null, repairStep: 0, cleared, xpEarned };
 }
 
 export async function checkBossRepairAnswer(learnerId: string, regionId: number, attemptId: string, repairIndex: number, answer: string) {
@@ -448,7 +448,7 @@ export async function completeBoss(learnerId: string, regionId: number, hearts: 
   await assertBossUnlocked(learnerId, regionId);
   await db.prepare("INSERT INTO boss_progress (learner_id, region_id, cleared, best_hearts, cleared_at) VALUES (?, ?, 1, ?, ?) ON CONFLICT(learner_id, region_id) DO UPDATE SET cleared = 1, best_hearts = MAX(best_hearts, excluded.best_hearts), cleared_at = COALESCE(cleared_at, excluded.cleared_at)")
     .bind(learnerId, regionId, hearts, new Date().toISOString()).run();
-  await awardXp(learnerId, "boss", String(regionId), 100);
+  return (await awardXp(learnerId, "boss", String(regionId), 100)) ? 100 : 0;
 }
 
 export async function claimDailyReward(learnerId: string, timezone: string) {

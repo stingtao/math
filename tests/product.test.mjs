@@ -150,6 +150,8 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.match(store, /assertBossUnlocked/);
   assert.match(store, /UPDATE boss_attempts SET hearts/);
   assert.match(store, /checkBossRepairAnswer/);
+  assert.match(store, /const xpEarned = cleared \? await completeBoss/);
+  assert.match(store, /return \(await awardXp\(learnerId, "boss", String\(regionId\), 100\)\) \? 100 : 0/);
   assert.match(schema, /bossAttempts/);
   assert.match(schema, /lessonRuns/);
   assert.match(store, /activateLessonRun/);
@@ -312,7 +314,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /practice-charge/);
   assert.match(lesson, /FOCUS CHARGE/);
   assert.match(lesson, /mastery-next-goal/);
-  assert.match(boss, /boss-unlock/);
+  assert.match(boss, /boss-victory-map/);
   for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg", "equation-balance-context.jpg", "irrational-garden-context.jpg", "scientific-observatory-context.jpg", "multistep-workshop-context.jpg", "unit-rate-bike-context.jpg", "circle-fountain-context.jpg", "prism-packing-context.jpg", "probability-arcade-context.jpg", "systems-transit-context.jpg", "polynomial-tiles-context.jpg", "parabola-bridge-context.jpg", "exponential-greenhouse-context.jpg", "scale-drawing-studio-context.jpg", "random-sample-context.jpg", "arithmetic-sequence-context.jpg", "quadratic-roots-context.jpg", "surface-area-packaging-context.jpg", "compound-events-lab-context.jpg", "two-way-survey-context.jpg", "exponential-decay-energy-context.jpg", "discount-studio-context.jpg", "angle-plaza-context.jpg", "cone-measure-context.jpg", "geometric-sequence-lab-context.jpg", "absolute-transit-context.jpg", "triangle-builder-context.jpg", "cross-section-studio-context.jpg", "coordinate-route-context.jpg", "sphere-tank-context.jpg", "difference-squares-workshop-context.jpg", "distribution-comparison-context.jpg", "real-number-sort-context.jpg", "elimination-workshop-context.jpg", "rational-exponent-lab-context.jpg", "growth-comparison-context.jpg", "simple-interest-growth-context.jpg", "graphing-line-city-context.jpg", "function-routing-context.jpg", "dilation-studio-context.jpg", "residual-observatory-context.jpg"]) {
     assert.match(concept, new RegExp(visual.replace(".", "\\.")));
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
@@ -482,6 +484,17 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(boss, /boss-connection-map/);
   assert.match(boss, /CONNECTION MAP/);
   assert.match(boss, /A correction keeps the map moving/);
+  assert.match(boss, /bossXpEarned/);
+  assert.match(boss, /Fair replay · no farmable XP/);
+  assert.match(boss, /REGION CONNECTION/);
+  assert.match(boss, /Every skill remains open to revisit/);
+  assert.match(boss, /NEXT REGION UNLOCKED/);
+  assert.match(boss, /WHOLE TRAIL COMPLETE/);
+  assert.match(boss, /Everything is saved/);
+  assert.match(boss, /This is enough for today/);
+  assert.match(boss, /region\.lessons\.map\(\(lesson\) => <div className="boss-victory-skill"/);
+  assert.doesNotMatch(boss, /className="reward-strip"/);
+  assert.doesNotMatch(boss, /className="unlock-path boss-unlock"/);
   assert.match(css, /\.review-memory-path/);
   assert.match(css, /\.review-memory-meter/);
   assert.match(css, /\.review-memory-nodes/);
@@ -494,6 +507,12 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.repair-restored-path/);
   assert.match(css, /\.boss-connection-map/);
   assert.match(css, /\.boss-connection-nodes/);
+  assert.match(css, /\.boss-victory-map/);
+  assert.match(css, /\.boss-victory-route/);
+  assert.match(css, /\.boss-settlement-summary/);
+  assert.match(css, /\.boss-next-region/);
+  assert.match(css, /\.boss-victory-actions/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.boss-settlement-summary \{ grid-template-columns: 1fr/);
   assert.match(profile, /achievementSpecs/);
   assert.match(profile, /PRIVATE ACHIEVEMENT SHELF/);
   for (const achievement of ["First Step", "Twelve Sparks", "Boss Link", "Steady Week", "Trail Builder", "Boss Pathfinder"]) assert.match(profile, new RegExp(achievement));

@@ -41,6 +41,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const [repairRestored, setRepairRestored] = useState(false);
   const [cleared, setCleared] = useState(false);
   const [serverCleared, setServerCleared] = useState(false);
+  const [bossXpEarned, setBossXpEarned] = useState(0);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const question = questions[Math.min(index, questions.length - 1)];
@@ -49,7 +50,9 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const repairQuestion = repairLesson.practice[Math.min(repair + 2, repairLesson.practice.length - 1)];
   const connectedLinks = index + (feedback === "correct" ? 1 : 0);
   const gradeCurriculum = getGradeCurriculum(region.grade);
-  const isFinalRegion = gradeCurriculum.regions[gradeCurriculum.regions.length - 1]?.id === region.id;
+  const regionIndex = gradeCurriculum.regions.findIndex((item) => item.id === region.id);
+  const nextRegion = gradeCurriculum.regions[regionIndex + 1];
+  const isFinalRegion = !nextRegion;
 
   useEffect(() => {
     if (!state || !unlocked) return;
@@ -87,7 +90,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   if (!state || error) return <main className="auth-gate"><div className="auth-card"><span className="auth-orbit">★</span><h1>Sign in to open this check.</h1><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
   const activeState = state;
   const trailUrl = `/learn?grade=${region.grade}${demo ? "&demo=1" : ""}`;
-  const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${demo ? "&demo=1" : ""}` : trailUrl;
+  const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${demo ? "&demo=1" : ""}` : `/learn/${nextRegion.lessons[0].slug}?grade=${region.grade}${demo ? "&demo=1" : ""}`;
+  const trailRegionUrl = nextRegion ? `${trailUrl}#region-${nextRegion.id}` : trailUrl;
   if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Four lessons come first.</h1><p>Finish this region, then return for the mixed check.</p><a className="primary-button" href={trailUrl}>Back to Grade {region.grade} <span>→</span></a></section></main>;
 
   function applyAttempt(attempt: Partial<BossAttempt>) {
@@ -119,7 +123,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       headers: mutationHeaders(),
       body: JSON.stringify({ action: "check", regionId: region.id, attemptId, questionIndex: index, answer }),
     });
-    const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; state?: LearnerState; error?: string; attempt?: BossAttempt | null };
+    const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; xpEarned?: number; state?: LearnerState; error?: string; attempt?: BossAttempt | null };
     if (!response.ok) setErrorMessage(body.error ?? "We could not check that answer.");
     else if (body.attempt) applyAttempt(body.attempt);
     else {
@@ -127,6 +131,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       setFeedback(body.correct ? "correct" : "incorrect");
       setShowHint(!body.correct);
       setServerCleared(Boolean(body.cleared));
+      if (body.cleared) setBossXpEarned(body.xpEarned ?? 0);
       if (body.state) setState(body.state);
     }
     setBusy(false);
@@ -134,6 +139,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   function finishBoss() {
     const already = activeState.clearedBosses.some((item) => item.regionId === region.id);
+    setBossXpEarned(already ? 0 : 100);
     const next: LearnerState = {
       ...activeState,
       clearedBosses: already ? activeState.clearedBosses.map((item) => item.regionId === region.id ? { ...item, hearts: Math.max(item.hearts, hearts) } : item) : [...activeState.clearedBosses, { regionId: region.id, hearts }],
@@ -219,7 +225,42 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setBusy(false);
   }
 
-  if (cleared) return <main className={`boss-shell accent-${region.accent}`}><SuccessBurst eventKey={`boss-${region.id}-complete`} large /><LearnerHeader state={state} demo={demo} /><section className="boss-victory"><div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} boss cleared`} /><span aria-hidden="true">★</span></div><span className="section-kicker">GRADE {region.grade} · REGION {region.order} CLEARED</span><h1>{isFinalRegion ? `Grade ${region.grade} trail cleared.` : "Boss cleared."}</h1><p>{isFinalRegion ? "Every region is complete. Daily Review will keep the whole trail ready to use." : "Five connected questions, complete. The next region is open."}</p><div className="earned-stars hearts-result">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div><div className="unlock-path boss-unlock" aria-label={isFinalRegion ? "Boss cleared and Daily Review unlocked" : "Boss cleared and next region unlocked"}><span className="done"><b>✓</b> Boss cleared</span><i /><span><b>→</b> {isFinalRegion ? "Daily Review ready" : "Next region unlocked"}</span></div><div className="reward-strip"><span><strong>+100</strong> XP</span><span><strong>{hearts}/3</strong> hearts</span><span><strong>1</strong> badge</span></div><a className="primary-button" href={victoryUrl}>{isFinalRegion ? "Open Daily Review" : `Back to Grade ${region.grade}`} <span>→</span></a></section></main>;
+  if (cleared) return (
+    <main className={`boss-shell accent-${region.accent}`}>
+      <SuccessBurst eventKey={`boss-${region.id}-complete`} large />
+      <LearnerHeader state={state} demo={demo} />
+      <section className="boss-victory boss-region-clear" aria-labelledby="boss-clear-title">
+        <div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} region cleared`} /><span aria-hidden="true">★</span></div>
+        <span className="section-kicker">GRADE {region.grade} · REGION {region.order} CLEARED</span>
+        <h1 id="boss-clear-title">{isFinalRegion ? `Grade ${region.grade} trail cleared.` : `${region.title} connected.`}</h1>
+        <p>{isFinalRegion ? "Every region is complete. Daily Review will keep the whole trail ready to use." : "Four lesson skills and the mixed finish now form one complete region."}</p>
+
+        <div className="boss-victory-map" aria-label={`All four ${region.title} lesson skills connected to the region clear`}>
+          <header><span>REGION CONNECTION</span><strong>4 lessons + 1 Boss</strong></header>
+          <div className="boss-victory-route" role="list">
+            {region.lessons.map((lesson) => <div className="boss-victory-skill" role="listitem" key={lesson.id}><TopicIcon visual={lesson.visual} accent={lesson.accent} size="sm" label="" /><b aria-hidden="true">✓</b><small>{lesson.title}</small></div>)}
+            <div className="boss-victory-seal" role="listitem"><span aria-hidden="true">★</span><b aria-hidden="true">✓</b><small>Region clear</small></div>
+          </div>
+          <p><span aria-hidden="true">◆</span>Every skill remains open to revisit. The clear is permanent.</p>
+        </div>
+
+        <div className="boss-settlement-summary" aria-label="Boss result summary">
+          <div><span className="boss-result-icon xp" aria-hidden="true">XP</span><p><strong>{bossXpEarned > 0 ? `+${bossXpEarned} XP` : "0 XP"}</strong><small>{bossXpEarned > 0 ? "First-clear reward" : "Fair replay · no farmable XP"}</small></p></div>
+          <div><span className="boss-result-icon hearts" aria-hidden="true">♥</span><p><strong>{hearts}/3 hearts</strong><small>{hearts === 3 ? "Steady clear" : "Clear saved · no penalty"}</small></p></div>
+          <div><span className="boss-result-icon badge" aria-hidden="true">{String(region.order).padStart(2, "0")}</span><p><strong>Region clear</strong><small>{bossXpEarned > 0 ? "Permanent trail mark" : "Best hearts kept"}</small></p></div>
+        </div>
+
+        <div className={`boss-next-region ${isFinalRegion ? "grade-complete" : ""}`}>
+          <TopicIcon visual={(nextRegion ?? region).lessons[0].visual} accent={nextRegion?.accent ?? region.accent} size="lg" label={isFinalRegion ? "Daily Review ready" : `${nextRegion.title} unlocked`} />
+          <div><span>{isFinalRegion ? "WHOLE TRAIL COMPLETE" : "NEXT REGION UNLOCKED"}</span><h2>{isFinalRegion ? "Daily Review is ready." : `Region ${nextRegion.order}: ${nextRegion.title}`}</h2><p>{isFinalRegion ? "Return for up to five calm recall questions whenever the queue is ready." : nextRegion.subtitle}</p></div>
+          <strong>{isFinalRegion ? "READY" : "OPEN"}</strong>
+        </div>
+
+        <p className="boss-settlement-save"><span aria-hidden="true">✓</span><strong>Everything is saved.</strong> This is enough for today.</p>
+        <div className="boss-victory-actions"><a className="secondary-button" href={trailRegionUrl}>{isFinalRegion ? `Back to Grade ${region.grade}` : "Finish for today"}</a><a className="primary-button" href={victoryUrl}>{isFinalRegion ? "Open Daily Review" : `Start ${nextRegion.title}`} <span>→</span></a></div>
+      </section>
+    </main>
+  );
 
   if (repairRestored) return (
     <main className={`boss-shell accent-${region.accent}`}>
