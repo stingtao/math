@@ -81,6 +81,25 @@ test("keeps avatar frames permanently unlocked and makes the token goal visible"
   assert.match(css, /\.reward-locker-link/);
 });
 
+test("presents daily rewards as a fixed, forgiving seven-claim journey", async () => {
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(store, /const rewardTokens = \[10, 12, 14, 16, 18, 20, 30\]/);
+  assert.match(store, /INSERT OR IGNORE INTO daily_rewards/);
+  assert.match(store, /if \(step === 7\) shields \+= 1/);
+  assert.match(dashboard, /Every reward is fixed/);
+  assert.match(dashboard, /Skip a day\? Nothing resets/);
+  assert.match(dashboard, /no mystery boxes or paid boosts/);
+  assert.match(dashboard, /rewardPending \? "Collecting…"/);
+  assert.match(dashboard, /Today’s reward is collected/);
+  assert.match(dashboard, /Streak Shields available/);
+  assert.match(css, /\.reward-balance/);
+  assert.match(css, /\.reward-shield/);
+  assert.match(css, /\.reward-calendar \.today/);
+});
+
 test("keeps signed-in navigation and a private self marker on the weekly league", async () => {
   const page = await readFile(new URL("../app/leaderboard/page.tsx", import.meta.url), "utf8");
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");

@@ -17,6 +17,7 @@ const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 export function LearningDashboard({ demo, grade }: { demo: boolean; grade: number }) {
   const { state, setState, loading, error } = useLearner(demo);
   const [rewardMessage, setRewardMessage] = useState("");
+  const [rewardPending, setRewardPending] = useState(false);
   const [showFullMap, setShowFullMap] = useState(false);
   const [welcomeReady, setWelcomeReady] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
@@ -56,38 +57,49 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   if (!state || error) return <SignInGate />;
 
   async function claimReward() {
-    if (state!.dailyRewardClaimed) return;
-    if (demo) {
-      const step = (state!.profile.rewardStep % 7) + 1;
-      const tokens = dailyRewardAmounts[step - 1];
-      const next = {
-        ...state!,
-        dailyRewardClaimed: true,
-        profile: {
-          ...state!.profile,
-          rewardStep: step,
-          trailTokens: state!.profile.trailTokens + tokens,
-          currentStreak: state!.profile.currentStreak + 1,
-          longestStreak: Math.max(state!.profile.longestStreak, state!.profile.currentStreak + 1),
-          streakShields: state!.profile.streakShields + (step === 7 ? 1 : 0),
-        },
-      };
-      saveDemoState(next);
-      setState(next);
-      setRewardMessage(`+${tokens} Trail Tokens${step === 7 ? " and a Streak Shield" : ""}`);
-      return;
+    if (state!.dailyRewardClaimed || rewardPending) return;
+    setRewardPending(true);
+    setRewardMessage("");
+    try {
+      if (demo) {
+        const step = (state!.profile.rewardStep % 7) + 1;
+        const tokens = dailyRewardAmounts[step - 1];
+        const next = {
+          ...state!,
+          dailyRewardClaimed: true,
+          profile: {
+            ...state!.profile,
+            rewardStep: step,
+            trailTokens: state!.profile.trailTokens + tokens,
+            currentStreak: state!.profile.currentStreak + 1,
+            longestStreak: Math.max(state!.profile.longestStreak, state!.profile.currentStreak + 1),
+            streakShields: state!.profile.streakShields + (step === 7 ? 1 : 0),
+          },
+        };
+        saveDemoState(next);
+        setState(next);
+        setRewardMessage(`Collected +${tokens} Trail Tokens${step === 7 ? " and one Streak Shield" : ""}.`);
+        return;
+      }
+      const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "claimDaily", timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }) });
+      const body = await response.json() as { state?: typeof state; reward?: { tokens: number; shield?: boolean }; error?: string };
+      if (response.ok && body.state) {
+        setState(body.state);
+        const tokens = body.reward?.tokens ?? dailyRewardAmounts[body.state.profile.rewardStep - 1] ?? 0;
+        setRewardMessage(`Collected +${tokens} Trail Tokens${body.reward?.shield ? " and one Streak Shield" : ""}.`);
+      } else setRewardMessage(body.error ?? "Your reward could not be claimed. Please try again.");
+    } catch {
+      setRewardMessage("Your reward could not be claimed. Check your connection and try again.");
+    } finally {
+      setRewardPending(false);
     }
-    const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "claimDaily", timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }) });
-    const body = await response.json() as { state?: typeof state; reward?: { tokens: number; shield?: boolean }; error?: string };
-    if (response.ok && body.state) {
-      setState(body.state);
-      setRewardMessage(`+${body.reward?.tokens ?? 0} Trail Tokens${body.reward?.shield ? " and a Streak Shield" : ""}`);
-    } else setRewardMessage(body.error ?? "Your reward could not be claimed.");
   }
 
   const nextRewardStep = (state.profile.rewardStep % 7) + 1;
   const visibleRewardStep = state.dailyRewardClaimed ? state.profile.rewardStep : nextRewardStep;
   const visibleRewardAmount = dailyRewardAmounts[visibleRewardStep - 1];
+  const followingRewardStep = (visibleRewardStep % 7) + 1;
+  const followingRewardAmount = dailyRewardAmounts[followingRewardStep - 1];
   const showWelcomeGuide = welcomeReady && state.completedLessons.length === 0 && !welcomeDismissed;
 
   function dismissWelcomeGuide() {
@@ -104,7 +116,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   return (
     <main className="learner-shell">
       <LearnerHeader state={state} demo={demo} />
-      {rewardMessage.startsWith("+") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} />}
+      {rewardMessage.startsWith("Collected") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} />}
       {demo && <div className="demo-banner"><span>Preview mode</span><p>Your progress stays in this browser session.</p><a href="/#join">Use Google to keep it for next time</a></div>}
       <section className="dashboard-wrap">
         <nav className="grade-switcher" aria-label="Choose a grade">
@@ -153,15 +165,34 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <div className="next-copy"><span className="section-kicker">GRADE {grade} · UP NEXT</span><h2>{featuredLesson.title}</h2><p>{featuredLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3 stars</span></div><a className="primary-button" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Continue lesson <span aria-hidden="true">→</span></a></div>
           </section>}
 
-          <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : ""}`}>
-            <div className="daily-card-top"><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">DAILY TRAIL REWARD</span></div>
-            <h2>{state.dailyRewardClaimed ? `${visibleRewardAmount} tokens collected` : `Claim ${visibleRewardAmount} tokens`}</h2>
-            <div className="reward-calendar" aria-label="Seven-claim reward cycle" role="list">
-              {dailyRewardAmounts.map((amount, index) => <span className={rewardCellClass(index + 1)} role="listitem" aria-label={`Claim ${index + 1}: ${amount} Trail Tokens${index === 6 ? " and a Streak Shield" : ""}`} key={amount}><small>{index + 1}</small><b>{amount}{index === 6 ? "+◇" : ""}</b></span>)}
+          <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : ""}`} aria-labelledby="daily-reward-heading">
+            <div className="daily-card-top">
+              <div><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">DAILY TRAIL REWARD</span></div>
+              <span className="reward-balance" aria-label={`${state.profile.trailTokens} Trail Tokens available`}>◇ {state.profile.trailTokens}</span>
             </div>
-            <button className="secondary-button full-button" type="button" disabled={state.dailyRewardClaimed} onClick={claimReward}>{state.dailyRewardClaimed ? "Come back tomorrow" : "Claim today’s reward"}</button>
-            {rewardMessage.startsWith("+") && <div className="reward-callout" role="status"><span aria-hidden="true">✦</span><strong>{rewardMessage}</strong></div>}
-            <p className="reward-note" aria-live="polite">{rewardMessage || `Claim ${nextRewardStep} of 7. Miss a day? This path waits for you.`}</p>
+            <div className="daily-reward-heading">
+              <h2 id="daily-reward-heading">{state.dailyRewardClaimed ? "Today’s reward is collected" : `Collect +${visibleRewardAmount} Trail Tokens`}</h2>
+              <p>{state.dailyRewardClaimed ? `Next claim: +${followingRewardAmount} tokens${followingRewardStep === 7 ? " and a Streak Shield" : ""}.` : `Claim ${nextRewardStep} of 7 is ready. Every reward is fixed.`}</p>
+            </div>
+            <div className="reward-calendar" aria-label="Seven-claim reward journey" role="list">
+              {dailyRewardAmounts.map((amount, index) => {
+                const claimNumber = index + 1;
+                const cellClass = rewardCellClass(claimNumber);
+                return <span className={cellClass} role="listitem" aria-current={cellClass === "today" ? "step" : undefined} aria-label={`Claim ${claimNumber}: ${amount} Trail Tokens${index === 6 ? " and a Streak Shield" : ""}${cellClass === "done" ? ", collected" : cellClass === "today" ? ", ready today" : ""}`} key={amount}>
+                  <small>{cellClass === "today" ? "TODAY" : `#${claimNumber}`}</small>
+                  <i aria-hidden="true">{cellClass === "done" ? "✓" : claimNumber}</i>
+                  <b>+{amount}</b>
+                  {index === 6 && <em>+ shield</em>}
+                </span>;
+              })}
+            </div>
+            <button className="secondary-button full-button reward-claim-button" type="button" disabled={state.dailyRewardClaimed || rewardPending} aria-busy={rewardPending} onClick={claimReward}>{rewardPending ? "Collecting…" : state.dailyRewardClaimed ? "Collected today ✓" : `Collect +${visibleRewardAmount} tokens`}</button>
+            {rewardMessage && <div className={`reward-callout ${rewardMessage.startsWith("Collected") ? "success" : "error"}`} role="status"><span aria-hidden="true">{rewardMessage.startsWith("Collected") ? "✦" : "!"}</span><strong>{rewardMessage}</strong></div>}
+            <div className="reward-note">
+              <strong>{state.dailyRewardClaimed ? `Claim ${followingRewardStep} of 7 comes next.` : "Skip a day? Nothing resets."}</strong>
+              <span>{state.dailyRewardClaimed ? "Return another day when it works for you." : "This seven-claim path waits for you—no mystery boxes or paid boosts."}</span>
+            </div>
+            <div className="reward-shield" aria-label={`${state.profile.streakShields} Streak Shields available`}><span aria-hidden="true">◇</span><div><strong>{state.profile.streakShields > 0 ? `${state.profile.streakShields} Streak ${state.profile.streakShields === 1 ? "Shield" : "Shields"} ready` : "A Streak Shield waits at claim 7"}</strong><small>{state.profile.streakShields > 0 ? "One shield protects your streak after one missed day." : "It is earned automatically—never purchased."}</small></div></div>
             <a className="reward-locker-link" href={`/profile${demo ? "?demo=1" : ""}`}><span aria-hidden="true">◇</span><div><strong>Use tokens for permanent frames</strong><small>Open your private Avatar Locker</small></div><b aria-hidden="true">→</b></a>
           </aside>
         </div>
