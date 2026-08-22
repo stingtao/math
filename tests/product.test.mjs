@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
+import { nextMomentumRun } from "../lib/momentum.ts";
 import { calculateLessonReward } from "../lib/rewards.ts";
 
 async function render(path = "/") {
@@ -182,12 +183,40 @@ test("does not send review answers to authenticated clients", async () => {
 
 test("ships five extensible success patterns and reduced-motion handling", async () => {
   const component = await readFile(new URL("../app/components/SuccessBurst.tsx", import.meta.url), "utf8");
+  const momentum = await readFile(new URL("../app/components/MomentumRun.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   for (const pattern of ["orbit", "confetti", "ripple", "spark", "lift"]) assert.match(component, new RegExp(`"${pattern}"`));
   assert.match(css, /\.success-confetti/);
   assert.match(css, /\.success-ripple/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /animation:\s*none !important/);
+  assert.match(momentum, /Bonus signal only—corrections still advance/);
+  assert.match(momentum, /BEST ×\{best\}/);
+  assert.match(lesson, /FOCUS CHAIN/);
+  assert.match(lesson, /setFocusStreak\(0\)/);
+  assert.match(lesson, /nextMomentumRun/);
+  assert.match(lesson, /focusStreak === 3/);
+  assert.match(review, /RECALL CHAIN/);
+  assert.match(review, /nextMomentumRun/);
+  assert.match(review, /recallStreak === 3/);
+  assert.match(css, /\.momentum-run/);
+  assert.match(css, /@keyframes chain-link/);
+});
+
+test("keeps answer chains optional while preserving the best run", () => {
+  let run = nextMomentumRun({ current: 0, best: 0 }, true);
+  assert.deepEqual(run, { current: 1, best: 1 });
+  run = nextMomentumRun(run, true);
+  run = nextMomentumRun(run, true);
+  assert.deepEqual(run, { current: 3, best: 3 });
+  run = nextMomentumRun(run, false);
+  assert.deepEqual(run, { current: 0, best: 3 });
+  run = nextMomentumRun(run, true);
+  assert.deepEqual(run, { current: 1, best: 3 });
+  run = nextMomentumRun(run, false);
+  assert.deepEqual(run, { current: 0, best: 3 });
 });
 
 test("ships a readable, safe-area-aware mobile learning interface", async () => {

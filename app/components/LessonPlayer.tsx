@@ -6,10 +6,12 @@ import type { LessonDefinition } from "@/lib/curriculum";
 import { getGradeCurriculum, getGradeLessons, getRegion, isAnswerCorrect, nextLesson } from "@/lib/curriculum";
 import { completeDemoLesson, type LearnerState } from "@/lib/learner-state";
 import { calculateLessonReward } from "@/lib/rewards";
+import { nextMomentumRun } from "@/lib/momentum";
 import { ConceptVisual } from "./ConceptVisual";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
+import { MomentumRun } from "./MomentumRun";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 
@@ -54,6 +56,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const [finished, setFinished] = useState(false);
   const [stars, setStars] = useState(1);
   const [completionReward, setCompletionReward] = useState<LessonCompletionReward | null>(null);
+  const [focusStreak, setFocusStreak] = useState(0);
+  const [bestFocusStreak, setBestFocusStreak] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -98,6 +102,10 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       }
       setAttempts((current) => ({ ...current, [question.id]: priorAttempts + 1 }));
       if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [question.id]: correct }));
+      const cleanFirstTry = correct && priorAttempts === 0 && !hinted[question.id];
+      const nextStreak = nextMomentumRun({ current: focusStreak, best: bestFocusStreak }, cleanFirstTry);
+      setFocusStreak(nextStreak.current);
+      setBestFocusStreak(nextStreak.best);
       setFeedback(correct ? "correct" : "incorrect");
     } catch {
       setErrorMessage("Your answer is still here. Check your connection and try again.");
@@ -167,6 +175,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
 
   function useHint() {
     setShowHint(true);
+    setFocusStreak(0);
     setHinted((current) => ({ ...current, [question.id]: true }));
   }
 
@@ -249,7 +258,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           {stage === 4 && (
             <div className="practice-stage">
               <div className="practice-heading"><div><span className="section-kicker">PRACTICE · {questionIndex + 1} OF {lesson.practice.length}</span><h2>{question.prompt}</h2></div><div className="practice-dots">{lesson.practice.map((item, index) => <span className={index < questionIndex ? "done" : index === questionIndex ? "active" : ""} key={item.id} />)}</div></div>
-              <div className={`practice-charge accent-${lesson.accent}`} aria-label={`Focus charge: ${correctedCount} of ${lesson.practice.length} questions corrected`}><div><span>FOCUS CHARGE</span><strong>{focusChargeLabels[correctedCount]}</strong></div><div className="charge-cells" aria-hidden="true">{lesson.practice.map((item, index) => <i className={index < correctedCount ? "done" : index === correctedCount ? "current" : ""} key={item.id}>{index < correctedCount ? "✓" : index + 1}</i>)}</div><small>{correctedCount}/{lesson.practice.length}</small></div>
+              <div className="practice-game-status"><div className={`practice-charge accent-${lesson.accent}`} aria-label={`Focus charge: ${correctedCount} of ${lesson.practice.length} questions corrected`}><div><span>FOCUS CHARGE</span><strong>{focusChargeLabels[correctedCount]}</strong></div><div className="charge-cells" aria-hidden="true">{lesson.practice.map((item, index) => <i className={index < correctedCount ? "done" : index === correctedCount ? "current" : ""} key={item.id}>{index < correctedCount ? "✓" : index + 1}</i>)}</div><small>{correctedCount}/{lesson.practice.length}</small></div><MomentumRun label="FOCUS CHAIN" current={focusStreak} best={bestFocusStreak} total={lesson.practice.length} tone="focus" justLinked={feedback === "correct" && currentFirstTry} /></div>
               <div className={`practice-star-path accent-${lesson.accent}`} aria-live="polite">
                 <div className="star-path-heading"><div><span>STAR PATH</span><strong>Corrections always finish the lesson.</strong></div><small>Stars describe this run—they never block progress.</small></div>
                 <div className="star-path-options">
@@ -261,7 +270,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} onClick={() => { setAnswer(choice); setFeedback(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
               {showHint && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <div className="feedback-card incorrect recovery-feedback" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—try this step.</strong><p>{question.hint}</p><small>Correct it to add the same Focus Charge.</small></div></div>}
-              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}`} /><div className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? "First-try spark!" : "Recovery complete!"}</strong><p>{practiceEncouragement[questionIndex]} Question {questionIndex + 1} is corrected.</p></div><span className="momentum-chip">{currentFirstTry ? "Clean +1" : "Recovered +1"}</span></div></>}
+              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}-chain-${focusStreak}`} large={currentFirstTry && (focusStreak === 3 || focusStreak === lesson.practice.length)} /><div className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? focusStreak >= 3 ? `Focus chain ×${focusStreak}!` : "First-try spark!" : "Recovery complete!"}</strong><p>{practiceEncouragement[questionIndex]} Question {questionIndex + 1} is corrected.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${focusStreak}` : "Recovered +1"}</span></div></>}
               {errorMessage && <p className="form-error">{errorMessage}</p>}
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" disabled={busy} onClick={continuePractice}>{busy ? "Saving…" : questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
             </div>

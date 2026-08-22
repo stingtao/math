@@ -3,9 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { isAnswerCorrect, lessonById, lessons } from "@/lib/curriculum";
 import { saveDemoState, type LearnerState } from "@/lib/learner-state";
+import { nextMomentumRun } from "@/lib/momentum";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
+import { MomentumRun } from "./MomentumRun";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 
@@ -21,6 +23,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const [attempts, setAttempts] = useState<Record<string, number>>({});
   const [answers, setAnswers] = useState<Array<{ lessonId: string; questionId: string; answer: string }>>([]);
   const [finished, setFinished] = useState(false);
+  const [recallStreak, setRecallStreak] = useState(0);
+  const [bestRecallStreak, setBestRecallStreak] = useState(0);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const question = questions[index];
@@ -71,13 +75,21 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     </main>
   );
 
+  function recordAnswerResult(correct: boolean) {
+    const priorAttempts = attempts[questionKey] ?? 0;
+    setAttempts((current) => ({ ...current, [questionKey]: priorAttempts + 1 }));
+    const nextStreak = nextMomentumRun({ current: recallStreak, best: bestRecallStreak }, correct && priorAttempts === 0);
+    setRecallStreak(nextStreak.current);
+    setBestRecallStreak(nextStreak.best);
+    setFeedback(correct ? "correct" : "incorrect");
+  }
+
   async function check() {
     if (!answer.trim() || busy) return;
     setBusy(true);
     setErrorMessage("");
     if (demo) {
-      setAttempts((current) => ({ ...current, [questionKey]: (current[questionKey] ?? 0) + 1 }));
-      setFeedback(isAnswerCorrect(answer, question.answer ?? "") ? "correct" : "incorrect");
+      recordAnswerResult(isAnswerCorrect(answer, question.answer ?? ""));
       setBusy(false);
       return;
     }
@@ -88,10 +100,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     });
     const body = await response.json() as { correct?: boolean; hint?: string; error?: string };
     if (!response.ok) setErrorMessage(body.error ?? "We could not check that review answer.");
-    else {
-      setAttempts((current) => ({ ...current, [questionKey]: (current[questionKey] ?? 0) + 1 }));
-      setFeedback(body.correct ? "correct" : "incorrect");
-    }
+    else recordAnswerResult(Boolean(body.correct));
     setBusy(false);
   }
   async function next() {
@@ -135,12 +144,12 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
           const itemLesson = lessonById.get(item.lessonId);
           const status = dot < recalledCount ? "done" : dot === recalledCount ? "current" : "upcoming";
           return <span className={status} role="listitem" aria-label={`${item.lessonTitle}: ${status === "done" ? "recalled" : status === "current" ? "current" : "upcoming"}`} key={`${item.lessonId}-${item.questionId}-${dot}`}>{itemLesson && <TopicIcon visual={itemLesson.visual} accent={itemLesson.accent} size="sm" label="" />}<b aria-hidden="true">{status === "done" ? "✓" : dot + 1}</b></span>;
-        })}</div><p>Every corrected memory fills one pulse. Nothing resets.</p></div><small>Complete the set: +20 XP.</small></aside>
+        })}</div><p>Every corrected memory fills one pulse. Nothing resets.</p></div><MomentumRun label="RECALL CHAIN" current={recallStreak} best={bestRecallStreak} total={questions.length} tone="memory" justLinked={feedback === "correct" && currentFirstTry} /><small>Complete the set: +20 XP.</small></aside>
         <div className="review-card">
           <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div><span>{index + 1}/{questions.length}</span></header>
           {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" onClick={() => { setAnswer(choice); setFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") check(); }} placeholder="Type your answer" autoFocus /></label>}
           {feedback === "incorrect" && <div className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—wake the memory.</strong><p>{question.hint}</p><small>Correcting it will fill the same Memory Pulse.</small></div></div>}
-          {feedback === "correct" && <><SuccessBurst eventKey={`review-${question.lessonId}-${question.questionId}`} /><div className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? "Quick recall!" : "Memory recovered!"}</strong><p>{index + 1} of {questions.length} recharged. Keep the rhythm going.</p></div><span className="momentum-chip">Pulse +1</span></div></>}
+          {feedback === "correct" && <><SuccessBurst eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} large={currentFirstTry && (recallStreak === 3 || recallStreak === questions.length)} /><div className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `Recall chain ×${recallStreak}!` : "Quick recall!" : "Memory recovered!"}</strong><p>{index + 1} of {questions.length} recharged. Keep the rhythm going.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${recallStreak}` : "Pulse +1"}</span></div></>}
           {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><span className="review-dots">{questions.map((item, dot) => <i className={dot < index ? "done" : dot === index ? "active" : ""} key={`${item.lessonId}-${dot}`} />)}</span>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === questions.length - 1 ? "Finish review" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>
