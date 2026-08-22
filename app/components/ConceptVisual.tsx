@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "scale-area" | "composite-area" | "experimental-probability" | "sample-space" | "literal-equation" | "line-forms" | "system-substitution" | "system-model" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "scale-area" | "composite-area" | "experimental-probability" | "sample-space" | "literal-equation" | "line-forms" | "system-substitution" | "system-model" | "radical-factor" | "like-radicals" | "gcf-factor" | "factor-chain" | "plus-minus-roots" | "zero-product" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -240,6 +240,66 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["a=\\text{adults}", "s=\\text{students}", "a+s=20", "10a+6s=152", "(a,s)=(8,12)"],
     mathStepLabels: ["unknown 1", "unknown 2", "head count", "ticket total", "solution"],
     modelLabel: "Math model: let a be adults and s be students; a plus s equals twenty and ten a plus six s equals one hundred fifty-two, so a is eight and s is twelve",
+  },
+  "g9-simplify-radicals": {
+    src: "/visuals/rational-exponent-lab-context.jpg",
+    alt: "A cube laboratory separates a perfect block structure from the pieces that remain",
+    headline: "pull out the largest perfect-square factor",
+    copy: "Split 72 into 36 times 2, take the known root of 36, and leave the remaining 2 under the radical.",
+    model: "radical-factor",
+    mathSteps: ["\\sqrt{72}", "\\sqrt{36\\cdot2}", "6\\sqrt2"],
+    mathStepLabels: ["radical", "perfect square × remainder", "simplified"],
+    modelLabel: "Math model: the square root of seventy-two becomes the square root of thirty-six times two, which simplifies to six square root two",
+  },
+  "g9-radical-operations": {
+    src: "/visuals/rational-exponent-lab-context.jpg",
+    alt: "Matching illuminated block structures are grouped while unlike structures remain separate",
+    headline: "only matching radical parts combine",
+    copy: "Both terms contain √3, so add their coefficients and keep the shared radical unchanged.",
+    model: "like-radicals",
+    mathSteps: ["2\\sqrt3+5\\sqrt3", "(2+5)\\sqrt3", "7\\sqrt3"],
+    mathStepLabels: ["like radicals", "combine coefficients", "result"],
+    modelLabel: "Math model: two square root three plus five square root three combines as two plus five times square root three, giving seven square root three",
+  },
+  "g9-greatest-common-factor": {
+    src: "/visuals/like-terms-sorting-context.jpg",
+    alt: "A sorting workshop gathers the greatest shared tile group before leaving smaller unmatched groups",
+    headline: "take the largest factor shared by every term",
+    copy: "Use the GCF of the coefficients and the smallest shared variable power, then divide each term by it.",
+    model: "gcf-factor",
+    mathSteps: ["12x^3+8x^2", "\\gcd(12,8)=4", "\\min(3,2)=2\\Rightarrow x^2", "4x^2(3x+2)"],
+    mathStepLabels: ["expression", "coefficient GCF", "shared power", "factored form"],
+    modelLabel: "Math model: twelve x cubed plus eight x squared shares coefficient factor four and variable factor x squared, giving four x squared times three x plus two",
+  },
+  "g9-factoring-completely": {
+    src: "/visuals/difference-squares-workshop-context.jpg",
+    alt: "A geometric workshop removes one common layer and then separates a difference of two squares",
+    headline: "factor the GCF first, then check the remainder",
+    copy: "After taking out 2, the remaining x²−9 is a difference of squares with two linear factors.",
+    model: "factor-chain",
+    mathSteps: ["2x^2-18", "2(x^2-9)", "2(x-3)(x+3)"],
+    mathStepLabels: ["start", "factor GCF", "factor completely"],
+    modelLabel: "Math model: two x squared minus eighteen factors first as two times x squared minus nine, then as two times x minus three times x plus three",
+  },
+  "g9-solve-by-square-roots": {
+    src: "/visuals/rational-exponent-lab-context.jpg",
+    alt: "A power laboratory reverses a squared structure back to its possible original values",
+    headline: "taking a square root creates two possibilities",
+    copy: "The squared expression can equal positive 3 or negative 3, so solve both branches.",
+    model: "plus-minus-roots",
+    mathSteps: ["(x-2)^2=9", "x-2=\\pm3", "x=5", "x=-1"],
+    mathStepLabels: ["isolated square", "take both roots", "positive branch", "negative branch"],
+    modelLabel: "Math model: x minus two squared equals nine, so x minus two equals plus or minus three, giving x equals five or x equals negative one",
+  },
+  "g9-solve-by-factoring": {
+    src: "/visuals/polynomial-tiles-context.jpg",
+    alt: "A rectangular algebra-tile product separates into two visible factor dimensions",
+    headline: "a zero product means at least one factor is zero",
+    copy: "Factor the quadratic, set each factor equal to zero, and solve both short equations.",
+    model: "zero-product",
+    mathSteps: ["x^2-5x+6=0", "(x-2)(x-3)=0", "x-2=0\\;\\text{or}\\;x-3=0", "x=2,3"],
+    mathStepLabels: ["quadratic", "factor", "zero-product rule", "solutions"],
+    modelLabel: "Math model: x squared minus five x plus six equals zero factors as x minus two times x minus three, so x equals two or three",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -989,6 +1049,12 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "line-forms" && <LineFormsModel />}
         {scene.model === "system-substitution" && <SystemSubstitutionModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "system-model" && <SystemModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "radical-factor" && <AlgebraPathModel className="radical-factor-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "like-radicals" && <AlgebraPathModel className="like-radicals-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "gcf-factor" && <AlgebraPathModel className="gcf-factor-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "factor-chain" && <AlgebraPathModel className="factor-chain-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "plus-minus-roots" && <AlgebraPathModel className="plus-minus-roots-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "zero-product" && <AlgebraPathModel className="zero-product-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -1157,4 +1223,8 @@ function SystemModel({ steps, labels }: { steps: string[]; labels: string[] }) {
   const [adult, student, count, cost, solution] = steps;
   if (!adult || !student || !count || !cost || !solution) return null;
   return <div className="system-model-context-model" aria-hidden="true"><header><span><small>{labels[0]}</small><MathStep value={adult} /></span><span><small>{labels[1]}</small><MathStep value={student} /></span></header><div><span><small>{labels[2]}</small><MathStep value={count} /></span><span><small>{labels[3]}</small><MathStep value={cost} /></span></div><footer><small>{labels[4]}</small><MathStep value={solution} /></footer></div>;
+}
+
+function AlgebraPathModel({ className, steps, labels }: { className: string; steps: string[]; labels: string[] }) {
+  return <div className={`algebra-path-context-model ${className}`} aria-hidden="true">{steps.map((step, index) => <span key={step}><small>{labels[index]}</small><MathStep value={step} />{index < steps.length - 1 && <i>→</i>}</span>)}</div>;
 }
