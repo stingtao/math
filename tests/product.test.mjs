@@ -3,7 +3,7 @@ import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import { nextMomentumRun } from "../lib/momentum.ts";
 import { calculateLessonReward } from "../lib/rewards.ts";
-import { achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
+import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
 
 test("reports only achievement thresholds crossed by the latest saved result", () => {
   const empty = { lessons: 0, stars: 0, bosses: 0, streak: 0 };
@@ -20,6 +20,16 @@ test("uses one achievement evaluation for the profile shelf and learning map", (
   assert.equal(evaluated.find((item) => item.id === "star-spark")?.progress, 58);
   assert.equal(getNextAchievement(totals)?.id, "star-spark");
   assert.equal(getNextAchievement({ lessons: 20, stars: 60, bosses: 8, streak: 7 }), null);
+});
+
+test("derives every private achievement surface from the same learner snapshot", () => {
+  const totals = achievementTotalsForState({
+    completedLessons: [{ stars: 3 }, { stars: 2 }, { stars: 1 }],
+    clearedBosses: [1, 2],
+    profile: { longestStreak: 7 },
+  });
+  assert.deepEqual(totals, { lessons: 3, stars: 6, bosses: 2, streak: 7 });
+  assert.equal(evaluateAchievements(totals).find((item) => item.id === "steady-week")?.unlocked, true);
 });
 
 async function render(path = "/") {
@@ -325,6 +335,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
   const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const landmarkUnlock = await readFile(new URL("../app/components/PrivateLandmarkUnlock.tsx", import.meta.url), "utf8");
   const achievementsSource = await readFile(new URL("../lib/achievements.ts", import.meta.url), "utf8");
   const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
@@ -520,9 +531,17 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /Stars and XP details/);
   assert.match(lesson, /Everything is saved/);
   assert.match(lesson, /achievementUnlockedBetween/);
-  assert.match(lesson, /settlement-landmark/);
-  assert.match(lesson, /PRIVATE LANDMARK UNLOCKED/);
-  assert.match(lesson, /View shelf/);
+  assert.match(landmarkUnlock, /settlement-landmark/);
+  assert.match(lesson, /<PrivateLandmarkUnlock/);
+  assert.match(boss, /achievementTotalsForState/);
+  assert.match(boss, /landmark\?\.source === "bosses"/);
+  assert.match(boss, /<PrivateLandmarkUnlock/);
+  assert.match(dashboard, /achievementTotalsForState/);
+  assert.match(dashboard, /landmark\?\.source === "streak"/);
+  assert.match(dashboard, /<PrivateLandmarkUnlock achievement=\{rewardLandmark\}/);
+  assert.match(landmarkUnlock, /PRIVATE LANDMARK UNLOCKED/);
+  assert.match(landmarkUnlock, /View shelf/);
+  assert.match(landmarkUnlock, /#achievement-heading/);
   assert.doesNotMatch(lesson, /className="reward-strip"/);
   assert.doesNotMatch(lesson, /className="unlock-path"/);
   assert.match(css, /\.game-loop-board/);

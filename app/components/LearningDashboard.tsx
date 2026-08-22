@@ -11,13 +11,15 @@ import { mutationHeaders } from "./mutation";
 import { Avatar } from "./Avatar";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
-import { getNextAchievement } from "@/lib/achievements";
+import { achievementTotalsForState, achievementUnlockedBetween, getNextAchievement, type AchievementSpec } from "@/lib/achievements";
+import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
 export function LearningDashboard({ demo, grade }: { demo: boolean; grade: number }) {
   const { state, setState, loading, error } = useLearner(demo);
   const [rewardMessage, setRewardMessage] = useState("");
+  const [rewardLandmark, setRewardLandmark] = useState<AchievementSpec | null>(null);
   const [rewardPending, setRewardPending] = useState(false);
   const [showFullMap, setShowFullMap] = useState(false);
   const [welcomeReady, setWelcomeReady] = useState(false);
@@ -68,6 +70,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     if (state!.dailyRewardClaimed || rewardPending) return;
     setRewardPending(true);
     setRewardMessage("");
+    setRewardLandmark(null);
     try {
       if (demo) {
         const step = (state!.profile.rewardStep % 7) + 1;
@@ -84,6 +87,8 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             streakShields: state!.profile.streakShields + (step === 7 ? 1 : 0),
           },
         };
+        const landmark = achievementUnlockedBetween(achievementTotalsForState(state!), achievementTotalsForState(next));
+        setRewardLandmark(landmark?.source === "streak" ? landmark : null);
         saveDemoState(next);
         setState(next);
         setRewardMessage(`Collected +${tokens} Trail Tokens${step === 7 ? " and one Streak Shield" : ""}.`);
@@ -92,6 +97,8 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
       const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "claimDaily", timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }) });
       const body = await response.json() as { state?: typeof state; reward?: { tokens: number; shield?: boolean }; error?: string };
       if (response.ok && body.state) {
+        const landmark = achievementUnlockedBetween(achievementTotalsForState(state!), achievementTotalsForState(body.state));
+        setRewardLandmark(landmark?.source === "streak" ? landmark : null);
         setState(body.state);
         const tokens = body.reward?.tokens ?? dailyRewardAmounts[body.state.profile.rewardStep - 1] ?? 0;
         setRewardMessage(`Collected +${tokens} Trail Tokens${body.reward?.shield ? " and one Streak Shield" : ""}.`);
@@ -206,6 +213,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             </div>
             <button className="secondary-button full-button reward-claim-button" type="button" disabled={state.dailyRewardClaimed || rewardPending} aria-busy={rewardPending} onClick={claimReward}>{rewardPending ? "Collecting…" : state.dailyRewardClaimed ? "Collected today ✓" : `Collect +${visibleRewardAmount} tokens`}</button>
             {rewardMessage && <div className={`reward-callout ${rewardMessage.startsWith("Collected") ? "success" : "error"}`} role="status"><span aria-hidden="true">{rewardMessage.startsWith("Collected") ? "✦" : "!"}</span><strong>{rewardMessage}</strong></div>}
+            {rewardLandmark && <PrivateLandmarkUnlock achievement={rewardLandmark} demo={demo} compact />}
             <div className="daily-rhythm" aria-label="Pressure-free streak status">
               <span><b>▲ {state.profile.currentStreak}</b><small>Current streak</small></span>
               <span><b>{state.profile.longestStreak}</b><small>Longest kept</small></span>

@@ -9,6 +9,8 @@ import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
+import { achievementTotalsForState, achievementUnlockedBetween, type AchievementSpec } from "@/lib/achievements";
+import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 
 type BossAttempt = {
   attemptId: string;
@@ -42,6 +44,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const [cleared, setCleared] = useState(false);
   const [serverCleared, setServerCleared] = useState(false);
   const [bossXpEarned, setBossXpEarned] = useState(0);
+  const [unlockedLandmark, setUnlockedLandmark] = useState<AchievementSpec | null>(null);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const question = questions[Math.min(index, questions.length - 1)];
@@ -132,7 +135,13 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       setShowHint(!body.correct);
       setServerCleared(Boolean(body.cleared));
       if (body.cleared) setBossXpEarned(body.xpEarned ?? 0);
-      if (body.state) setState(body.state);
+      if (body.state) {
+        if (body.cleared) {
+          const landmark = achievementUnlockedBetween(achievementTotalsForState(activeState), achievementTotalsForState(body.state));
+          setUnlockedLandmark(landmark?.source === "bosses" ? landmark : null);
+        }
+        setState(body.state);
+      }
     }
     setBusy(false);
   }
@@ -146,6 +155,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       totalXp: activeState.totalXp + (already ? 0 : 100),
       weeklyXp: activeState.weeklyXp + (already ? 0 : 100),
     };
+    const landmark = achievementUnlockedBetween(achievementTotalsForState(activeState), achievementTotalsForState(next));
+    setUnlockedLandmark(landmark?.source === "bosses" ? landmark : null);
     saveDemoState(next);
     setState(next);
   }
@@ -249,6 +260,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <div><span className="boss-result-icon hearts" aria-hidden="true">♥</span><p><strong>{hearts}/3 hearts</strong><small>{hearts === 3 ? "Steady clear" : "Clear saved · no penalty"}</small></p></div>
           <div><span className="boss-result-icon badge" aria-hidden="true">{String(region.order).padStart(2, "0")}</span><p><strong>Region clear</strong><small>{bossXpEarned > 0 ? "Permanent trail mark" : "Best hearts kept"}</small></p></div>
         </div>
+
+        {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={demo} />}
 
         <div className={`boss-next-region ${isFinalRegion ? "grade-complete" : ""}`}>
           <TopicIcon visual={(nextRegion ?? region).lessons[0].visual} accent={nextRegion?.accent ?? region.accent} size="lg" label={isFinalRegion ? "Daily Review ready" : `${nextRegion.title} unlocked`} />

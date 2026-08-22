@@ -2755,6 +2755,14 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .settlement-landmark > div > p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.45; }
 .settlement-landmark > a { min-height: 40px; padding: 0 11px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid color-mix(in srgb, var(--accent) 30%, #cad7df); border-radius: 11px; color: var(--accent); background: white; font-size: 9px; font-weight: 900; white-space: nowrap; }
 .settlement-landmark > a:hover { border-color: var(--accent); transform: translateY(-1px); }
+.settlement-landmark.compact-landmark { width: 100%; margin: 11px 0 0; padding: 11px; grid-template-columns: 42px minmax(0, 1fr); gap: 10px; }
+.settlement-landmark.compact-landmark .achievement-badge { width: 42px; height: 42px; border-radius: 14px; }
+.settlement-landmark.compact-landmark .achievement-badge::before { width: 28px; height: 28px; }
+.settlement-landmark.compact-landmark .achievement-badge b { font-size: 16px; }
+.settlement-landmark.compact-landmark > div > small { font-size: 6px; }
+.settlement-landmark.compact-landmark > div > strong { font-size: 12px; }
+.settlement-landmark.compact-landmark > div > p { font-size: 8px; }
+.settlement-landmark.compact-landmark > a { min-height: 38px; grid-column: 2; justify-self: start; font-size: 9px; }
 .settlement-next { width: min(580px, 100%); margin: 13px auto 0; padding: 17px 18px; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 15px; border: 1px solid color-mix(in srgb, var(--accent) 28%, #d8e2e9); border-radius: 17px; background: linear-gradient(115deg, white, var(--accent-soft)); text-align: left; }
 .settlement-next .topic-icon-md { --topic-size: 54px; }
 .settlement-boss-icon { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 17px; color: white; background: var(--gold); box-shadow: 0 8px 18px rgb(176 127 24 / 18%); font-size: 23px; font-weight: 900; }

@@ -7,7 +7,23 @@ export const achievementSpecs = [
   { id: "boss-pathfinder", title: "Boss Pathfinder", copy: "Clear eight region bosses.", glyph: "◎", tone: "blue", source: "bosses", target: 8, unit: "boss" },
 ] as const;
 
+export type AchievementSpec = (typeof achievementSpecs)[number];
 export type AchievementTotals = Record<(typeof achievementSpecs)[number]["source"], number>;
+
+type AchievementStateSnapshot = {
+  completedLessons: readonly { stars: number }[];
+  clearedBosses: readonly unknown[];
+  profile: { longestStreak: number };
+};
+
+export function achievementTotalsForState(state: AchievementStateSnapshot): AchievementTotals {
+  return {
+    lessons: state.completedLessons.length,
+    stars: state.completedLessons.reduce((total, item) => total + item.stars, 0),
+    bosses: state.clearedBosses.length,
+    streak: state.profile.longestStreak,
+  };
+}
 
 export function evaluateAchievements(totals: AchievementTotals) {
   return achievementSpecs.map((item) => {
