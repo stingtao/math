@@ -2706,26 +2706,27 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .today-mission-header p { font-size: 14px; }
   .today-mission-route { grid-template-columns: 1fr 24px 1fr; }
   .today-mission-route > span { min-height: 76px; padding: 10px; grid-template-columns: 30px minmax(0, 1fr); }
-  .today-mission-route > span > small { font-size: 8px; }
-  .today-mission-route > span > strong { font-size: 11px; }
+  .today-mission-route > span > small { font-size: 10px; }
+  .today-mission-route > span > strong { font-size: 12px; }
   .daily-card { padding: 20px; }
   .daily-reward-hero { grid-template-columns: 68px minmax(0, 1fr); }
   .daily-token-medallion { width: 68px; height: 68px; }
+  .daily-token-medallion small { font-size: 9px; letter-spacing: .06em; }
   .daily-card .daily-reward-heading h2 { font-size: 24px; }
   .daily-reward-heading p { font-size: 12px; }
   .reward-balance { padding: 8px 10px; font-size: 12px; }
   .reward-claim-button { min-height: 52px; font-size: 15px; }
   .reward-callout strong { font-size: 13px; }
   .daily-rhythm b { font-size: 14px; }
-  .daily-rhythm small { font-size: 9px; }
+  .daily-rhythm small { font-size: 10px; }
   .daily-reward-details > summary span { font-size: 13px; }
   .daily-reward-details > summary strong { font-size: 10px; }
   .reward-calendar { gap: 3px; }
   .reward-calendar span { min-height: 76px; border-radius: 9px; }
-  .reward-calendar span small { font-size: 7px; }
+  .reward-calendar span small { font-size: 9px; }
   .reward-calendar span i { width: 27px; height: 27px; font-size: 10px; }
   .reward-calendar span b { font-size: 11px; }
-  .reward-calendar span em { font-size: 6px; }
+  .reward-calendar span em { font-size: 8px; }
   .reward-note { padding: 12px; gap: 3px; font-size: 12px; }
   .reward-note strong { font-size: 13px; }
   .reward-shield { min-height: 61px; padding: 11px 12px; }

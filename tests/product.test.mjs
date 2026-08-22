@@ -323,6 +323,10 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.momentum-run-copy > strong \{ font-size: 13px; white-space: normal/);
   assert.match(css, /\.star-path-options small \{ font-size: 10px/);
   assert.match(css, /\.recovery-feedback small \{ font-size: 11px/);
+  assert.match(css, /\.today-mission-route > span > small \{ font-size: 10px/);
+  assert.match(css, /\.daily-token-medallion small \{ font-size: 9px/);
+  assert.match(css, /\.daily-rhythm small \{ font-size: 10px/);
+  assert.match(css, /\.reward-calendar span em \{ font-size: 8px/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {
