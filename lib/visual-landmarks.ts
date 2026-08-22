@@ -7,7 +7,7 @@ export type VisualLandmark = {
 export const grade7RegionLandmarks: Record<number, VisualLandmark> = {
   701: { src: "/visuals/unit-rate-bike-context.jpg", alt: "Three bicycles and equal route sections model an amount per one unit", lessonSlug: "g7-unit-rates" },
   702: { src: "/visuals/signed-numbers-context.png", alt: "Floors above and below street level model rational changes around zero", lessonSlug: "g7-add-rational-numbers" },
-  703: { src: "/visuals/equation-balance-context.jpg", alt: "A level balance models equivalent equation steps", lessonSlug: "g7-multi-step-equations-g7" },
+  703: { src: "/visuals/inequality-trail-context.jpg", alt: "Open and closed trail boundaries model inequality solution sets extending left or right", lessonSlug: "g7-inequalities-g7" },
   704: { src: "/visuals/percent-market-context.jpg", alt: "A market display models percent change and everyday percent problems", lessonSlug: "g7-percent-change" },
   705: { src: "/visuals/circle-fountain-context.jpg", alt: "A fountain highlights the radius, diameter, circumference, and area of a circle", lessonSlug: "g7-circle-measures" },
   706: { src: "/visuals/prism-packing-context.jpg", alt: "A packing box built in equal layers models prism volume", lessonSlug: "g7-prism-volume" },

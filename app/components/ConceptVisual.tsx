@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -108,6 +108,146 @@ const contextScenes: Record<string, ContextScene> = {
     headline: "one intersection, none, or the same line",
     copy: "After simplifying both equations, compare their lines: they can meet once, never meet, or match at every point.",
     model: "solution-cases",
+  },
+  "two-step-equations": {
+    src: "/visuals/equation-balance-context.jpg",
+    alt: "A level balance with matching quantities on both sides",
+    headline: "undo two operations in reverse order",
+    copy: "Keep the equation balanced while you remove the outside operation, then the inside one.",
+    model: "balance",
+  },
+  "systems-graphing": {
+    src: "/visuals/systems-transit-context.jpg",
+    alt: "Two straight transit routes crossing at one shared gold station",
+    headline: "the intersection makes both equations true",
+    copy: "Graph both lines on the same plane and read the ordered pair where they meet.",
+    model: "systems-crossing",
+  },
+  "comparing-functions": {
+    src: "/visuals/function-kiosk-context.jpg",
+    alt: "A rule machine connecting inputs to outputs, a table, and a graph",
+    headline: "compare the starting value and rate of change",
+    copy: "Translate each representation into the same two features before deciding which function changes faster.",
+    model: "function",
+  },
+  "linear-nonlinear": {
+    src: "/visuals/growth-comparison-context.jpg",
+    alt: "Two growth displays comparing equal additions with repeated multiplication",
+    headline: "constant differences create a line",
+    copy: "Linear relationships add the same amount; nonlinear relationships change their rate or multiply repeatedly.",
+    model: "growth-compare",
+  },
+  "rigid-transformations": {
+    src: "/visuals/transform-plaza-context.jpg",
+    alt: "Matching triangular sculptures slid, reflected, and rotated across a tiled plaza",
+    headline: "slide, flip, or turn every point",
+    copy: "A rigid transformation moves a figure without stretching or shrinking it.",
+    model: "transform",
+  },
+  congruence: {
+    src: "/visuals/transform-plaza-context.jpg",
+    alt: "Matching triangular sculptures in several positions across a tiled plaza",
+    headline: "rigid moves preserve size and shape",
+    copy: "If one figure can land exactly on another after rigid transformations, the figures are congruent.",
+    model: "transform",
+  },
+  "angle-relationships": {
+    src: "/visuals/angle-plaza-context.jpg",
+    alt: "Crossing paths forming vertical angles and adjacent linear pairs",
+    headline: "equal opposites · adjacent angles total 180°",
+    copy: "Use the structure of intersecting lines before solving for an unknown angle.",
+    model: "angles",
+  },
+  "triangle-angles": {
+    src: "/visuals/angle-plaza-context.jpg",
+    alt: "Geometric paths meeting around a central angle plaza",
+    headline: "a triangle’s interior angles total 180°",
+    copy: "Two known angles determine the missing angle because all three make one straight-angle total.",
+    model: "angles",
+  },
+  "lines-of-fit": {
+    src: "/visuals/residual-observatory-context.jpg",
+    alt: "Observation points above and below a fitted line with vertical residual guides",
+    headline: "fit the overall pattern, then inspect the misses",
+    copy: "A useful line passes through the center of the data with small residuals on both sides.",
+    model: "residuals",
+  },
+  probability: {
+    src: "/visuals/probability-arcade-context.jpg",
+    alt: "A spinner, die, and trial tokens in a modern probability arcade",
+    headline: "probability stays between 0 and 1",
+    copy: "Place an event on the scale from impossible to certain before calculating its chance.",
+    model: "probability-scale",
+  },
+  "g7-inequalities-g7": {
+    src: "/visuals/inequality-trail-context.jpg",
+    alt: "Two number-line trails: an open boundary with highlighted tiles extending left and a closed boundary with highlighted tiles extending right",
+    headline: "the point sets the boundary; the arrow shows every solution",
+    copy: "An open point excludes the boundary, a closed point includes it, and dividing by a negative flips the inequality direction.",
+    model: "inequality-range",
+  },
+  "g7-multi-step-equations-g7": {
+    src: "/visuals/multistep-workshop-context.jpg",
+    alt: "A sequence removing outer layers from identical mystery boxes one operation at a time",
+    headline: "simplify, then undo operations in reverse",
+    copy: "Keep both sides equal while you work inward toward the unknown.",
+    model: "equation-steps",
+  },
+  "g7-percent-change": {
+    src: "/visuals/percent-market-context.jpg",
+    alt: "A market display showing one highlighted percent of a whole wall",
+    headline: "change = original amount × rate",
+    copy: "Find the percent change from the original amount, then add for an increase or subtract for a decrease.",
+    model: "percent",
+  },
+  "g7-tax-tip-commission": {
+    src: "/visuals/percent-market-context.jpg",
+    alt: "A market display showing one highlighted percent of a whole wall",
+    headline: "tax, tip, and commission are a percent of a base",
+    copy: "Identify the base amount first, multiply by the rate, then decide whether the result is added or reported separately.",
+    model: "percent",
+  },
+  "g9-linear-inequalities-g9": {
+    src: "/visuals/inequality-trail-context.jpg",
+    alt: "Two number-line trails: an open boundary with highlighted tiles extending left and a closed boundary with highlighted tiles extending right",
+    headline: "a boundary point and direction describe the solution set",
+    copy: "Solve as you would an equation, but reverse the sign when multiplying or dividing by a negative value.",
+    model: "inequality-range",
+  },
+  "g9-multi-step-linear-equations": {
+    src: "/visuals/multistep-workshop-context.jpg",
+    alt: "A sequence removing outer layers from identical mystery boxes one operation at a time",
+    headline: "simplify both sides before isolating the variable",
+    copy: "Combine structure first, move variable terms together, then undo the remaining operations.",
+    model: "equation-steps",
+  },
+  "g9-equation-solution-cases": {
+    src: "/visuals/solution-cases-gallery-context.jpg",
+    alt: "Three route displays showing one intersection, parallel routes, and two routes sharing the same path",
+    headline: "one solution, no solution, or every real number",
+    copy: "Simplifying reveals whether the equation ends with one value, a false statement, or an identity.",
+    model: "solution-cases",
+  },
+  "g9-slope-from-points": {
+    src: "/visuals/slope-trail-context.jpg",
+    alt: "A rising trail showing vertical change compared with horizontal change",
+    headline: "m = change in y ÷ change in x",
+    copy: "Subtract coordinates in the same order so the two signed changes describe one direction.",
+    model: "slope",
+  },
+  "g9-graph-linear-functions": {
+    src: "/visuals/graphing-line-city-context.jpg",
+    alt: "A city route beginning at an intercept and repeating one rise-and-run step",
+    headline: "start at the intercept, then repeat the slope",
+    copy: "One plotted starting point and one consistent step are enough to build the whole line.",
+    model: "graph-line",
+  },
+  "g9-factor-trinomials": {
+    src: "/visuals/polynomial-tiles-context.jpg",
+    alt: "A rectangular algebra tile board divided into four aligned product regions",
+    headline: "read the area model backward to recover the factors",
+    copy: "Find two side lengths whose product tiles rebuild the trinomial exactly.",
+    model: "area-product",
   },
   "g7-unit-rates": {
     src: "/visuals/unit-rate-bike-context.jpg",
@@ -426,6 +566,7 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "probability-scale" && <div className="probability-context-model" aria-hidden="true"><div><span>0</span><i><b /></i><span>1</span></div><small>impossible</small><em>equally likely</em><small>certain</small></div>}
         {scene.model === "systems-crossing" && <div className="systems-context-model" aria-hidden="true"><i className="system-axis-x" /><i className="system-axis-y" /><span className="system-line-one" /><span className="system-line-two" /><b /><em>one shared solution</em></div>}
         {scene.model === "solution-cases" && <div className="solution-cases-context-model" aria-hidden="true"><div className="solution-case-one"><span><i /><b /></span><small>ONE</small><strong>meet once</strong></div><div className="solution-case-none"><span><i /><b /></span><small>NONE</small><strong>parallel lines</strong></div><div className="solution-case-many"><span><i /><b /></span><small>INFINITELY MANY</small><strong>same line</strong></div></div>}
+        {scene.model === "inequality-range" && <div className="inequality-range-context-model" aria-hidden="true"><div className="inequality-less"><strong>x &lt; 3</strong><span><i>←</i><b /><em>3</em></span><small>open · 3 is not included</small></div><div className="inequality-greater"><strong>x ≥ −2</strong><span><i>→</i><b /><em>−2</em></span><small>closed · −2 is included</small></div><div className="inequality-flip"><b>−3x ≤ 12</b><i>÷ −3 · flip</i><strong>x ≥ −4</strong></div></div>}
         {scene.model === "area-product" && <div className="area-product-context-model" aria-hidden="true"><div><span>x²</span><span>3x</span><span>2x</span><span>6</span></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("(x+2)(x+3)=x^2+5x+6", { throwOnError: false }) }} /></div>}
         {scene.model === "parabola" && <div className="parabola-context-model" aria-hidden="true"><i className="parabola-axis-x" /><i className="parabola-axis-y" /><span /><b dangerouslySetInnerHTML={{ __html: katex.renderToString("y=x^2-4", { throwOnError: false }) }} /></div>}
         {scene.model === "exponential" && <div className="exponential-context-model" aria-hidden="true">{[1, 2, 4, 8, 16].map((value, index) => <span style={{ height: `${24 + index * 16}px` }} key={value}><b>{value}</b></span>)}</div>}
