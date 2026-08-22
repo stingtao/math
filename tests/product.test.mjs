@@ -206,6 +206,14 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /Four lesson keys, then the boss/);
   assert.match(home, /RECOVERY COUNTS/);
   assert.match(dashboard, /CURRENT QUEST/);
+  assert.match(dashboard, /welcomeReady/);
+  assert.match(dashboard, /math-welcome-guide/);
+  assert.match(dashboard, /Your private trail starts with one small step/);
+  assert.match(dashboard, /Your Google name, email, and photo are not saved/);
+  assert.match(dashboard, /Collect 4 keys/);
+  assert.match(dashboard, /Stars are feedback/);
+  assert.match(dashboard, /Start one small step/);
+  assert.match(dashboard, /<Avatar avatar=\{state\.profile\.avatar\}/);
   assert.match(dashboard, /reviewBatchSize/);
   assert.match(dashboard, /TODAY’S BEST STEP · REVIEW READY/);
   assert.match(dashboard, /Start Daily Review/);
@@ -253,6 +261,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.math-world-grid/);
   assert.match(css, /\.math-world-proof/);
   assert.match(css, /\.world-landmark/);
+  assert.match(css, /\.welcome-trail-guide/);
+  assert.match(css, /\.welcome-route-step/);
+  assert.match(css, /\.welcome-guide-promises/);
   assert.match(css, /\.review-priority-card/);
   assert.match(css, /\.review-priority-orbit/);
   assert.match(css, /\.practice-charge/);
@@ -314,6 +325,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.achievement-badge/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.achievement-grid/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-tracker/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-route/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);
 });

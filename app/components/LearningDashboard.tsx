@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { getGradeCurriculum, getGradeLessons } from "@/lib/curriculum";
 import { getRegionLandmark } from "@/lib/visual-landmarks";
@@ -8,6 +8,7 @@ import { saveDemoState } from "@/lib/learner-state";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
+import { Avatar } from "./Avatar";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 
@@ -17,6 +18,14 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const { state, setState, loading, error } = useLearner(demo);
   const [rewardMessage, setRewardMessage] = useState("");
   const [showFullMap, setShowFullMap] = useState(false);
+  const [welcomeReady, setWelcomeReady] = useState(false);
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
+
+  useEffect(() => {
+    try { setWelcomeDismissed(window.sessionStorage.getItem("math-welcome-guide") === "dismissed"); }
+    catch { setWelcomeDismissed(false); }
+    setWelcomeReady(true);
+  }, []);
 
   const completed = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
   const cleared = useMemo(() => new Set(state?.clearedBosses.map((item) => item.regionId) ?? []), [state]);
@@ -78,6 +87,13 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const nextRewardStep = (state.profile.rewardStep % 7) + 1;
   const visibleRewardStep = state.dailyRewardClaimed ? state.profile.rewardStep : nextRewardStep;
   const visibleRewardAmount = dailyRewardAmounts[visibleRewardStep - 1];
+  const showWelcomeGuide = welcomeReady && state.completedLessons.length === 0 && !welcomeDismissed;
+
+  function dismissWelcomeGuide() {
+    try { window.sessionStorage.setItem("math-welcome-guide", "dismissed"); } catch { /* Device storage is optional. */ }
+    setWelcomeDismissed(true);
+  }
+
   function rewardCellClass(claimNumber: number) {
     if (state.dailyRewardClaimed) return claimNumber <= visibleRewardStep ? "done" : "";
     if (state.profile.rewardStep < 7 && claimNumber <= state.profile.rewardStep) return "done";
@@ -101,6 +117,25 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <div><strong>{gradeBosses}<small>/{curriculum.regions.length}</small></strong><span>Bosses</span></div>
           </div>
         </div>
+
+        {showWelcomeGuide && <section className={`welcome-trail-guide accent-${nextLesson.accent}`} aria-labelledby="welcome-trail-heading">
+          <button className="welcome-guide-close" type="button" onClick={dismissWelcomeGuide} aria-label="Dismiss welcome guide">×</button>
+          <header className="welcome-guide-heading">
+            <Avatar avatar={state.profile.avatar} size="lg" label="Your random abstract avatar" />
+            <div><span className="section-kicker">WELCOME, {state.profile.nickname.toUpperCase()}</span><h2 id="welcome-trail-heading">Your private trail starts with one small step.</h2><p>Math created a random nickname and abstract avatar for you. Your Google name, email, and photo are not saved.</p></div>
+          </header>
+          <div className="welcome-route" aria-label="Complete short lessons, collect four region keys, then unlock the boss">
+            <div className="welcome-route-step"><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="md" label="First short lesson" /><div><small>STEP 1</small><strong>Short lesson</strong><span>6–8 minutes</span></div></div>
+            <i className="welcome-route-connector" aria-hidden="true" />
+            <div className="welcome-route-step welcome-key-step"><span className="welcome-mini-keys" aria-hidden="true"><b>1</b><b>2</b><b>3</b><b>4</b></span><div><small>REGION</small><strong>Collect 4 keys</strong><span>One key per lesson</span></div></div>
+            <i className="welcome-route-connector" aria-hidden="true" />
+            <div className="welcome-route-step welcome-boss-step"><span aria-hidden="true">★</span><div><small>UNLOCK</small><strong>Boss quest</strong><span>5 mixed questions</span></div></div>
+          </div>
+          <footer className="welcome-guide-footer">
+            <div className="welcome-guide-promises"><p><span aria-hidden="true">✓</span><strong>Corrections count.</strong> Fix every answer and the lesson completes.</p><p><span aria-hidden="true">☆</span><strong>Stars are feedback.</strong> They celebrate this run and never lock progress.</p></div>
+            <div className="welcome-guide-action"><small>YOUR FIRST QUEST</small><strong>{nextLesson.title}</strong><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start one small step <span aria-hidden="true">→</span></a></div>
+          </footer>
+        </section>}
 
         <div className="dashboard-grid">
           {reviewBatchSize > 0 ? <section className="next-card review-priority-card">
