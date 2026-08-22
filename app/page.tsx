@@ -27,7 +27,7 @@ const gradeVisuals = {
 
 const mathWorldScenes = [
   { grade: 8, title: "Read the instruction first", copy: "Move through a deliberate operation sequence so grouping, powers, multiplication, and addition happen in the right order.", image: "/visuals/operations-sequence-context.jpg", lesson: "order-of-operations", visual: "steps", accent: "blue" as const },
-  { grade: 8, title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.png", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
+  { grade: 8, title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.webp", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
   { grade: 8, title: "Different pieces, same amount", copy: "Line up equal wholes to see why six eighths and three fourths name the same length.", image: "/visuals/fraction-workshop-context.jpg", lesson: "fractions", visual: "fraction-bars", accent: "gold" as const },
   { grade: 8, title: "Put the value in its place", copy: "Insert one known value into every matching variable slot, then evaluate the operations in order.", image: "/visuals/substitution-machine-context.jpg", lesson: "substitution", visual: "substitute", accent: "teal" as const },
   { grade: 8, title: "Four factors, one power", copy: "Gather repeated copies of the same base, then use the exponent as a compact factor count.", image: "/visuals/exponent-lab-context.jpg", lesson: "powers", visual: "powers", accent: "violet" as const },
@@ -64,7 +64,7 @@ export default function Home() {
         <div className="hero-proof" aria-label="Course contents"><div><strong>{curriculumStats.grades}</strong><span>grade paths</span></div><div><strong>{curriculumStats.lessons}</strong><span>short lessons</span></div><div><strong>{curriculumStats.questions}</strong><span>practice checks</span></div></div>
       </div>
       <div className="hero-art" aria-label="A visual math trail from number lines and fractions to graphs, geometry, and an achievement star">
-        <div className="hero-art-frame"><Image src="/visuals/math-trail-hero.png" width={1280} height={853} priority sizes="(max-width: 860px) 100vw, 48vw" alt="A paper-cut math trail with a number line, fraction model, graph, triangle, and achievement star" /></div>
+        <div className="hero-art-frame"><Image src="/visuals/math-trail-hero.webp" width={1280} height={853} priority sizes="(max-width: 860px) 100vw, 48vw" alt="A paper-cut math trail with a number line, fraction model, graph, triangle, and achievement star" /></div>
         <span className="hero-float hero-float-time"><b>6–8</b><small>minutes</small></span>
         <span className="hero-float hero-float-practice"><b>5</b><small>quick checks</small></span>
         <span className="hero-float hero-float-boss"><b>★</b><small>boss unlocked</small></span>

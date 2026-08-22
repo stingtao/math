@@ -23,7 +23,7 @@ const contextScenes: Record<string, ContextScene> = {
     modelLabel: "Math model: less than, greater than, less than or equal to, and not equal each give a different instruction; negative four is less than negative one",
   },
   "signed-numbers": {
-    src: "/visuals/signed-numbers-context.png",
+    src: "/visuals/signed-numbers-context.webp",
     alt: "A building with floors above and below street level, showing positive and negative positions around a central reference",
     headline: "street level works like zero",
     copy: "Above and below are opposite directions from the same reference point.",
@@ -98,7 +98,7 @@ const contextScenes: Record<string, ContextScene> = {
     modelLabel: "Math model: with radius two and height nine, the cylinder volume is thirty-six pi and the cone volume is twelve pi, so their difference is twenty-four pi",
   },
   "g7-add-rational-numbers": {
-    src: "/visuals/signed-numbers-context.png",
+    src: "/visuals/signed-numbers-context.webp",
     alt: "A building uses street level as zero with positions above and below it",
     headline: "compare directions and distances from zero",
     copy: "Different signs pull in opposite directions, so subtract the distances and keep the farther sign.",
@@ -128,7 +128,7 @@ const contextScenes: Record<string, ContextScene> = {
     modelLabel: "Math model: negative three fourths divided by positive one half has a negative sign; three fourths times two gives three halves, so the result is negative three halves",
   },
   "g7-rational-word-problems": {
-    src: "/visuals/signed-numbers-context.png",
+    src: "/visuals/signed-numbers-context.webp",
     alt: "A building shows positions above and below a shared zero at street level",
     headline: "translate the change before calculating",
     copy: "A descent is a negative change: start at five, change by negative twelve, and finish at negative seven.",

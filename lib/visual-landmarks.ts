@@ -6,7 +6,7 @@ export type VisualLandmark = {
 
 export const grade7RegionLandmarks: Record<number, VisualLandmark> = {
   701: { src: "/visuals/unit-rate-bike-context.jpg", alt: "Three bicycles and equal route sections model an amount per one unit", lessonSlug: "g7-unit-rates" },
-  702: { src: "/visuals/signed-numbers-context.png", alt: "Floors above and below street level model rational changes around zero", lessonSlug: "g7-add-rational-numbers" },
+  702: { src: "/visuals/signed-numbers-context.webp", alt: "Floors above and below street level model rational changes around zero", lessonSlug: "g7-add-rational-numbers" },
   703: { src: "/visuals/inequality-trail-context.jpg", alt: "Open and closed trail boundaries model inequality solution sets extending left or right", lessonSlug: "g7-inequalities-g7" },
   704: { src: "/visuals/percent-market-context.jpg", alt: "A market display models percent change and everyday percent problems", lessonSlug: "g7-percent-change" },
   705: { src: "/visuals/circle-fountain-context.jpg", alt: "A fountain highlights the radius, diameter, circumference, and area of a circle", lessonSlug: "g7-circle-measures" },
@@ -16,7 +16,7 @@ export const grade7RegionLandmarks: Record<number, VisualLandmark> = {
 };
 
 export const grade8RegionLandmarks: Record<number, VisualLandmark> = {
-  1: { src: "/visuals/signed-numbers-context.png", alt: "Floors above and below street level model positive and negative positions", lessonSlug: "signed-numbers" },
+  1: { src: "/visuals/signed-numbers-context.webp", alt: "Floors above and below street level model positive and negative positions", lessonSlug: "signed-numbers" },
   2: { src: "/visuals/percent-market-context.jpg", alt: "A market wall split into equal tiles models a percent of a whole", lessonSlug: "percent" },
   3: { src: "/visuals/equation-balance-context.jpg", alt: "A level balance models doing the same operation to both sides", lessonSlug: "one-step-equations" },
   4: { src: "/visuals/distributive-workshop-context.jpg", alt: "Repeated workshop trays model distributing a factor to every term", lessonSlug: "distributive-property" },
