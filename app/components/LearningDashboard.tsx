@@ -13,6 +13,7 @@ import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 import { achievementTotalsForState, achievementUnlockedBetween, getNextAchievement, type AchievementSpec } from "@/lib/achievements";
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
+import { getQuestMilestone } from "@/lib/quest-milestone";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
@@ -125,6 +126,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     ? `${activeRegion.title} Boss`
     : featuredLesson.title;
   const mainMissionType = reviewBatchSize > 0 ? "Daily Review" : gradeComplete ? "Trail complete" : activeBossReady ? "Boss quest" : "Short lesson";
+  const questMilestone = getQuestMilestone({ gradeComplete, reviewBatchSize, activeBossReady, activeDone, regionSize: activeRegion.lessons.length, nextLessonTitle: activeNextLesson?.title });
 
   function dismissWelcomeGuide() {
     try { window.sessionStorage.setItem("math-welcome-guide", "dismissed"); } catch { /* Device storage is optional. */ }
@@ -269,6 +271,11 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               })}
               <i className="quest-connector" aria-hidden="true" />
               <span className={`quest-node quest-boss-node ${gradeComplete ? "done" : activeBossReady ? "current" : "locked"}`} aria-label={`Boss quest: ${gradeComplete ? "complete" : activeBossReady ? "ready" : "locked"}`}>★</span>
+            </div>
+            <div className={`quest-milestone milestone-${questMilestone.tone}`} role="status" aria-label={`${questMilestone.kicker}: ${questMilestone.title}. ${questMilestone.badge}`}>
+              <span aria-hidden="true">{questMilestone.glyph}</span>
+              <div><small>{questMilestone.kicker}</small><strong>{questMilestone.title}</strong></div>
+              <b>{questMilestone.badge}</b>
             </div>
           </div>
           <div className="quest-action">

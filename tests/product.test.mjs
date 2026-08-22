@@ -5,6 +5,7 @@ import { nextMomentumRun } from "../lib/momentum.ts";
 import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
 import { mathInputMode } from "../lib/math-input.ts";
+import { getQuestMilestone } from "../lib/quest-milestone.ts";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
   assert.equal(mathInputMode("12"), "decimal");
@@ -15,6 +16,16 @@ test("keeps the right math symbols available on mobile answer keyboards", () => 
   assert.equal(mathInputMode("(2, 5)"), "text");
   assert.equal(mathInputMode("x = 7|7"), "decimal");
   assert.equal(mathInputMode(), "text");
+});
+
+test("turns every returning trail state into one clear milestone", () => {
+  const base = { gradeComplete: false, reviewBatchSize: 0, activeBossReady: false, activeDone: 0, regionSize: 4, nextLessonTitle: "Signed Numbers" };
+  assert.deepEqual(getQuestMilestone(base), { tone: "start", glyph: "1", kicker: "FIRST KEY AHEAD", title: "Signed Numbers starts this region", badge: "0/4" });
+  assert.equal(getQuestMilestone({ ...base, activeDone: 2 }).title, "2 short lessons to the Boss");
+  assert.deepEqual(getQuestMilestone({ ...base, activeDone: 3 }), { tone: "near", glyph: "4", kicker: "FINAL KEY AHEAD", title: "Signed Numbers opens the Boss", badge: "1 left" });
+  assert.equal(getQuestMilestone({ ...base, activeDone: 4, activeBossReady: true }).kicker, "BOSS GATE OPEN");
+  assert.equal(getQuestMilestone({ ...base, gradeComplete: true, reviewBatchSize: 3 }).title, "3 ideas are ready to recharge");
+  assert.deepEqual(getQuestMilestone({ ...base, gradeComplete: true }), { tone: "complete", glyph: "✓", kicker: "GRADE TRAIL SAFE", title: "Nothing is due today", badge: "Saved" });
 });
 
 test("reports only achievement thresholds crossed by the latest saved result", () => {
@@ -600,6 +611,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /Four lesson keys, then the boss/);
   assert.match(home, /RECOVERY COUNTS/);
   assert.match(dashboard, /CURRENT QUEST/);
+  assert.match(dashboard, /questMilestone/);
+  assert.match(dashboard, /getQuestMilestone/);
+  assert.match(dashboard, /quest-milestone milestone-\$\{questMilestone\.tone\}/);
   assert.match(dashboard, /getNextAchievement/);
   assert.match(dashboard, /NEXT PRIVATE LANDMARK/);
   assert.match(dashboard, /quest-landmark-meter/);
@@ -638,6 +652,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.learning-loop-grid/);
   assert.match(css, /\.feedback-celebration/);
   assert.match(css, /\.quest-tracker/);
+  assert.match(css, /\.quest-milestone/);
+  assert.match(css, /\.quest-milestone\.milestone-near/);
+  assert.match(css, /\.quest-milestone\.milestone-memory/);
   assert.match(css, /\.quest-landmark/);
   assert.match(css, /\.percent-context-grid/);
   assert.match(css, /\.scatter-model/);
@@ -797,6 +814,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.achievement-badge/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.achievement-grid/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-tracker/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-milestone strong \{ font-size: 13px/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-route/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);
