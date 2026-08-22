@@ -262,6 +262,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /quest-key-card/);
   assert.match(lesson, /First-try spark!/);
   assert.match(lesson, /Recovery complete!/);
+  assert.match(lesson, /This is enough for today/);
+  assert.match(lesson, /Optional: next lesson/);
   assert.match(css, /\.game-loop-board/);
   assert.match(css, /\.game-quest-path/);
   assert.match(css, /\.practice-star-path/);
@@ -275,6 +277,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(review, /MEMORY PULSE/);
   assert.match(review, /Quick recall!/);
   assert.match(review, /Memory recovered!/);
+  assert.match(review, /MEMORY QUEUE · CLEAR/);
+  assert.match(review, /SESSION WIN SAVED/);
+  assert.match(review, /You can stop here/);
+  assert.match(review, /suggestedLesson/);
   assert.match(boss, /isFinalRegion/);
   assert.match(boss, /repair-progress/);
   assert.match(boss, /repairRestored/);
@@ -289,6 +295,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.review-memory-path/);
   assert.match(css, /\.review-memory-meter/);
   assert.match(css, /\.review-memory-nodes/);
+  assert.match(css, /\.review-clear-state/);
+  assert.match(css, /\.session-save-card/);
+  assert.match(css, /\.review-finish-actions/);
   assert.match(css, /\.repair-progress/);
   assert.match(css, /\.repair-checkpoint/);
   assert.match(css, /\.repair-restored-card/);

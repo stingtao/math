@@ -26,6 +26,11 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const question = questions[index];
   const questionLesson = question ? lessonById.get(question.lessonId) : undefined;
   const reviewAnchorLesson = questions[0] ? lessonById.get(questions[0].lessonId) : undefined;
+  const savedNextLesson = state ? lessonById.get(state.nextLessonId) : undefined;
+  const suggestedLesson = savedNextLesson && !state?.completedLessons.some((item) => item.id === savedNextLesson.id) ? savedNextLesson : undefined;
+  const savedGrade = suggestedLesson?.grade ?? savedNextLesson?.grade ?? 8;
+  const trailHref = `/learn?grade=${savedGrade}${demo ? "&demo=1" : ""}`;
+  const suggestedHref = suggestedLesson ? `/learn/${suggestedLesson.slug}?grade=${suggestedLesson.grade}${demo ? "&demo=1" : ""}` : trailHref;
   const questionKey = question ? `${question.lessonId}:${question.questionId}` : "";
   const recalledCount = index + (feedback === "correct" ? 1 : 0);
   const currentFirstTry = feedback === "correct" && attempts[questionKey] === 1;
@@ -49,7 +54,22 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   if (loading || !ready) return <main className="loading-page" role="status"><div className="loading-mark">◇</div><p>Gathering today’s review…</p></main>;
   if (!state || error) return <main className="auth-gate"><div className="auth-card"><span className="auth-orbit">◇</span><h1>Sign in to open Daily Review.</h1><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
   const activeState = state;
-  if (!questions.length) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="review-empty"><span>✓</span><span className="section-kicker">REVIEW COMPLETE</span><h1>Your queue is clear.</h1><p>Nothing is due right now. Keep moving or revisit any completed lesson from the trail.</p><a className="primary-button" href={demo ? "/learn?demo=1" : "/learn"}>Return to the trail <span>→</span></a></section></main>;
+  if (!questions.length) return (
+    <main className="learner-shell">
+      <LearnerHeader state={state} demo={demo} />
+      <section className="review-empty review-clear-state">
+        <div className="review-finish-emblem review-clear-emblem"><TopicIcon visual="steps" accent="teal" size="xl" label="Daily Review queue clear" /><span aria-hidden="true">✓</span></div>
+        <span className="section-kicker">MEMORY QUEUE · CLEAR</span>
+        <h1>Nothing needs attention.</h1>
+        <p>Your review path is caught up. That is a complete study win—you do not need to add more work today.</p>
+        <div className="session-save-card"><span aria-hidden="true">✓</span><div><small>PROGRESS SAVED</small><strong>You can stop here.</strong><p>When an idea is ready to revisit, up to five quick recalls will appear as Today’s best step.</p></div></div>
+        <div className="review-finish-actions">
+          <a className="secondary-button" href={trailHref}>View learning map</a>
+          {suggestedLesson && <a className="primary-button" href={suggestedHref}>Optional: {suggestedLesson.title} <span>→</span></a>}
+        </div>
+      </section>
+    </main>
+  );
 
   async function check() {
     if (!answer.trim() || busy) return;
@@ -90,7 +110,22 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     setFinished(true);
   }
 
-  if (finished) return <main className="learner-shell"><SuccessBurst eventKey="daily-review-complete" large /><LearnerHeader state={state} demo={demo} /><section className="review-finish">{reviewAnchorLesson && <div className="review-finish-emblem"><TopicIcon visual={reviewAnchorLesson.visual} accent={reviewAnchorLesson.accent} size="xl" label="Daily Review completed" /><span aria-hidden="true">✓</span></div>}<span className="section-kicker">DAILY REVIEW COMPLETE</span><h1>Memory strengthened.</h1><p>You recalled {questions.length} ideas today. They will return on the spaced-review path when practice matters most.</p><div className="review-finish-reward"><span><strong>+20</strong> XP</span><span><strong>{questions.length}/{questions.length}</strong> recalled</span><span><strong>1–14</strong> day cycle</span></div><div className="review-memory-path" aria-label="Today complete and future reviews scheduled"><span className="done"><b>✓</b> Today complete</span><i /><span><b>◇</b> Next recall scheduled</span></div><a className="primary-button" href={demo ? "/learn?demo=1" : "/learn"}>Back to your trail <span>→</span></a></section></main>;
+  if (finished) return (
+    <main className="learner-shell">
+      <SuccessBurst eventKey="daily-review-complete" large />
+      <LearnerHeader state={state} demo={demo} />
+      <section className="review-finish">
+        {reviewAnchorLesson && <div className="review-finish-emblem"><TopicIcon visual={reviewAnchorLesson.visual} accent={reviewAnchorLesson.accent} size="xl" label="Daily Review completed" /><span aria-hidden="true">✓</span></div>}
+        <span className="section-kicker">DAILY REVIEW COMPLETE</span>
+        <h1>Memory strengthened.</h1>
+        <p>You recalled {questions.length} ideas today. They will return on the spaced-review path when practice matters most.</p>
+        <div className="review-finish-reward"><span><strong>+20</strong> XP</span><span><strong>{questions.length}/{questions.length}</strong> recalled</span><span><strong>1–14</strong> day cycle</span></div>
+        <div className="review-memory-path" aria-label="Today complete and future reviews scheduled"><span className="done"><b>✓</b> Today complete</span><i /><span><b>◇</b> Next recall scheduled</span></div>
+        <div className="session-save-card"><span aria-hidden="true">✓</span><div><small>SESSION WIN SAVED</small><strong>You can stop here.</strong><p>When another idea is due, it will appear as Today’s best step on your trail.</p></div></div>
+        <div className="review-finish-actions"><a className="secondary-button" href={trailHref}>View learning map</a>{suggestedLesson && <a className="primary-button" href={suggestedHref}>Optional: {suggestedLesson.title} <span>→</span></a>}</div>
+      </section>
+    </main>
+  );
 
   return (
     <main className="learner-shell review-shell">

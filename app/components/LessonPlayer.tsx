@@ -147,9 +147,10 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           </div>
           <div className="unlock-path" aria-label={regionFinished ? "Lesson complete and boss quest unlocked" : "Lesson complete and next lesson unlocked"}><span className="done"><b>✓</b> Lesson complete</span><i /><span><b>{regionFinished ? "★" : "→"}</b> {regionFinished ? "Boss quest unlocked" : "Next lesson unlocked"}</span></div>
           <div className="reward-strip"><span><strong>+{40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0)}</strong> XP</span><span><strong>{stars}/3</strong> stars</span><span><strong>1</strong> step forward</span></div>
+          <div className="session-save-card"><span aria-hidden="true">✓</span><div><small>SESSION WIN SAVED</small><strong>This is enough for today.</strong><p>You can stop here. Daily Review will bring this idea back when another short visit will help.</p></div></div>
           <div className="celebration-actions">
             <a className="secondary-button" href={trailUrl}>Back to trail</a>
-            <a className="primary-button" href={regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`}>{regionFinished ? "Enter the boss quest" : "Take the next step"} <span>→</span></a>
+            <a className="primary-button" href={regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`}>{regionFinished ? "Optional: enter boss" : "Optional: next lesson"} <span>→</span></a>
           </div>
         </section>
       </main>

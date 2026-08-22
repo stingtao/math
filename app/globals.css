@@ -1058,8 +1058,10 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .review-question-heading .topic-icon { margin-top: 2px; }
 .review-feedback { margin-top: 22px; }
 .review-finish { width: min(700px, calc(100% - 40px)); }
+.review-clear-state { width: min(700px, calc(100% - 40px)); border-color: #cfe5de; background: radial-gradient(circle at 50% 0, rgb(226 248 241 / 70%), white 40%); box-shadow: 0 22px 65px rgb(23 50 79 / 9%); }
 .review-finish-emblem { width: 156px; height: 156px; margin: 0 auto 28px; position: relative; display: grid; place-items: center; }
 .review-finish-emblem > span { width: 48px; height: 48px; position: absolute; right: -2px; bottom: 4px; display: grid; place-items: center; border: 5px solid white; border-radius: 17px; color: white; background: var(--teal); box-shadow: 0 8px 18px rgb(17 113 91 / 28%); font-size: 22px; font-weight: 900; }
+.review-clear-emblem .topic-icon { transform: rotate(-4deg); }
 .review-finish > p { max-width: 520px; margin-inline: auto; }
 .review-finish-reward { margin: 26px 0 18px; display: grid; grid-template-columns: repeat(3, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: #f7fafb; }
 .review-finish-reward span { padding: 17px 12px; display: grid; gap: 3px; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
@@ -1071,6 +1073,14 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .review-memory-path b { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--teal); }
 .review-memory-path > span:last-child b { color: #8d6819; background: var(--gold); }
 .review-memory-path > i { height: 2px; background: linear-gradient(90deg, var(--teal), var(--gold)); }
+.session-save-card { width: min(560px, 100%); margin: 20px auto 24px; padding: 17px 18px; display: grid; grid-template-columns: 42px 1fr; align-items: center; gap: 13px; border: 1px solid #cce7df; border-radius: 16px; background: linear-gradient(120deg, #eff9f6, white); text-align: left; }
+.session-save-card > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; color: white; background: var(--teal); box-shadow: 0 7px 16px rgb(17 113 91 / 18%); font-size: 18px; font-weight: 900; }
+.session-save-card > div { min-width: 0; display: grid; gap: 3px; }
+.session-save-card small { color: #087965; font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+.session-save-card strong { font-size: 14px; }
+.session-save-card p { margin: 0; color: #58756d; font-size: 11px; line-height: 1.45; }
+.review-finish-actions { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
+.review-finish-actions a { min-height: 50px; display: inline-flex; align-items: center; justify-content: center; }
 .repair-emblem { width: 98px; height: 98px; margin: 0 auto 24px; position: relative; display: grid; place-items: center; }
 .repair-emblem .topic-icon { transform: rotate(-4deg); }
 .repair-emblem > span { width: 34px; height: 34px; position: absolute; right: -2px; bottom: 0; display: grid; place-items: center; border: 4px solid white; border-radius: 12px; color: white; background: var(--gold); font-size: 17px; font-weight: 900; }
@@ -1109,6 +1119,11 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .review-finish-reward span + span { border-left: 0; border-top: 1px solid var(--line); }
   .review-memory-path { grid-template-columns: 1fr; gap: 7px; }
   .review-memory-path > i { width: 2px; height: 18px; justify-self: center; }
+  .review-clear-state { width: calc(100% - 28px); }
+  .session-save-card { padding: 15px; }
+  .session-save-card p { font-size: 13px; }
+  .review-finish-actions { flex-direction: column-reverse; }
+  .review-finish-actions a { width: 100%; min-height: 54px; font-size: 14px; }
   .repair-progress { grid-template-columns: 34px 1fr 34px; }
   .repair-progress > b { grid-column: 1 / -1; justify-self: stretch; margin-top: 8px; text-align: center; }
   .repair-checkpoint { padding: 13px 14px; }
