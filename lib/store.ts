@@ -531,14 +531,14 @@ export async function getLearnerLeaderboard(learnerId: string) {
   await ensureSchema();
   const week = weekKey();
   const leagueId = await ensureLeagueMembership(learnerId);
-  const result = await getStore().prepare(`SELECT p.nickname, p.avatar_glyph, p.avatar_tone, p.frame, COALESCE(SUM(x.xp), 0) AS weekly_xp,
+  const result = await getStore().prepare(`SELECT m.learner_id, p.nickname, p.avatar_glyph, p.avatar_tone, p.frame, COALESCE(SUM(x.xp), 0) AS weekly_xp,
       SUM(CASE WHEN x.kind = 'boss' THEN 1 ELSE 0 END) AS bosses
     FROM league_members m JOIN public_profiles p ON p.learner_id = m.learner_id
     LEFT JOIN xp_events x ON x.learner_id = m.learner_id AND x.week_key = m.week_key
     WHERE m.week_key = ? AND m.league_id = ? AND p.leaderboard_opt_in = 1
     GROUP BY m.learner_id, p.nickname, p.avatar_glyph, p.avatar_tone, p.frame
-    ORDER BY weekly_xp DESC, bosses DESC, p.nickname ASC LIMIT 30`).bind(week, leagueId).all<{ nickname: string; avatar_glyph: string; avatar_tone: string; frame: string; weekly_xp: number }>();
-  return result.results.map((entry, index) => ({ rank: index + 1, nickname: entry.nickname, avatar: { glyph: entry.avatar_glyph, tone: entry.avatar_tone, frame: entry.frame }, weeklyXp: Number(entry.weekly_xp) }));
+    ORDER BY weekly_xp DESC, bosses DESC, p.nickname ASC LIMIT 30`).bind(week, leagueId).all<{ learner_id: string; nickname: string; avatar_glyph: string; avatar_tone: string; frame: string; weekly_xp: number }>();
+  return result.results.map((entry, index) => ({ rank: index + 1, nickname: entry.nickname, avatar: { glyph: entry.avatar_glyph, tone: entry.avatar_tone, frame: entry.frame }, weeklyXp: Number(entry.weekly_xp), isViewer: entry.learner_id === learnerId }));
 }
 
 export async function isLeaderboardParticipant(learnerId: string) {

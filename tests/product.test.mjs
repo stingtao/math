@@ -79,6 +79,24 @@ test("keeps avatar frames permanently unlocked and makes the token goal visible"
   assert.match(css, /\.reward-locker-link/);
 });
 
+test("keeps signed-in navigation and a private self marker on the weekly league", async () => {
+  const page = await readFile(new URL("../app/leaderboard/page.tsx", import.meta.url), "utf8");
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const view = await readFile(new URL("../app/components/LeaderboardView.tsx", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(page, /LeaderboardView demo=\{params\.demo === "1"\}/);
+  assert.match(header, /leaderboard\?demo=1/);
+  assert.match(view, /state \? <LearnerHeader/);
+  assert.match(view, /YOUR PRIVATE POINTER/);
+  assert.match(view, /Other learners see only your random identity/);
+  assert.match(view, /entry\.weeklyXp > 0/);
+  assert.match(store, /isViewer: entry\.learner_id === learnerId/);
+  assert.match(css, /\.current-rank-card/);
+  assert.match(css, /li\.current-learner/);
+});
+
 test("keeps feedback rows unlinkable from learner progress", async () => {
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
   const feedback = schema.slice(schema.indexOf("feedbackMessages"), schema.indexOf("leagueMembers"));

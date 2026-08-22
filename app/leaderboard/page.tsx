@@ -6,4 +6,9 @@ export const metadata: Metadata = {
   description: "An anonymous weekly Grades 7–9 learning league using random nicknames and abstract avatars.",
 };
 
-export default function LeaderboardPage() { return <LeaderboardView />; }
+export const dynamic = "force-dynamic";
+
+export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ demo?: string }> }) {
+  const params = await searchParams;
+  return <LeaderboardView demo={params.demo === "1"} />;
+}
