@@ -31,14 +31,14 @@ const mathWorldScenes = [
   { grade: 8, title: "Two questions, four groups", copy: "Sort one survey by two categories, then compare groups using the right total.", image: "/visuals/two-way-survey-context.jpg", lesson: "two-way-tables", visual: "two-way", accent: "gold" as const },
   { grade: 7, title: "Chance happens in stages", copy: "Follow two independent events and see why their probabilities multiply.", image: "/visuals/compound-events-lab-context.jpg", lesson: "g7-compound-events", visual: "tree", accent: "violet" as const },
   { grade: 9, title: "The same fraction remains", copy: "Watch stored energy shrink by one fixed multiplier at every step.", image: "/visuals/exponential-decay-energy-context.jpg", lesson: "g9-exponential-decay", visual: "decay", accent: "teal" as const },
-  { grade: 9, title: "Two landing points", copy: "Connect a parabolic path with the two roots that make a quadratic equal zero.", image: "/visuals/quadratic-roots-context.jpg", lesson: "g9-quadratic-formula", visual: "formula", accent: "violet" as const },
-  { grade: 7, title: "One crossing, linked angles", copy: "Match opposite angles, then use a straight line to find the missing measure.", image: "/visuals/angle-plaza-context.jpg", lesson: "g7-angle-equations", visual: "angles", accent: "coral" as const },
-  { grade: 8, title: "Three cones fill one cylinder", copy: "Compare shapes with the same base and height to see where the one-third comes from.", image: "/visuals/cone-measure-context.jpg", lesson: "cone-volume", visual: "cone", accent: "blue" as const },
-  { grade: 7, title: "A solid hides a flat shape", copy: "Move one slicing plane through a cylinder and reveal the exact cross-section inside.", image: "/visuals/cross-section-studio-context.jpg", lesson: "g7-cross-sections", visual: "cross-section", accent: "violet" as const },
-  { grade: 9, title: "One square comes out", copy: "See a difference of square areas before turning it into two matching algebraic factors.", image: "/visuals/difference-squares-workshop-context.jpg", lesson: "g9-difference-squares", visual: "area-model", accent: "coral" as const },
+  { grade: 7, title: "Interest grows in equal steps", copy: "Separate the starting principal from the same simple-interest addition earned each year.", image: "/visuals/simple-interest-growth-context.jpg", lesson: "g7-simple-interest", visual: "formula", accent: "gold" as const },
+  { grade: 8, title: "Start at b, then follow m", copy: "Plot the intercept first, then repeat one rise-and-run step to build a straight line.", image: "/visuals/graphing-line-city-context.jpg", lesson: "graphing-lines", visual: "line-graph", accent: "blue" as const },
+  { grade: 8, title: "One input, one destination", copy: "Follow each route through a rule and see why a function never sends one input two ways.", image: "/visuals/function-routing-context.jpg", lesson: "function-rules", visual: "mapping", accent: "teal" as const },
+  { grade: 8, title: "Same shape, one scale factor", copy: "Project every vertex from one center and enlarge all corresponding sides consistently.", image: "/visuals/dilation-studio-context.jpg", lesson: "dilations-similarity", visual: "dilation", accent: "coral" as const },
+  { grade: 9, title: "Measure every miss from the line", copy: "Use vertical residual distances to judge whether a fitted line captures the data pattern.", image: "/visuals/residual-observatory-context.jpg", lesson: "g9-correlation-residuals", visual: "residual", accent: "violet" as const },
 ];
 
-const expandedSceneCount = 44;
+const expandedSceneCount = 49;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";

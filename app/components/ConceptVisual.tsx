@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare";
+  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -319,6 +319,41 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Linear patterns add the same amount. Exponential patterns multiply by the same factor and eventually pull away.",
     model: "growth-compare",
   },
+  "g7-simple-interest": {
+    src: "/visuals/simple-interest-growth-context.jpg",
+    alt: "A savings vault feeding four account columns that grow by the same gold coin layer at each time step",
+    headline: "I = Prt · equal interest each year",
+    copy: "Simple interest adds the same percent of the original principal for every unit of time.",
+    model: "simple-interest",
+  },
+  "graphing-lines": {
+    src: "/visuals/graphing-line-city-context.jpg",
+    alt: "A city coordinate plaza with a line crossing the vertical axis above the origin and repeated rise-run steps",
+    headline: "y = 2x + 1 starts at 1, then rises 2",
+    copy: "Plot the y-intercept first. Repeat the same rise and run to build the line.",
+    model: "graph-line",
+  },
+  "function-rules": {
+    src: "/visuals/function-routing-context.jpg",
+    alt: "Four input capsules traveling through separate unbranched lanes to exactly one output dock each",
+    headline: "each input gets exactly one output",
+    copy: "A relation is a function when no input branches toward two different outputs.",
+    model: "function",
+  },
+  "dilations-similarity": {
+    src: "/visuals/dilation-studio-context.jpg",
+    alt: "A small triangular frame and an enlarged similar frame aligned with projection rays from one center point",
+    headline: "scale factor 2 doubles every side",
+    copy: "A dilation keeps every angle equal and multiplies every length by one scale factor.",
+    model: "dilation",
+  },
+  "g9-correlation-residuals": {
+    src: "/visuals/residual-observatory-context.jpg",
+    alt: "Data points above and below a fitted line with vertical gold rods showing their residual distances",
+    headline: "residual = actual − predicted",
+    copy: "Small residuals scattered above and below zero support a useful linear model.",
+    model: "residuals",
+  },
 };
 
 function mathFor(visual: string) {
@@ -399,6 +434,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "distribution-compare" && <div className="distribution-compare-context-model" aria-hidden="true"><div className="distribution-row distribution-tight"><small>A</small><span><i /><b /><em /></span><strong>median 12 · IQR 3</strong></div><div className="distribution-row distribution-wide"><small>B</small><span><i /><b /><em /></span><strong>median 9 · IQR 8</strong></div></div>}
         {scene.model === "rational-exponent" && <div className="rational-exponent-context-model" aria-hidden="true"><div className="radical-cube-layers">{Array.from({ length: 3 }, (_, layer) => <div key={layer}>{Array.from({ length: 9 }, (_, cell) => <span key={cell} />)}</div>)}</div><i>→</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("27^{2/3}=(\\sqrt[3]{27})^2=3^2=9", { throwOnError: false }) }} /></div>}
         {scene.model === "growth-compare" && <div className="growth-compare-context-model" aria-hidden="true"><div><small>LINEAR</small>{[2, 5, 8, 11].map((value, index) => <span key={value}><b>{value}</b>{index < 3 && <i>+3</i>}</span>)}</div><div><small>EXPONENTIAL</small>{[2, 6, 18, 54].map((value, index) => <span key={value}><b>{value}</b>{index < 3 && <i>×3</i>}</span>)}</div></div>}
+        {scene.model === "simple-interest" && <div className="simple-interest-context-model" aria-hidden="true"><div><span><small>principal</small><b>$500</b></span><i>×</i><span><small>rate</small><b>0.04</b></span><i>×</i><span><small>time</small><b>2</b></span></div><strong><small>interest</small><b>$40</b></strong></div>}
+        {scene.model === "graph-line" && <div className="graph-line-context-model" aria-hidden="true"><span><small>START</small><b>b = 1</b><em>plot (0, 1)</em></span><i>→</i><span><small>STEP</small><b>m = 2/1</b><em>rise 2 · run 1</em></span><strong>y = 2x + 1</strong></div>}
+        {scene.model === "dilation" && <div className="dilation-context-model" aria-hidden="true"><div>{[[3, 6], [4, 8], [5, 10]].map(([before, after]) => <span key={before}><b>{before}</b><i>×2</i><strong>{after}</strong></span>)}</div><small>all angles stay equal</small></div>}
+        {scene.model === "residuals" && <div className="residuals-context-model" aria-hidden="true"><div><span><small>actual</small><b>14</b></span><i>−</i><span><small>predicted</small><b>11</b></span><strong><small>residual</small><b>+3</b></strong></div><em>small + no pattern → useful linear fit</em></div>}
       </div>
       <strong>{scene.headline}</strong>
       <p>{scene.copy}</p>

@@ -2248,6 +2248,75 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .growth-compare-context-model b { width: 28px; height: 28px; font-size: 9px; }
 }
 
+/* Exact companion models for the newest real-world lesson scenes. */
+.context-model-simple-interest .context-scene img,
+.context-model-graph-line .context-scene img,
+.context-model-dilation .context-scene img,
+.context-model-residuals .context-scene img { object-position: center 50%; }
+.simple-interest-context-model { width: min(510px, 100%); display: grid; grid-template-columns: minmax(0, 1fr) 92px; align-items: stretch; gap: 12px; }
+.simple-interest-context-model > div { min-width: 0; display: grid; grid-template-columns: 1fr 18px 1fr 18px 1fr; align-items: center; gap: 5px; }
+.simple-interest-context-model span { min-width: 0; min-height: 58px; padding: 9px 5px; display: grid; place-items: center; align-content: center; gap: 4px; border: 1px solid #d7e2e8; border-radius: 12px; background: #f7fafb; }
+.simple-interest-context-model small { color: #6e8190; font-size: 7px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.simple-interest-context-model span b { color: var(--navy); font-size: 14px; }
+.simple-interest-context-model > div > i { color: var(--gold); font-size: 14px; font-style: normal; font-weight: 900; text-align: center; }
+.simple-interest-context-model > strong { min-width: 0; padding: 9px; display: grid; place-items: center; align-content: center; gap: 4px; border-radius: 12px; color: white; background: var(--teal); }
+.simple-interest-context-model > strong small { color: rgb(255 255 255 / 76%); }
+.simple-interest-context-model > strong b { font-size: 20px; }
+.graph-line-context-model { width: min(510px, 100%); display: grid; grid-template-columns: 1fr 26px 1fr; align-items: stretch; gap: 7px; }
+.graph-line-context-model > span { min-width: 0; padding: 9px 10px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 9px; border: 1px solid #d7e2e8; border-radius: 12px; background: #f7fafb; }
+.graph-line-context-model > span small { color: var(--teal); font-size: 7px; font-weight: 900; letter-spacing: .08em; }
+.graph-line-context-model > span b { color: var(--navy); font-size: 16px; }
+.graph-line-context-model > span em { grid-column: 1 / -1; color: #6d7f8d; font-size: 8px; font-style: normal; }
+.graph-line-context-model > i { display: grid; place-items: center; color: var(--coral); font-size: 18px; font-style: normal; font-weight: 900; }
+.graph-line-context-model > strong { grid-column: 1 / -1; padding: 8px 12px; border-radius: 11px; color: white; background: var(--blue); font-size: 15px; text-align: center; }
+.dilation-context-model { width: min(480px, 100%); display: grid; gap: 9px; }
+.dilation-context-model > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dilation-context-model span { min-width: 0; min-height: 51px; padding: 8px; display: grid; grid-template-columns: 1fr auto 1fr; place-items: center; gap: 5px; border: 1px solid #e1d6ae; border-radius: 12px; background: #fff9e9; }
+.dilation-context-model span b { color: #7c661e; font-size: 13px; }
+.dilation-context-model span i { padding: 4px 5px; border-radius: 7px; color: white; background: var(--gold); font-size: 8px; font-style: normal; }
+.dilation-context-model span strong { color: var(--navy); font-size: 16px; }
+.dilation-context-model > small { color: #72623a; font-size: 8px; font-weight: 900; letter-spacing: .06em; text-align: center; text-transform: uppercase; }
+.residuals-context-model { width: min(500px, 100%); display: grid; gap: 9px; }
+.residuals-context-model > div { display: grid; grid-template-columns: 1fr 24px 1fr 1.05fr; align-items: stretch; gap: 7px; }
+.residuals-context-model span,
+.residuals-context-model strong { min-width: 0; min-height: 55px; padding: 8px; display: grid; place-items: center; align-content: center; gap: 3px; border: 1px solid #d7e2e8; border-radius: 11px; background: #f7fafb; }
+.residuals-context-model small { color: #6e8190; font-size: 7px; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.residuals-context-model b { color: var(--navy); font-size: 16px; }
+.residuals-context-model > div > i { display: grid; place-items: center; color: var(--coral); font-size: 17px; font-style: normal; font-weight: 900; }
+.residuals-context-model strong { border-color: #b9ddd3; color: white; background: var(--teal); }
+.residuals-context-model strong small,
+.residuals-context-model strong b { color: white; }
+.residuals-context-model > em { color: #5e766f; font-size: 8px; font-style: normal; font-weight: 900; text-align: center; text-transform: uppercase; }
+
+@media (max-width: 760px) {
+  .simple-interest-context-model { grid-template-columns: minmax(0, 1fr) 77px; gap: 7px; }
+  .simple-interest-context-model > div { grid-template-columns: 1fr 13px 1fr 13px 1fr; gap: 3px; }
+  .simple-interest-context-model span { min-height: 54px; padding-inline: 3px; }
+  .simple-interest-context-model span b { font-size: 12px; }
+  .simple-interest-context-model > strong b { font-size: 17px; }
+  .graph-line-context-model { grid-template-columns: 1fr 20px 1fr; }
+  .graph-line-context-model > span { padding-inline: 8px; }
+  .graph-line-context-model > span b { font-size: 14px; }
+  .dilation-context-model span { padding-inline: 5px; }
+  .dilation-context-model span strong { font-size: 14px; }
+  .residuals-context-model > div { grid-template-columns: 1fr 18px 1fr 1fr; gap: 5px; }
+  .residuals-context-model span,
+  .residuals-context-model strong { padding-inline: 5px; }
+}
+
+@media (max-width: 380px) {
+  .simple-interest-context-model small,
+  .graph-line-context-model > span small,
+  .residuals-context-model small { font-size: 6px; }
+  .simple-interest-context-model span b { font-size: 10px; }
+  .graph-line-context-model > span em { font-size: 7px; }
+  .graph-line-context-model > strong { font-size: 13px; }
+  .dilation-context-model span { gap: 3px; }
+  .dilation-context-model span b,
+  .dilation-context-model span strong { font-size: 12px; }
+  .residuals-context-model b { font-size: 13px; }
+}
+
 /* The daily reward reads as a calm seven-claim journey, not a mystery calendar. */
 .daily-card { display: flex; flex-direction: column; }
 .daily-card-top { justify-content: space-between; gap: 14px; }
