@@ -242,6 +242,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /reviewBatchSize/);
   assert.match(dashboard, /TODAY’S BEST STEP · REVIEW READY/);
   assert.match(dashboard, /Start Daily Review/);
+  assert.match(dashboard, /gradeComplete \? <section className="next-card trail-complete-card"/);
+  assert.match(dashboard, /activeBossReady \? <section className="next-card boss-priority-card"/);
+  assert.match(dashboard, /TODAY’S BEST STEP · BOSS READY/);
+  assert.match(dashboard, /Nothing due today/);
+  assert.match(dashboard, /featuredLesson/);
   assert.match(dashboard, /rewardCellClass/);
   assert.match(dashboard, /Claim \$\{nextRewardStep\} of 7/);
   assert.match(dashboard, /visibleRegions\.map/);
@@ -291,6 +296,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.welcome-guide-promises/);
   assert.match(css, /\.review-priority-card/);
   assert.match(css, /\.review-priority-orbit/);
+  assert.match(css, /\.boss-priority-card/);
+  assert.match(css, /\.trail-complete-card/);
   assert.match(css, /\.practice-charge/);
   assert.match(css, /\.charge-cells/);
   assert.match(lesson, /practice-star-path/);

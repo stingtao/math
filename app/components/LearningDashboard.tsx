@@ -42,11 +42,12 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const activeNextLesson = activeRegion.lessons.find((item) => !completed.has(item.id));
   const activeBossReady = activeDone === activeRegion.lessons.length;
   const reviewBatchSize = Math.min(state?.dueReview ?? 0, 5);
+  const featuredLesson = activeNextLesson ?? nextLesson;
   const focusedStart = Math.max(0, activeRegionIndex - 1);
   const focusedEnd = Math.min(curriculum.regions.length, activeRegionIndex + 2);
   const visibleRegions = showFullMap ? curriculum.regions : curriculum.regions.slice(focusedStart, focusedEnd);
   const questHref = gradeComplete
-    ? `/review?grade=${grade}${demo ? "&demo=1" : ""}`
+    ? reviewBatchSize > 0 ? `/review?grade=${grade}${demo ? "&demo=1" : ""}` : "#grade-map"
     : activeBossReady
     ? `/boss/${activeRegion.id}?grade=${grade}${demo ? "&demo=1" : ""}`
     : `/learn/${activeNextLesson?.slug ?? activeRegion.lessons[0].slug}?grade=${grade}${demo ? "&demo=1" : ""}`;
@@ -141,9 +142,15 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           {reviewBatchSize > 0 ? <section className="next-card review-priority-card">
             <div className="next-visual review-priority-visual" role="img" aria-label={`${reviewBatchSize} ideas ready for Daily Review`}><span>{String(reviewBatchSize).padStart(2, "0")}</span><div className="review-priority-orbit"><b>◇</b>{Array.from({ length: reviewBatchSize }, (_, index) => <i key={index} />)}</div><small>MEMORY PATH</small></div>
             <div className="next-copy"><span className="section-kicker">TODAY’S BEST STEP · REVIEW READY</span><h2>Recharge today’s ideas.</h2><p>{reviewBatchSize === 1 ? "One quick recall is due. Strengthen it before adding new material." : `${reviewBatchSize} quick recalls are due. Strengthen them before adding new material.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button" href={`/review?grade=${grade}${demo ? "&demo=1" : ""}`}>Start Daily Review <span aria-hidden="true">→</span></a></div>
+          </section> : gradeComplete ? <section className="next-card trail-complete-card">
+            <div className={`next-visual trail-complete-visual accent-${activeRegion.accent}`}><span>{String(curriculum.regions.length).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[3].visual} accent={activeRegion.accent} size="xl" label={`Grade ${grade} trail complete`} /><b aria-hidden="true">✓</b><small>TRAIL CLEARED</small></div>
+            <div className="next-copy"><span className="section-kicker">GRADE {grade} · NOTHING DUE</span><h2>Today’s trail is complete.</h2><p>Every lesson and boss is saved, and no review is waiting. This is enough for today.</p><div className="next-meta"><span>✓ {gradeLessons.length} lessons</span><span>★ {curriculum.regions.length} bosses</span><span>◇ review will return</span></div><a className="secondary-button" href="#grade-map">Revisit the completed trail <span aria-hidden="true">↓</span></a></div>
+          </section> : activeBossReady ? <section className="next-card boss-priority-card">
+            <div className={`next-visual boss-priority-visual accent-${activeRegion.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="xl" label={`${activeRegion.title} boss quest`} /><b aria-hidden="true">★</b><small>4 KEYS COLLECTED</small></div>
+            <div className="next-copy"><span className="section-kicker">TODAY’S BEST STEP · BOSS READY</span><h2>{activeRegion.title} Boss</h2><p>Connect the four ideas in five mixed questions. Take your time—there is no countdown, and corrections restore the path.</p><div className="next-meta"><span>♥ 3 hearts</span><span>◇ 5 mixed questions</span><span>◆ 100 XP</span></div><a className="primary-button" href={`/boss/${activeRegion.id}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start boss quest <span aria-hidden="true">→</span></a></div>
           </section> : <section className="next-card">
-            <div className={`next-visual accent-${nextLesson.accent}`}><span>{String(curriculum.regions.find((item) => item.id === nextLesson.regionId)?.order ?? 1).padStart(2, "0")}</span><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="xl" label={`${nextLesson.title} topic icon`} /></div>
-            <div className="next-copy"><span className="section-kicker">GRADE {grade} · UP NEXT</span><h2>{nextLesson.title}</h2><p>{nextLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP</span><span>☆ 3 stars</span></div><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Continue lesson <span aria-hidden="true">→</span></a></div>
+            <div className={`next-visual accent-${featuredLesson.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={featuredLesson.visual} accent={featuredLesson.accent} size="xl" label={`${featuredLesson.title} topic icon`} /></div>
+            <div className="next-copy"><span className="section-kicker">GRADE {grade} · UP NEXT</span><h2>{featuredLesson.title}</h2><p>{featuredLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP</span><span>☆ 3 stars</span></div><a className="primary-button" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Continue lesson <span aria-hidden="true">→</span></a></div>
           </section>}
 
           <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : ""}`}>
@@ -164,7 +171,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           <div className="quest-copy">
             <span className="section-kicker">CURRENT QUEST · {activeRegion.standard}</span>
             <h2 id="current-quest-heading">{activeRegion.title}</h2>
-            <p>{gradeComplete ? `Grade ${grade} trail cleared. Daily Review will keep your strongest skills fresh.` : activeBossReady ? "All four lessons are complete. Your boss quest is ready—take your time and use all three hearts." : `${activeRegion.lessons.length - activeDone} short ${activeRegion.lessons.length - activeDone === 1 ? "lesson" : "lessons"} until the boss quest. Corrections count as progress.`}</p>
+            <p>{gradeComplete ? reviewBatchSize > 0 ? `Grade ${grade} is cleared, and ${reviewBatchSize} ${reviewBatchSize === 1 ? "idea is" : "ideas are"} ready for a quick review.` : `Grade ${grade} is cleared and nothing is due. Your progress is saved; revisit any lesson only when you want to.` : activeBossReady ? "All four lessons are complete. Your boss quest is ready—take your time and use all three hearts." : `${activeRegion.lessons.length - activeDone} short ${activeRegion.lessons.length - activeDone === 1 ? "lesson" : "lessons"} until the boss quest. Corrections count as progress.`}</p>
             <div className="quest-progress" aria-label={`${activeDone} of ${activeRegion.lessons.length} lessons complete`}><span style={{ width: `${activeDone / activeRegion.lessons.length * 100}%` }} /></div>
             <div className="quest-nodes" aria-label="Current quest progress">
               {activeRegion.lessons.map((item, index) => {
@@ -176,7 +183,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               <span className={`quest-node quest-boss-node ${gradeComplete ? "done" : activeBossReady ? "current" : "locked"}`} aria-label={`Boss quest: ${gradeComplete ? "complete" : activeBossReady ? "ready" : "locked"}`}>★</span>
             </div>
           </div>
-          <div className="quest-action"><span>{gradeComplete ? "TRAIL CLEARED" : activeBossReady ? "BOSS READY" : `STEP ${activeDone + 1} OF ${activeRegion.lessons.length}`}</span><strong>{gradeComplete ? "Keep your mastery moving" : activeBossReady ? "5 mixed questions" : activeNextLesson?.title}</strong><a className="primary-button" href={questHref}>{gradeComplete ? "Open Daily Review" : activeBossReady ? "Start boss quest" : "Continue quest"} <span aria-hidden="true">→</span></a></div>
+          <div className="quest-action"><span>{gradeComplete ? reviewBatchSize > 0 ? "REVIEW READY" : "TRAIL CLEARED" : activeBossReady ? "BOSS READY" : `STEP ${activeDone + 1} OF ${activeRegion.lessons.length}`}</span><strong>{gradeComplete ? reviewBatchSize > 0 ? `${reviewBatchSize} quick ${reviewBatchSize === 1 ? "recall" : "recalls"}` : "Nothing due today" : activeBossReady ? "5 mixed questions" : activeNextLesson?.title}</strong><a className={gradeComplete && reviewBatchSize === 0 ? "secondary-button" : "primary-button"} href={questHref}>{gradeComplete ? reviewBatchSize > 0 ? "Open Daily Review" : "Browse completed lessons" : activeBossReady ? "Start boss quest" : "Continue quest"} <span aria-hidden="true">{gradeComplete && reviewBatchSize === 0 ? "↓" : "→"}</span></a></div>
         </section>
 
         <section className="trail-overview">
