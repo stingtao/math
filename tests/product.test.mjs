@@ -186,6 +186,8 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   const answerRoute = await readFile(new URL("../app/api/answer/route.ts", import.meta.url), "utf8");
   const stateRoute = await readFile(new URL("../app/api/state/route.ts", import.meta.url), "utf8");
   const bossRoute = await readFile(new URL("../app/api/boss/route.ts", import.meta.url), "utf8");
+  const bossPlayer = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
   assert.match(store, /assertLessonUnlocked/);
   assert.match(store, /assertBossUnlocked/);
@@ -201,6 +203,11 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.match(stateRoute, /completeLesson\(learner\.id, body\.lessonId, body\.runId\)/);
   assert.match(bossRoute, /claimMutation/);
   assert.doesNotMatch(stateRoute, /action: "completeBoss"/);
+  assert.match(bossPlayer, /repair-answer-feedback/);
+  assert.match(bossPlayer, /No XP or completed repair is lost/);
+  assert.match(bossPlayer, /aria-valuenow=\{repair\}/);
+  assert.match(css, /\.repair-answer-feedback/);
+  assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.repair-answer-feedback/);
 });
 
 test("shows exact lesson rewards while keeping replay XP fair", async () => {

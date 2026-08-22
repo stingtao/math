@@ -305,13 +305,13 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         <span className="section-kicker">2-QUESTION REPAIR</span>
         <h1>Fix the idea. Try again.</h1>
         <p>No XP lost. Answer two focused questions to refill all three hearts.</p>
-        <div className="repair-progress" aria-label={`${repair} of 2 repair questions complete`}><span className={repair > 0 ? "done" : "active"}>{repair > 0 ? "✓" : "1"}</span><i /><span className={repair > 0 ? "active" : "locked"}>2</span><b>Complete both <em>→</em> ♥♥♥</b></div>
+        <div className="repair-progress" role="progressbar" aria-label={`${repair} of 2 repair questions complete`} aria-valuemin={0} aria-valuemax={2} aria-valuenow={repair}><span className={repair > 0 ? "done" : "active"}>{repair > 0 ? "✓" : "1"}</span><i /><span className={repair > 0 ? "active" : "locked"}>2</span><b>Complete both <em>→</em> ♥♥♥</b></div>
         {repairCheckpoint && <div className="repair-checkpoint" role="status"><span aria-hidden="true">✓</span><div><strong>First repair locked in.</strong><p>One more answer restores ♥♥♥.</p></div></div>}
         <div className="repair-question">
           <span>{repair + 1} OF 2 · {repairLesson.title}</span>
           <strong>{repairQuestion.prompt}</strong>
           {repairQuestion.choices ? <div className="choice-grid">{repairQuestion.choices.map((choice) => <button className={repairAnswer === choice ? "selected" : ""} type="button" onClick={() => { setRepairAnswer(choice); setRepairFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={repairAnswer} onChange={(event) => { setRepairAnswer(event.target.value); setRepairFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") void checkRepair(); }} placeholder="Type your answer" autoFocus /></label>}
-          {repairFeedback === "incorrect" && <p role="status">Not yet—{repairQuestion.hint}</p>}
+          {repairFeedback === "incorrect" && <div className="repair-answer-feedback" role="status"><span aria-hidden="true">↻</span><div><strong>Not yet—repair this step.</strong><p>{repairQuestion.hint}</p><small>Repair {repair + 1} stays open. No XP or completed repair is lost.</small></div></div>}
         </div>
         {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
         <button className="primary-button" type="button" onClick={checkRepair} disabled={!repairAnswer.trim() || busy}>{busy ? "Checking…" : repair === 1 ? "Restore all hearts" : "Check repair"} <span>→</span></button>
