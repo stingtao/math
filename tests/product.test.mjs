@@ -206,6 +206,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /Four lesson keys, then the boss/);
   assert.match(home, /RECOVERY COUNTS/);
   assert.match(dashboard, /CURRENT QUEST/);
+  assert.match(dashboard, /reviewBatchSize/);
+  assert.match(dashboard, /TODAY’S BEST STEP · REVIEW READY/);
+  assert.match(dashboard, /Start Daily Review/);
+  assert.match(dashboard, /rewardCellClass/);
+  assert.match(dashboard, /Claim \$\{nextRewardStep\} of 7/);
   assert.match(dashboard, /visibleRegions\.map/);
   assert.match(dashboard, /aria-expanded=\{showFullMap\}/);
   assert.match(dashboard, /id=\{`region-\$\{region\.id\}`\}/);
@@ -248,6 +253,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.math-world-grid/);
   assert.match(css, /\.math-world-proof/);
   assert.match(css, /\.world-landmark/);
+  assert.match(css, /\.review-priority-card/);
+  assert.match(css, /\.review-priority-orbit/);
   assert.match(css, /\.practice-charge/);
   assert.match(css, /\.charge-cells/);
   assert.match(lesson, /practice-star-path/);

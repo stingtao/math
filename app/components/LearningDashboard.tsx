@@ -11,6 +11,8 @@ import { mutationHeaders } from "./mutation";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 
+const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
+
 export function LearningDashboard({ demo, grade }: { demo: boolean; grade: number }) {
   const { state, setState, loading, error } = useLearner(demo);
   const [rewardMessage, setRewardMessage] = useState("");
@@ -30,6 +32,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const activeDone = activeRegion.lessons.filter((item) => completed.has(item.id)).length;
   const activeNextLesson = activeRegion.lessons.find((item) => !completed.has(item.id));
   const activeBossReady = activeDone === activeRegion.lessons.length;
+  const reviewBatchSize = Math.min(state?.dueReview ?? 0, 5);
   const focusedStart = Math.max(0, activeRegionIndex - 1);
   const focusedEnd = Math.min(curriculum.regions.length, activeRegionIndex + 2);
   const visibleRegions = showFullMap ? curriculum.regions : curriculum.regions.slice(focusedStart, focusedEnd);
@@ -46,7 +49,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     if (state!.dailyRewardClaimed) return;
     if (demo) {
       const step = (state!.profile.rewardStep % 7) + 1;
-      const tokens = [10, 12, 14, 16, 18, 20, 30][step - 1];
+      const tokens = dailyRewardAmounts[step - 1];
       const next = {
         ...state!,
         dailyRewardClaimed: true,
@@ -72,6 +75,15 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     } else setRewardMessage(body.error ?? "Your reward could not be claimed.");
   }
 
+  const nextRewardStep = (state.profile.rewardStep % 7) + 1;
+  const visibleRewardStep = state.dailyRewardClaimed ? state.profile.rewardStep : nextRewardStep;
+  const visibleRewardAmount = dailyRewardAmounts[visibleRewardStep - 1];
+  function rewardCellClass(claimNumber: number) {
+    if (state.dailyRewardClaimed) return claimNumber <= visibleRewardStep ? "done" : "";
+    if (state.profile.rewardStep < 7 && claimNumber <= state.profile.rewardStep) return "done";
+    return claimNumber === nextRewardStep ? "today" : "";
+  }
+
   return (
     <main className="learner-shell">
       <LearnerHeader state={state} demo={demo} />
@@ -91,20 +103,23 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         </div>
 
         <div className="dashboard-grid">
-          <section className="next-card">
+          {reviewBatchSize > 0 ? <section className="next-card review-priority-card">
+            <div className="next-visual review-priority-visual" role="img" aria-label={`${reviewBatchSize} ideas ready for Daily Review`}><span>{String(reviewBatchSize).padStart(2, "0")}</span><div className="review-priority-orbit"><b>◇</b>{Array.from({ length: reviewBatchSize }, (_, index) => <i key={index} />)}</div><small>MEMORY PATH</small></div>
+            <div className="next-copy"><span className="section-kicker">TODAY’S BEST STEP · REVIEW READY</span><h2>Recharge today’s ideas.</h2><p>{reviewBatchSize === 1 ? "One quick recall is due. Strengthen it before adding new material." : `${reviewBatchSize} quick recalls are due. Strengthen them before adding new material.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button" href={`/review?grade=${grade}${demo ? "&demo=1" : ""}`}>Start Daily Review <span aria-hidden="true">→</span></a></div>
+          </section> : <section className="next-card">
             <div className={`next-visual accent-${nextLesson.accent}`}><span>{String(curriculum.regions.find((item) => item.id === nextLesson.regionId)?.order ?? 1).padStart(2, "0")}</span><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="xl" label={`${nextLesson.title} topic icon`} /></div>
             <div className="next-copy"><span className="section-kicker">GRADE {grade} · UP NEXT</span><h2>{nextLesson.title}</h2><p>{nextLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP</span><span>☆ 3 stars</span></div><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Continue lesson <span aria-hidden="true">→</span></a></div>
-          </section>
+          </section>}
 
           <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : ""}`}>
             <div className="daily-card-top"><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">DAILY TRAIL REWARD</span></div>
-            <h2>{state.dailyRewardClaimed ? "Reward collected" : "Today’s reward"}</h2>
-            <div className="reward-calendar" aria-label="Seven-claim reward cycle">
-              {[10, 12, 14, 16, 18, 20, 30].map((amount, index) => <span className={index + 1 < state.profile.rewardStep || state.dailyRewardClaimed && index + 1 === state.profile.rewardStep ? "done" : index + 1 === (state.profile.rewardStep % 7) + 1 ? "today" : ""} key={amount}>{index === 6 ? "◇" : amount}</span>)}
+            <h2>{state.dailyRewardClaimed ? `${visibleRewardAmount} tokens collected` : `Claim ${visibleRewardAmount} tokens`}</h2>
+            <div className="reward-calendar" aria-label="Seven-claim reward cycle" role="list">
+              {dailyRewardAmounts.map((amount, index) => <span className={rewardCellClass(index + 1)} role="listitem" aria-label={`Claim ${index + 1}: ${amount} Trail Tokens${index === 6 ? " and a Streak Shield" : ""}`} key={amount}><small>{index + 1}</small><b>{amount}{index === 6 ? "+◇" : ""}</b></span>)}
             </div>
             <button className="secondary-button full-button" type="button" disabled={state.dailyRewardClaimed} onClick={claimReward}>{state.dailyRewardClaimed ? "Come back tomorrow" : "Claim today’s reward"}</button>
             {rewardMessage.startsWith("+") && <div className="reward-callout" role="status"><span aria-hidden="true">✦</span><strong>{rewardMessage}</strong></div>}
-            <p className="reward-note" aria-live="polite">{rewardMessage || `Miss a day? Your ${state.profile.rewardStep || 1}-step reward path will wait.`}</p>
+            <p className="reward-note" aria-live="polite">{rewardMessage || `Claim ${nextRewardStep} of 7. Miss a day? This path waits for you.`}</p>
           </aside>
         </div>
 
