@@ -99,6 +99,19 @@ test("ships all three curriculum files and all source sheets", async () => {
   assert.equal(sheets.filter((name) => name.endsWith(".png")).length, 20);
 });
 
+test("makes Quick Sheets readable and actionable on small screens", async () => {
+  const lessonPlayer = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(lessonPlayer, /aria-labelledby="quick-sheet-title"/);
+  assert.match(lessonPlayer, /Tap to open full size/);
+  assert.match(lessonPlayer, /target="_blank" rel="noreferrer"/);
+  assert.match(lessonPlayer, /Download PNG/);
+  assert.match(lessonPlayer, /event\.key === "Escape"/);
+  assert.match(css, /\.sheet-preview-link/);
+  assert.match(css, /\.sheet-actions/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.sheet-actions a \{ min-width: 0; min-height: 52px/);
+});
+
 test("keeps real Google profile fields out of persistent schema", async () => {
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
   for (const forbidden of ["email", "full_name", "profile_photo", "google_sub"]) assert.doesNotMatch(schema, new RegExp(`["]${forbidden}["]`, "i"));

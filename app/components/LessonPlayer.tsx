@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import type { LessonDefinition } from "@/lib/curriculum";
 import { getGradeCurriculum, getGradeLessons, getRegion, isAnswerCorrect, nextLesson } from "@/lib/curriculum";
@@ -75,6 +75,15 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const currentFirstTry = feedback === "correct" && Boolean(firstCorrect[question.id]) && !hinted[question.id];
   const region = getRegion(lesson.regionId);
   const completeMap = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
+
+  useEffect(() => {
+    if (!sheetOpen) return;
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setSheetOpen(false);
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [sheetOpen]);
 
   if (loading) return <main className="loading-page" role="status"><div className="loading-mark">M</div><p>Opening your lesson…</p></main>;
   if (!state || error) return <LessonGate />;
@@ -319,7 +328,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           )}
         </section>
       </div>
-      {sheetOpen && lesson.quickSheet && <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label={`${lesson.title} quick sheet`}><div className="sheet-modal"><button className="modal-close" type="button" onClick={() => setSheetOpen(false)} aria-label="Close quick sheet">×</button><Image src={lesson.quickSheet} width={1920} height={1080} alt={`${lesson.title} visual summary with key idea, worked example, and two practice questions`} /><a href={lesson.quickSheet} download>Download Quick Sheet</a></div></div>}
+      {sheetOpen && lesson.quickSheet && <div className="modal-backdrop"><div className="sheet-modal" role="dialog" aria-modal="true" aria-labelledby="quick-sheet-title" aria-describedby="quick-sheet-help"><button className="modal-close" type="button" onClick={() => setSheetOpen(false)} aria-label="Close quick sheet" autoFocus>×</button><header className="sheet-modal-heading"><span className="section-kicker">QUICK SHEET</span><h2 id="quick-sheet-title">{lesson.title}</h2><p id="quick-sheet-help">Open the full-size sheet to pinch and zoom, or save it for a quick review later.</p></header><a className="sheet-preview-link" href={lesson.quickSheet} target="_blank" rel="noreferrer" aria-label={`Open the full-size ${lesson.title} quick sheet in a new tab`}><Image src={lesson.quickSheet} width={1920} height={1080} alt={`${lesson.title} visual summary with key idea, worked example, and two practice questions`} /><span>Tap to open full size <b aria-hidden="true">↗</b></span></a><div className="sheet-actions"><a className="secondary-button" href={lesson.quickSheet} target="_blank" rel="noreferrer">Open full size <span aria-hidden="true">↗</span></a><a className="primary-button" href={lesson.quickSheet} download>Download PNG <span aria-hidden="true">↓</span></a></div></div></div>}
     </main>
   );
 }
