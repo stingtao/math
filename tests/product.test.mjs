@@ -291,6 +291,7 @@ test("keeps answer chains optional while preserving the best run", () => {
 test("ships a readable, safe-area-aware mobile learning interface", async () => {
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(header, /mobile-learner-nav/);
@@ -308,6 +309,13 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.lesson-mobile-status \{[^}]*display: grid/);
   assert.match(css, /\.lesson-sidebar \.stage-list,[\s\S]*\.lesson-sidebar \.standard-chip \{ display: none/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.lesson-mobile-status \{[^}]*grid-template-columns: 1fr/);
+  assert.match(review, /review-mobile-status/);
+  assert.match(review, /5-MINUTE MEMORY QUEST/);
+  assert.match(review, /Correct every recall\. Nothing resets\./);
+  assert.match(review, /aria-valuenow=\{recalledCount\}/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.review-mobile-status \{[^}]*display: grid/);
+  assert.match(css, /\.review-layout > aside \{ display: none/);
+  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.review-mobile-status \{[^}]*width: calc\(100% - 28px\)/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {

@@ -139,6 +139,15 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   return (
     <main className="learner-shell review-shell">
       <LearnerHeader state={state} demo={demo} />
+      <div className={`review-mobile-status accent-${questionLesson?.accent ?? "teal"}`} aria-label={`Daily Review: ${recalledCount} of ${questions.length} memories recharged`}>
+        <header><div><small>5-MINUTE MEMORY QUEST</small><strong>{question.lessonTitle}</strong></div><b>{recalledCount}/{questions.length}</b></header>
+        <div className="review-mobile-nodes" style={{ gridTemplateColumns: `repeat(${questions.length}, minmax(0, 1fr))` }} role="progressbar" aria-label="Daily Review completion" aria-valuemin={0} aria-valuemax={questions.length} aria-valuenow={recalledCount}>{questions.map((item, dot) => {
+          const itemLesson = lessonById.get(item.lessonId);
+          const status = dot < recalledCount ? "done" : dot === recalledCount ? "current" : "upcoming";
+          return <span className={status} key={`${item.lessonId}-${item.questionId}-mobile-${dot}`}>{itemLesson && <TopicIcon visual={itemLesson.visual} accent={itemLesson.accent} size="sm" label="" />}<b aria-hidden="true">{status === "done" ? "✓" : dot + 1}</b></span>;
+        })}</div>
+        <footer><span>Correct every recall. Nothing resets.</span><strong>{feedback === "correct" && !currentFirstTry ? "Recovered +1" : recallStreak > 0 ? `Chain ×${recallStreak}` : "+20 XP set"}</strong></footer>
+      </div>
       <section className="review-layout">
         <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Today’s five.</h1><p>Review at 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><div className="review-memory-meter" aria-label={`${recalledCount} of ${questions.length} memories recharged`}><header><div><span>MEMORY PULSE</span><strong>{recalledCount === questions.length ? "Fully recharged" : "Recall, correct, recharge"}</strong></div><small>{recalledCount}/{questions.length}</small></header><div className="review-memory-nodes" style={{ gridTemplateColumns: `repeat(${questions.length}, minmax(0, 1fr))` }} role="list">{questions.map((item, dot) => {
           const itemLesson = lessonById.get(item.lessonId);
