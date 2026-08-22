@@ -32,6 +32,8 @@ const mathWorldScenes = [
   { grade: 7, title: "Chance happens in stages", copy: "Follow two independent events and see why their probabilities multiply.", image: "/visuals/compound-events-lab-context.jpg", lesson: "g7-compound-events", visual: "tree", accent: "violet" as const },
   { grade: 9, title: "The same fraction remains", copy: "Watch stored energy shrink by one fixed multiplier at every step.", image: "/visuals/exponential-decay-energy-context.jpg", lesson: "g9-exponential-decay", visual: "decay", accent: "teal" as const },
   { grade: 9, title: "Two landing points", copy: "Connect a parabolic path with the two roots that make a quadratic equal zero.", image: "/visuals/quadratic-roots-context.jpg", lesson: "g9-quadratic-formula", visual: "formula", accent: "violet" as const },
+  { grade: 7, title: "One crossing, linked angles", copy: "Match opposite angles, then use a straight line to find the missing measure.", image: "/visuals/angle-plaza-context.jpg", lesson: "g7-angle-equations", visual: "angles", accent: "coral" as const },
+  { grade: 8, title: "Three cones fill one cylinder", copy: "Compare shapes with the same base and height to see where the one-third comes from.", image: "/visuals/cone-measure-context.jpg", lesson: "cone-volume", visual: "cone", accent: "blue" as const },
 ];
 
 export default function Home() {

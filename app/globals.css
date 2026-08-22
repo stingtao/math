@@ -1975,3 +1975,36 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .current-rank-card > .avatar { justify-self: center; }
   .current-rank-card > span { grid-column: 1; justify-self: center; }
 }
+
+/* Exact interactive models paired with the newest real-world context scenes. */
+.context-model-angles .context-scene img,
+.context-model-cone-volume .context-scene img { object-position: center 50%; }
+.angles-context-model { width: min(330px, 100%); height: 135px; position: relative; overflow: hidden; border-radius: 15px; background: radial-gradient(circle at center, #fff 0 13px, transparent 14px), conic-gradient(from 32deg at center, #ffe0dc 0 25%, #dce9fb 25% 50%, #ffe0dc 50% 75%, #dce9fb 75% 100%); }
+.angles-context-model > i { width: 125%; height: 4px; position: absolute; left: -12.5%; top: 50%; border-radius: 99px; background: var(--navy); transform-origin: center; }
+.angles-context-model .angle-line-one { transform: rotate(32deg); }
+.angles-context-model .angle-line-two { transform: rotate(-32deg); }
+.angles-context-model > span { position: absolute; z-index: 2; padding: 6px 9px; border: 3px solid white; border-radius: 10px; color: white; font-size: 13px; font-weight: 900; box-shadow: 0 3px 8px rgb(23 50 79 / 18%); }
+.angles-context-model .angle-x { left: 50%; top: 12px; background: var(--coral); transform: translateX(-50%); }
+.angles-context-model .angle-65 { right: 28px; top: 50%; background: var(--blue); transform: translateY(-50%); }
+.angles-context-model > b { position: absolute; left: 50%; bottom: 8px; padding: 5px 9px; border-radius: 9px; color: var(--navy); background: white; font-size: 10px; box-shadow: 0 3px 8px rgb(23 50 79 / 12%); transform: translateX(-50%); }
+.cone-volume-context-model { width: min(500px, 100%); display: grid; grid-template-columns: 1.4fr 30px .8fr; grid-template-rows: 92px auto; align-items: center; gap: 7px 14px; }
+.cone-model-group { height: 90px; display: flex; align-items: end; justify-content: center; gap: 9px; }
+.cone-model-group > span { width: 61px; height: 79px; display: block; border: 3px solid var(--teal); border-radius: 50% 50% 38% 38% / 8% 8% 92% 92%; background: linear-gradient(90deg, #eaf8f4, #cdebe3 52%, #eaf8f4); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.cone-volume-context-model > i { color: var(--teal); font-size: 22px; font-style: normal; font-weight: 900; text-align: center; }
+.cone-cylinder-model { width: 84px; height: 83px; position: relative; justify-self: center; }
+.cone-cylinder-model > span { width: 75px; height: 76px; position: absolute; left: 4px; top: 4px; display: block; border: 3px solid var(--blue); border-radius: 50% / 12%; background: repeating-linear-gradient(to top, #d9eafd 0 23px, white 23px 25px); }
+.cone-cylinder-model > b { position: absolute; z-index: 2; left: 50%; bottom: 7px; padding: 4px 6px; border-radius: 7px; color: white; background: var(--blue); font-size: 8px; white-space: nowrap; transform: translateX(-50%); }
+.cone-volume-context-model > strong { grid-column: 1 / -1; justify-self: center; padding: 8px 13px; border-radius: 10px; color: white; background: var(--violet); font-size: 14px; }
+
+@media (max-width: 760px) {
+  .angles-context-model { height: 122px; }
+  .cone-volume-context-model { grid-template-columns: 1fr 25px .72fr; column-gap: 7px; transform: scale(.94); }
+  .cone-model-group { gap: 5px; }
+  .cone-model-group > span { width: 48px; height: 68px; }
+  .cone-volume-context-model > strong { font-size: 12px; }
+}
+
+@media (max-width: 380px) {
+  .angles-context-model .angle-65 { right: 14px; }
+  .cone-model-group > span { width: 42px; }
+}
