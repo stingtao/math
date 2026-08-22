@@ -10,6 +10,7 @@ import { mutationHeaders } from "./mutation";
 import { MomentumRun } from "./MomentumRun";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
+import { mathInputMode } from "@/lib/math-input";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; choices?: string[] };
 
@@ -36,6 +37,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const trailHref = `/learn?grade=${savedGrade}${demo ? "&demo=1" : ""}`;
   const suggestedHref = suggestedLesson ? `/learn/${suggestedLesson.slug}?grade=${suggestedLesson.grade}${demo ? "&demo=1" : ""}` : trailHref;
   const questionKey = question ? `${question.lessonId}:${question.questionId}` : "";
+  const answerLocked = busy || feedback === "correct";
   const recalledCount = index + (feedback === "correct" ? 1 : 0);
   const currentFirstTry = feedback === "correct" && attempts[questionKey] === 1;
 
@@ -88,35 +90,48 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     if (!answer.trim() || busy) return;
     setBusy(true);
     setErrorMessage("");
-    if (demo) {
-      recordAnswerResult(isAnswerCorrect(answer, question.answer ?? ""));
+    try {
+      if (demo) {
+        recordAnswerResult(isAnswerCorrect(answer, question.answer ?? ""));
+        return;
+      }
+      const response = await fetch("/api/review", {
+        method: "POST",
+        headers: mutationHeaders(),
+        body: JSON.stringify({ action: "check", lessonId: question.lessonId, questionId: question.questionId, answer }),
+      });
+      const body = await response.json() as { correct?: boolean; hint?: string; error?: string };
+      if (!response.ok) setErrorMessage(body.error ?? "We could not check that review answer.");
+      else recordAnswerResult(Boolean(body.correct));
+    } catch {
+      setErrorMessage("Your review answer is still here. Check your connection and try again.");
+    } finally {
       setBusy(false);
-      return;
     }
-    const response = await fetch("/api/review", {
-      method: "POST",
-      headers: mutationHeaders(),
-      body: JSON.stringify({ action: "check", lessonId: question.lessonId, questionId: question.questionId, answer }),
-    });
-    const body = await response.json() as { correct?: boolean; hint?: string; error?: string };
-    if (!response.ok) setErrorMessage(body.error ?? "We could not check that review answer.");
-    else recordAnswerResult(Boolean(body.correct));
-    setBusy(false);
   }
   async function next() {
+    if (busy) return;
     const submitted = [...answers, { lessonId: question.lessonId, questionId: question.questionId, answer }];
-    setAnswers(submitted);
-    if (index < questions.length - 1) { setIndex((value) => value + 1); setAnswer(""); setFeedback(""); return; }
-    if (demo) {
-      const nextState: LearnerState = { ...activeState, dueReview: 0, totalXp: activeState.totalXp + 20, weeklyXp: activeState.weeklyXp + 20 };
-      saveDemoState(nextState); setState(nextState);
-    } else {
-      const response = await fetch("/api/review", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "complete", answers: submitted }) });
-      const body = await response.json() as { state?: LearnerState; error?: string };
-      if (!response.ok) { setErrorMessage(body.error ?? "We could not finish today’s review."); return; }
-      if (body.state) setState(body.state);
+    if (index < questions.length - 1) { setAnswers(submitted); setIndex((value) => value + 1); setAnswer(""); setFeedback(""); return; }
+    setBusy(true);
+    setErrorMessage("");
+    try {
+      if (demo) {
+        const nextState: LearnerState = { ...activeState, dueReview: 0, totalXp: activeState.totalXp + 20, weeklyXp: activeState.weeklyXp + 20 };
+        saveDemoState(nextState); setState(nextState);
+      } else {
+        const response = await fetch("/api/review", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "complete", answers: submitted }) });
+        const body = await response.json() as { state?: LearnerState; error?: string };
+        if (!response.ok) { setErrorMessage(body.error ?? "We could not finish today’s review."); return; }
+        if (body.state) setState(body.state);
+      }
+      setAnswers(submitted);
+      setFinished(true);
+    } catch {
+      setErrorMessage("Your completed review is still here. Check your connection and save again.");
+    } finally {
+      setBusy(false);
     }
-    setFinished(true);
   }
 
   if (finished) return (
@@ -154,13 +169,13 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
           const status = dot < recalledCount ? "done" : dot === recalledCount ? "current" : "upcoming";
           return <span className={status} role="listitem" aria-label={`${item.lessonTitle}: ${status === "done" ? "recalled" : status === "current" ? "current" : "upcoming"}`} key={`${item.lessonId}-${item.questionId}-${dot}`}>{itemLesson && <TopicIcon visual={itemLesson.visual} accent={itemLesson.accent} size="sm" label="" />}<b aria-hidden="true">{status === "done" ? "✓" : dot + 1}</b></span>;
         })}</div><p>Every corrected memory fills one pulse. Nothing resets.</p></div><MomentumRun label="RECALL CHAIN" current={recallStreak} best={bestRecallStreak} total={questions.length} tone="memory" justLinked={feedback === "correct" && currentFirstTry} /><small>Complete the set: +20 XP.</small></aside>
-        <div className="review-card">
+        <div className="review-card" aria-busy={busy}>
           <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div><span>{index + 1}/{questions.length}</span></header>
-          {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" onClick={() => { setAnswer(choice); setFeedback(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} onKeyDown={(event) => { if (event.key === "Enter") check(); }} placeholder="Type your answer" autoFocus /></label>}
-          {feedback === "incorrect" && <div className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—wake the memory.</strong><p>{question.hint}</p><small>Correcting it will fill the same Memory Pulse.</small></div></div>}
-          {feedback === "correct" && <><SuccessBurst eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} large={currentFirstTry && (recallStreak === 3 || recallStreak === questions.length)} /><div className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `Recall chain ×${recallStreak}!` : "Quick recall!" : "Memory recovered!"}</strong><p>{index + 1} of {questions.length} recharged. Keep the rhythm going.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${recallStreak}` : "Pulse +1"}</span></div></>}
-          {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
-          <div className="practice-actions"><span className="review-dots">{questions.map((item, dot) => <i className={dot < index ? "done" : dot === index ? "active" : ""} key={`${item.lessonId}-${dot}`} />)}</span>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === questions.length - 1 ? "Finish review" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
+          {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
+          {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—wake the memory.</strong><p>{question.hint}</p><small>Correcting it will fill the same Memory Pulse.</small></div></div>}
+          {feedback === "correct" && <><SuccessBurst eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} large={currentFirstTry && (recallStreak === 3 || recallStreak === questions.length)} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `Recall chain ×${recallStreak}!` : "Quick recall!" : "Memory recovered!"}</strong><p>{index + 1} of {questions.length} recharged. Keep the rhythm going.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${recallStreak}` : "Pulse +1"}</span></div></>}
+          {errorMessage && <p id="review-answer-error" className="form-error" role="alert">{errorMessage}</p>}
+          <div className="practice-actions"><span className="review-dots">{questions.map((item, dot) => <i className={dot < index ? "done" : dot === index ? "active" : ""} key={`${item.lessonId}-${dot}`} />)}</span>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next} disabled={busy} aria-busy={busy}>{busy ? "Saving review…" : index === questions.length - 1 ? "Finish review" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>
       </section>
     </main>

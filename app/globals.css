@@ -3550,3 +3550,16 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .leaderboard-card > footer a,
   .league-view-note a { align-self: stretch; }
 }
+
+/* Answer controls stay stable while server-authoritative checks are running. */
+.choice-grid button:disabled { cursor: default; opacity: .62; }
+.choice-grid button.selected:disabled { opacity: 1; }
+.answer-field input:disabled { color: var(--navy); background: #f3f7f9; opacity: 1; cursor: default; }
+.primary-button:disabled { opacity: .64; cursor: not-allowed; }
+[aria-busy="true"] .choice-grid button:disabled,
+[aria-busy="true"] .answer-field input:disabled { cursor: progress; }
+.primary-button[aria-busy="true"] { opacity: 1; cursor: progress; }
+.primary-button[aria-busy="true"] span { display: none; }
+.primary-button[aria-busy="true"]::after { content: ""; width: 14px; height: 14px; margin-left: 12px; display: inline-block; border: 2px solid rgb(255 255 255 / 45%); border-top-color: white; border-radius: 50%; vertical-align: -2px; animation: answer-check-spin .7s linear infinite; }
+.form-error { margin: 14px 0; padding: 12px 14px; border: 1px solid #efc3be; border-radius: 12px; background: #fff3f1; font-size: 13px; line-height: 1.45; }
+@keyframes answer-check-spin { to { transform: rotate(360deg); } }

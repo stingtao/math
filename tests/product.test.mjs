@@ -4,6 +4,18 @@ import test from "node:test";
 import { nextMomentumRun } from "../lib/momentum.ts";
 import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
+import { mathInputMode } from "../lib/math-input.ts";
+
+test("keeps the right math symbols available on mobile answer keyboards", () => {
+  assert.equal(mathInputMode("12"), "decimal");
+  assert.equal(mathInputMode("0.65"), "decimal");
+  assert.equal(mathInputMode("42%|42"), "decimal");
+  assert.equal(mathInputMode("-5"), "text");
+  assert.equal(mathInputMode("3/4"), "text");
+  assert.equal(mathInputMode("(2, 5)"), "text");
+  assert.equal(mathInputMode("x = 7|7"), "decimal");
+  assert.equal(mathInputMode(), "text");
+});
 
 test("reports only achievement thresholds crossed by the latest saved result", () => {
   const empty = { lessons: 0, stars: 0, bosses: 0, streak: 0 };
@@ -291,6 +303,7 @@ test("keeps answer chains optional while preserving the best run", () => {
 test("ships a readable, safe-area-aware mobile learning interface", async () => {
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
@@ -333,6 +346,17 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.game-feedback-card p \{ font-size: 14px/);
   assert.match(css, /a,[\s\S]*button,[\s\S]*summary \{ touch-action: manipulation/);
   assert.match(css, /\.site-footer nav a,[\s\S]*\.privacy-settings-card > \.text-link,[\s\S]*\.legal-wrap > footer a \{[\s\S]*min-height: 44px/);
+  for (const player of [lesson, boss, review]) {
+    assert.match(player, /inputMode=\{mathInputMode\(/);
+    assert.match(player, /enterKeyHint="done"/);
+    assert.match(player, /aria-busy=\{busy\}/);
+    assert.match(player, /aria-invalid=/);
+  }
+  assert.match(lesson, /role="alert">\{errorMessage\}/);
+  assert.match(boss, /Your answer is still here\. Check your connection and try again\./);
+  assert.match(review, /Your completed review is still here\. Check your connection and save again\./);
+  assert.match(css, /\.primary-button\[aria-busy="true"\]::after/);
+  assert.match(css, /@keyframes answer-check-spin/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {
