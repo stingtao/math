@@ -1853,3 +1853,63 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .achievement-card { min-height: 135px; }
   .achievement-count { width: 100%; text-align: center; }
 }
+
+/* Trail Tokens become a visible, permanent collection loop. */
+.reward-locker-link { margin-top: 16px; padding: 12px; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; border: 1px solid #ead59b; border-radius: 13px; color: var(--navy); background: rgb(255 255 255 / 72%); text-decoration: none; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.reward-locker-link:hover { transform: translateY(-2px); border-color: #d9b95d; box-shadow: 0 8px 18px rgb(106 77 15 / 9%); }
+.reward-locker-link > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; color: white; background: var(--gold); font-weight: 900; }
+.reward-locker-link > div { min-width: 0; display: grid; gap: 2px; }
+.reward-locker-link strong { font-size: 10px; line-height: 1.3; }
+.reward-locker-link small { color: #826f47; font-size: 8px; line-height: 1.3; }
+.reward-locker-link > b { color: #a77b1e; font-size: 17px; }
+.locker-goal { margin-top: 20px; padding: 16px; display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; align-items: center; gap: 15px; border: 1px solid #ead69c; border-radius: 17px; background: linear-gradient(115deg, #fffdf7, #fff5d8); }
+.locker-goal.ready { border-color: #b9ddd3; background: linear-gradient(115deg, #fbfffe, #e9f8f3); }
+.locker-goal > div { min-width: 0; display: grid; gap: 3px; }
+.locker-goal > div > small { color: #9a721f; font-size: 8px; font-weight: 900; letter-spacing: .09em; }
+.locker-goal.ready > div > small { color: #087965; }
+.locker-goal > div > strong { font-size: 14px; }
+.locker-goal > div > p { margin: 0; color: #7a6a4a; font-size: 10px; line-height: 1.4; }
+.locker-goal > b { color: #9a721f; font-size: 17px; white-space: nowrap; }
+.locker-goal > b small { font-size: 10px; }
+.locker-goal-meter { height: 7px; margin-top: 6px; overflow: hidden; display: block; border-radius: 99px; background: #eadfbd; }
+.locker-goal-meter > i { height: 100%; display: block; border-radius: inherit; background: linear-gradient(90deg, var(--gold), #e5b44e); transition: width .35s ease; }
+.locker-goal.ready .locker-goal-meter > i { background: var(--teal); }
+.locker-goal.collection-complete { grid-template-columns: 48px 1fr; border-color: #b9ddd3; background: linear-gradient(115deg, #fbfffe, #e9f8f3); }
+.locker-complete-mark { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 16px; color: white; background: var(--teal); font-size: 19px; font-weight: 900; }
+.frame-grid { grid-template-columns: repeat(4, 1fr); }
+.frame-grid button { min-width: 0; min-height: 164px; align-content: center; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.frame-grid button:not(:disabled):hover { transform: translateY(-3px); border-color: #9fb5c3; box-shadow: 0 9px 19px rgb(23 50 79 / 8%); }
+.frame-grid button.locked { border-style: dashed; background: #fbfaf6; }
+.frame-grid button:disabled { cursor: default; }
+.frame-grid button.locked:disabled { opacity: 1; }
+.frame-grid button > small { min-height: 29px; color: var(--muted); font-size: 8px; line-height: 1.35; }
+.frame-grid button.owned > span { color: #087965; }
+.frame-grid button.locked > span { color: #8c6b25; }
+.locker-promise { margin-top: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; border-radius: 13px; color: #526c63; background: #eff8f5; }
+.locker-promise > span { width: 29px; height: 29px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--teal); }
+.locker-promise p { margin: 0; font-size: 9px; line-height: 1.45; }
+
+@media (max-width: 760px) {
+  .reward-locker-link { min-height: 64px; }
+  .reward-locker-link strong { font-size: 13px; }
+  .reward-locker-link small { font-size: 11px; }
+  .locker-card > header { align-items: flex-start; gap: 12px; }
+  .token-balance { flex: 0 0 auto; font-size: 11px; }
+  .locker-goal { grid-template-columns: 58px minmax(0, 1fr); padding: 15px 13px; }
+  .locker-goal > b { grid-column: 2; font-size: 15px; }
+  .locker-goal > div > small { font-size: 9px; }
+  .locker-goal > div > strong { font-size: 16px; }
+  .locker-goal > div > p { font-size: 12px; }
+  .frame-grid { grid-template-columns: repeat(2, 1fr); }
+  .frame-grid button { min-height: 177px; padding: 17px 12px; }
+  .frame-grid button > small { min-height: 34px; font-size: 10px; }
+  .frame-grid span { font-size: 12px; }
+  .locker-promise p { font-size: 11px; }
+}
+
+@media (max-width: 420px) {
+  .locker-card > header { flex-direction: column; }
+  .locker-goal { grid-template-columns: 52px minmax(0, 1fr); gap: 11px; }
+  .frame-grid { grid-template-columns: 1fr; }
+  .frame-grid button { min-height: 150px; }
+}

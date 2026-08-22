@@ -25,6 +25,12 @@ export const publicProfiles = sqliteTable("public_profiles", {
   lastActiveDate: text("last_active_date"),
 });
 
+export const avatarFrames = sqliteTable("avatar_frames", {
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  frame: text("frame").notNull(),
+  unlockedAt: text("unlocked_at").notNull(),
+}, (table) => [primaryKey({ columns: [table.learnerId, table.frame] })]);
+
 export const sessions = sqliteTable("sessions", {
   tokenHash: text("token_hash").primaryKey(),
   learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),

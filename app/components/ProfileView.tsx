@@ -6,12 +6,8 @@ import { Avatar } from "./Avatar";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
-
-const frames = [
-  { id: "halo", label: "Soft Halo", cost: 30 },
-  { id: "summit", label: "Summit Ring", cost: 60 },
-  { id: "prism", label: "Prism Frame", cost: 90 },
-];
+import { avatarFrameCatalog } from "@/lib/avatar-frames";
+import { SuccessBurst } from "./SuccessBurst";
 
 const achievementSpecs = [
   { id: "first-step", title: "First Step", copy: "Finish one lesson.", glyph: "→", tone: "blue", source: "lessons", target: 1, unit: "lesson" },
@@ -26,6 +22,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const { state, setState, loading, error } = useLearner(demo);
   const [message, setMessage] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [busyFrame, setBusyFrame] = useState("");
+  const [frameCelebrationKey, setFrameCelebrationKey] = useState("");
   if (loading) return <main className="loading-page" role="status"><div className="loading-mark">✦</div><p>Opening your anonymous profile…</p></main>;
   if (!state || error) return <main className="auth-gate"><div className="auth-card"><span className="auth-orbit">✦</span><h1>Sign in to view your profile.</h1><a className="primary-button" href="/#join">Continue with Google <span>→</span></a></div></main>;
   const activeState = state;
@@ -37,6 +35,10 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   });
   const unlockedAchievements = achievements.filter((item) => item.unlocked).length;
   const nextAchievement = achievements.find((item) => !item.unlocked);
+  const ownedFrames = new Set(["plain", ...state.profile.ownedFrames, state.profile.avatar.frame]);
+  const nextFrame = avatarFrameCatalog.find((item) => item.cost > 0 && !ownedFrames.has(item.id));
+  const nextFrameProgress = nextFrame ? Math.min(100, Math.round(state.profile.trailTokens / nextFrame.cost * 100)) : 100;
+  const nextFrameNeeded = nextFrame ? Math.max(0, nextFrame.cost - state.profile.trailTokens) : 0;
 
   async function action(payload: Record<string, unknown>) {
     if (demo) return null;
@@ -65,18 +67,42 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     await action({ action: "leaderboard", enabled });
   }
 
-  async function buyFrame(frame: string, cost: number) {
-    if (demo) {
-      if (activeState.profile.trailTokens < cost) { setMessage("Keep learning to earn enough Trail Tokens."); return; }
-      const next: LearnerState = { ...activeState, profile: { ...activeState.profile, trailTokens: activeState.profile.trailTokens - cost, avatar: { ...activeState.profile.avatar, frame } } };
-      saveDemoState(next); setState(next); setMessage("Frame equipped."); return;
+  async function buyFrame(frameSpec: (typeof avatarFrameCatalog)[number]) {
+    if (busyFrame || activeState.profile.avatar.frame === frameSpec.id) return;
+    const wasOwned = ownedFrames.has(frameSpec.id);
+    if (!wasOwned && activeState.profile.trailTokens < frameSpec.cost) {
+      setMessage(`${frameSpec.cost - activeState.profile.trailTokens} more Trail Tokens unlock ${frameSpec.label}.`);
+      return;
     }
-    await action({ action: "purchaseFrame", frame });
+    setBusyFrame(frameSpec.id);
+    try {
+      if (demo) {
+        const next: LearnerState = {
+          ...activeState,
+          profile: {
+            ...activeState.profile,
+            trailTokens: activeState.profile.trailTokens - (wasOwned ? 0 : frameSpec.cost),
+            ownedFrames: wasOwned ? activeState.profile.ownedFrames : [...activeState.profile.ownedFrames, frameSpec.id],
+            avatar: { ...activeState.profile.avatar, frame: frameSpec.id },
+          },
+        };
+        saveDemoState(next);
+        setState(next);
+      } else {
+        const ok = await action({ action: "purchaseFrame", frame: frameSpec.id });
+        if (!ok) return;
+      }
+      setMessage(wasOwned ? `${frameSpec.label} equipped. No tokens spent.` : `${frameSpec.label} unlocked forever and equipped.`);
+      if (!wasOwned) setFrameCelebrationKey(`${frameSpec.id}-${Date.now()}`);
+    } finally {
+      setBusyFrame("");
+    }
   }
 
   return (
     <main className="learner-shell profile-page">
       <LearnerHeader state={state} demo={demo} />
+      {frameCelebrationKey && <SuccessBurst eventKey={`frame-${frameCelebrationKey}`} />}
       <section className="profile-wrap">
         <div className="profile-hero">
           <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your abstract avatar" /><div><span className="section-kicker">YOUR ANONYMOUS IDENTITY</span><h1>{state.profile.nickname}</h1><p>No custom text. No real name. Nothing another learner can search.</p></div></div>
@@ -94,8 +120,20 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         <div className="profile-grid">
           <section className="locker-card">
             <header><div><span className="section-kicker">AVATAR LOCKER</span><h2>Earned, never purchased.</h2></div><span className="token-balance">◆ {state.profile.trailTokens} tokens</span></header>
-            <p>Trail Tokens come from showing up. They have no cash value and there are no random rewards.</p>
-            <div className="frame-grid">{frames.map((frame) => <button className={state.profile.avatar.frame === frame.id ? "equipped" : ""} type="button" onClick={() => buyFrame(frame.id, frame.cost)} key={frame.id}><Avatar avatar={{ ...state.profile.avatar, frame: frame.id }} size="md" /><strong>{frame.label}</strong><span>{state.profile.avatar.frame === frame.id ? "Equipped" : `◆ ${frame.cost}`}</span></button>)}</div>
+            <p>Trail Tokens come from showing up. Unlock a frame once, then switch your collection anytime without spending again.</p>
+            {nextFrame ? <div className={`locker-goal ${nextFrameNeeded === 0 ? "ready" : ""}`}>
+              <Avatar avatar={{ ...state.profile.avatar, frame: nextFrame.id }} size="md" label={`${nextFrame.label} preview`} />
+              <div><small>{nextFrameNeeded === 0 ? "READY TO UNLOCK" : "NEXT COLLECTION GOAL"}</small><strong>{nextFrame.label}</strong><p>{nextFrameNeeded === 0 ? `You have enough tokens. Unlock it below.` : `${nextFrameNeeded} more ${nextFrameNeeded === 1 ? "token" : "tokens"} to make it yours forever.`}</p><span className="locker-goal-meter" role="progressbar" aria-label={`${nextFrame.label} token progress`} aria-valuemin={0} aria-valuemax={nextFrame.cost} aria-valuenow={Math.min(state.profile.trailTokens, nextFrame.cost)}><i style={{ width: `${nextFrameProgress}%` }} /></span></div>
+              <b>{Math.min(state.profile.trailTokens, nextFrame.cost)}<small> / {nextFrame.cost}</small></b>
+            </div> : <div className="locker-goal collection-complete"><span className="locker-complete-mark" aria-hidden="true">✓</span><div><small>COLLECTION COMPLETE</small><strong>Every current frame is yours.</strong><p>Keep your tokens—new trail rewards can arrive in a future update.</p></div></div>}
+            <div className="frame-grid">{avatarFrameCatalog.map((frame) => {
+              const isEquipped = state.profile.avatar.frame === frame.id;
+              const isOwned = ownedFrames.has(frame.id);
+              const canUnlock = state.profile.trailTokens >= frame.cost;
+              const status = isEquipped ? "Equipped" : isOwned ? "Owned · Equip" : canUnlock ? `Unlock · ◆ ${frame.cost}` : `${frame.cost - state.profile.trailTokens} tokens to go`;
+              return <button className={`${isEquipped ? "equipped" : ""} ${isOwned ? "owned" : "locked"}`} type="button" disabled={isEquipped || Boolean(busyFrame) || (!isOwned && !canUnlock)} onClick={() => buyFrame(frame)} aria-label={`${frame.label}: ${status}`} key={frame.id}><Avatar avatar={{ ...state.profile.avatar, frame: frame.id }} size="md" /><strong>{frame.label}</strong><small>{frame.copy}</small><span>{busyFrame === frame.id ? "Saving…" : status}</span></button>;
+            })}</div>
+            <footer className="locker-promise"><span aria-hidden="true">◇</span><p><strong>{ownedFrames.size} of {avatarFrameCatalog.length} collected.</strong> Frames are private cosmetics; they never affect XP, lessons, or leaderboard rank.</p></footer>
           </section>
           <aside className="privacy-settings-card">
             <span className="section-kicker">PRIVACY CONTROLS</span><h2>You decide what is public.</h2>

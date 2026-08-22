@@ -155,6 +155,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <button className="secondary-button full-button" type="button" disabled={state.dailyRewardClaimed} onClick={claimReward}>{state.dailyRewardClaimed ? "Come back tomorrow" : "Claim today’s reward"}</button>
             {rewardMessage.startsWith("+") && <div className="reward-callout" role="status"><span aria-hidden="true">✦</span><strong>{rewardMessage}</strong></div>}
             <p className="reward-note" aria-live="polite">{rewardMessage || `Claim ${nextRewardStep} of 7. Miss a day? This path waits for you.`}</p>
+            <a className="reward-locker-link" href={`/profile${demo ? "?demo=1" : ""}`}><span aria-hidden="true">◇</span><div><strong>Use tokens for permanent frames</strong><small>Open your private Avatar Locker</small></div><b aria-hidden="true">→</b></a>
           </aside>
         </div>
 

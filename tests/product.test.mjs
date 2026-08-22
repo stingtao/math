@@ -54,6 +54,31 @@ test("keeps real Google profile fields out of persistent schema", async () => {
   assert.match(schema, /ON DELETE CASCADE|onDelete: "cascade"/i);
 });
 
+test("keeps avatar frames permanently unlocked and makes the token goal visible", async () => {
+  const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  const bootstrap = await readFile(new URL("../db/bootstrap.ts", import.meta.url), "utf8");
+  const migration = await readFile(new URL("../drizzle/0004_faithful_stryfe.sql", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(schema, /avatarFrames/);
+  assert.match(schema, /primaryKey\(\{ columns: \[table\.learnerId, table\.frame\]/);
+  assert.match(bootstrap, /INSERT OR IGNORE INTO avatar_frames/);
+  assert.match(migration, /WHERE `frame` <> 'plain'/);
+  assert.match(store, /SELECT 1 AS owned FROM avatar_frames/);
+  assert.match(store, /NOT EXISTS \(SELECT 1 FROM avatar_frames/);
+  assert.match(store, /return \{ unlocked: false, cost: 0 \}/);
+  assert.match(profile, /unlocked forever and equipped/);
+  assert.match(profile, /NEXT COLLECTION GOAL/);
+  assert.match(profile, /Owned · Equip/);
+  assert.match(profile, /No tokens spent/);
+  assert.match(dashboard, /Use tokens for permanent frames/);
+  assert.match(css, /\.locker-goal/);
+  assert.match(css, /\.reward-locker-link/);
+});
+
 test("keeps feedback rows unlinkable from learner progress", async () => {
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
   const feedback = schema.slice(schema.indexOf("feedbackMessages"), schema.indexOf("leagueMembers"));

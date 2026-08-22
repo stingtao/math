@@ -1,6 +1,7 @@
 import { ensureSchema, getStore } from "@/db/bootstrap";
 import { getGradeCurriculum, isAnswerCorrect, lessons, regions } from "@/lib/curriculum";
 import { getCookie, randomToken, sha256 } from "@/lib/security";
+import { getAvatarFrame } from "@/lib/avatar-frames";
 
 const adjectives = ["Calm", "Bright", "Brave", "Clever", "Curious", "Gentle", "Kind", "Nimble", "Quiet", "Swift", "Wise", "Bold"];
 const nouns = ["Comet", "Compass", "Cedar", "Falcon", "Harbor", "Lantern", "Orbit", "Panda", "Pebble", "River", "Sparrow", "Summit"];
@@ -126,8 +127,9 @@ export async function deleteSessionFromRequest(request: Request) {
 export async function getLearnerState(learnerId: string) {
   await ensureSchema();
   const db = getStore();
-  const [profile, progressResult, bossResult, xp, weekly, dueReview] = await Promise.all([
+  const [profile, frameResult, progressResult, bossResult, xp, weekly, dueReview] = await Promise.all([
     db.prepare("SELECT nickname, avatar_glyph, avatar_tone, frame, reroll_used, leaderboard_opt_in, trail_tokens, current_streak, longest_streak, streak_shields, reward_step, last_active_date FROM public_profiles WHERE learner_id = ?").bind(learnerId).first<ProfileRow>(),
+    db.prepare("SELECT frame FROM avatar_frames WHERE learner_id = ? ORDER BY unlocked_at, frame").bind(learnerId).all<{ frame: string }>(),
     db.prepare("SELECT lesson_id, stars, first_correct_count, completed_at FROM lesson_progress WHERE learner_id = ? ORDER BY completed_at").bind(learnerId).all<{ lesson_id: string; stars: number; first_correct_count: number; completed_at: string }>(),
     db.prepare("SELECT region_id, cleared, best_hearts FROM boss_progress WHERE learner_id = ?").bind(learnerId).all<{ region_id: number; cleared: number; best_hearts: number }>(),
     db.prepare("SELECT COALESCE(SUM(xp), 0) AS total FROM xp_events WHERE learner_id = ?").bind(learnerId).first<{ total: number }>(),
@@ -152,6 +154,7 @@ export async function getLearnerState(learnerId: string) {
       longestStreak: profile.longest_streak,
       streakShields: profile.streak_shields,
       rewardStep: profile.reward_step,
+      ownedFrames: [...new Set(["plain", ...frameResult.results.map((item) => item.frame), profile.frame])],
     },
     completedLessons: progressResult.results.map((item) => ({ id: item.lesson_id, stars: item.stars })),
     clearedBosses: bossResult.results.filter((item) => item.cleared).map((item) => ({ regionId: item.region_id, hearts: item.best_hearts })),
@@ -469,12 +472,37 @@ async function ensureLeagueMembership(learnerId: string) {
 
 export async function purchaseFrame(learnerId: string, frame: string) {
   await ensureSchema();
-  const costs: Record<string, number> = { halo: 30, summit: 60, prism: 90 };
-  const cost = costs[frame];
-  if (!cost) throw new Error("Frame not found.");
-  const result = await getStore().prepare("UPDATE public_profiles SET trail_tokens = trail_tokens - ?, frame = ? WHERE learner_id = ? AND trail_tokens >= ?")
-    .bind(cost, frame, learnerId, cost).run();
-  if (!result.meta.changes) throw new Error("Keep learning to earn enough Trail Tokens.");
+  const frameSpec = getAvatarFrame(frame);
+  if (!frameSpec) throw new Error("Frame not found.");
+  const db = getStore();
+  if (frameSpec.cost === 0) {
+    await db.prepare("UPDATE public_profiles SET frame = ? WHERE learner_id = ?").bind(frame, learnerId).run();
+    return { unlocked: false, cost: 0 };
+  }
+  const owned = await db.prepare("SELECT 1 AS owned FROM avatar_frames WHERE learner_id = ? AND frame = ?")
+    .bind(learnerId, frame).first<{ owned: number }>();
+  if (owned) {
+    await db.prepare("UPDATE public_profiles SET frame = ? WHERE learner_id = ?").bind(frame, learnerId).run();
+    return { unlocked: false, cost: 0 };
+  }
+  const now = new Date().toISOString();
+  const [charge] = await db.batch([
+    db.prepare(`UPDATE public_profiles SET trail_tokens = trail_tokens - ?, frame = ?
+      WHERE learner_id = ? AND trail_tokens >= ?
+      AND NOT EXISTS (SELECT 1 FROM avatar_frames WHERE learner_id = ? AND frame = ?)`)
+      .bind(frameSpec.cost, frame, learnerId, frameSpec.cost, learnerId, frame),
+    db.prepare(`INSERT OR IGNORE INTO avatar_frames (learner_id, frame, unlocked_at)
+      SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM public_profiles WHERE learner_id = ? AND frame = ?)`)
+      .bind(learnerId, frame, now, learnerId, frame),
+  ]);
+  if (charge.meta.changes) return { unlocked: true, cost: frameSpec.cost };
+  const nowOwned = await db.prepare("SELECT 1 AS owned FROM avatar_frames WHERE learner_id = ? AND frame = ?")
+    .bind(learnerId, frame).first<{ owned: number }>();
+  if (nowOwned) {
+    await db.prepare("UPDATE public_profiles SET frame = ? WHERE learner_id = ?").bind(frame, learnerId).run();
+    return { unlocked: false, cost: 0 };
+  }
+  throw new Error(`Earn ${frameSpec.cost} Trail Tokens to unlock ${frameSpec.label}.`);
 }
 
 export async function deleteLearner(learnerId: string) {

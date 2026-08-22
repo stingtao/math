@@ -10,6 +10,7 @@ export type LearnerState = {
     longestStreak: number;
     streakShields: number;
     rewardStep: number;
+    ownedFrames: string[];
   };
   completedLessons: Array<{ id: string; stars: number }>;
   clearedBosses: Array<{ regionId: number; hearts: number }>;
@@ -31,6 +32,7 @@ const fallback: LearnerState = {
     longestStreak: 7,
     streakShields: 1,
     rewardStep: 3,
+    ownedFrames: ["plain"],
   },
   completedLessons: [{ id: "g8-r1-l1", stars: 3 }],
   clearedBosses: [],
@@ -45,7 +47,12 @@ export function getDemoState(): LearnerState {
   if (typeof window === "undefined") return fallback;
   try {
     const saved = window.sessionStorage.getItem("math-demo-state");
-    return saved ? { ...fallback, ...JSON.parse(saved) as LearnerState } : fallback;
+    if (!saved) return fallback;
+    const parsed = JSON.parse(saved) as Partial<LearnerState>;
+    const profile = { ...fallback.profile, ...parsed.profile };
+    const savedFrames = Array.isArray(parsed.profile?.ownedFrames) ? parsed.profile.ownedFrames : ["plain"];
+    profile.ownedFrames = [...new Set(["plain", ...savedFrames, profile.avatar.frame])];
+    return { ...fallback, ...parsed, profile } as LearnerState;
   } catch {
     return fallback;
   }
