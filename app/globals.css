@@ -1334,6 +1334,23 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .mastery-next-goal small { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .1em; }
 .mastery-next-goal strong { font-size: 13px; }
 .mastery-next-goal p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.reward-receipt { width: min(560px, 100%); margin: 14px auto 0; padding: 17px 18px 15px; display: grid; gap: 14px; border: 1px solid #d7e2e8; border-radius: 17px; background: linear-gradient(135deg, #f7fafb, white); text-align: left; animation: reward-arrive .5s cubic-bezier(.2, 1.25, .3, 1) both; }
+.reward-receipt.upgrade { border-color: #ead69e; background: linear-gradient(135deg, #fff8e5, white); }
+.reward-receipt.replay { border-color: #d8e2e8; background: linear-gradient(135deg, #f4f7f9, white); }
+.reward-receipt > header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.reward-receipt > header > div { min-width: 0; display: grid; gap: 3px; }
+.reward-receipt > header small { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+.reward-receipt > header strong { font-size: 13px; }
+.reward-receipt > header > b { flex: 0 0 auto; padding: 8px 10px; border-radius: 11px; color: white; background: var(--accent); box-shadow: 0 6px 14px color-mix(in srgb, var(--accent) 20%, transparent); font-size: 13px; }
+.reward-receipt.replay > header > b { color: #5d7181; background: #e6edf1; box-shadow: none; }
+.reward-receipt-path { display: grid; grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr) 18px minmax(0, 1fr); align-items: center; }
+.reward-receipt-path > span { min-height: 55px; padding: 9px 8px; display: grid; place-items: center; align-content: center; gap: 2px; border: 1px solid #d9e2e7; border-radius: 12px; color: #718392; background: white; text-align: center; }
+.reward-receipt-path > span.earned { color: #087965; border-color: #bfe2d8; background: #edf8f5; }
+.reward-receipt-path > span.total { color: white; border-color: var(--accent); background: var(--accent); }
+.reward-receipt-path b { font-size: 14px; }
+.reward-receipt-path small { font-size: 7px; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+.reward-receipt-path > i { height: 2px; background: linear-gradient(90deg, #b8c7d0, var(--accent)); }
+.reward-receipt > p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
 
 @media (max-width: 760px) {
   .world-header.with-landmark { grid-template-columns: 62px minmax(0, 1fr); }
@@ -1345,12 +1362,17 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .practice-charge > small { grid-column: 2; grid-row: 1; }
   .mastery-next-goal { padding: 15px; }
   .mastery-next-goal p { font-size: 12px; }
+  .reward-receipt { padding: 15px; }
+  .reward-receipt > p { font-size: 11px; }
 }
 
 @media (max-width: 380px) {
   .world-landmark { height: 112px; }
   .practice-charge { margin-top: 16px; }
   .charge-cells { gap: 4px; }
+  .reward-receipt > header { align-items: flex-start; flex-direction: column; }
+  .reward-receipt-path { grid-template-columns: minmax(0, 1fr) 9px minmax(0, 1fr) 9px minmax(0, 1fr); }
+  .reward-receipt-path > span { min-height: 59px; padding-inline: 4px; }
 }
 
 /* Grade 7 and 9 real-world context models. */

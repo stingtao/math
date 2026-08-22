@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
+import { calculateLessonReward } from "../lib/rewards.ts";
 
 async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -121,6 +122,7 @@ test("guards authenticated mutations and production responses", async () => {
 
 test("keeps progression and boss hearts server-authoritative", async () => {
   const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const answerRoute = await readFile(new URL("../app/api/answer/route.ts", import.meta.url), "utf8");
   const stateRoute = await readFile(new URL("../app/api/state/route.ts", import.meta.url), "utf8");
   const bossRoute = await readFile(new URL("../app/api/boss/route.ts", import.meta.url), "utf8");
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
@@ -129,8 +131,45 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.match(store, /UPDATE boss_attempts SET hearts/);
   assert.match(store, /checkBossRepairAnswer/);
   assert.match(schema, /bossAttempts/);
+  assert.match(schema, /lessonRuns/);
+  assert.match(store, /activateLessonRun/);
+  assert.match(store, /activeRun\.run_id !== runId/);
+  assert.match(answerRoute, /runId/);
+  assert.match(stateRoute, /completeLesson\(learner\.id, body\.lessonId, body\.runId\)/);
   assert.match(bossRoute, /claimMutation/);
   assert.doesNotMatch(stateRoute, /action: "completeBoss"/);
+});
+
+test("shows exact lesson rewards while keeping replay XP fair", async () => {
+  const cases = [
+    { previous: 0, run: 1, total: 40, base: 40, star: 0, best: 1 },
+    { previous: 0, run: 2, total: 45, base: 40, star: 5, best: 2 },
+    { previous: 0, run: 3, total: 50, base: 40, star: 10, best: 3 },
+    { previous: 1, run: 3, total: 10, base: 0, star: 10, best: 3 },
+    { previous: 2, run: 3, total: 5, base: 0, star: 5, best: 3 },
+    { previous: 3, run: 1, total: 0, base: 0, star: 0, best: 3 },
+  ];
+  for (const item of cases) {
+    const reward = calculateLessonReward(item.previous, item.run);
+    assert.equal(reward.totalXp, item.total);
+    assert.equal(reward.baseXp, item.base);
+    assert.equal(reward.starXp, item.star);
+    assert.equal(reward.bestStars, item.best);
+  }
+
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const demoState = await readFile(new URL("../lib/learner-state.ts", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(store, /lesson-star-2/);
+  assert.match(store, /lesson-star-3/);
+  assert.match(store, /xpEarned: baseXp \+ starXp/);
+  assert.match(demoState, /calculateLessonReward/);
+  assert.match(lesson, /REWARD RECEIPT/);
+  assert.match(lesson, /Fair replay · skill refreshed/);
+  assert.match(lesson, /Repeat XP stays at 0/);
+  assert.match(lesson, /saved best/);
+  assert.match(css, /\.reward-receipt-path/);
 });
 
 test("does not send review answers to authenticated clients", async () => {

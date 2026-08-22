@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { LessonDefinition } from "@/lib/curriculum";
 import { getGradeCurriculum, getGradeLessons, getRegion, isAnswerCorrect, nextLesson } from "@/lib/curriculum";
 import { completeDemoLesson, type LearnerState } from "@/lib/learner-state";
+import { calculateLessonReward } from "@/lib/rewards";
 import { ConceptVisual } from "./ConceptVisual";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
@@ -30,6 +31,16 @@ const practiceEncouragement = [
 
 const focusChargeLabels = ["Ready", "First spark", "Building rhythm", "Strong focus", "Almost clear", "Fully charged"];
 
+type LessonCompletionReward = {
+  previousStars: number;
+  bestStars: number;
+  firstCompletion: boolean;
+  starsImproved: boolean;
+  baseXp: number;
+  starXp: number;
+  xpEarned: number;
+};
+
 export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo: boolean }) {
   const { state, setState, loading, error } = useLearner(demo);
   const [stage, setStage] = useState(0);
@@ -42,9 +53,11 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const [showHint, setShowHint] = useState(false);
   const [finished, setFinished] = useState(false);
   const [stars, setStars] = useState(1);
+  const [completionReward, setCompletionReward] = useState<LessonCompletionReward | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [runId] = useState(() => crypto.randomUUID());
   const question = lesson.practice[questionIndex];
   const correctedCount = questionIndex + (feedback === "correct" ? 1 : 0);
   const firstTryCount = Object.values(firstCorrect).filter(Boolean).length;
@@ -73,18 +86,24 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   async function submitAnswer() {
     if (!answer.trim() || busy) return;
     setBusy(true);
+    setErrorMessage("");
     const priorAttempts = attempts[question.id] ?? 0;
-    let correct = isAnswerCorrect(answer, question.answer);
-    if (!demo) {
-      const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[question.id]) }) });
-      const body = await response.json() as { correct?: boolean; error?: string };
-      if (!response.ok) { setErrorMessage(body.error ?? "We could not check that answer."); setBusy(false); return; }
-      correct = Boolean(body.correct);
+    try {
+      let correct = isAnswerCorrect(answer, question.answer);
+      if (!demo) {
+        const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[question.id]), runId }) });
+        const body = await response.json() as { correct?: boolean; error?: string };
+        if (!response.ok) { setErrorMessage(body.error ?? "We could not check that answer."); return; }
+        correct = Boolean(body.correct);
+      }
+      setAttempts((current) => ({ ...current, [question.id]: priorAttempts + 1 }));
+      if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [question.id]: correct }));
+      setFeedback(correct ? "correct" : "incorrect");
+    } catch {
+      setErrorMessage("Your answer is still here. Check your connection and try again.");
+    } finally {
+      setBusy(false);
     }
-    setAttempts((current) => ({ ...current, [question.id]: priorAttempts + 1 }));
-    if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [question.id]: correct }));
-    setFeedback(correct ? "correct" : "incorrect");
-    setBusy(false);
   }
 
   async function continuePractice() {
@@ -99,16 +118,51 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const correctFirst = Object.values(firstCorrect).filter(Boolean).length + (attempts[question.id] === undefined ? 1 : 0);
     const usedAnyHint = Object.keys(hinted).length > 0;
     const earnedStars = correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= 4 ? 2 : 1;
+    const previousStars = activeState.completedLessons.find((item) => item.id === lesson.id)?.stars ?? 0;
+    const expectedReward = calculateLessonReward(previousStars, earnedStars);
+    if (busy) return;
+    setBusy(true);
+    setErrorMessage("");
     setStars(earnedStars);
-    if (demo) setState(completeDemoLesson(activeState, lesson.id, earnedStars));
-    else {
-      const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "completeLesson", lessonId: lesson.id }) });
-      const body = await response.json() as { stars?: number; state?: LearnerState; error?: string };
-      if (!response.ok) { setErrorMessage(body.error ?? "We could not save your progress."); return; }
-      setStars(body.stars ?? earnedStars);
-      if (body.state) setState(body.state);
+    try {
+      if (demo) {
+        const nextState = completeDemoLesson(activeState, lesson.id, earnedStars);
+        setCompletionReward({
+          previousStars,
+          bestStars: expectedReward.bestStars,
+          firstCompletion: expectedReward.firstCompletion,
+          starsImproved: expectedReward.starsImproved,
+          baseXp: expectedReward.baseXp,
+          starXp: expectedReward.starXp,
+          xpEarned: nextState.totalXp - activeState.totalXp,
+        });
+        setState(nextState);
+      }
+      else {
+        const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(`${runId}-complete`), body: JSON.stringify({ action: "completeLesson", lessonId: lesson.id, runId }) });
+        const body = await response.json() as Partial<LessonCompletionReward> & { stars?: number; state?: LearnerState; error?: string };
+        if (!response.ok) { setErrorMessage(body.error ?? "We could not save your progress."); return; }
+        const runStars = body.stars ?? earnedStars;
+        const savedBest = body.bestStars ?? body.state?.completedLessons.find((item) => item.id === lesson.id)?.stars ?? Math.max(previousStars, runStars);
+        const xpEarned = body.xpEarned ?? Math.max(0, (body.state?.totalXp ?? activeState.totalXp) - activeState.totalXp);
+        setStars(runStars);
+        setCompletionReward({
+          previousStars: body.previousStars ?? previousStars,
+          bestStars: savedBest,
+          firstCompletion: body.firstCompletion ?? previousStars === 0,
+          starsImproved: body.starsImproved ?? (previousStars > 0 && savedBest > previousStars),
+          baseXp: body.baseXp ?? (previousStars === 0 ? Math.min(40, xpEarned) : 0),
+          starXp: body.starXp ?? Math.max(0, xpEarned - (previousStars === 0 ? Math.min(40, xpEarned) : 0)),
+          xpEarned,
+        });
+        if (body.state) setState(body.state);
+      }
+      setFinished(true);
+    } catch {
+      setErrorMessage("Your progress is still here. Check your connection and save again.");
+    } finally {
+      setBusy(false);
     }
-    setFinished(true);
   }
 
   function useHint() {
@@ -119,25 +173,37 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   if (finished) {
     const following = nextLesson(lesson);
     const regionFinished = lesson.order === 4;
-    const masteryMessage = stars === 3 ? "No-hint mastery" : stars === 2 ? "Strong first pass" : "Complete after corrections";
-    const masteryNext = stars === 3
+    const reward = completionReward ?? { previousStars: 0, bestStars: stars, firstCompletion: true, starsImproved: false, baseXp: 40, starXp: stars === 3 ? 10 : stars === 2 ? 5 : 0, xpEarned: 40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0) };
+    const replayed = !reward.firstCompletion && !reward.starsImproved;
+    const masteryMessage = reward.bestStars > stars ? `Best marker kept · ${reward.bestStars}/3` : stars === 3 ? "No-hint mastery" : stars === 2 ? "Strong first pass" : "Complete after corrections";
+    const masteryNext = reward.bestStars === 3
       ? { title: "Mastery marker complete", copy: "This lesson is ready for spaced review. Your three-star marker stays on the trail." }
-      : stars === 2
+      : reward.bestStars === 2
       ? { title: "One clean pass from mastery", copy: "A future no-hint review can turn this into a three-star skill." }
       : { title: "The path stays open", copy: "Corrections finished the lesson. Daily Review will bring the useful steps back at the right time." };
+    const outcome = reward.firstCompletion
+      ? { kicker: "LESSON COMPLETE · NEW", title: "That step is yours.", copy: <><strong>{lesson.title}</strong> is complete. Corrections count.</> }
+      : reward.starsImproved
+      ? { kicker: "MASTERY UPGRADED", title: "Your marker just leveled up.", copy: <><strong>{lesson.title}</strong> now has a {reward.bestStars}-star best.</> }
+      : { kicker: "PRACTICE COMPLETE", title: "Practice strengthened.", copy: <><strong>{lesson.title}</strong> is refreshed. Your {reward.bestStars}-star best stays saved.</> };
     const regionKeyCount = region?.lessons.filter((item) => item.id === lesson.id || completeMap.has(item.id)).length ?? lesson.order;
     return (
       <main className="learner-shell celebration-page">
-        <SuccessBurst eventKey={`${lesson.id}-complete-${stars}`} large />
+        <SuccessBurst eventKey={`${lesson.id}-complete-${stars}-${reward.firstCompletion ? "new" : reward.starsImproved ? "upgrade" : "replay"}`} large />
         <LearnerHeader state={state} demo={demo} />
         <section className={`celebration-card accent-${lesson.accent}`}>
           <div className="celebration-emblem"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} completed`} /><span aria-hidden="true">✓</span></div>
-          <span className="section-kicker">LESSON COMPLETE</span>
-          <h1>That step is yours.</h1>
-          <p><strong>{lesson.title}</strong> is complete. Corrections count.</p>
-          <div className="earned-stars" aria-label={`${stars} out of 3 stars`}>{"★".repeat(stars)}{"☆".repeat(3 - stars)}</div>
+          <span className="section-kicker">{outcome.kicker}</span>
+          <h1>{outcome.title}</h1>
+          <p>{outcome.copy}</p>
+          <div className="earned-stars" aria-label={`${stars} out of 3 stars earned on this run`}>{"★".repeat(stars)}{"☆".repeat(3 - stars)}</div>
           <strong className="mastery-message">{masteryMessage}</strong>
-          <div className="mastery-next-goal"><span aria-hidden="true">{stars === 3 ? "✦" : stars === 2 ? "↑" : "↻"}</span><div><small>NEXT MASTERY GOAL</small><strong>{masteryNext.title}</strong><p>{masteryNext.copy}</p></div></div>
+          <div className="mastery-next-goal"><span aria-hidden="true">{reward.bestStars === 3 ? "✦" : reward.bestStars === 2 ? "↑" : "↻"}</span><div><small>NEXT MASTERY GOAL</small><strong>{masteryNext.title}</strong><p>{masteryNext.copy}</p></div></div>
+          <div className={`reward-receipt ${replayed ? "replay" : reward.starsImproved ? "upgrade" : "new"}`} aria-label={`${reward.xpEarned} XP earned on this run`}>
+            <header><div><small>REWARD RECEIPT</small><strong>{replayed ? "Fair replay · skill refreshed" : reward.starsImproved ? "New best · bonus unlocked" : "First finish · XP banked"}</strong></div><b>+{reward.xpEarned} XP</b></header>
+            <div className="reward-receipt-path" aria-hidden="true"><span className={reward.baseXp > 0 ? "earned" : "quiet"}><b>{reward.baseXp > 0 ? `+${reward.baseXp}` : "—"}</b><small>First finish</small></span><i /><span className={reward.starXp > 0 ? "earned" : "quiet"}><b>{reward.starXp > 0 ? `+${reward.starXp}` : "—"}</b><small>Star bonus</small></span><i /><span className="total"><b>+{reward.xpEarned}</b><small>This run</small></span></div>
+            <p>{replayed ? "Repeat XP stays at 0 so practice cannot be farmed for the weekly league. Your memory work still counts." : reward.starsImproved ? `Your ${reward.bestStars}-star marker and the new bonus are permanently saved.` : "This one-time lesson reward is now included in your XP total."}</p>
+          </div>
           <div className="quest-key-card" aria-label={`${regionKeyCount} of 4 quest keys collected in ${region?.title ?? "this region"}`}>
             <div className="quest-key-copy"><small>REGION QUEST KEYS</small><strong>{regionKeyCount} / 4 collected</strong><span>{regionKeyCount === 4 ? "Boss gate open" : `${4 - regionKeyCount} ${4 - regionKeyCount === 1 ? "key" : "keys"} until the boss`}</span></div>
             <div className="quest-key-nodes" aria-hidden="true">{region?.lessons.map((item, index) => {
@@ -145,9 +211,9 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               return <span className={collected ? "collected" : index === regionKeyCount ? "next" : "locked"} key={item.id}>{collected ? "✓" : index + 1}</span>;
             })}<i /><b className={regionKeyCount === 4 ? "open" : ""}>★</b></div>
           </div>
-          <div className="unlock-path" aria-label={regionFinished ? "Lesson complete and boss quest unlocked" : "Lesson complete and next lesson unlocked"}><span className="done"><b>✓</b> Lesson complete</span><i /><span><b>{regionFinished ? "★" : "→"}</b> {regionFinished ? "Boss quest unlocked" : "Next lesson unlocked"}</span></div>
-          <div className="reward-strip"><span><strong>+{40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0)}</strong> XP</span><span><strong>{stars}/3</strong> stars</span><span><strong>1</strong> step forward</span></div>
-          <div className="session-save-card"><span aria-hidden="true">✓</span><div><small>SESSION WIN SAVED</small><strong>This is enough for today.</strong><p>You can stop here. Daily Review will bring this idea back when another short visit will help.</p></div></div>
+          <div className="unlock-path" aria-label={replayed ? "Practice replay complete and trail progress kept" : regionFinished ? "Lesson complete and boss quest unlocked" : "Lesson complete and next lesson unlocked"}><span className="done"><b>✓</b> {replayed ? "Practice replayed" : reward.starsImproved ? "Best marker updated" : "Lesson complete"}</span><i /><span><b>{replayed ? "◆" : regionFinished ? "★" : "→"}</b> {replayed ? "Trail progress kept" : regionFinished ? "Boss quest unlocked" : "Next lesson unlocked"}</span></div>
+          <div className="reward-strip"><span><strong>+{reward.xpEarned}</strong> XP this run</span><span><strong>{stars}/3</strong> run stars</span><span><strong>{reward.bestStars}/3</strong> saved best</span></div>
+          <div className="session-save-card"><span aria-hidden="true">✓</span><div><small>SESSION WIN SAVED</small><strong>{replayed ? "Practice still counts." : "This is enough for today."}</strong><p>{replayed ? "Your best marker and trail progress are protected. Daily Review will use this memory work when it schedules the next useful visit." : "You can stop here. Daily Review will bring this idea back when another short visit will help."}</p></div></div>
           <div className="celebration-actions">
             <a className="secondary-button" href={trailUrl}>Back to trail</a>
             <a className="primary-button" href={regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`}>{regionFinished ? "Optional: enter boss" : "Optional: next lesson"} <span>→</span></a>
@@ -197,7 +263,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               {feedback === "incorrect" && <div className="feedback-card incorrect recovery-feedback" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—try this step.</strong><p>{question.hint}</p><small>Correct it to add the same Focus Charge.</small></div></div>}
               {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}`} /><div className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? "First-try spark!" : "Recovery complete!"}</strong><p>{practiceEncouragement[questionIndex]} Question {questionIndex + 1} is corrected.</p></div><span className="momentum-chip">{currentFirstTry ? "Clean +1" : "Recovered +1"}</span></div></>}
               {errorMessage && <p className="form-error">{errorMessage}</p>}
-              <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={continuePractice}>{questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
+              <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" disabled={busy} onClick={continuePractice}>{busy ? "Saving…" : questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
             </div>
           )}
         </section>

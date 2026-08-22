@@ -52,6 +52,15 @@ export const lessonAttempts = sqliteTable("lesson_attempts", {
   index("idx_lesson_attempts_lesson").on(table.learnerId, table.lessonId),
 ]);
 
+export const lessonRuns = sqliteTable("lesson_runs", {
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  lessonId: text("lesson_id").notNull(),
+  runId: text("run_id").notNull(),
+  completed: integer("completed", { mode: "boolean" }).notNull().default(false),
+  startedAt: text("started_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+}, (table) => [primaryKey({ columns: [table.learnerId, table.lessonId] })]);
+
 export const lessonProgress = sqliteTable("lesson_progress", {
   learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
   lessonId: text("lesson_id").notNull(),

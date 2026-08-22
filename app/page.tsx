@@ -76,7 +76,7 @@ export default function Home() {
         </div>
         <div className="game-feedback-stack">
           <article className="game-feedback-card game-correction-card"><span aria-hidden="true">↻</span><div><small>RECOVERY COUNTS</small><h3>Not yet becomes now I see it.</h3><p>Use a hint, correct the step, and keep moving.</p></div><strong>✓</strong></article>
-          <article className="game-feedback-card game-stars-card"><span aria-hidden="true">✦</span><div><small>STARS EXPLAIN THE RUN</small><h3>Completion is always one star.</h3><p>First tries and no-hint runs add mastery stars; they never lock the next lesson.</p></div><strong>★★★</strong></article>
+          <article className="game-feedback-card game-stars-card"><span aria-hidden="true">✦</span><div><small>STARS EXPLAIN THE RUN</small><h3>Completion is always one star.</h3><p>First tries and no-hint runs add mastery stars and one-time bonus XP; they never lock the next lesson.</p></div><strong>★★★</strong></article>
           <article className="game-feedback-card game-review-card"><span aria-hidden="true">◇</span><div><small>MEMORY PATH</small><h3>Review returns at the right time.</h3><p>Up to five questions revisit useful ideas after 1, 3, 7, and 14 days.</p></div><strong>1·3·7·14</strong></article>
         </div>
       </div>

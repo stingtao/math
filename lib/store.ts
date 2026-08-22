@@ -2,6 +2,7 @@ import { ensureSchema, getStore } from "@/db/bootstrap";
 import { getGradeCurriculum, isAnswerCorrect, lessons, regions } from "@/lib/curriculum";
 import { getCookie, randomToken, sha256 } from "@/lib/security";
 import { getAvatarFrame } from "@/lib/avatar-frames";
+import { calculateLessonReward } from "@/lib/rewards";
 
 const adjectives = ["Calm", "Bright", "Brave", "Clever", "Curious", "Gentle", "Kind", "Nimble", "Quiet", "Swift", "Wise", "Bold"];
 const nouns = ["Comet", "Compass", "Cedar", "Falcon", "Harbor", "Lantern", "Orbit", "Panda", "Pebble", "River", "Sparrow", "Summit"];
@@ -192,9 +193,28 @@ export async function assertLessonUnlocked(learnerId: string, lessonId: string) 
   return lesson;
 }
 
-export async function recordAnswer(learnerId: string, lessonId: string, questionId: string, correct: boolean, usedHint: boolean) {
+function validateLessonRunId(runId: string) {
+  if (!/^[A-Za-z0-9_-]{12,80}$/.test(runId)) throw new Error("Start a fresh lesson run first.");
+}
+
+async function activateLessonRun(learnerId: string, lessonId: string, runId: string) {
+  validateLessonRunId(runId);
+  const db = getStore();
+  const active = await db.prepare("SELECT run_id FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
+    .bind(learnerId, lessonId).first<{ run_id: string }>();
+  if (active?.run_id === runId) return;
+  const now = new Date().toISOString();
+  await db.batch([
+    db.prepare("DELETE FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ?").bind(learnerId, lessonId),
+    db.prepare("INSERT INTO lesson_runs (learner_id, lesson_id, run_id, completed, started_at, updated_at) VALUES (?, ?, ?, 0, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET run_id = excluded.run_id, completed = 0, started_at = excluded.started_at, updated_at = excluded.updated_at")
+      .bind(learnerId, lessonId, runId, now, now),
+  ]);
+}
+
+export async function recordAnswer(learnerId: string, lessonId: string, questionId: string, correct: boolean, usedHint: boolean, runId: string) {
   await ensureSchema();
   await assertLessonUnlocked(learnerId, lessonId);
+  await activateLessonRun(learnerId, lessonId, runId);
   const db = getStore();
   const now = new Date();
   const current = await db.prepare("SELECT first_correct, corrected, attempts, hints_used FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
@@ -224,8 +244,9 @@ export async function claimMutation(learnerId: string, key: string | null, route
 async function awardXp(learnerId: string, kind: string, refId: string, amount: number) {
   const db = getStore();
   const id = `${learnerId}:${kind}:${refId}`;
-  await db.prepare("INSERT OR IGNORE INTO xp_events (id, learner_id, kind, ref_id, xp, week_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+  const result = await db.prepare("INSERT OR IGNORE INTO xp_events (id, learner_id, kind, ref_id, xp, week_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
     .bind(id, learnerId, kind, refId, amount, weekKey(), new Date().toISOString()).run();
+  return Boolean(result.meta.changes);
 }
 
 export async function getDueReviewItems(learnerId: string) {
@@ -256,19 +277,41 @@ export async function completeReviewSet(learnerId: string, results: Array<{ less
   await awardXp(learnerId, "review", rewardDate, 20);
 }
 
-export async function completeLesson(learnerId: string, lessonId: string) {
+export async function completeLesson(learnerId: string, lessonId: string, runId: string) {
   await ensureSchema();
   const db = getStore();
   const lesson = await assertLessonUnlocked(learnerId, lessonId);
+  validateLessonRunId(runId);
+  const activeRun = await db.prepare("SELECT run_id, completed FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
+    .bind(learnerId, lessonId).first<{ run_id: string; completed: number }>();
+  if (!activeRun || activeRun.run_id !== runId || activeRun.completed) throw new Error("Finish the active lesson run before saving it.");
   const summary = await db.prepare("SELECT COUNT(*) AS total, SUM(first_correct) AS first_correct, SUM(hints_used) AS hints FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND corrected = 1")
     .bind(learnerId, lessonId).first<{ total: number; first_correct: number; hints: number }>();
   if (Number(summary?.total ?? 0) < lesson.practice.length) throw new Error("Correct every practice question before completing the lesson.");
+  const previous = await db.prepare("SELECT stars FROM lesson_progress WHERE learner_id = ? AND lesson_id = ?")
+    .bind(learnerId, lessonId).first<{ stars: number }>();
   const firstCorrect = Number(summary?.first_correct ?? 0);
   const stars = firstCorrect === lesson.practice.length && Number(summary?.hints ?? 0) === 0 ? 3 : firstCorrect >= Math.ceil(lesson.practice.length * 0.8) ? 2 : 1;
+  const reward = calculateLessonReward(Number(previous?.stars ?? 0), stars);
   await db.prepare("INSERT INTO lesson_progress (learner_id, lesson_id, stars, first_correct_count, completed_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET stars = MAX(stars, excluded.stars), first_correct_count = MAX(first_correct_count, excluded.first_correct_count)")
     .bind(learnerId, lessonId, stars, firstCorrect, new Date().toISOString()).run();
-  await awardXp(learnerId, "lesson", lessonId, 40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0));
-  return { stars };
+  let baseXp = 0;
+  let starXp = 0;
+  if (reward.baseXp > 0 && await awardXp(learnerId, "lesson", lessonId, reward.baseXp)) baseXp = reward.baseXp;
+  if (reward.previousStars < 2 && reward.bestStars >= 2 && await awardXp(learnerId, "lesson-star-2", lessonId, 5)) starXp += 5;
+  if (reward.previousStars < 3 && reward.bestStars >= 3 && await awardXp(learnerId, "lesson-star-3", lessonId, 5)) starXp += 5;
+  await db.prepare("UPDATE lesson_runs SET completed = 1, updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND run_id = ?")
+    .bind(new Date().toISOString(), learnerId, lessonId, runId).run();
+  return {
+    stars,
+    bestStars: reward.bestStars,
+    previousStars: reward.previousStars,
+    firstCompletion: reward.firstCompletion,
+    starsImproved: reward.starsImproved,
+    baseXp,
+    starXp,
+    xpEarned: baseXp + starXp,
+  };
 }
 
 type BossAttemptRow = {

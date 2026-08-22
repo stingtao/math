@@ -1,6 +1,6 @@
-export function mutationHeaders() {
+export function mutationHeaders(idempotencyKey = crypto.randomUUID()) {
   return {
     "Content-Type": "application/json",
-    "Idempotency-Key": crypto.randomUUID(),
+    "Idempotency-Key": idempotencyKey,
   };
 }

@@ -1,3 +1,5 @@
+import { calculateLessonReward } from "./rewards";
+
 export type AvatarSpec = { glyph: string; tone: string; frame: string };
 export type LearnerState = {
   profile: {
@@ -64,18 +66,18 @@ export function saveDemoState(state: LearnerState) {
 
 export function completeDemoLesson(state: LearnerState, lessonId: string, stars: number): LearnerState {
   const existing = state.completedLessons.find((item) => item.id === lessonId);
+  const reward = calculateLessonReward(existing?.stars ?? 0, stars);
   const completedLessons = existing
     ? state.completedLessons.map((item) => item.id === lessonId ? { ...item, stars: Math.max(item.stars, stars) } : item)
     : [...state.completedLessons, { id: lessonId, stars }];
   const nextOrder = Math.min(51, completedLessons.length);
   const region = Math.floor(nextOrder / 4) + 1;
   const order = (nextOrder % 4) + 1;
-  const addedXp = existing ? 0 : 40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0);
   const next = {
     ...state,
     completedLessons,
-    totalXp: state.totalXp + addedXp,
-    weeklyXp: state.weeklyXp + addedXp,
+    totalXp: state.totalXp + reward.totalXp,
+    weeklyXp: state.weeklyXp + reward.totalXp,
     nextLessonId: `g8-r${region}-l${order}`,
   };
   saveDemoState(next);

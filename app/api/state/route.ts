@@ -5,7 +5,7 @@ import { clearSessionCookie, hmacIdentity } from "@/lib/security";
 import { claimDailyReward, claimMutation, completeLesson, deleteLearner, getLearnerState, learnerFromRequest, purchaseFrame, updateProfile } from "@/lib/store";
 
 type StateAction =
-  | { action: "completeLesson"; lessonId: string }
+  | { action: "completeLesson"; lessonId: string; runId: string }
   | { action: "claimDaily"; timezone: string }
   | { action: "reroll" }
   | { action: "leaderboard"; enabled: boolean }
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const isNew = await claimMutation(learner.id, request.headers.get("Idempotency-Key"), `state:${body.action}`);
     if (!isNew) return Response.json({ duplicate: true, state: await getLearnerState(learner.id) });
     if (body.action === "completeLesson") {
-      const result = await completeLesson(learner.id, body.lessonId);
+      const result = await completeLesson(learner.id, body.lessonId, body.runId);
       return Response.json({ ...result, state: await getLearnerState(learner.id) });
     }
     if (body.action === "claimDaily") {
