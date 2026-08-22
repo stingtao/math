@@ -2400,15 +2400,68 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .residuals-context-model b { font-size: 13px; }
 }
 
-/* The daily reward reads as a calm seven-claim journey, not a mystery calendar. */
+/* The daily board separates the main math step from a pressure-free optional check-in. */
+.today-mission-board { display: grid; gap: 14px; }
+.today-mission-header { padding: 24px 27px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 440px); align-items: center; gap: 35px; overflow: hidden; border-radius: 23px; color: white; background: linear-gradient(125deg, #17324f, #214d70); box-shadow: 0 15px 35px rgb(23 50 79 / 13%); }
+.today-mission-header .section-kicker { color: #8ebeff; }
+.today-mission-header h2 { margin: 7px 0 5px; font-size: 27px; letter-spacing: -.04em; }
+.today-mission-header p { max-width: 570px; margin: 0; color: #c1d2df; font-size: 11px; line-height: 1.5; }
+.today-mission-route { min-width: 0; display: grid; grid-template-columns: 1fr 31px 1fr; align-items: center; }
+.today-mission-route > span { min-width: 0; min-height: 73px; padding: 11px 12px; display: grid; grid-template-columns: 31px minmax(0, 1fr); grid-template-rows: auto auto; align-items: center; gap: 2px 9px; border: 1px solid rgb(255 255 255 / 16%); border-radius: 15px; background: rgb(255 255 255 / 9%); }
+.today-mission-route > span > b { width: 31px; height: 31px; grid-row: 1 / 3; display: grid; place-items: center; border-radius: 10px; color: #775510; background: #ffdfa0; font-size: 12px; }
+.today-mission-route > span > small { align-self: end; overflow: hidden; color: #b9cbd8; font-size: 6px; font-weight: 900; letter-spacing: .08em; text-overflow: ellipsis; white-space: nowrap; }
+.today-mission-route > span > strong { align-self: start; overflow: hidden; font-size: 9px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.today-mission-route > i { height: 3px; background: linear-gradient(90deg, #e1bd62, #78cdb7); }
+.today-mission-route > span.current { border-color: rgb(142 190 255 / 55%); background: rgb(255 255 255 / 15%); box-shadow: 0 0 0 3px rgb(142 190 255 / 10%); }
+.today-mission-route > span.current > b { color: white; background: var(--blue); }
+.today-mission-route > span.done > b { color: white; background: var(--teal); }
+
 .daily-card { display: flex; flex-direction: column; }
 .daily-card-top { justify-content: space-between; gap: 14px; }
 .daily-card-top > div { min-width: 0; display: flex; align-items: center; gap: 9px; }
 .reward-balance { flex: 0 0 auto; padding: 7px 9px; border-radius: 999px; color: #805d15; background: white; box-shadow: inset 0 0 0 1px #ead69d; font-size: 10px; font-weight: 900; }
-.daily-reward-heading { margin: 17px 0 15px; }
-.daily-card .daily-reward-heading h2 { margin: 0; font-size: 22px; line-height: 1.18; }
-.daily-reward-heading p { margin: 7px 0 0; color: #796b4e; font-size: 10px; line-height: 1.45; }
-.reward-calendar { gap: 4px; margin-bottom: 16px; }
+.daily-card.claimed .reward-balance { color: #087965; box-shadow: inset 0 0 0 1px #b8dcd2; }
+.daily-reward-hero { margin: 17px 0 14px; display: grid; grid-template-columns: 70px minmax(0, 1fr); align-items: center; gap: 13px; }
+.daily-token-medallion { width: 70px; height: 70px; display: grid; place-items: center; align-content: center; gap: 3px; border: 5px solid white; border-radius: 24px; color: white; background: linear-gradient(145deg, #e9b83d, #c88913); box-shadow: 0 10px 22px rgb(142 96 12 / 18%); transform: rotate(-3deg); }
+.daily-token-medallion b { font-size: 20px; line-height: 1; }
+.daily-token-medallion small { font-size: 6px; font-weight: 900; letter-spacing: .11em; }
+.daily-card.claimed .daily-token-medallion { background: linear-gradient(145deg, #28a88f, #087965); box-shadow: 0 10px 22px rgb(17 113 91 / 18%); }
+.daily-reward-heading { min-width: 0; }
+.daily-card .daily-reward-heading h2 { margin: 0; font-size: 20px; line-height: 1.18; }
+.daily-reward-heading p { margin: 6px 0 0; color: #796b4e; font-size: 9px; line-height: 1.45; }
+.daily-card.claimed .daily-reward-heading p { color: #55756d; }
+.reward-claim-button { min-height: 48px; border-color: #cfa73f; color: #694b0c; background: #fff; font-size: 12px; }
+.reward-claim-button:not(:disabled):hover { border-color: #a87813; background: #fff8e8; }
+.daily-card.claimed .reward-claim-button:disabled { border-color: #b8dcd2; color: #087965; background: white; opacity: 1; }
+.reward-callout { margin-top: 11px; }
+.reward-callout strong { font-size: 10px; line-height: 1.4; }
+.reward-callout.error { color: #9e3e37; background: #fff5f3; box-shadow: none; }
+.reward-callout.error > span { background: var(--coral); }
+
+.daily-rhythm { margin-top: 11px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #e2d5b2; border-radius: 12px; background: rgb(255 255 255 / 65%); }
+.daily-card.claimed .daily-rhythm { border-color: #cfe3dd; }
+.daily-rhythm > span { min-width: 0; padding: 10px 5px; display: grid; place-items: center; gap: 3px; text-align: center; }
+.daily-rhythm > span + span { border-left: 1px solid #e4d9ba; }
+.daily-card.claimed .daily-rhythm > span + span { border-color: #d3e6e0; }
+.daily-rhythm b { color: var(--navy); font-size: 12px; }
+.daily-rhythm small { color: #807152; font-size: 6px; font-weight: 850; line-height: 1.25; }
+.daily-card.claimed .daily-rhythm small { color: #607c75; }
+
+.daily-reward-details { margin-top: 11px; border: 1px solid #e1d4b1; border-radius: 13px; background: rgb(255 255 255 / 50%); }
+.daily-card.claimed .daily-reward-details { border-color: #cfe3dd; }
+.daily-reward-details > summary { min-height: 48px; padding: 9px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; }
+.daily-reward-details > summary::-webkit-details-marker { display: none; }
+.daily-reward-details > summary::after { content: "+"; width: 24px; height: 24px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 8px; color: #8a681d; background: white; font-size: 15px; font-weight: 800; }
+.daily-reward-details[open] > summary::after { content: "−"; }
+.daily-reward-details > summary span { color: var(--navy); font-size: 10px; font-weight: 800; }
+.daily-reward-details > summary strong { margin-left: auto; color: #83631c; font-size: 8px; }
+.daily-card.claimed .daily-reward-details > summary strong { color: #087965; }
+.daily-reward-details[open] > summary { border-bottom: 1px solid #e7dcbd; }
+.daily-card.claimed .daily-reward-details[open] > summary { border-color: #d4e6e0; }
+.daily-reward-details > .reward-calendar,
+.daily-reward-details > .reward-note,
+.daily-reward-details > .reward-shield { margin-inline: 11px; }
+.reward-calendar { gap: 4px; margin-top: 13px; margin-bottom: 0; }
 .reward-calendar span { min-width: 0; min-height: 72px; padding: 6px 1px 5px; position: relative; display: grid; grid-template-rows: 11px 25px 13px 9px; place-items: center; align-content: center; gap: 2px; border: 1px solid #eadfbe; border-radius: 10px; color: #807252; background: rgb(255 255 255 / 70%); }
 .reward-calendar span small { max-width: 100%; overflow: hidden; color: #8b7850; font-size: 7px; line-height: 1; letter-spacing: .02em; text-overflow: clip; }
 .reward-calendar span i { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 9px; color: #8b7648; background: #f4e9ca; font-size: 9px; font-style: normal; font-weight: 900; }
@@ -2420,35 +2473,47 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .reward-calendar .today { border-color: #b98214; box-shadow: 0 0 0 2px #f0c45f, 0 7px 16px rgb(116 83 17 / 10%); color: #765514; background: white; transform: translateY(-2px); }
 .reward-calendar .today small { color: #91670e; font-weight: 950; }
 .reward-calendar .today i { color: white; background: var(--gold); }
-.reward-claim-button { min-height: 48px; border-color: #cfa73f; color: #694b0c; background: #fff; font-size: 12px; }
-.reward-claim-button:not(:disabled):hover { border-color: #a87813; background: #fff8e8; }
-.daily-card.claimed .reward-claim-button:disabled { border-color: #b8dcd2; color: #087965; background: white; opacity: 1; }
-.reward-callout { margin-top: 12px; }
-.reward-callout strong { font-size: 10px; line-height: 1.4; }
-.reward-callout.error { color: #9e3e37; background: #fff5f3; box-shadow: none; }
-.reward-callout.error > span { background: var(--coral); }
-.reward-note { margin: 12px 0 0; padding: 10px 11px; display: grid; gap: 2px; border-radius: 11px; color: #736548; background: rgb(255 255 255 / 58%); font-size: 9px; line-height: 1.4; text-align: left; }
+.reward-note { margin-top: 12px; padding: 10px 11px; display: grid; gap: 2px; border-radius: 11px; color: #736548; background: rgb(255 255 255 / 64%); font-size: 9px; line-height: 1.4; text-align: left; }
 .reward-note strong { color: #6b521d; font-size: 10px; }
 .reward-note span { display: block; }
-.reward-shield { margin-top: 10px; padding: 10px 11px; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 9px; border: 1px solid #d9e2e8; border-radius: 11px; background: rgb(255 255 255 / 72%); }
+.reward-shield { margin-top: 9px; margin-bottom: 11px; padding: 10px 11px; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 9px; border: 1px solid #d9e2e8; border-radius: 11px; background: rgb(255 255 255 / 72%); }
 .reward-shield > span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--blue); font-size: 14px; font-weight: 900; }
 .reward-shield > div { min-width: 0; display: grid; gap: 2px; }
 .reward-shield strong { color: var(--navy); font-size: 9px; line-height: 1.3; }
 .reward-shield small { color: #6d7f8e; font-size: 8px; line-height: 1.35; }
 
+@media (max-width: 980px) {
+  .today-mission-header { grid-template-columns: 1fr; gap: 18px; }
+  .today-mission-route { width: min(520px, 100%); }
+}
+
 @media (max-width: 760px) {
+  .today-mission-board { gap: 11px; }
+  .today-mission-header { padding: 21px 18px; border-radius: 20px; }
+  .today-mission-header h2 { font-size: 26px; }
+  .today-mission-header p { font-size: 14px; }
+  .today-mission-route { grid-template-columns: 1fr 24px 1fr; }
+  .today-mission-route > span { min-height: 76px; padding: 10px; grid-template-columns: 30px minmax(0, 1fr); }
+  .today-mission-route > span > small { font-size: 8px; }
+  .today-mission-route > span > strong { font-size: 11px; }
   .daily-card { padding: 20px; }
-  .daily-card .daily-reward-heading h2 { font-size: 26px; }
-  .daily-reward-heading p { font-size: 13px; }
+  .daily-reward-hero { grid-template-columns: 68px minmax(0, 1fr); }
+  .daily-token-medallion { width: 68px; height: 68px; }
+  .daily-card .daily-reward-heading h2 { font-size: 24px; }
+  .daily-reward-heading p { font-size: 12px; }
   .reward-balance { padding: 8px 10px; font-size: 12px; }
+  .reward-claim-button { min-height: 52px; font-size: 15px; }
+  .reward-callout strong { font-size: 13px; }
+  .daily-rhythm b { font-size: 14px; }
+  .daily-rhythm small { font-size: 9px; }
+  .daily-reward-details > summary span { font-size: 13px; }
+  .daily-reward-details > summary strong { font-size: 10px; }
   .reward-calendar { gap: 3px; }
   .reward-calendar span { min-height: 76px; border-radius: 9px; }
   .reward-calendar span small { font-size: 7px; }
   .reward-calendar span i { width: 27px; height: 27px; font-size: 10px; }
   .reward-calendar span b { font-size: 11px; }
   .reward-calendar span em { font-size: 6px; }
-  .reward-claim-button { min-height: 52px; font-size: 15px; }
-  .reward-callout strong { font-size: 13px; }
   .reward-note { padding: 12px; gap: 3px; font-size: 12px; }
   .reward-note strong { font-size: 13px; }
   .reward-shield { min-height: 61px; padding: 11px 12px; }
@@ -2456,14 +2521,33 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .reward-shield small { font-size: 10px; }
 }
 
+@media (max-width: 420px) {
+  .daily-reward-details > .reward-calendar { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .daily-reward-details > .reward-calendar span:last-child { grid-column: span 2; }
+  .reward-calendar span small { font-size: 9px; }
+  .reward-calendar span i { width: 29px; height: 29px; font-size: 11px; }
+  .reward-calendar span b { font-size: 12px; }
+  .reward-calendar span em { font-size: 8px; }
+}
+
 @media (max-width: 380px) {
+  .today-mission-header { padding-inline: 15px; }
+  .today-mission-route { grid-template-columns: 1fr 16px 1fr; }
+  .today-mission-route > span { padding-inline: 8px; grid-template-columns: 27px minmax(0, 1fr); gap: 2px 6px; }
+  .today-mission-route > span > b { width: 27px; height: 27px; }
+  .today-mission-route > span > strong { font-size: 10px; }
   .daily-card { padding: 17px 14px; }
   .daily-card-top .section-kicker { font-size: 9px; }
   .daily-icon { width: 29px; height: 29px; }
   .reward-balance { padding-inline: 8px; }
-  .reward-calendar span { min-height: 72px; }
-  .reward-calendar span i { width: 24px; height: 24px; }
-  .reward-calendar span b { font-size: 10px; }
+  .daily-reward-hero { grid-template-columns: 60px minmax(0, 1fr); gap: 10px; }
+  .daily-token-medallion { width: 60px; height: 60px; border-radius: 20px; }
+  .daily-token-medallion b { font-size: 18px; }
+  .daily-card .daily-reward-heading h2 { font-size: 21px; }
+  .daily-rhythm > span { padding-inline: 2px; }
+  .daily-reward-details > summary { padding-inline: 10px; gap: 7px; }
+  .daily-reward-details > summary strong { display: none; }
+  .reward-calendar span { min-height: 74px; }
 }
 
 /* Lesson settlement keeps the win, route progress, and one next action above optional details. */

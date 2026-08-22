@@ -101,6 +101,15 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const followingRewardStep = (visibleRewardStep % 7) + 1;
   const followingRewardAmount = dailyRewardAmounts[followingRewardStep - 1];
   const showWelcomeGuide = welcomeReady && state.completedLessons.length === 0 && !welcomeDismissed;
+  const mainMissionDone = gradeComplete && reviewBatchSize === 0;
+  const mainMissionTitle = reviewBatchSize > 0
+    ? `${reviewBatchSize} quick ${reviewBatchSize === 1 ? "recall" : "recalls"}`
+    : gradeComplete
+    ? "Nothing due today"
+    : activeBossReady
+    ? `${activeRegion.title} Boss`
+    : featuredLesson.title;
+  const mainMissionType = reviewBatchSize > 0 ? "Daily Review" : gradeComplete ? "Trail complete" : activeBossReady ? "Boss quest" : "Short lesson";
 
   function dismissWelcomeGuide() {
     try { window.sessionStorage.setItem("math-welcome-guide", "dismissed"); } catch { /* Device storage is optional. */ }
@@ -150,7 +159,17 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           </footer>
         </section>}
 
-        <div className="dashboard-grid">
+        <section className="today-mission-board" aria-labelledby="today-mission-heading">
+          <header className="today-mission-header">
+            <div><span className="section-kicker">TODAY’S MISSION BOARD</span><h2 id="today-mission-heading">{mainMissionDone ? "Nothing is required today." : "One clear math step. Then stop."}</h2><p>Daily check-in is optional. Your learning progress never resets when you miss a day.</p></div>
+            <div className="today-mission-route" aria-label={`Daily check-in ${state.dailyRewardClaimed ? "collected" : "ready and optional"}; main math step: ${mainMissionTitle}`}>
+              <span className={state.dailyRewardClaimed ? "done" : "optional"}><b aria-hidden="true">{state.dailyRewardClaimed ? "✓" : "◆"}</b><small>OPTIONAL CHECK-IN</small><strong>{state.dailyRewardClaimed ? "Reward saved" : `+${visibleRewardAmount} tokens ready`}</strong></span>
+              <i aria-hidden="true" />
+              <span className={mainMissionDone ? "done" : "current"}><b aria-hidden="true">{mainMissionDone ? "✓" : "→"}</b><small>MAIN · {mainMissionType.toUpperCase()}</small><strong>{mainMissionTitle}</strong></span>
+            </div>
+          </header>
+
+          <div className="dashboard-grid">
           {reviewBatchSize > 0 ? <section className="next-card review-priority-card">
             <div className="next-visual review-priority-visual" role="img" aria-label={`${reviewBatchSize} ideas ready for Daily Review`}><span>{String(reviewBatchSize).padStart(2, "0")}</span><div className="review-priority-orbit"><b>◇</b>{Array.from({ length: reviewBatchSize }, (_, index) => <i key={index} />)}</div><small>MEMORY PATH</small></div>
             <div className="next-copy"><span className="section-kicker">TODAY’S BEST STEP · REVIEW READY</span><h2>Recharge today’s ideas.</h2><p>{reviewBatchSize === 1 ? "One quick recall is due. Strengthen it before adding new material." : `${reviewBatchSize} quick recalls are due. Strengthen them before adding new material.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button" href={`/review?grade=${grade}${demo ? "&demo=1" : ""}`}>Start Daily Review <span aria-hidden="true">→</span></a></div>
@@ -165,37 +184,51 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <div className="next-copy"><span className="section-kicker">GRADE {grade} · UP NEXT</span><h2>{featuredLesson.title}</h2><p>{featuredLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3 stars</span></div><a className="primary-button" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Continue lesson <span aria-hidden="true">→</span></a></div>
           </section>}
 
-          <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : ""}`} aria-labelledby="daily-reward-heading">
+          <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : "ready"}`} aria-labelledby="daily-reward-heading">
             <div className="daily-card-top">
-              <div><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">DAILY TRAIL REWARD</span></div>
+              <div><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">OPTIONAL DAILY CHECK-IN</span></div>
               <span className="reward-balance" aria-label={`${state.profile.trailTokens} Trail Tokens available`}>◇ {state.profile.trailTokens}</span>
             </div>
-            <div className="daily-reward-heading">
-              <h2 id="daily-reward-heading">{state.dailyRewardClaimed ? "Today’s reward is collected" : `Collect +${visibleRewardAmount} Trail Tokens`}</h2>
-              <p>{state.dailyRewardClaimed ? `Next claim: +${followingRewardAmount} tokens${followingRewardStep === 7 ? " and a Streak Shield" : ""}.` : `Claim ${nextRewardStep} of 7 is ready. Every reward is fixed.`}</p>
-            </div>
-            <div className="reward-calendar" aria-label="Seven-claim reward journey" role="list">
-              {dailyRewardAmounts.map((amount, index) => {
-                const claimNumber = index + 1;
-                const cellClass = rewardCellClass(claimNumber);
-                return <span className={cellClass} role="listitem" aria-current={cellClass === "today" ? "step" : undefined} aria-label={`Claim ${claimNumber}: ${amount} Trail Tokens${index === 6 ? " and a Streak Shield" : ""}${cellClass === "done" ? ", collected" : cellClass === "today" ? ", ready today" : ""}`} key={amount}>
-                  <small>{cellClass === "today" ? "TODAY" : `#${claimNumber}`}</small>
-                  <i aria-hidden="true">{cellClass === "done" ? "✓" : claimNumber}</i>
-                  <b>+{amount}</b>
-                  {index === 6 && <em>+ shield</em>}
-                </span>;
-              })}
+            <div className="daily-reward-hero">
+              <span className="daily-token-medallion" aria-hidden="true"><b>{state.dailyRewardClaimed ? "✓" : `+${visibleRewardAmount}`}</b><small>{state.dailyRewardClaimed ? "SAVED" : "TOKENS"}</small></span>
+              <div className="daily-reward-heading">
+                <h2 id="daily-reward-heading">{state.dailyRewardClaimed ? "Today’s reward is collected" : `Collect +${visibleRewardAmount} Trail Tokens`}</h2>
+                <p>{state.dailyRewardClaimed ? `Next claim: +${followingRewardAmount} tokens${followingRewardStep === 7 ? " and a Streak Shield" : ""}.` : `Claim ${nextRewardStep} of 7 is ready. Every reward is fixed.`}</p>
+              </div>
             </div>
             <button className="secondary-button full-button reward-claim-button" type="button" disabled={state.dailyRewardClaimed || rewardPending} aria-busy={rewardPending} onClick={claimReward}>{rewardPending ? "Collecting…" : state.dailyRewardClaimed ? "Collected today ✓" : `Collect +${visibleRewardAmount} tokens`}</button>
             {rewardMessage && <div className={`reward-callout ${rewardMessage.startsWith("Collected") ? "success" : "error"}`} role="status"><span aria-hidden="true">{rewardMessage.startsWith("Collected") ? "✦" : "!"}</span><strong>{rewardMessage}</strong></div>}
-            <div className="reward-note">
-              <strong>{state.dailyRewardClaimed ? `Claim ${followingRewardStep} of 7 comes next.` : "Skip a day? Nothing resets."}</strong>
-              <span>{state.dailyRewardClaimed ? "Return another day when it works for you." : "This seven-claim path waits for you—no mystery boxes or paid boosts."}</span>
+            <div className="daily-rhythm" aria-label="Pressure-free streak status">
+              <span><b>▲ {state.profile.currentStreak}</b><small>Current streak</small></span>
+              <span><b>{state.profile.longestStreak}</b><small>Longest kept</small></span>
+              <span><b>◇ {state.profile.streakShields}</b><small>Shields ready</small></span>
             </div>
-            <div className="reward-shield" aria-label={`${state.profile.streakShields} Streak Shields available`}><span aria-hidden="true">◇</span><div><strong>{state.profile.streakShields > 0 ? `${state.profile.streakShields} Streak ${state.profile.streakShields === 1 ? "Shield" : "Shields"} ready` : "A Streak Shield waits at claim 7"}</strong><small>{state.profile.streakShields > 0 ? "One shield protects your streak after one missed day." : "It is earned automatically—never purchased."}</small></div></div>
+
+            <details className="daily-reward-details" open={!state.dailyRewardClaimed}>
+              <summary><span>Fixed seven-claim path</span><strong>{state.dailyRewardClaimed ? `Claim ${visibleRewardStep} complete` : `Claim ${nextRewardStep} ready`}</strong></summary>
+              <div className="reward-calendar" aria-label="Seven-claim reward journey" role="list">
+                {dailyRewardAmounts.map((amount, index) => {
+                  const claimNumber = index + 1;
+                  const cellClass = rewardCellClass(claimNumber);
+                  return <span className={cellClass} role="listitem" aria-current={cellClass === "today" ? "step" : undefined} aria-label={`Claim ${claimNumber}: ${amount} Trail Tokens${index === 6 ? " and a Streak Shield" : ""}${cellClass === "done" ? ", collected" : cellClass === "today" ? ", ready today" : ""}`} key={amount}>
+                    <small>{cellClass === "today" ? "TODAY" : `#${claimNumber}`}</small>
+                    <i aria-hidden="true">{cellClass === "done" ? "✓" : claimNumber}</i>
+                    <b>+{amount}</b>
+                    {index === 6 && <em>+ shield</em>}
+                  </span>;
+                })}
+              </div>
+              <div className="reward-note">
+                <strong>{state.dailyRewardClaimed ? `Claim ${followingRewardStep} of 7 comes next.` : "Skip a day? Nothing resets."}</strong>
+                <span>{state.dailyRewardClaimed ? "Return another day when it works for you." : "This seven-claim path waits for you—no mystery boxes or paid boosts."}</span>
+              </div>
+              <div className="reward-shield" aria-label={`${state.profile.streakShields} Streak Shields available`}><span aria-hidden="true">◇</span><div><strong>{state.profile.streakShields > 0 ? `${state.profile.streakShields} Streak ${state.profile.streakShields === 1 ? "Shield" : "Shields"} ready` : "A Streak Shield waits at claim 7"}</strong><small>{state.profile.streakShields > 0 ? "One shield protects your streak after one missed day." : "It is earned automatically—never purchased."}</small></div></div>
+            </details>
+
             <a className="reward-locker-link" href={`/profile${demo ? "?demo=1" : ""}`}><span aria-hidden="true">◇</span><div><strong>Use tokens for permanent frames</strong><small>Open your private Avatar Locker</small></div><b aria-hidden="true">→</b></a>
           </aside>
-        </div>
+          </div>
+        </section>
 
         <section className={`quest-tracker accent-${activeRegion.accent}`} aria-labelledby="current-quest-heading">
           <div className="quest-visual"><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="lg" label={`${activeRegion.title} current quest`} /><span>{String(activeRegion.order).padStart(2, "0")}</span></div>

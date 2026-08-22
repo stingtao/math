@@ -95,9 +95,22 @@ test("presents daily rewards as a fixed, forgiving seven-claim journey", async (
   assert.match(dashboard, /rewardPending \? "Collecting…"/);
   assert.match(dashboard, /Today’s reward is collected/);
   assert.match(dashboard, /Streak Shields available/);
+  assert.match(dashboard, /TODAY’S MISSION BOARD/);
+  assert.match(dashboard, /Daily check-in is optional/);
+  assert.match(dashboard, /learning progress never resets/);
+  assert.match(dashboard, /className="daily-reward-details" open=\{!state\.dailyRewardClaimed\}/);
+  assert.match(dashboard, /Current streak/);
+  assert.match(dashboard, /Longest kept/);
+  assert.match(dashboard, /MAIN · \{mainMissionType\.toUpperCase\(\)\}/);
   assert.match(css, /\.reward-balance/);
   assert.match(css, /\.reward-shield/);
   assert.match(css, /\.reward-calendar \.today/);
+  assert.match(css, /\.today-mission-header/);
+  assert.match(css, /\.today-mission-route/);
+  assert.match(css, /\.daily-reward-details/);
+  assert.match(css, /\.daily-rhythm/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.today-mission-header/);
+  assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.daily-reward-details > \.reward-calendar \{ grid-template-columns: repeat\(4/);
 });
 
 test("keeps signed-in navigation and a private self marker on the weekly league", async () => {
