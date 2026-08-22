@@ -3501,4 +3501,15 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .review-mobile-nodes::before { top: 20px; }
   .review-mobile-nodes > span > b { right: calc(50% - 24px); }
   .context-math-card.context-math-card small { font-size: 10px; line-height: 1.3; }
+  .momentum-run-emblem small { font-size: 9px; letter-spacing: .04em; }
+  .momentum-run-copy > span,
+  .momentum-run-copy > small,
+  .momentum-run > p { font-size: 10px; line-height: 1.35; }
+  .momentum-run-copy > strong { font-size: 13px; white-space: normal; }
+  .momentum-run > b { font-size: 9px; }
+  .momentum-run-links i { font-size: 10px; }
+  .star-path-options strong { font-size: 12px; }
+  .star-path-options small { font-size: 10px; line-height: 1.35; }
+  .star-path-options > span.earned::after { font-size: 9px; }
+  .recovery-feedback small { font-size: 11px; line-height: 1.4; }
 }

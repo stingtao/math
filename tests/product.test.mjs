@@ -319,6 +319,10 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.context-math-card\.context-math-card small \{ font-size: 10px; line-height: 1\.3/);
   assert.match(css, /\.lesson-mobile-topic small \{[^}]*font-size: 10px/);
   assert.match(css, /\.review-mobile-status > header small \{[^}]*font-size: 10px/);
+  assert.match(css, /\.momentum-run-copy > span,[\s\S]*\.momentum-run > p \{ font-size: 10px/);
+  assert.match(css, /\.momentum-run-copy > strong \{ font-size: 13px; white-space: normal/);
+  assert.match(css, /\.star-path-options small \{ font-size: 10px/);
+  assert.match(css, /\.recovery-feedback small \{ font-size: 11px/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {
