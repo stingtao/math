@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "scale-area" | "composite-area" | "experimental-probability" | "sample-space" | "literal-equation" | "line-forms" | "system-substitution" | "system-model" | "radical-factor" | "like-radicals" | "gcf-factor" | "factor-chain" | "plus-minus-roots" | "zero-product" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "scale-area" | "composite-area" | "experimental-probability" | "sample-space" | "literal-equation" | "line-forms" | "system-substitution" | "system-model" | "radical-factor" | "like-radicals" | "gcf-factor" | "factor-chain" | "plus-minus-roots" | "zero-product" | "fit-prediction" | "model-choice" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -300,6 +300,22 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["x^2-5x+6=0", "(x-2)(x-3)=0", "x-2=0\\;\\text{or}\\;x-3=0", "x=2,3"],
     mathStepLabels: ["quadratic", "factor", "zero-product rule", "solutions"],
     modelLabel: "Math model: x squared minus five x plus six equals zero factors as x minus two times x minus three, so x equals two or three",
+  },
+  "g9-scatter-models-g9": {
+    src: "/visuals/scatter-field-context.jpg",
+    alt: "A greenhouse experiment records paired observations that follow an upward overall pattern",
+    headline: "use the fitted trend within the observed range",
+    copy: "Substitute x into the line of fit for a prediction, then keep the units and avoid claiming causation.",
+    model: "fit-prediction",
+    modelLabel: "Math model: the fitted line y equals two point five x plus four predicts twenty-nine when x equals ten; use the prediction within the data range",
+  },
+  "g9-modeling-decisions": {
+    src: "/visuals/growth-comparison-context.jpg",
+    alt: "Three growth displays compare equal additions, changing additions, and repeated multiplication",
+    headline: "look at how the outputs change, not just their size",
+    copy: "Constant first differences suggest linear, constant second differences suggest quadratic, and constant ratios suggest exponential.",
+    model: "model-choice",
+    modelLabel: "Math model: constant first differences indicate a linear model, constant second differences indicate a quadratic model, and constant ratios indicate an exponential model",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -1055,6 +1071,8 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "factor-chain" && <AlgebraPathModel className="factor-chain-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "plus-minus-roots" && <AlgebraPathModel className="plus-minus-roots-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "zero-product" && <AlgebraPathModel className="zero-product-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "fit-prediction" && <FitPredictionModel />}
+        {scene.model === "model-choice" && <ModelChoiceModel />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -1227,4 +1245,17 @@ function SystemModel({ steps, labels }: { steps: string[]; labels: string[] }) {
 
 function AlgebraPathModel({ className, steps, labels }: { className: string; steps: string[]; labels: string[] }) {
   return <div className={`algebra-path-context-model ${className}`} aria-hidden="true">{steps.map((step, index) => <span key={step}><small>{labels[index]}</small><MathStep value={step} />{index < steps.length - 1 && <i>→</i>}</span>)}</div>;
+}
+
+function FitPredictionModel() {
+  return <div className="fit-prediction-context-model" aria-hidden="true"><div>{Array.from({ length: 8 }, (_, index) => <span key={index} />)}<i /></div><section><span><small>line of fit</small><MathStep value="y=2.5x+4" /></span><span><small>within range</small><MathStep value="x=10" /></span><strong><small>prediction</small><MathStep value="y=29" /></strong></section></div>;
+}
+
+function ModelChoiceModel() {
+  const models = [
+    { label: "linear", values: "3,5,7,9", check: "+2,+2,+2", clue: "first difference" },
+    { label: "quadratic", values: "1,4,9,16", check: "2,2", clue: "second difference" },
+    { label: "exponential", values: "2,6,18,54", check: "\\times3,\\times3,\\times3", clue: "constant ratio" },
+  ];
+  return <div className="model-choice-context-model" aria-hidden="true">{models.map((model) => <span key={model.label}><small>{model.label}</small><b>{model.values}</b><MathStep value={model.check} /><em>{model.clue}</em></span>)}</div>;
 }
