@@ -2123,3 +2123,87 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .difference-square > i { width: 45px; height: 45px; }
   .difference-squares-context-model > strong { font-size: 12px; }
 }
+
+/* Exact models for number sets, elimination, distributions, roots, and growth. */
+.context-model-number-kinds .context-scene img,
+.context-model-system-elimination .context-scene img,
+.context-model-distribution-compare .context-scene img,
+.context-model-rational-exponent .context-scene img,
+.context-model-growth-compare .context-scene img { object-position: center 50%; }
+.number-kinds-context-model { width: min(490px, 100%); display: grid; grid-template-columns: 1fr 28px 1fr; align-items: center; gap: 10px; }
+.number-kinds-context-model > div { min-width: 0; padding: 11px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; border: 1px solid #cbdfe9; border-radius: 14px; background: #eff6fb; }
+.number-kinds-context-model > div:last-child { border-color: #d8cfee; background: #f5f1ff; }
+.number-kinds-context-model small { grid-column: 1 / -1; color: var(--blue); font-size: 8px; font-weight: 900; letter-spacing: .09em; text-align: center; }
+.number-kinds-context-model > div:last-child small { color: var(--violet); }
+.number-kinds-context-model span { min-width: 0; padding: 8px 3px; border-radius: 9px; color: var(--navy); background: white; font-size: 13px; text-align: center; box-shadow: 0 3px 8px rgb(23 50 79 / 6%); }
+.number-kinds-context-model > i { color: var(--muted); font-size: 9px; font-style: normal; font-weight: 900; text-align: center; text-transform: uppercase; }
+.system-elimination-context-model { width: min(440px, 100%); display: grid; grid-template-columns: 1fr 30px 1.15fr; align-items: center; gap: 12px; }
+.system-elimination-context-model > div { padding: 10px 12px; display: grid; gap: 6px; border-radius: 13px; background: #eef4fb; }
+.system-elimination-context-model > div span { min-height: 37px; display: grid; place-items: center; border-radius: 9px; color: var(--navy); background: white; font-size: 17px; }
+.system-elimination-context-model > div span + span { border-top: 2px solid var(--navy); }
+.system-elimination-context-model > i { color: var(--coral); font-size: 22px; font-style: normal; font-weight: 900; text-align: center; }
+.system-elimination-context-model > strong { padding: 12px; display: grid; gap: 7px; border-radius: 13px; color: white; background: var(--teal); text-align: center; }
+.system-elimination-context-model > strong span { font-size: 19px; }
+.system-elimination-context-model > strong b { padding-top: 7px; border-top: 1px solid rgb(255 255 255 / 44%); font-size: 13px; }
+.distribution-compare-context-model { width: min(510px, 100%); display: grid; gap: 14px; }
+.distribution-row { min-width: 0; display: grid; grid-template-columns: 24px minmax(150px, 1fr) 116px; align-items: center; gap: 12px; }
+.distribution-row > small { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--blue); font-size: 10px; font-weight: 900; }
+.distribution-row > span { height: 28px; position: relative; display: block; }
+.distribution-row > span::before { content: ""; height: 2px; position: absolute; left: 3%; right: 3%; top: 13px; background: #aec0cc; }
+.distribution-row > span > i { height: 10px; position: absolute; top: 9px; border-left: 2px solid var(--navy); border-right: 2px solid var(--navy); }
+.distribution-row > span > b { height: 20px; position: absolute; top: 4px; border: 2px solid var(--blue); border-radius: 5px; background: #dfeefd; }
+.distribution-row > span > em { width: 3px; height: 24px; position: absolute; top: 2px; border-radius: 99px; background: var(--coral); }
+.distribution-tight > span > i { left: 32%; width: 42%; }
+.distribution-tight > span > b { left: 43%; width: 23%; }
+.distribution-tight > span > em { left: 56%; }
+.distribution-wide > small { background: var(--coral); }
+.distribution-wide > span > i { left: 10%; width: 78%; }
+.distribution-wide > span > b { left: 20%; width: 58%; border-color: var(--coral); background: #ffe7e3; }
+.distribution-wide > span > em { left: 44%; }
+.distribution-row > strong { color: var(--muted); font-size: 9px; line-height: 1.35; }
+.rational-exponent-context-model { width: min(490px, 100%); display: grid; grid-template-columns: 150px 30px 1fr; align-items: center; gap: 13px; }
+.radical-cube-layers { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.radical-cube-layers > div { width: 43px; height: 43px; padding: 3px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border: 1px solid #c9d9e5; border-radius: 7px; background: white; box-shadow: 3px 4px 0 #dbe6ed; }
+.radical-cube-layers span { display: block; border-radius: 2px; background: linear-gradient(145deg, var(--blue), var(--violet)); }
+.rational-exponent-context-model > i { color: var(--gold); font-size: 23px; font-style: normal; font-weight: 900; text-align: center; }
+.rational-exponent-context-model > strong { padding: 12px 13px; border-radius: 12px; color: white; background: var(--violet); font-size: 15px; line-height: 1.5; text-align: center; }
+.growth-compare-context-model { width: min(520px, 100%); display: grid; gap: 10px; }
+.growth-compare-context-model > div { min-width: 0; padding: 8px 10px; display: grid; grid-template-columns: 82px repeat(4, minmax(34px, 1fr)); align-items: center; gap: 6px; border-radius: 13px; background: #edf8f6; }
+.growth-compare-context-model > div:last-child { background: #f5f0ff; }
+.growth-compare-context-model small { color: var(--teal); font-size: 8px; font-weight: 900; letter-spacing: .07em; }
+.growth-compare-context-model > div:last-child small { color: var(--violet); }
+.growth-compare-context-model span { min-width: 0; position: relative; display: grid; place-items: center; }
+.growth-compare-context-model b { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--teal); font-size: 11px; }
+.growth-compare-context-model > div:last-child b { background: var(--violet); }
+.growth-compare-context-model i { position: absolute; left: -13px; color: var(--muted); font-size: 8px; font-style: normal; font-weight: 900; }
+
+@media (max-width: 760px) {
+  .number-kinds-context-model { grid-template-columns: 1fr 20px 1fr; gap: 6px; }
+  .number-kinds-context-model > div { padding: 8px; gap: 4px; }
+  .number-kinds-context-model span { padding: 7px 1px; font-size: 11px; }
+  .system-elimination-context-model { grid-template-columns: 1fr 22px 1.08fr; gap: 7px; }
+  .system-elimination-context-model > div,
+  .system-elimination-context-model > strong { padding: 9px; }
+  .system-elimination-context-model > div span { font-size: 14px; }
+  .distribution-row { grid-template-columns: 22px minmax(105px, 1fr) 88px; gap: 8px; }
+  .distribution-row > strong { font-size: 8px; }
+  .rational-exponent-context-model { grid-template-columns: 126px 22px minmax(0, 1fr); gap: 7px; }
+  .radical-cube-layers > div { width: 36px; height: 36px; }
+  .rational-exponent-context-model > strong { padding-inline: 8px; font-size: 12px; }
+  .growth-compare-context-model > div { grid-template-columns: 67px repeat(4, minmax(31px, 1fr)); gap: 4px; }
+  .growth-compare-context-model b { width: 31px; height: 31px; }
+  .growth-compare-context-model i { left: -10px; font-size: 7px; }
+}
+
+@media (max-width: 380px) {
+  .number-kinds-context-model small { font-size: 7px; }
+  .number-kinds-context-model span { font-size: 10px; }
+  .distribution-row { grid-template-columns: 20px minmax(92px, 1fr) 73px; gap: 6px; }
+  .distribution-row > strong { font-size: 7px; }
+  .rational-exponent-context-model { grid-template-columns: 105px 18px minmax(0, 1fr); }
+  .radical-cube-layers { gap: 2px; }
+  .radical-cube-layers > div { width: 32px; height: 32px; padding: 2px; }
+  .growth-compare-context-model > div { grid-template-columns: 58px repeat(4, minmax(28px, 1fr)); padding-inline: 7px; }
+  .growth-compare-context-model small { font-size: 7px; }
+  .growth-compare-context-model b { width: 28px; height: 28px; font-size: 9px; }
+}

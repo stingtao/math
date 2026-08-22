@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay";
+  model: "number-line" | "percent" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -284,6 +284,41 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Remove one square area from another, then recognize the two side-length factors that remain.",
     model: "difference-squares",
   },
+  "g7-compare-distributions": {
+    src: "/visuals/distribution-comparison-context.jpg",
+    alt: "Two training lanes, one tightly clustered around its center and one spread across a wider range",
+    headline: "compare center and spread together",
+    copy: "A higher typical value does not automatically mean a group is more consistent; compare both the middle and the variability.",
+    model: "distribution-compare",
+  },
+  "rational-irrational": {
+    src: "/visuals/real-number-sort-context.jpg",
+    alt: "A number observatory sorting repeating tile patterns from one nonrepeating spiral",
+    headline: "terminates or repeats → rational",
+    copy: "Rational decimals stop or repeat a fixed pattern. Irrational decimals continue without a repeating block.",
+    model: "number-kinds",
+  },
+  "systems-algebra": {
+    src: "/visuals/elimination-workshop-context.jpg",
+    alt: "Two conveyor lanes combining matching blocks while an opposite pair cancels at the center",
+    headline: "add the equations: 2x = 8",
+    copy: "Choose substitution or elimination so one unknown disappears, then use the remaining equation to find both values.",
+    model: "system-elimination",
+  },
+  "g9-rational-exponents": {
+    src: "/visuals/rational-exponent-lab-context.jpg",
+    alt: "A three by three by three cube becoming one three-unit edge and then a three by three square",
+    headline: "27^(2/3) = (∛27)² = 9",
+    copy: "The denominator names the root. The numerator tells which power to apply after finding that root.",
+    model: "rational-exponent",
+  },
+  "g9-linear-vs-exponential": {
+    src: "/visuals/growth-comparison-context.jpg",
+    alt: "Equal additive steps beside accelerating multiplicative columns that begin from the same baseline",
+    headline: "constant difference or constant ratio?",
+    copy: "Linear patterns add the same amount. Exponential patterns multiply by the same factor and eventually pull away.",
+    model: "growth-compare",
+  },
 };
 
 function mathFor(visual: string) {
@@ -359,6 +394,11 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "compound-event" && <div className="compound-event-context-model" aria-hidden="true"><span><small>head</small><b>1/2</b></span><i>×</i><span><small>roll 6</small><b>1/6</b></span><i>=</i><strong><small>together</small><b>1/12</b></strong></div>}
         {scene.model === "two-way-table" && <div className="two-way-context-model" aria-hidden="true"><table><thead><tr><th /><th>Tea</th><th>Other</th><th>Total</th></tr></thead><tbody><tr><th>Group A</th><td className="focus-cell">18</td><td>12</td><td className="focus-total">30</td></tr><tr><th>Group B</th><td>12</td><td>18</td><td>30</td></tr></tbody></table><strong>18 ÷ 30 = 60%</strong></div>}
         {scene.model === "exponential-decay" && <div className="exponential-decay-context-model" aria-hidden="true"><div>{[120, 60, 30, 15].map((value, index) => <span key={value}><b style={{ height: `${30 + value / 3}px` }}>{value}</b>{index < 3 && <i>× 1/2</i>}</span>)}</div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("y=120(\\tfrac12)^t", { throwOnError: false }) }} /></div>}
+        {scene.model === "number-kinds" && <div className="number-kinds-context-model" aria-hidden="true"><div><small>RATIONAL</small>{["\\frac34", "0.25", "0.\\overline3"].map((value) => <span dangerouslySetInnerHTML={{ __html: katex.renderToString(value, { throwOnError: false }) }} key={value} />)}</div><i>or</i><div><small>IRRATIONAL</small>{["\\sqrt2", "\\pi", "0.101001\\ldots"].map((value) => <span dangerouslySetInnerHTML={{ __html: katex.renderToString(value, { throwOnError: false }) }} key={value} />)}</div></div>}
+        {scene.model === "system-elimination" && <div className="system-elimination-context-model" aria-hidden="true"><div><span dangerouslySetInnerHTML={{ __html: katex.renderToString("x+y=7", { throwOnError: false }) }} /><span dangerouslySetInnerHTML={{ __html: katex.renderToString("x-y=1", { throwOnError: false }) }} /></div><i>+</i><strong><span dangerouslySetInnerHTML={{ __html: katex.renderToString("2x=8", { throwOnError: false }) }} /><b dangerouslySetInnerHTML={{ __html: katex.renderToString("(x,y)=(4,3)", { throwOnError: false }) }} /></strong></div>}
+        {scene.model === "distribution-compare" && <div className="distribution-compare-context-model" aria-hidden="true"><div className="distribution-row distribution-tight"><small>A</small><span><i /><b /><em /></span><strong>median 12 · IQR 3</strong></div><div className="distribution-row distribution-wide"><small>B</small><span><i /><b /><em /></span><strong>median 9 · IQR 8</strong></div></div>}
+        {scene.model === "rational-exponent" && <div className="rational-exponent-context-model" aria-hidden="true"><div className="radical-cube-layers">{Array.from({ length: 3 }, (_, layer) => <div key={layer}>{Array.from({ length: 9 }, (_, cell) => <span key={cell} />)}</div>)}</div><i>→</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("27^{2/3}=(\\sqrt[3]{27})^2=3^2=9", { throwOnError: false }) }} /></div>}
+        {scene.model === "growth-compare" && <div className="growth-compare-context-model" aria-hidden="true"><div><small>LINEAR</small>{[2, 5, 8, 11].map((value, index) => <span key={value}><b>{value}</b>{index < 3 && <i>+3</i>}</span>)}</div><div><small>EXPONENTIAL</small>{[2, 6, 18, 54].map((value, index) => <span key={value}><b>{value}</b>{index < 3 && <i>×3</i>}</span>)}</div></div>}
       </div>
       <strong>{scene.headline}</strong>
       <p>{scene.copy}</p>

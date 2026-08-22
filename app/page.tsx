@@ -38,7 +38,7 @@ const mathWorldScenes = [
   { grade: 9, title: "One square comes out", copy: "See a difference of square areas before turning it into two matching algebraic factors.", image: "/visuals/difference-squares-workshop-context.jpg", lesson: "g9-difference-squares", visual: "area-model", accent: "coral" as const },
 ];
 
-const expandedSceneCount = 39;
+const expandedSceneCount = 44;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";
