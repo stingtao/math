@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots";
+  model: "number-line" | "percent" | "slope" | "triangle" | "scatter" | "distribute" | "function" | "transform" | "volume" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay";
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -186,6 +186,34 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "The quadratic formula finds the x-values where a parabola meets the horizontal axis.",
     model: "quadratic-roots",
   },
+  "g7-surface-area": {
+    src: "/visuals/surface-area-packaging-context.jpg",
+    alt: "A rectangular box net beside its folded box with matching face colors and alignment guides",
+    headline: "a 2 × 3 × 4 box has surface area 52",
+    copy: "List every outer face once, pair matching faces, then add all their areas.",
+    model: "surface-area-net",
+  },
+  "g7-compound-events": {
+    src: "/visuals/compound-events-lab-context.jpg",
+    alt: "A two-stage probability station sending a coin-like token toward six possible second outcomes",
+    headline: "head and roll 6 → 1/2 × 1/6 = 1/12",
+    copy: "For independent events joined by “and,” multiply the probability of each stage.",
+    model: "compound-event",
+  },
+  "two-way-tables": {
+    src: "/visuals/two-way-survey-context.jpg",
+    alt: "Survey tokens sorted into four compartments by color and shape",
+    headline: "18 of 30 students = 60%",
+    copy: "A joint count sits where two categories meet; divide by the correct total to compare groups.",
+    model: "two-way-table",
+  },
+  "g9-exponential-decay": {
+    src: "/visuals/exponential-decay-energy-context.jpg",
+    alt: "Four connected energy reservoirs holding a smaller fixed fraction at each step",
+    headline: "120, 60, 30, 15, … multiplies by 1/2",
+    copy: "Exponential decay keeps the same multiplier between zero and one at every step.",
+    model: "exponential-decay",
+  },
 };
 
 function mathFor(visual: string) {
@@ -250,6 +278,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "random-sample" && <div className="random-sample-context-model" aria-hidden="true"><div className="sample-population"><small>population</small>{Array.from({ length: 20 }, (_, index) => <span data-group={index % 5} key={index} />)}</div><i>random draw</i><div className="sample-result"><small>sample</small>{[0, 3, 1, 4, 2].map((group, index) => <span data-group={group} key={`${group}-${index}`} />)}</div></div>}
         {scene.model === "arithmetic-sequence" && <div className="arithmetic-sequence-context-model" aria-hidden="true"><div>{[4, 7, 10, 13].map((value, index) => <span key={value}><b>{value}</b>{index < 3 && <i>+3</i>}</span>)}</div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("a_n=4+3(n-1)", { throwOnError: false }) }} /></div>}
         {scene.model === "quadratic-roots" && <div className="quadratic-roots-context-model" aria-hidden="true"><div><i className="root-axis-x" /><i className="root-axis-y" /><span className="root-parabola" /><b className="root-point root-point-one">−1</b><b className="root-point root-point-two">3</b></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("x^2-2x-3=0", { throwOnError: false }) }} /></div>}
+        {scene.model === "surface-area-net" && <div className="surface-area-context-model" aria-hidden="true"><div className="surface-net"><span>8</span><span>6</span><span>8</span><span>6</span><span>12</span><span>12</span></div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("2(6+8+12)=52", { throwOnError: false }) }} /></div>}
+        {scene.model === "compound-event" && <div className="compound-event-context-model" aria-hidden="true"><span><small>head</small><b>1/2</b></span><i>×</i><span><small>roll 6</small><b>1/6</b></span><i>=</i><strong><small>together</small><b>1/12</b></strong></div>}
+        {scene.model === "two-way-table" && <div className="two-way-context-model" aria-hidden="true"><table><thead><tr><th /><th>Tea</th><th>Other</th><th>Total</th></tr></thead><tbody><tr><th>Group A</th><td className="focus-cell">18</td><td>12</td><td className="focus-total">30</td></tr><tr><th>Group B</th><td>12</td><td>18</td><td>30</td></tr></tbody></table><strong>18 ÷ 30 = 60%</strong></div>}
+        {scene.model === "exponential-decay" && <div className="exponential-decay-context-model" aria-hidden="true"><div>{[120, 60, 30, 15].map((value, index) => <span key={value}><b style={{ height: `${30 + value / 3}px` }}>{value}</b>{index < 3 && <i>× 1/2</i>}</span>)}</div><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("y=120(\\tfrac12)^t", { throwOnError: false }) }} /></div>}
       </div>
       <strong>{scene.headline}</strong>
       <p>{scene.copy}</p>

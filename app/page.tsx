@@ -26,10 +26,12 @@ const gradeVisuals = {
 };
 
 const mathWorldScenes = [
-  { title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.png", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
-  { title: "Rules that connect", copy: "Follow one bike-rental rule through a situation, table, graph, and equation.", image: "/visuals/function-kiosk-context.jpg", lesson: "function-representations", visual: "function-machine", accent: "teal" as const },
-  { title: "The diagonal shortcut", copy: "Turn a route across the city into a right triangle you can measure.", image: "/visuals/pythagorean-city-context.jpg", lesson: "pythagorean-theorem", visual: "right-triangle", accent: "coral" as const },
-  { title: "Volume in layers", copy: "See a cylinder as equal circular layers stacked through its height.", image: "/visuals/cylinder-tank-context.jpg", lesson: "cylinder-volume", visual: "cylinder", accent: "gold" as const },
+  { grade: 8, title: "Opposite directions", copy: "Use a building to see why positive and negative positions share the same zero.", image: "/visuals/signed-numbers-context.png", lesson: "signed-numbers", visual: "number-line", accent: "blue" as const },
+  { grade: 7, title: "Every face counts", copy: "Unfold a package, match every face, and turn a solid into areas you can add.", image: "/visuals/surface-area-packaging-context.jpg", lesson: "g7-surface-area", visual: "net", accent: "coral" as const },
+  { grade: 8, title: "Two questions, four groups", copy: "Sort one survey by two categories, then compare groups using the right total.", image: "/visuals/two-way-survey-context.jpg", lesson: "two-way-tables", visual: "two-way", accent: "gold" as const },
+  { grade: 7, title: "Chance happens in stages", copy: "Follow two independent events and see why their probabilities multiply.", image: "/visuals/compound-events-lab-context.jpg", lesson: "g7-compound-events", visual: "tree", accent: "violet" as const },
+  { grade: 9, title: "The same fraction remains", copy: "Watch stored energy shrink by one fixed multiplier at every step.", image: "/visuals/exponential-decay-energy-context.jpg", lesson: "g9-exponential-decay", visual: "decay", accent: "teal" as const },
+  { grade: 9, title: "Two landing points", copy: "Connect a parabolic path with the two roots that make a quadratic equal zero.", image: "/visuals/quadratic-roots-context.jpg", lesson: "g9-quadratic-formula", visual: "formula", accent: "violet" as const },
 ];
 
 export default function Home() {
@@ -79,9 +81,9 @@ export default function Home() {
     </section>
 
     <section className="math-world-section" aria-labelledby="math-world-title">
-      <div className="section-heading split-heading"><div><span className="section-kicker">MATH IN THE WORLD</span><h2 id="math-world-title">See the reason before the rule.</h2></div><p>Each part of Grade 8 has a visual landmark that turns an abstract idea into something you can picture.</p></div>
-      <div className="math-world-grid">{mathWorldScenes.map((scene, index) => <a className={`math-world-card accent-${scene.accent} scene-${index + 1}`} href={`/learn/${scene.lesson}?grade=8&demo=1`} key={scene.lesson}><div className="math-world-image"><Image src={scene.image} width={1200} height={800} sizes="(max-width: 760px) 92vw, (max-width: 1100px) 46vw, 520px" alt="" /><span><TopicIcon visual={scene.visual} accent={scene.accent} size="md" label="" /></span></div><div className="math-world-copy"><small>EXPLORE A 6–8 MINUTE LESSON</small><h3>{scene.title}</h3><p>{scene.copy}</p><strong>See this idea <span aria-hidden="true">→</span></strong></div></a>)}</div>
-      <div className="math-world-proof"><strong>13 / 13</strong><span><b>Grade 8 regions now have a real-world visual landmark.</b> Exact diagrams and math stay clear and readable on every screen.</span><i aria-hidden="true">✓</i></div>
+      <div className="section-heading split-heading"><div><span className="section-kicker">MATH IN THE WORLD · GRADES 7–9</span><h2 id="math-world-title">See the reason before the rule.</h2></div><p>Every lesson has a recognizable topic marker. Hard-to-picture ideas add a full visual scene before the exact math.</p></div>
+      <div className="math-world-grid">{mathWorldScenes.map((scene, index) => <a className={`math-world-card accent-${scene.accent} scene-${index + 1}`} href={`/learn/${scene.lesson}?grade=${scene.grade}&demo=1`} key={scene.lesson}><div className="math-world-image"><Image src={scene.image} width={1200} height={800} sizes="(max-width: 760px) 92vw, (max-width: 1100px) 46vw, 520px" alt="" /><span><TopicIcon visual={scene.visual} accent={scene.accent} size="md" label="" /></span></div><div className="math-world-copy"><small>GRADE {scene.grade} · EXPLORE A 6–8 MINUTE LESSON</small><h3>{scene.title}</h3><p>{scene.copy}</p><strong>See this idea <span aria-hidden="true">→</span></strong></div></a>)}</div>
+      <div className="math-world-proof"><strong>{curriculumStats.lessons} / {curriculumStats.lessons}</strong><span><b>Every lesson has a distinct visual topic marker.</b> Expanded context scenes build intuition, while exact diagrams and math stay readable on every screen.</span><i aria-hidden="true">✓</i></div>
     </section>
 
     <section className="founder-section" id="story">
