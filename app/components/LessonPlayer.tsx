@@ -14,6 +14,7 @@ import { mutationHeaders } from "./mutation";
 import { MomentumRun } from "./MomentumRun";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
+import { achievementUnlockedBetween, type AchievementTotals } from "@/lib/achievements";
 
 const stageLabels = [
   { label: "Goal", icon: "◎" },
@@ -210,6 +211,18 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         ? { kicker: "BOSS GATE OPEN", title: `${region?.title ?? "Region"} Boss`, copy: "Five mixed questions connect all four lesson ideas. No timer, unlimited retries." }
         : { kicker: "NEXT QUEST UNLOCKED", title: following?.title ?? "Return to the trail", copy: "The next short lesson is ready whenever you are. Stopping here is also progress." }
       : { kicker: "TRAIL STATUS", title: "Your progress is protected.", copy: "This practice strengthened memory without removing XP, stars, or quest keys you already earned." };
+    const currentAchievementTotals: AchievementTotals = {
+      lessons: state.completedLessons.length,
+      stars: state.completedLessons.reduce((total, item) => total + item.stars, 0),
+      bosses: state.clearedBosses.length,
+      streak: state.profile.longestStreak,
+    };
+    const previousAchievementTotals: AchievementTotals = {
+      ...currentAchievementTotals,
+      lessons: Math.max(0, currentAchievementTotals.lessons - (reward.firstCompletion ? 1 : 0)),
+      stars: Math.max(0, currentAchievementTotals.stars - Math.max(0, reward.bestStars - reward.previousStars)),
+    };
+    const unlockedLandmark = achievementUnlockedBetween(previousAchievementTotals, currentAchievementTotals);
     return (
       <main className="learner-shell celebration-page">
         <SuccessBurst eventKey={`${lesson.id}-complete-${stars}-${reward.firstCompletion ? "new" : reward.starsImproved ? "upgrade" : "replay"}`} large />
@@ -231,6 +244,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               return <span className={collected ? "collected" : index === regionKeyCount ? "next" : "locked"} key={item.id}>{collected ? "✓" : index + 1}</span>;
             })}<i /><b className={regionKeyCount === 4 ? "open" : ""}>★</b></div>
           </div>
+          {unlockedLandmark && <section className={`settlement-landmark accent-${unlockedLandmark.tone}`} aria-label={`${unlockedLandmark.title} achievement unlocked`}><span className="achievement-badge" aria-hidden="true"><b>{unlockedLandmark.glyph}</b><i /></span><div><small>PRIVATE LANDMARK UNLOCKED</small><strong>{unlockedLandmark.title}</strong><p>{unlockedLandmark.copy} It is now saved on your private achievement shelf.</p></div><a href={`/profile${demo ? "?demo=1" : ""}`}>View shelf <span aria-hidden="true">→</span></a></section>}
           <section className="settlement-next" aria-labelledby="settlement-next-title">
             {reward.firstCompletion && regionFinished ? <span className="settlement-boss-icon" aria-hidden="true">★</span> : <TopicIcon visual={reward.firstCompletion && following ? following.visual : lesson.visual} accent={reward.firstCompletion && following ? following.accent : lesson.accent} size="md" label="" />}
             <div><small>{nextStep.kicker}</small><strong id="settlement-next-title">{nextStep.title}</strong><p>{nextStep.copy}</p></div>

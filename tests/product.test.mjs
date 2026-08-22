@@ -3,6 +3,15 @@ import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import { nextMomentumRun } from "../lib/momentum.ts";
 import { calculateLessonReward } from "../lib/rewards.ts";
+import { achievementUnlockedBetween } from "../lib/achievements.ts";
+
+test("reports only achievement thresholds crossed by the latest saved result", () => {
+  const empty = { lessons: 0, stars: 0, bosses: 0, streak: 0 };
+  assert.equal(achievementUnlockedBetween(empty, { ...empty, lessons: 1 })?.id, "first-step");
+  assert.equal(achievementUnlockedBetween({ ...empty, lessons: 1 }, { ...empty, lessons: 2 }), null);
+  assert.equal(achievementUnlockedBetween({ ...empty, stars: 11 }, { ...empty, stars: 12 })?.id, "star-spark");
+  assert.equal(achievementUnlockedBetween({ ...empty, lessons: 19, stars: 11 }, { ...empty, lessons: 20, stars: 12 })?.id, "trail-builder");
+});
 
 async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -307,6 +316,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
   const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const achievementsSource = await readFile(new URL("../lib/achievements.ts", import.meta.url), "utf8");
   const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
@@ -328,24 +338,24 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /FOCUS CHARGE/);
   assert.match(lesson, /mastery-next-goal/);
   assert.match(boss, /boss-victory-map/);
-  for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "fraction-workshop-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg", "equation-balance-context.jpg", "irrational-garden-context.jpg", "scientific-observatory-context.jpg", "multistep-workshop-context.jpg", "unit-rate-bike-context.jpg", "circle-fountain-context.jpg", "prism-packing-context.jpg", "probability-arcade-context.jpg", "systems-transit-context.jpg", "solution-cases-gallery-context.jpg", "inequality-trail-context.jpg", "polynomial-tiles-context.jpg", "parabola-bridge-context.jpg", "exponential-greenhouse-context.jpg", "scale-drawing-studio-context.jpg", "random-sample-context.jpg", "arithmetic-sequence-context.jpg", "quadratic-roots-context.jpg", "surface-area-packaging-context.jpg", "compound-events-lab-context.jpg", "two-way-survey-context.jpg", "exponential-decay-energy-context.jpg", "discount-studio-context.jpg", "angle-plaza-context.jpg", "cone-measure-context.jpg", "geometric-sequence-lab-context.jpg", "absolute-transit-context.jpg", "triangle-builder-context.jpg", "cross-section-studio-context.jpg", "coordinate-route-context.jpg", "sphere-tank-context.jpg", "difference-squares-workshop-context.jpg", "distribution-comparison-context.jpg", "real-number-sort-context.jpg", "elimination-workshop-context.jpg", "rational-exponent-lab-context.jpg", "growth-comparison-context.jpg", "simple-interest-growth-context.jpg", "graphing-line-city-context.jpg", "function-routing-context.jpg", "dilation-studio-context.jpg", "residual-observatory-context.jpg"]) {
+  for (const visual of ["signed-numbers-context.png", "percent-market-context.jpg", "fraction-workshop-context.jpg", "substitution-machine-context.jpg", "slope-trail-context.jpg", "pythagorean-city-context.jpg", "scatter-field-context.jpg", "distributive-workshop-context.jpg", "function-kiosk-context.jpg", "transform-plaza-context.jpg", "cylinder-tank-context.jpg", "equation-balance-context.jpg", "irrational-garden-context.jpg", "scientific-observatory-context.jpg", "multistep-workshop-context.jpg", "unit-rate-bike-context.jpg", "circle-fountain-context.jpg", "prism-packing-context.jpg", "probability-arcade-context.jpg", "systems-transit-context.jpg", "solution-cases-gallery-context.jpg", "inequality-trail-context.jpg", "polynomial-tiles-context.jpg", "parabola-bridge-context.jpg", "exponential-greenhouse-context.jpg", "scale-drawing-studio-context.jpg", "random-sample-context.jpg", "arithmetic-sequence-context.jpg", "quadratic-roots-context.jpg", "surface-area-packaging-context.jpg", "compound-events-lab-context.jpg", "two-way-survey-context.jpg", "exponential-decay-energy-context.jpg", "discount-studio-context.jpg", "angle-plaza-context.jpg", "cone-measure-context.jpg", "geometric-sequence-lab-context.jpg", "absolute-transit-context.jpg", "triangle-builder-context.jpg", "cross-section-studio-context.jpg", "coordinate-route-context.jpg", "sphere-tank-context.jpg", "difference-squares-workshop-context.jpg", "distribution-comparison-context.jpg", "real-number-sort-context.jpg", "elimination-workshop-context.jpg", "rational-exponent-lab-context.jpg", "growth-comparison-context.jpg", "simple-interest-growth-context.jpg", "graphing-line-city-context.jpg", "function-routing-context.jpg", "dilation-studio-context.jpg", "residual-observatory-context.jpg"]) {
     assert.match(concept, new RegExp(visual.replace(".", "\\.")));
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
     assert.ok(asset.byteLength > 10_000);
   }
-  for (const visual of ["fraction-workshop-context.jpg", "triangle-builder-context.jpg", "cross-section-studio-context.jpg", "coordinate-route-context.jpg", "sphere-tank-context.jpg", "difference-squares-workshop-context.jpg", "distribution-comparison-context.jpg", "real-number-sort-context.jpg", "elimination-workshop-context.jpg", "rational-exponent-lab-context.jpg", "growth-comparison-context.jpg", "simple-interest-growth-context.jpg", "graphing-line-city-context.jpg", "function-routing-context.jpg", "dilation-studio-context.jpg", "residual-observatory-context.jpg", "solution-cases-gallery-context.jpg", "inequality-trail-context.jpg"]) {
+  for (const visual of ["fraction-workshop-context.jpg", "substitution-machine-context.jpg", "triangle-builder-context.jpg", "cross-section-studio-context.jpg", "coordinate-route-context.jpg", "sphere-tank-context.jpg", "difference-squares-workshop-context.jpg", "distribution-comparison-context.jpg", "real-number-sort-context.jpg", "elimination-workshop-context.jpg", "rational-exponent-lab-context.jpg", "growth-comparison-context.jpg", "simple-interest-growth-context.jpg", "graphing-line-city-context.jpg", "function-routing-context.jpg", "dilation-studio-context.jpg", "residual-observatory-context.jpg", "solution-cases-gallery-context.jpg", "inequality-trail-context.jpg"]) {
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
     assert.ok(asset.byteLength < 550_000, `${visual} should remain mobile-friendly`);
   }
-  for (const model of ["number-line", "percent", "fraction-equivalence", "fraction-addition", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "solution-cases", "inequality-range", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay", "number-kinds", "system-elimination", "distribution-compare", "rational-exponent", "growth-compare", "simple-interest", "graph-line", "dilation", "residuals"]) assert.match(concept, new RegExp(`model: "${model}"`));
+  for (const model of ["number-line", "percent", "fraction-equivalence", "fraction-addition", "substitution", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "solution-cases", "inequality-range", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay", "number-kinds", "system-elimination", "distribution-compare", "rational-exponent", "growth-compare", "simple-interest", "graph-line", "dilation", "residuals"]) assert.match(concept, new RegExp(`model: "${model}"`));
   const contextSceneSource = concept.slice(concept.indexOf("const contextScenes"), concept.indexOf("function mathFor"));
-  assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 72);
+  assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 78);
   const expandedSceneCount = Number(home.match(/const expandedSceneCount = (\d+);/)?.[1]);
-  assert.equal(expandedSceneCount, 72);
-  for (const representative of ["signed-numbers", "percent", "fractions", "adding-fractions", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "rational-irrational", "systems-algebra", "graphing-lines", "function-rules", "dilations-similarity", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g7-compare-distributions", "g7-simple-interest", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula", "g9-rational-exponents", "g9-linear-vs-exponential", "g9-correlation-residuals"]) {
+  assert.equal(expandedSceneCount, 78);
+  for (const representative of ["signed-numbers", "percent", "fractions", "adding-fractions", "substitution", "g9-evaluate-formulas", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "rational-irrational", "systems-algebra", "graphing-lines", "function-rules", "dilations-similarity", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g7-compare-distributions", "g7-simple-interest", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula", "g9-rational-exponents", "g9-linear-vs-exponential", "g9-correlation-residuals"]) {
     assert.match(contextSceneSource, new RegExp(`[" ]${representative}[":]`));
   }
-  for (const reusedSceneLesson of ["two-step-equations", "systems-graphing", "comparing-functions", "linear-nonlinear", "rigid-transformations", "congruence", "angle-relationships", "triangle-angles", "lines-of-fit", "probability", "g7-inequalities-g7", "g7-multi-step-equations-g7", "g7-percent-change", "g7-tax-tip-commission", "g9-linear-inequalities-g9", "g9-multi-step-linear-equations", "g9-equation-solution-cases", "g9-slope-from-points", "g9-graph-linear-functions", "g9-factor-trinomials"]) {
+  for (const reusedSceneLesson of ["two-step-equations", "systems-graphing", "comparing-functions", "linear-nonlinear", "rigid-transformations", "congruence", "angle-relationships", "triangle-angles", "lines-of-fit", "probability", "g7-inequalities-g7", "g7-multi-step-equations-g7", "g7-percent-change", "g7-tax-tip-commission", "g7-center-spread", "g7-informal-inference", "g9-linear-inequalities-g9", "g9-multi-step-linear-equations", "g9-equation-solution-cases", "g9-slope-from-points", "g9-graph-linear-functions", "g9-factor-trinomials", "g9-properties-real-numbers", "g9-one-variable-data"]) {
     assert.match(contextSceneSource, new RegExp(`[" ]${reusedSceneLesson}[":]`));
   }
   assert.match(home, /mathWorldScenes/);
@@ -368,6 +378,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /solution-cases-gallery-context\.jpg/);
   assert.match(home, /inequality-trail-context\.jpg/);
   assert.match(home, /fraction-workshop-context\.jpg/);
+  assert.match(home, /substitution-machine-context\.jpg/);
+  assert.match(home, /Put the value in its place/);
   assert.match(home, /Different pieces, same amount/);
   assert.match(home, /A boundary and every value beyond it/);
   assert.match(home, /Three ways two lines can relate/);
@@ -375,10 +387,12 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(concept, /inequality-range-context-model/);
   assert.match(concept, /fraction-equivalence-context-model/);
   assert.match(concept, /fraction-addition-context-model/);
+  assert.match(concept, /substitution-context-model/);
   assert.match(css, /\.solution-cases-context-model/);
   assert.match(css, /\.inequality-range-context-model/);
   assert.match(css, /\.fraction-equivalence-context-model/);
   assert.match(css, /\.fraction-addition-context-model/);
+  assert.match(css, /\.substitution-context-model/);
   assert.match(home, /game-loop-board/);
   assert.match(home, /Four lesson keys, then the boss/);
   assert.match(home, /RECOVERY COUNTS/);
@@ -482,6 +496,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /Continue to the next lesson/);
   assert.match(lesson, /Stars and XP details/);
   assert.match(lesson, /Everything is saved/);
+  assert.match(lesson, /achievementUnlockedBetween/);
+  assert.match(lesson, /settlement-landmark/);
+  assert.match(lesson, /PRIVATE LANDMARK UNLOCKED/);
+  assert.match(lesson, /View shelf/);
   assert.doesNotMatch(lesson, /className="reward-strip"/);
   assert.doesNotMatch(lesson, /className="unlock-path"/);
   assert.match(css, /\.game-loop-board/);
@@ -495,6 +513,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.settlement-next/);
   assert.match(css, /\.settlement-details/);
   assert.match(css, /\.settlement-save-note/);
+  assert.match(css, /\.settlement-landmark/);
   assert.match(review, /review-finish-emblem/);
   assert.match(review, /Memory strengthened/);
   assert.match(review, /<TopicIcon visual=\{questionLesson\.visual\}/);
@@ -548,7 +567,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.boss-settlement-summary \{ grid-template-columns: 1fr/);
   assert.match(profile, /achievementSpecs/);
   assert.match(profile, /PRIVATE ACHIEVEMENT SHELF/);
-  for (const achievement of ["First Step", "Twelve Sparks", "Boss Link", "Steady Week", "Trail Builder", "Boss Pathfinder"]) assert.match(profile, new RegExp(achievement));
+  for (const achievement of ["First Step", "Twelve Sparks", "Boss Link", "Steady Week", "Trail Builder", "Boss Pathfinder"]) assert.match(achievementsSource, new RegExp(achievement));
   assert.match(profile, /Only you see this shelf/);
   assert.match(profile, /Achievements are not added to the leaderboard/);
   assert.match(css, /\.achievement-section/);

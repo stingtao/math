@@ -1956,6 +1956,16 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .fraction-addition-part:nth-child(3) > .fraction-strip > i.filled { background: var(--teal); }
 .fraction-addition-part > small { min-width: 31px; color: var(--navy); font-size: 13px; font-weight: 850; }
 .fraction-addition-part > b { width: 22px; height: 22px; position: absolute; right: -22px; top: 2px; display: grid; place-items: center; color: var(--coral); font-size: 17px; }
+.context-model-substitution .context-scene img { object-position: center 51%; }
+.substitution-context-model { width: min(520px, 100%); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; gap: 24px; }
+.substitution-context-step { min-width: 0; min-height: 62px; position: relative; padding: 9px 7px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid #d6e1e8; border-radius: 12px; background: #f7fafb; text-align: center; }
+.substitution-context-step:first-child { border-color: #bfe5dd; background: #e8f7f3; }
+.substitution-context-step:nth-child(3) { border: 2px solid var(--blue); background: var(--blue-soft); box-shadow: 0 6px 14px rgb(42 108 181 / 10%); }
+.substitution-context-step:last-child { color: white; border-color: var(--teal); background: var(--teal); }
+.substitution-context-step:not(:last-child)::after { content: "→"; width: 24px; position: absolute; right: -25px; top: 50%; color: var(--coral); font-size: 17px; font-weight: 900; transform: translateY(-50%); }
+.substitution-context-step small { overflow: hidden; color: var(--muted); font-size: 7px; font-weight: 900; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.substitution-context-step strong { max-width: 100%; font-size: 15px; }
+.substitution-context-step:last-child small { color: rgb(255 255 255 / 78%); }
 
 @media (max-width: 520px) {
   .fraction-equivalence-context-model { grid-template-columns: 1fr; gap: 7px; }
@@ -1964,6 +1974,11 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .fraction-addition-context-model > div { grid-template-columns: 1fr; gap: 8px; }
   .fraction-addition-part > b { right: auto; left: 50%; top: auto; bottom: -14px; z-index: 2; border-radius: 7px; background: white; transform: translateX(-50%); }
   .fraction-addition-context-model > header { font-size: 15px; }
+  .substitution-context-model { grid-template-columns: 1fr; gap: 16px; }
+  .substitution-context-step { min-height: 52px; padding: 8px 10px; }
+  .substitution-context-step:not(:last-child)::after { content: "↓"; width: 24px; right: 50%; top: auto; bottom: -20px; transform: translateX(50%); }
+  .substitution-context-step small { font-size: 8px; }
+  .substitution-context-step strong { font-size: 16px; }
 }
 
 .review-memory-meter { margin: 20px 0 16px; padding: 15px; border: 1px solid #d5e3df; border-radius: 17px; background: linear-gradient(145deg, white, #eaf7f3); box-shadow: 0 10px 23px rgb(23 50 79 / 5%); }
@@ -2670,6 +2685,16 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .settlement-summary .settlement-xp.quiet { border-color: #d9e3e9; background: #f5f7f9; }
 .settlement-summary .settlement-xp.quiet > b { color: #6e8190; }
 .celebration-card .quest-key-card { margin-top: 13px; background: white; }
+.settlement-landmark { width: min(580px, 100%); margin: 13px auto 0; padding: 14px 15px; display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 13px; border: 1px solid color-mix(in srgb, var(--accent) 30%, #d8e2e9); border-radius: 17px; background: linear-gradient(120deg, var(--accent-soft), white 62%); box-shadow: 0 8px 20px rgb(23 50 79 / 6%); text-align: left; }
+.settlement-landmark .achievement-badge { width: 52px; height: 52px; border-radius: 17px; }
+.settlement-landmark .achievement-badge::before { width: 33px; height: 33px; }
+.settlement-landmark .achievement-badge b { font-size: 19px; }
+.settlement-landmark > div { min-width: 0; display: grid; gap: 2px; }
+.settlement-landmark > div > small { color: var(--accent); font-size: 7px; font-weight: 900; letter-spacing: .1em; }
+.settlement-landmark > div > strong { font-size: 14px; line-height: 1.3; }
+.settlement-landmark > div > p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.45; }
+.settlement-landmark > a { min-height: 40px; padding: 0 11px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid color-mix(in srgb, var(--accent) 30%, #cad7df); border-radius: 11px; color: var(--accent); background: white; font-size: 9px; font-weight: 900; white-space: nowrap; }
+.settlement-landmark > a:hover { border-color: var(--accent); transform: translateY(-1px); }
 .settlement-next { width: min(580px, 100%); margin: 13px auto 0; padding: 17px 18px; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 15px; border: 1px solid color-mix(in srgb, var(--accent) 28%, #d8e2e9); border-radius: 17px; background: linear-gradient(115deg, white, var(--accent-soft)); text-align: left; }
 .settlement-next .topic-icon-md { --topic-size: 54px; }
 .settlement-boss-icon { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 17px; color: white; background: var(--gold); box-shadow: 0 8px 18px rgb(176 127 24 / 18%); font-size: 23px; font-weight: 900; }
@@ -2704,6 +2729,12 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .settlement-summary > span > small { align-self: start; font-size: 10px; text-align: left; }
   .settlement-summary .settlement-xp > b { font-size: 20px; }
   .settlement-summary .settlement-stars > b { font-size: 15px; }
+  .settlement-landmark { padding: 13px; grid-template-columns: 50px minmax(0, 1fr); gap: 11px; }
+  .settlement-landmark .achievement-badge { width: 50px; height: 50px; }
+  .settlement-landmark > div > small { font-size: 8px; }
+  .settlement-landmark > div > strong { font-size: 16px; }
+  .settlement-landmark > div > p { font-size: 11px; }
+  .settlement-landmark > a { min-height: 44px; grid-column: 2; justify-self: start; font-size: 11px; }
   .settlement-next { padding: 15px; grid-template-columns: 50px minmax(0, 1fr); gap: 13px; }
   .settlement-next .topic-icon-md { --topic-size: 50px; }
   .settlement-boss-icon { width: 50px; height: 50px; }
@@ -2720,6 +2751,8 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 
 @media (max-width: 380px) {
   .celebration-card { width: calc(100% - 20px); padding-inline: 13px; }
+  .settlement-landmark { grid-template-columns: 45px minmax(0, 1fr); padding-inline: 12px; }
+  .settlement-landmark .achievement-badge { width: 45px; height: 45px; }
   .settlement-next { grid-template-columns: 45px minmax(0, 1fr); padding-inline: 12px; }
   .settlement-next .topic-icon-md { --topic-size: 45px; }
   .settlement-boss-icon { width: 45px; height: 45px; }

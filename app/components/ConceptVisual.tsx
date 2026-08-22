@@ -7,7 +7,10 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "fraction-equivalence" | "fraction-addition" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  mathSteps?: string[];
+  mathStepLabels?: string[];
+  modelLabel?: string;
 };
 
 const contextScenes: Record<string, ContextScene> = {
@@ -31,6 +34,7 @@ const contextScenes: Record<string, ContextScene> = {
     headline: "different pieces can name the same amount",
     copy: "Keep the whole the same. Six eighths and three fourths cover exactly the same length.",
     model: "fraction-equivalence",
+    modelLabel: "Math model: six eighths equals three fourths because both cover the same amount of an equal whole",
   },
   "adding-fractions": {
     src: "/visuals/fraction-workshop-context.jpg",
@@ -38,6 +42,27 @@ const contextScenes: Record<string, ContextScene> = {
     headline: "rename first, then add equal-size pieces",
     copy: "One third becomes two sixths. Now every piece has the same size, so the numerators can be added.",
     model: "fraction-addition",
+    modelLabel: "Math model: one third is renamed as two sixths; two sixths plus one sixth equals three sixths, or one half",
+  },
+  substitution: {
+    src: "/visuals/substitution-machine-context.jpg",
+    alt: "A teal value block entering a matching placeholder socket, passing through two operation modules, and reaching one output tray",
+    headline: "replace the variable before you calculate",
+    copy: "Put the known value inside parentheses, then follow the operations in order.",
+    model: "substitution",
+    mathSteps: ["x=-3", "2x^2+1", "2(-3)^2+1", "19"],
+    mathStepLabels: ["known value", "expression", "replace x", "result"],
+    modelLabel: "Math model: x is negative three; two x squared plus one becomes two times negative three squared plus one, which equals nineteen",
+  },
+  "g9-evaluate-formulas": {
+    src: "/visuals/substitution-machine-context.jpg",
+    alt: "A teal value block entering a matching placeholder socket, passing through two operation modules, and reaching one output tray",
+    headline: "one careful replacement makes the formula concrete",
+    copy: "Replace every x with the same parenthesized value before simplifying any operation.",
+    model: "substitution",
+    mathSteps: ["x=-3", "x^2-2x", "(-3)^2-2(-3)", "15"],
+    mathStepLabels: ["known value", "formula", "replace every x", "result"],
+    modelLabel: "Math model: x is negative three; x squared minus two x becomes negative three squared minus two times negative three, which equals fifteen",
   },
   "slope-rate": {
     src: "/visuals/slope-trail-context.jpg",
@@ -333,6 +358,13 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Give every member a fair chance so the sample can represent the whole population.",
     model: "random-sample",
   },
+  "g7-informal-inference": {
+    src: "/visuals/random-sample-context.jpg",
+    alt: "A sampling machine drawing a mixed random group from a much larger population",
+    headline: "use a fair sample to estimate the whole",
+    copy: "A random sample supports a cautious population estimate, but every sample still carries uncertainty.",
+    model: "random-sample",
+  },
   "g9-arithmetic-sequences": {
     src: "/visuals/arithmetic-sequence-context.jpg",
     alt: "An architectural stair installation gaining an equal group of blocks on every new tier",
@@ -452,6 +484,13 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "A higher typical value does not automatically mean a group is more consistent; compare both the middle and the variability.",
     model: "distribution-compare",
   },
+  "g7-center-spread": {
+    src: "/visuals/distribution-comparison-context.jpg",
+    alt: "Two data lanes with different centers and spreads",
+    headline: "describe both the middle and the variability",
+    copy: "Center tells what is typical. Range or IQR tells how widely the values are spread.",
+    model: "distribution-compare",
+  },
   "rational-irrational": {
     src: "/visuals/real-number-sort-context.jpg",
     alt: "A number observatory sorting repeating tile patterns from one nonrepeating spiral",
@@ -515,6 +554,20 @@ const contextScenes: Record<string, ContextScene> = {
     copy: "Small residuals scattered above and below zero support a useful linear model.",
     model: "residuals",
   },
+  "g9-properties-real-numbers": {
+    src: "/visuals/distributive-workshop-context.jpg",
+    alt: "Four identical workshop trays, each split into a group of blue gears and two coral parts",
+    headline: "a property explains why each step is valid",
+    copy: "The distributive property sends the outside factor to every term inside the group.",
+    model: "distribute",
+  },
+  "g9-one-variable-data": {
+    src: "/visuals/distribution-comparison-context.jpg",
+    alt: "Two data lanes, one tightly clustered and one spread across a wider range",
+    headline: "shape, center, spread, and unusual values tell one story",
+    copy: "Choose a display and summary that fit the distribution instead of reporting one number alone.",
+    model: "distribution-compare",
+  },
 };
 
 function mathFor(visual: string) {
@@ -553,11 +606,12 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
   return (
     <div className={`lesson-visual contextual-lesson-visual context-model-${scene.model}`}>
       <div className="context-scene"><Image src={scene.src} width={1200} height={800} sizes="(max-width: 760px) 92vw, 720px" alt={scene.alt} /></div>
-      <div className="context-math-card" aria-label={`Math model: ${scene.headline}`}>
+      <div className="context-math-card" aria-label={scene.modelLabel ?? `Math model: ${scene.headline}`}>
         {scene.model === "number-line" && <div className="number-line-model context-number-line"><span>−4</span><span>−2</span><i>0</i><span>2</span><span>4</span><b /></div>}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
+        {scene.model === "substitution" && <div className="substitution-context-model" aria-hidden="true">{scene.mathSteps?.map((step, index) => <span className="substitution-context-step" key={step}><small>{scene.mathStepLabels?.[index]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(step, { throwOnError: false }) }} /></span>)}</div>}
         {scene.model === "slope" && <div className="coordinate-model context-coordinate"><span className="axis-x" /><span className="axis-y" /><i className="point-one" /><i className="point-two" /><b /><em className="slope-run">run</em><em className="slope-rise">rise</em></div>}
         {scene.model === "triangle" && <div className="shape-model context-triangle"><span /><span /><span /><i aria-hidden="true" /></div>}
         {scene.model === "triangle-build" && <div className="triangle-build-context-model" aria-hidden="true"><div className="triangle-build-frame"><span className="triangle-side-three"><b>3</b></span><span className="triangle-side-four"><b>4</b></span><span className="triangle-side-five"><b>5</b></span><i className="triangle-vertex-one" /><i className="triangle-vertex-two" /><i className="triangle-vertex-three" /></div><strong>3 + 4 &gt; 5 · triangle closes</strong></div>}
