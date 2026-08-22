@@ -42,9 +42,11 @@ const mathWorldScenes = [
   { grade: 8, title: "Three ways two lines can relate", copy: "See why a system can have one solution, no solution, or infinitely many shared points.", image: "/visuals/solution-cases-gallery-context.jpg", lesson: "solution-types", visual: "solution-types", accent: "blue" as const },
   { grade: 7, title: "A boundary and every value beyond it", copy: "See how an open or closed point sets the edge while an arrow shows the entire solution set.", image: "/visuals/inequality-trail-context.jpg", lesson: "g7-inequalities-g7", visual: "inequality-line", accent: "coral" as const },
   { grade: 9, title: "Measure every miss from the line", copy: "Use vertical residual distances to judge whether a fitted line captures the data pattern.", image: "/visuals/residual-observatory-context.jpg", lesson: "g9-correlation-residuals", visual: "residual", accent: "violet" as const },
+  { grade: 8, title: "Only matching terms combine", copy: "Sort square terms, linear terms, and constants into matching families before combining their coefficients.", image: "/visuals/like-terms-sorting-context.jpg", lesson: "combining-like-terms", visual: "term-groups", accent: "blue" as const },
+  { grade: 7, title: "Center and spread tell the story", copy: "Compare a typical value and the amount of variation instead of judging two groups by one number.", image: "/visuals/distribution-comparison-context.jpg", lesson: "g7-compare-distributions", visual: "box-plots", accent: "teal" as const },
 ];
 
-const expandedSceneCount = 86;
+const expandedSceneCount = 92;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";

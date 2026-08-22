@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -133,6 +133,66 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["3x^2\\cdot2x^3", "(3\\cdot2)x^{2+3}", "6x^5"],
     mathStepLabels: ["two monomials", "group like factors", "simplify"],
     modelLabel: "Math model: three x squared times two x cubed becomes three times two times x to the two plus three power, which is six x to the fifth",
+  },
+  "algebra-language": {
+    src: "/visuals/like-terms-sorting-context.jpg",
+    alt: "A tabletop sorting station separates large square tiles, long rectangular bars, and small unit squares into three matching groups",
+    headline: "read each part before you calculate",
+    copy: "The coefficient, variable, and constant have different jobs inside one expression.",
+    model: "term-structure",
+    mathSteps: ["3x+5", "3", "x", "5"],
+    mathStepLabels: ["expression", "coefficient", "variable", "constant"],
+    modelLabel: "Math model: in three x plus five, three is the coefficient, x is the variable, and five is the constant",
+  },
+  "combining-like-terms": {
+    src: "/visuals/like-terms-sorting-context.jpg",
+    alt: "A tabletop sorting station routes each of three tile shapes into its own matching lane and collection tray",
+    headline: "match the variable structure first",
+    copy: "x-terms combine with x-terms. Constants combine with constants. Unlike structures stay separate.",
+    model: "term-structure",
+    mathSteps: ["3x+2+5x-1", "(3+5)x+(2-1)", "8x+1"],
+    mathStepLabels: ["mixed expression", "group matching terms", "simplified"],
+    modelLabel: "Math model: three x plus two plus five x minus one groups as three plus five x and two minus one, then simplifies to eight x plus one",
+  },
+  "g7-equivalent-expressions": {
+    src: "/visuals/like-terms-sorting-context.jpg",
+    alt: "A tabletop algebra workshop with matching tile families gathered without changing any tile shape",
+    headline: "the structure can change while the value stays equal",
+    copy: "Factor the common 3 to reveal a new form, then test one value to confirm both forms agree.",
+    model: "term-structure",
+    mathSteps: ["3x+6", "3(x+2)", "x=4:\\;18=18"],
+    mathStepLabels: ["expanded form", "factored form", "same value check"],
+    modelLabel: "Math model: three x plus six equals three times x plus two; at x equals four, both forms equal eighteen",
+  },
+  "g9-algebraic-structure": {
+    src: "/visuals/like-terms-sorting-context.jpg",
+    alt: "A tabletop sorting lab uses distinct shapes to keep an outside factor, a grouped object, and a repetition count conceptually separate",
+    headline: "read the outside, the group, and the exponent",
+    copy: "Treat the parenthesized expression as one object before deciding whether to expand it.",
+    model: "term-structure",
+    mathSteps: ["3(x+2)^2", "3", "(x+2)", "2"],
+    mathStepLabels: ["whole expression", "outside factor", "grouped object", "repeat count"],
+    modelLabel: "Math model: in three times x plus two squared, three is the outside factor, x plus two is the grouped object, and two is the exponent",
+  },
+  "g9-polynomial-vocabulary": {
+    src: "/visuals/like-terms-sorting-context.jpg",
+    alt: "A tabletop sorting station keeps three different algebra tile families visually distinct",
+    headline: "term count and greatest exponent name the polynomial",
+    copy: "First separate the terms, then find the greatest exponent before classifying the expression.",
+    model: "term-structure",
+    mathSteps: ["4x^3-2x+1", "3\\text{ terms}", "\\text{degree}=3", "\\text{cubic trinomial}"],
+    mathStepLabels: ["polynomial", "count", "greatest exponent", "classification"],
+    modelLabel: "Math model: four x cubed minus two x plus one has three terms and degree three, so it is a cubic trinomial",
+  },
+  "g9-add-subtract-polynomials": {
+    src: "/visuals/like-terms-sorting-context.jpg",
+    alt: "A tabletop sorting lab gathers only algebra tiles with identical shapes into the same tray",
+    headline: "distribute the minus, then match structures",
+    copy: "Remove the parentheses carefully, group equal powers, and combine only their coefficients.",
+    model: "term-structure",
+    mathSteps: ["(3x^2+x)-(x^2-4x)", "3x^2+x-x^2+4x", "(3-1)x^2+(1+4)x", "2x^2+5x"],
+    mathStepLabels: ["subtract", "distribute the minus", "group like powers", "simplify"],
+    modelLabel: "Math model: three x squared plus x minus the group x squared minus four x becomes three x squared plus x minus x squared plus four x, then two x squared plus five x",
   },
   "coordinate-plane": {
     src: "/visuals/coordinate-route-context.jpg",
@@ -691,6 +751,7 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
         {scene.model === "substitution" && <div className="substitution-context-model" aria-hidden="true">{scene.mathSteps?.map((step, index) => <span className="substitution-context-step" key={step}><small>{scene.mathStepLabels?.[index]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(step, { throwOnError: false }) }} /></span>)}</div>}
         {scene.model === "power-steps" && <div className="power-context-model" aria-hidden="true">{scene.mathSteps?.map((step, index) => <span className="power-context-step" key={step}><small>{scene.mathStepLabels?.[index]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(step, { throwOnError: false }) }} />{index < (scene.mathSteps?.length ?? 0) - 1 && <i>→</i>}</span>)}</div>}
+        {scene.model === "term-structure" && <TermStructureModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "slope" && <div className="coordinate-model context-coordinate"><span className="axis-x" /><span className="axis-y" /><i className="point-one" /><i className="point-two" /><b /><em className="slope-run">run</em><em className="slope-rise">rise</em></div>}
         {scene.model === "triangle" && <div className="shape-model context-triangle"><span /><span /><span /><i aria-hidden="true" /></div>}
         {scene.model === "triangle-build" && <div className="triangle-build-context-model" aria-hidden="true"><div className="triangle-build-frame"><span className="triangle-side-three"><b>3</b></span><span className="triangle-side-four"><b>4</b></span><span className="triangle-side-five"><b>5</b></span><i className="triangle-vertex-one" /><i className="triangle-vertex-two" /><i className="triangle-vertex-three" /></div><strong>3 + 4 &gt; 5 · triangle closes</strong></div>}
@@ -742,4 +803,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
       <p>{scene.copy}</p>
     </div>
   );
+}
+
+function TermStructureModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [source, ...parts] = steps;
+  if (!source) return null;
+  return <div className="term-structure-context-model" aria-hidden="true"><header><small>{labels[0]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(source, { throwOnError: false }) }} /></header><div>{parts.map((step, index) => <span key={`${step}-${index}`}><small>{labels[index + 1]}</small><strong dangerouslySetInnerHTML={{ __html: katex.renderToString(step, { throwOnError: false }) }} /></span>)}</div></div>;
 }

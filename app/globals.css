@@ -1998,6 +1998,20 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .power-context-step strong { max-width: 100%; font-size: 16px; }
 .power-context-step:last-child small { color: rgb(255 255 255 / 78%); }
 .power-context-step > i { width: 24px; position: absolute; right: -25px; top: 50%; color: var(--gold); font-size: 18px; font-style: normal; font-weight: 900; transform: translateY(-50%); }
+.context-model-term-structure .context-scene img { object-position: center 51%; }
+.context-model-term-structure .context-math-card { width: min(620px, 95%); }
+.term-structure-context-model { width: 100%; display: grid; gap: 9px; }
+.term-structure-context-model > header { min-height: 48px; padding: 8px 13px; display: grid; grid-template-columns: minmax(92px, auto) minmax(0, 1fr); align-items: center; gap: 13px; border: 2px solid var(--blue); border-radius: 13px; background: linear-gradient(120deg, var(--blue-soft), white); }
+.term-structure-context-model small { color: var(--muted); font-size: 7px; font-weight: 900; letter-spacing: .07em; line-height: 1.25; text-transform: uppercase; }
+.term-structure-context-model > header > small { color: var(--blue); }
+.term-structure-context-model > header > strong { min-width: 0; overflow-x: auto; color: var(--navy); font-size: 18px; text-align: right; scrollbar-width: thin; }
+.term-structure-context-model > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.term-structure-context-model > div > span { min-width: 0; min-height: 58px; padding: 8px 7px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid #d6e1e8; border-radius: 11px; background: #f6f9fa; text-align: center; }
+.term-structure-context-model > div > span:nth-child(3n + 1) { border-color: #c9d9f1; background: #eef4fd; }
+.term-structure-context-model > div > span:nth-child(3n + 2) { border-color: #bfe3da; background: #ebf7f4; }
+.term-structure-context-model > div > span:nth-child(3n) { border-color: #efd998; background: #fff8e6; }
+.term-structure-context-model > div > span:last-child { border-width: 2px; border-color: var(--teal); box-shadow: 0 5px 12px rgb(17 113 91 / 9%); }
+.term-structure-context-model > div strong { max-width: 100%; overflow-x: auto; font-size: 14px; scrollbar-width: thin; }
 
 @media (max-width: 520px) {
   .fraction-equivalence-context-model { grid-template-columns: 1fr; gap: 7px; }
@@ -2016,6 +2030,13 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .power-context-step small { font-size: 8px; }
   .power-context-step strong { font-size: 17px; }
   .power-context-step > i { right: 50%; top: auto; bottom: -20px; transform: translateX(50%) rotate(90deg); }
+  .context-model-term-structure .context-math-card { width: 94%; padding-inline: 11px; }
+  .term-structure-context-model > header { min-height: 52px; grid-template-columns: 1fr; gap: 2px; text-align: center; }
+  .term-structure-context-model > header > strong { font-size: 18px; text-align: center; }
+  .term-structure-context-model > div { grid-template-columns: 1fr; gap: 7px; }
+  .term-structure-context-model > div > span { min-height: 50px; grid-template-columns: minmax(105px, .85fr) minmax(0, 1.15fr); justify-items: start; padding: 8px 11px; text-align: left; }
+  .term-structure-context-model > div strong { justify-self: end; font-size: 15px; text-align: right; }
+  .term-structure-context-model small { font-size: 8px; }
 }
 
 .review-memory-meter { margin: 20px 0 16px; padding: 15px; border: 1px solid #d5e3df; border-radius: 17px; background: linear-gradient(145deg, white, #eaf7f3); box-shadow: 0 10px 23px rgb(23 50 79 / 5%); }
