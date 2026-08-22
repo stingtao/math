@@ -327,6 +327,10 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.daily-token-medallion small \{ font-size: 9px/);
   assert.match(css, /\.daily-rhythm small \{ font-size: 10px/);
   assert.match(css, /\.reward-calendar span em \{ font-size: 8px/);
+  assert.match(css, /\.math-world-proof-stats small \{ font-size: 10px/);
+  assert.match(css, /\.game-feedback-card small \{ font-size: 10px/);
+  assert.match(css, /\.game-feedback-card h3 \{ font-size: 18px/);
+  assert.match(css, /\.game-feedback-card p \{ font-size: 14px/);
 });
 
 test("places a teen-treated AdSense unit between every page and the shared footer", async () => {

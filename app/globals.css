@@ -3514,3 +3514,16 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .star-path-options > span.earned::after { font-size: 9px; }
   .recovery-feedback small { font-size: 11px; line-height: 1.4; }
 }
+
+@media (max-width: 760px) {
+  .math-world-mobile-cue { font-size: 13px; }
+  .math-world-copy > small { font-size: 10px; line-height: 1.4; }
+  .math-world-copy > strong { font-size: 14px; }
+  .math-world-proof-stats small { font-size: 10px; }
+  .math-world-proof > span { font-size: 14px; }
+  .math-world-proof > span b { font-size: 15px; }
+  .game-quest-path small { font-size: 11px; }
+  .game-feedback-card small { font-size: 10px; }
+  .game-feedback-card h3 { font-size: 18px; }
+  .game-feedback-card p { font-size: 14px; }
+}
