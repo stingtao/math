@@ -169,7 +169,15 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <div className="welcome-route-step welcome-boss-step"><span aria-hidden="true">★</span><div><small>UNLOCK</small><strong>Boss quest</strong><span>5 mixed questions</span></div></div>
           </div>
           <footer className="welcome-guide-footer">
-            <div className="welcome-guide-promises"><p><span aria-hidden="true">✓</span><strong>Corrections count.</strong> Fix every answer and the lesson completes.</p><p><span aria-hidden="true">☆</span><strong>Stars are feedback.</strong> They celebrate this run and never lock progress.</p></div>
+            <div className="welcome-first-win" aria-label="First lesson reward preview: one of four region keys, at least 40 XP, and the next lesson opens">
+              <header><span aria-hidden="true">✦</span><div><small>FIRST WIN PREVIEW</small><strong>Finish all five—even after corrections.</strong></div></header>
+              <div className="welcome-first-win-rewards" role="list">
+                <span role="listitem"><b>1/4</b><strong>Region key</strong><small>Boss path begins</small></span>
+                <span role="listitem"><b>+40</b><strong>Base XP</strong><small>Star bonus possible</small></span>
+                <span role="listitem"><b>→</b><strong>Next lesson</strong><small>Opens right away</small></span>
+              </div>
+              <p><span aria-hidden="true">✓</span><strong>Stars are feedback.</strong> First tries add sparkle; corrected work still unlocks everything.</p>
+            </div>
             <div className="welcome-guide-action"><small>YOUR FIRST QUEST</small><strong>{nextLesson.title}</strong><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start one small step <span aria-hidden="true">→</span></a></div>
           </footer>
         </section>}

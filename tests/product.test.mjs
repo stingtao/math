@@ -609,6 +609,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /Your Google name, email, and photo are not saved/);
   assert.match(dashboard, /Collect 4 keys/);
   assert.match(dashboard, /Stars are feedback/);
+  assert.match(dashboard, /FIRST WIN PREVIEW/);
+  assert.match(dashboard, /First lesson reward preview: one of four region keys, at least 40 XP, and the next lesson opens/);
+  assert.match(dashboard, /Base XP/);
+  assert.match(dashboard, /Corrected work still unlocks everything/i);
   assert.match(dashboard, /Start one small step/);
   assert.match(dashboard, /<Avatar avatar=\{state\.profile\.avatar\}/);
   assert.match(dashboard, /reviewBatchSize/);
@@ -685,7 +689,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.world-landmark/);
   assert.match(css, /\.welcome-trail-guide/);
   assert.match(css, /\.welcome-route-step/);
-  assert.match(css, /\.welcome-guide-promises/);
+  assert.match(css, /\.welcome-first-win/);
+  assert.match(css, /\.welcome-first-win-rewards/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-first-win-rewards strong \{ font-size: 11px/);
   assert.match(css, /\.review-priority-card/);
   assert.match(css, /\.review-priority-orbit/);
   assert.match(css, /\.boss-priority-card/);
