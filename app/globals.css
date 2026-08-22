@@ -3102,3 +3102,77 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .signed-sum-context-model small,
   .rational-flow-context-model small { font-size: 9px; }
 }
+
+/* Proportion and word-model scenes form one Grade 7 modeling chain. */
+.context-model-proportion-table .context-scene img,
+.context-model-origin-proportion .context-scene img,
+.context-model-word-equation .context-scene img { object-position: center 51%; }
+.context-model-proportion-table .context-math-card,
+.context-model-origin-proportion .context-math-card,
+.context-model-word-equation .context-math-card { width: min(610px, 95%); }
+.proportion-table-context-model { width: 100%; display: grid; grid-template-columns: minmax(250px, 1fr) minmax(180px, .72fr); align-items: center; gap: 16px; }
+.proportion-table-context-model table { width: 100%; overflow: hidden; border-collapse: separate; border-spacing: 0; border: 1px solid #cad9e3; border-radius: 12px; background: white; font-size: 12px; text-align: center; }
+.proportion-table-context-model th,
+.proportion-table-context-model td { padding: 7px 10px; border-right: 1px solid #dbe5eb; border-bottom: 1px solid #dbe5eb; }
+.proportion-table-context-model th:last-child,
+.proportion-table-context-model td:last-child { border-right: 0; }
+.proportion-table-context-model tbody tr:last-child td { border-bottom: 0; }
+.proportion-table-context-model th { color: white; background: var(--blue); font-size: 9px; font-weight: 900; }
+.proportion-table-context-model tbody td:last-child { color: #087965; background: #ecf8f4; font-weight: 900; }
+.proportion-table-context-model > strong { min-height: 78px; padding: 12px; display: grid; place-items: center; align-content: center; gap: 7px; border-radius: 13px; color: white; background: var(--teal); text-align: center; }
+.proportion-table-context-model > strong small { color: white; font-size: 8px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; opacity: .82; }
+.proportion-table-context-model > strong strong { color: white; font-size: 15px; }
+
+.origin-proportion-context-model { width: min(470px, 100%); display: grid; grid-template-columns: minmax(270px, 1fr) minmax(150px, .58fr); align-items: center; gap: 17px; }
+.origin-proportion-context-model > div { width: 100%; height: 150px; position: relative; overflow: hidden; border-radius: 11px; background-color: #f8fafb; background-image: linear-gradient(#dfe8ed 1px, transparent 1px), linear-gradient(90deg, #dfe8ed 1px, transparent 1px); background-size: 30px 25px; }
+.origin-proportion-context-model > div > i { position: absolute; z-index: 1; background: var(--navy); }
+.origin-proportion-axis-x { left: 0; right: 0; bottom: 25px; height: 2px; }
+.origin-proportion-axis-y { left: 30px; top: 0; bottom: 0; width: 2px; }
+.origin-proportion-context-model > div > span { width: 310px; height: 5px; position: absolute; left: 19px; bottom: 20px; z-index: 2; border-radius: 99px; background: var(--blue); transform: rotate(-39.8deg); transform-origin: left center; }
+.origin-proportion-context-model > div > b { position: absolute; z-index: 3; padding: 5px 7px; border: 3px solid white; border-radius: 8px; color: white; font-size: 8px; box-shadow: 0 3px 8px rgb(23 50 79 / 16%); }
+.origin-proportion-zero { left: 12px; bottom: 14px; background: var(--navy); }
+.origin-proportion-point { right: 15px; top: 8px; background: var(--coral); }
+.origin-proportion-context-model > strong { min-height: 75px; padding: 11px; display: grid; place-items: center; align-content: center; gap: 7px; border-radius: 13px; color: white; background: var(--violet); text-align: center; }
+.origin-proportion-context-model > strong strong { color: white; font-size: 18px; }
+.origin-proportion-context-model > strong small { color: white; font-size: 8px; font-weight: 850; line-height: 1.35; opacity: .82; }
+
+.word-equation-context-model { width: 100%; display: grid; grid-template-columns: .64fr 1.36fr; gap: 9px; }
+.word-equation-context-model small { color: var(--muted); font-size: 8px; font-weight: 900; letter-spacing: .06em; line-height: 1.3; text-transform: uppercase; }
+.word-equation-context-model > header { min-height: 72px; grid-row: 1 / 3; padding: 10px; display: grid; place-items: center; align-content: center; gap: 5px; border-radius: 13px; color: white; background: var(--blue); }
+.word-equation-context-model > header small,
+.word-equation-context-model > header strong { color: white; }
+.word-equation-context-model > header strong { font-size: 16px; }
+.word-equation-context-model > div { display: grid; grid-template-columns: .72fr 18px .72fr 25px 1.2fr; align-items: center; gap: 5px; }
+.word-equation-context-model > div > span { min-width: 0; min-height: 59px; padding: 7px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid #c7d9ed; border-radius: 11px; background: #eef4fc; text-align: center; }
+.word-equation-context-model > div > span:nth-of-type(2) { border-color: #ead79c; background: #fff8e6; }
+.word-equation-context-model > div > span:last-child { border: 2px solid var(--violet); background: #f4f0fb; }
+.word-equation-context-model > div strong { max-width: 100%; overflow-x: auto; color: var(--navy); font-size: 14px; scrollbar-width: thin; }
+.word-equation-context-model > div > i,
+.word-equation-context-model > div > b { color: var(--blue); font-size: 15px; font-style: normal; font-weight: 900; text-align: center; }
+.word-equation-context-model > div > b { color: var(--violet); }
+.word-equation-context-model > footer { min-height: 48px; padding: 8px 12px; display: grid; grid-template-columns: minmax(74px, auto) minmax(0, 1fr); align-items: center; gap: 8px; border-radius: 11px; color: white; background: var(--teal); }
+.word-equation-context-model > footer small,
+.word-equation-context-model > footer strong { color: white; }
+.word-equation-context-model > footer strong { justify-self: end; font-size: 17px; }
+
+@media (max-width: 520px) {
+  .context-model-proportion-table .context-math-card,
+  .context-model-origin-proportion .context-math-card,
+  .context-model-word-equation .context-math-card { width: 94%; padding-inline: 11px; }
+  .proportion-table-context-model,
+  .origin-proportion-context-model,
+  .word-equation-context-model { grid-template-columns: 1fr; gap: 8px; }
+  .proportion-table-context-model > strong { min-height: 56px; }
+  .origin-proportion-context-model { width: 100%; }
+  .origin-proportion-context-model > div { height: 145px; }
+  .origin-proportion-context-model > strong { min-height: 56px; }
+  .word-equation-context-model > header { min-height: 54px; grid-row: auto; }
+  .word-equation-context-model > div { grid-template-columns: 1fr; }
+  .word-equation-context-model > div > span { min-height: 49px; grid-template-columns: minmax(102px, .8fr) minmax(0, 1.2fr); justify-items: start; padding: 7px 10px; text-align: left; }
+  .word-equation-context-model > div > span strong { justify-self: end; font-size: 16px; }
+  .word-equation-context-model > div > i,
+  .word-equation-context-model > div > b { transform: rotate(90deg); }
+  .word-equation-context-model > footer { grid-template-columns: 1fr; justify-items: center; gap: 2px; text-align: center; }
+  .word-equation-context-model > footer strong { justify-self: center; }
+  .word-equation-context-model small { font-size: 9px; }
+}

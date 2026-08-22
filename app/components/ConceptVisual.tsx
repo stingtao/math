@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -136,6 +136,32 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["5\\text{ m}", "-12\\text{ m}", "5+(-12)", "-7\\text{ m}"],
     mathStepLabels: ["start", "signed change", "equation", "finish"],
     modelLabel: "Math model: start at five meters, descend twelve meters, write five plus negative twelve, and finish at negative seven meters",
+  },
+  "g7-proportional-tables": {
+    src: "/visuals/unit-rate-bike-context.jpg",
+    alt: "A cyclist travels a measured route while a clean rate display compares distance with time",
+    headline: "the same quotient in every row means one constant rate",
+    copy: "Divide y by x in each row. When every quotient matches, one rule connects the whole table.",
+    model: "proportion-table",
+    modelLabel: "Math model: the pairs two and six, four and twelve, and six and eighteen all have y divided by x equal to three, so y equals three x",
+  },
+  "g7-proportional-graphs": {
+    src: "/visuals/graphing-line-city-context.jpg",
+    alt: "A straight route rises through a coordinate city from one marked starting point",
+    headline: "a proportional line starts at the origin",
+    copy: "Zero input must give zero output, and every other point follows the same rise-to-run ratio.",
+    model: "origin-proportion",
+    modelLabel: "Math model: y equals two x passes through zero zero and three six, forming a straight line through the origin",
+  },
+  "g7-equation-word-models": {
+    src: "/visuals/multistep-workshop-context.jpg",
+    alt: "A workshop removes one operation layer at a time from matching mystery boxes",
+    headline: "name the unknown, then translate each part",
+    copy: "Four dollars per ride becomes 4r; the fixed fee adds 3; the total gives the other side of the equation.",
+    model: "word-equation",
+    mathSteps: ["r=\\text{rides}", "4r", "+3", "4r+3=19", "r=4"],
+    mathStepLabels: ["unknown", "per-ride cost", "fixed fee", "equation", "check"],
+    modelLabel: "Math model: let r be the number of rides; four dollars per ride plus a three dollar fee totals nineteen, so four r plus three equals nineteen and r equals four",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -874,6 +900,9 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "subtract-opposite" && <RationalFlowModel className="subtract-opposite-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "signed-rational-quotient" && <RationalFlowModel className="signed-rational-quotient-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "signed-change" && <RationalFlowModel className="signed-change-context-model" steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "proportion-table" && <ProportionTableModel />}
+        {scene.model === "origin-proportion" && <OriginProportionModel />}
+        {scene.model === "word-equation" && <WordEquationModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -993,4 +1022,18 @@ function SignedSumModel({ steps, labels }: { steps: string[]; labels: string[] }
 
 function RationalFlowModel({ className, steps, labels }: { className: string; steps: string[]; labels: string[] }) {
   return <div className={`rational-flow-context-model ${className}`} aria-hidden="true">{steps.map((step, index) => <span key={step}><small>{labels[index]}</small><MathStep value={step} />{index < steps.length - 1 && <i>→</i>}</span>)}</div>;
+}
+
+function ProportionTableModel() {
+  return <div className="proportion-table-context-model" aria-hidden="true"><table><thead><tr><th>x</th><th>y</th><th>y ÷ x</th></tr></thead><tbody>{[[2, 6], [4, 12], [6, 18]].map(([x, y]) => <tr key={x}><td>{x}</td><td>{y}</td><td>3</td></tr>)}</tbody></table><strong><small>constant of proportionality</small><MathStep value="k=3\\Rightarrow y=3x" /></strong></div>;
+}
+
+function OriginProportionModel() {
+  return <div className="origin-proportion-context-model" aria-hidden="true"><div><i className="origin-proportion-axis-x" /><i className="origin-proportion-axis-y" /><span /><b className="origin-proportion-zero">(0, 0)</b><b className="origin-proportion-point">(3, 6)</b></div><strong><MathStep value="y=2x" /><small>straight line · through the origin</small></strong></div>;
+}
+
+function WordEquationModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [unknown, rate, fee, equation, result] = steps;
+  if (!unknown || !rate || !fee || !equation || !result) return null;
+  return <div className="word-equation-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={unknown} /></header><div><span><small>{labels[1]}</small><MathStep value={rate} /></span><i>+</i><span><small>{labels[2]}</small><MathStep value={fee} /></span><b>→</b><span><small>{labels[3]}</small><MathStep value={equation} /></span></div><footer><small>{labels[4]}</small><MathStep value={result} /></footer></div>;
 }
