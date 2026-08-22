@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "signed-sum" | "subtract-opposite" | "signed-rational-quotient" | "signed-change" | "proportion-table" | "origin-proportion" | "word-equation" | "scale-area" | "composite-area" | "experimental-probability" | "sample-space" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -162,6 +162,38 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["r=\\text{rides}", "4r", "+3", "4r+3=19", "r=4"],
     mathStepLabels: ["unknown", "per-ride cost", "fixed fee", "equation", "check"],
     modelLabel: "Math model: let r be the number of rides; four dollars per ride plus a three dollar fee totals nineteen, so four r plus three equals nineteen and r equals four",
+  },
+  "g7-scale-area": {
+    src: "/visuals/scale-drawing-studio-context.jpg",
+    alt: "A precise design studio compares the same plan at two different scales",
+    headline: "length uses k; area uses k squared",
+    copy: "Scaling every side by 3 creates three times as many rows and three times as many columns: 9 times the area.",
+    model: "scale-area",
+    modelLabel: "Math model: a square with side two has area four; after scale factor three, its side is six and area is thirty-six, so area changes by nine",
+  },
+  "g7-composite-area": {
+    src: "/visuals/polynomial-tiles-context.jpg",
+    alt: "A large rectangular board is partitioned into smaller non-overlapping rectangular regions",
+    headline: "start with a familiar whole, then remove the missing part",
+    copy: "Find the 10 by 8 rectangle, subtract the 3 by 2 cutout, and keep square units.",
+    model: "composite-area",
+    modelLabel: "Math model: a ten by eight rectangle has area eighty; subtract a three by two cutout with area six to get seventy-four square units",
+  },
+  "g7-experimental-probability": {
+    src: "/visuals/probability-arcade-context.jpg",
+    alt: "A probability arcade records repeated trials on a clear results display",
+    headline: "estimate chance from what actually happened",
+    copy: "Count observed successes, divide by all trials, and expect the estimate to settle with more data.",
+    model: "experimental-probability",
+    modelLabel: "Math model: eighteen observed heads in thirty tosses gives experimental probability eighteen thirtieths, which is three fifths or zero point six",
+  },
+  "g7-sample-spaces": {
+    src: "/visuals/compound-events-lab-context.jpg",
+    alt: "A two-stage chance laboratory branches from one event into every possible paired outcome",
+    headline: "list every outcome exactly once",
+    copy: "Two coin flips create four ordered outcomes: HH, HT, TH, and TT.",
+    model: "sample-space",
+    modelLabel: "Math model: two coin flips have the sample space head head, head tail, tail head, and tail tail, with four equally likely outcomes",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -903,6 +935,10 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "proportion-table" && <ProportionTableModel />}
         {scene.model === "origin-proportion" && <OriginProportionModel />}
         {scene.model === "word-equation" && <WordEquationModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "scale-area" && <ScaleAreaModel />}
+        {scene.model === "composite-area" && <CompositeAreaModel />}
+        {scene.model === "experimental-probability" && <ExperimentalProbabilityModel />}
+        {scene.model === "sample-space" && <SampleSpaceModel />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -1036,4 +1072,20 @@ function WordEquationModel({ steps, labels }: { steps: string[]; labels: string[
   const [unknown, rate, fee, equation, result] = steps;
   if (!unknown || !rate || !fee || !equation || !result) return null;
   return <div className="word-equation-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={unknown} /></header><div><span><small>{labels[1]}</small><MathStep value={rate} /></span><i>+</i><span><small>{labels[2]}</small><MathStep value={fee} /></span><b>→</b><span><small>{labels[3]}</small><MathStep value={equation} /></span></div><footer><small>{labels[4]}</small><MathStep value={result} /></footer></div>;
+}
+
+function ScaleAreaModel() {
+  return <div className="scale-area-context-model" aria-hidden="true"><div className="scale-area-small"><span /><small>side 2</small><strong>area 4</strong></div><i><b>length × 3</b><b>area × 3²</b></i><div className="scale-area-large"><span>{Array.from({ length: 9 }, (_, index) => <em key={index} />)}</span><small>side 6</small><strong>area 36</strong></div><footer><MathStep value="k=3\\Rightarrow k^2=9" /><small>nine times the area</small></footer></div>;
+}
+
+function CompositeAreaModel() {
+  return <div className="composite-area-context-model" aria-hidden="true"><div><span>10 × 8</span><i>3 × 2</i></div><strong><small>whole − cutout</small><MathStep value="80-6=74\\text{ units}^2" /></strong></div>;
+}
+
+function ExperimentalProbabilityModel() {
+  return <div className="experimental-probability-context-model" aria-hidden="true"><div>{Array.from({ length: 30 }, (_, index) => <span className={index < 18 ? "observed" : ""} key={index} />)}</div><strong><small>18 observed · 30 trials</small><MathStep value="P(H)=\\frac{18}{30}=\\frac35=0.6" /></strong></div>;
+}
+
+function SampleSpaceModel() {
+  return <div className="sample-space-context-model" aria-hidden="true"><header><span>FIRST FLIP</span><i>H</i><i>T</i></header><div><small>SECOND FLIP</small>{["HH", "HT", "TH", "TT"].map((outcome) => <span key={outcome}><b>{outcome}</b><em>1 of 4</em></span>)}</div><footer>S = &#123;HH, HT, TH, TT&#125;</footer></div>;
 }

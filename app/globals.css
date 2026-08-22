@@ -3176,3 +3176,82 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .word-equation-context-model > footer strong { justify-self: center; }
   .word-equation-context-model small { font-size: 9px; }
 }
+
+/* Grade 7 geometry and probability models close the remaining visual gaps. */
+.context-model-scale-area .context-scene img,
+.context-model-composite-area .context-scene img,
+.context-model-experimental-probability .context-scene img,
+.context-model-sample-space .context-scene img { object-position: center 50%; }
+.context-model-scale-area .context-math-card,
+.context-model-composite-area .context-math-card,
+.context-model-experimental-probability .context-math-card,
+.context-model-sample-space .context-math-card { width: min(610px, 95%); }
+.scale-area-context-model { width: min(520px, 100%); display: grid; grid-template-columns: 105px 120px 170px; grid-template-rows: auto auto; align-items: center; justify-content: center; gap: 8px 15px; }
+.scale-area-context-model > div { display: grid; justify-items: center; gap: 4px; }
+.scale-area-context-model > div > span { display: grid; overflow: hidden; border: 3px solid var(--navy); border-radius: 9px; background: var(--blue-soft); }
+.scale-area-small > span { width: 64px; height: 64px; }
+.scale-area-large > span { width: 138px; height: 138px; grid-template-columns: repeat(3, 1fr); }
+.scale-area-large > span > em { border: 1px solid white; background: color-mix(in srgb, var(--blue) 70%, white); }
+.scale-area-context-model small { color: var(--muted); font-size: 8px; font-weight: 850; }
+.scale-area-context-model > div > strong { color: var(--navy); font-size: 11px; }
+.scale-area-context-model > i { display: grid; gap: 8px; color: var(--blue); font-style: normal; text-align: center; }
+.scale-area-context-model > i > b { padding: 7px 8px; border-radius: 9px; background: #eef4fb; font-size: 10px; }
+.scale-area-context-model > i > b:last-child { color: #765714; background: #fff6db; }
+.scale-area-context-model > footer { grid-column: 1 / -1; justify-self: center; padding: 8px 13px; display: flex; align-items: center; gap: 11px; border-radius: 10px; color: white; background: var(--violet); }
+.scale-area-context-model > footer strong,
+.scale-area-context-model > footer small { color: white; }
+.scale-area-context-model > footer strong { font-size: 14px; }
+
+.composite-area-context-model { width: min(470px, 100%); display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: center; gap: 22px; }
+.composite-area-context-model > div { width: 220px; height: 145px; position: relative; overflow: hidden; border: 3px solid var(--navy); border-radius: 11px; background: repeating-linear-gradient(0deg, transparent 0 28px, rgb(255 255 255 / 36%) 28px 30px), var(--blue); }
+.composite-area-context-model > div > span { position: absolute; left: 13px; top: 12px; padding: 6px 8px; border-radius: 8px; color: white; background: rgb(23 50 79 / 74%); font-size: 11px; font-weight: 900; }
+.composite-area-context-model > div > i { width: 66px; height: 43px; position: absolute; right: -3px; bottom: -3px; display: grid; place-items: center; border: 3px solid var(--navy); border-radius: 8px 0 0 0; color: var(--coral); background: white; font-size: 10px; font-style: normal; font-weight: 900; }
+.composite-area-context-model > strong { min-height: 79px; padding: 12px; display: grid; place-items: center; align-content: center; gap: 7px; border-radius: 13px; color: white; background: var(--coral); text-align: center; }
+.composite-area-context-model > strong small { color: white; font-size: 8px; letter-spacing: .07em; text-transform: uppercase; opacity: .82; }
+.composite-area-context-model > strong strong { color: white; font-size: 14px; }
+
+.experimental-probability-context-model { width: min(500px, 100%); display: grid; grid-template-columns: minmax(240px, 1fr) minmax(180px, .72fr); align-items: center; gap: 17px; }
+.experimental-probability-context-model > div { padding: 11px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; border: 1px solid #d7e2e8; border-radius: 13px; background: #f7fafb; }
+.experimental-probability-context-model > div > span { aspect-ratio: 1; display: block; border: 2px solid white; border-radius: 6px; background: #d5e0e7; box-shadow: 0 2px 5px rgb(23 50 79 / 10%); }
+.experimental-probability-context-model > div > span.observed { background: var(--teal); }
+.experimental-probability-context-model > strong { min-height: 82px; padding: 12px; display: grid; place-items: center; align-content: center; gap: 7px; border-radius: 13px; color: white; background: var(--violet); text-align: center; }
+.experimental-probability-context-model > strong small,
+.experimental-probability-context-model > strong strong { color: white; }
+.experimental-probability-context-model > strong small { font-size: 8px; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; opacity: .82; }
+.experimental-probability-context-model > strong strong { font-size: 14px; }
+
+.sample-space-context-model { width: min(470px, 100%); display: grid; grid-template-columns: 95px minmax(0, 1fr); gap: 8px; }
+.sample-space-context-model > header { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: auto 1fr; gap: 5px; }
+.sample-space-context-model > header > span { grid-column: 1 / -1; color: var(--muted); font-size: 8px; font-weight: 900; letter-spacing: .06em; text-align: center; }
+.sample-space-context-model > header > i { min-height: 62px; display: grid; place-items: center; border-radius: 11px; color: white; background: var(--blue); font-size: 17px; font-style: normal; font-weight: 900; }
+.sample-space-context-model > header > i:last-child { background: var(--coral); }
+.sample-space-context-model > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.sample-space-context-model > div > small { grid-column: 1 / -1; color: var(--muted); font-size: 8px; font-weight: 900; letter-spacing: .06em; text-align: center; }
+.sample-space-context-model > div > span { min-width: 0; min-height: 62px; display: grid; place-items: center; align-content: center; gap: 3px; border: 1px solid #d5e1e8; border-radius: 11px; background: #f7fafb; }
+.sample-space-context-model > div > span:nth-of-type(2),
+.sample-space-context-model > div > span:nth-of-type(3) { border-color: #e7d098; background: #fff8e5; }
+.sample-space-context-model > div b { color: var(--navy); font-size: 15px; }
+.sample-space-context-model > div em { color: var(--muted); font-size: 7px; font-style: normal; font-weight: 850; }
+.sample-space-context-model > footer { grid-column: 1 / -1; padding: 8px 12px; border-radius: 10px; color: white; background: var(--teal); font-size: 13px; font-weight: 900; text-align: center; }
+
+@media (max-width: 520px) {
+  .context-model-scale-area .context-math-card,
+  .context-model-composite-area .context-math-card,
+  .context-model-experimental-probability .context-math-card,
+  .context-model-sample-space .context-math-card { width: 94%; padding-inline: 11px; }
+  .scale-area-context-model { grid-template-columns: 82px 80px 130px; gap: 7px 8px; }
+  .scale-area-small > span { width: 55px; height: 55px; }
+  .scale-area-large > span { width: 114px; height: 114px; }
+  .scale-area-context-model > i > b { padding-inline: 4px; font-size: 9px; }
+  .scale-area-context-model > footer { flex-direction: column; gap: 2px; }
+  .composite-area-context-model,
+  .experimental-probability-context-model,
+  .sample-space-context-model { grid-template-columns: 1fr; justify-items: center; gap: 9px; }
+  .composite-area-context-model > strong,
+  .experimental-probability-context-model > strong { width: 100%; min-height: 58px; }
+  .experimental-probability-context-model > div { width: 100%; }
+  .sample-space-context-model > header { width: 100%; grid-template-columns: repeat(2, 1fr); }
+  .sample-space-context-model > header > i { min-height: 44px; }
+  .sample-space-context-model > div { width: 100%; grid-template-columns: repeat(2, 1fr); }
+  .sample-space-context-model > div > span { min-height: 50px; }
+}
