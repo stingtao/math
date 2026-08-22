@@ -7,7 +7,7 @@ type ContextScene = {
   alt: string;
   headline: string;
   copy: string;
-  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
+  model: "number-line" | "symbol-meaning" | "sign-pairs" | "operation-order" | "place-value" | "repeating-decimal" | "negative-distribute" | "root-inverse" | "solid-compare" | "percent" | "fraction-equivalence" | "fraction-addition" | "substitution" | "power-steps" | "term-structure" | "slope" | "triangle" | "triangle-build" | "angles" | "scatter" | "distribute" | "function" | "transform" | "volume" | "cone-volume" | "sphere-volume" | "cross-section" | "coordinate-location" | "coordinate-distance" | "difference-squares" | "balance" | "root-bracket" | "scientific-scale" | "equation-steps" | "ratio" | "circle" | "prism" | "probability-scale" | "systems-crossing" | "solution-cases" | "inequality-range" | "area-product" | "parabola" | "exponential" | "scale-drawing" | "random-sample" | "arithmetic-sequence" | "quadratic-roots" | "surface-area-net" | "compound-event" | "two-way-table" | "exponential-decay" | "number-kinds" | "system-elimination" | "distribution-compare" | "rational-exponent" | "growth-compare" | "simple-interest" | "graph-line" | "dilation" | "residuals";
   mathSteps?: string[];
   mathStepLabels?: string[];
   modelLabel?: string;
@@ -76,6 +76,26 @@ const contextScenes: Record<string, ContextScene> = {
     mathSteps: ["-3(x^2+y^3)", "-3\\cdot x^2=-3x^2", "-3\\cdot y^3=-3y^3", "-3x^2-3y^3"],
     mathStepLabels: ["start", "first term", "second term", "result"],
     modelLabel: "Math model: negative three times the group x squared plus y cubed distributes to negative three x squared and negative three y cubed, giving negative three x squared minus three y cubed",
+  },
+  "square-cube-roots": {
+    src: "/visuals/rational-exponent-lab-context.jpg",
+    alt: "A cube made from equal unit blocks is reduced to one edge and then rebuilt as one square layer",
+    headline: "a root reverses a power",
+    copy: "Ask which original factor was squared or cubed to make the number under the root.",
+    model: "root-inverse",
+    mathSteps: ["9^2=81", "\\sqrt{81}=9", "3^3=27", "\\sqrt[3]{27}=3"],
+    mathStepLabels: ["square builds", "square root undoes", "cube builds", "cube root undoes"],
+    modelLabel: "Math model: nine squared is eighty-one, so the square root of eighty-one is nine; three cubed is twenty-seven, so the cube root of twenty-seven is three",
+  },
+  "mixed-volume": {
+    src: "/visuals/cone-measure-context.jpg",
+    alt: "Three matching cones fill the same amount of space as one cylinder with the same radius and height",
+    headline: "identify each solid before choosing a formula",
+    copy: "With the same radius and height, a cone is one third of its matching cylinder.",
+    model: "solid-compare",
+    mathSteps: ["r=2,\\;h=9", "V_{cyl}=36\\pi", "V_{cone}=12\\pi", "36\\pi-12\\pi=24\\pi"],
+    mathStepLabels: ["same dimensions", "cylinder", "cone", "difference"],
+    modelLabel: "Math model: with radius two and height nine, the cylinder volume is thirty-six pi and the cone volume is twelve pi, so their difference is twenty-four pi",
   },
   percent: {
     src: "/visuals/percent-market-context.jpg",
@@ -808,6 +828,8 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "place-value" && <PlaceValueModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "repeating-decimal" && <RepeatingDecimalModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "negative-distribute" && <NegativeDistributeModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "root-inverse" && <RootInverseModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
+        {scene.model === "solid-compare" && <SolidCompareModel steps={scene.mathSteps ?? []} labels={scene.mathStepLabels ?? []} />}
         {scene.model === "percent" && <div className="percent-context-grid" aria-hidden="true">{Array.from({ length: 100 }, (_, index) => <span className={index < 20 ? "filled" : ""} key={index} />)}</div>}
         {scene.model === "fraction-equivalence" && <div className="fraction-equivalence-context-model" aria-hidden="true"><div><small>8 equal parts</small><span className="fraction-strip fraction-eighths">{Array.from({ length: 8 }, (_, index) => <i className={index < 6 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac68", { throwOnError: false }) }} /></div><b>=</b><div><small>4 equal parts</small><span className="fraction-strip fraction-quarters">{Array.from({ length: 4 }, (_, index) => <i className={index < 3 ? "filled" : ""} key={index} />)}</span><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac34", { throwOnError: false }) }} /></div></div>}
         {scene.model === "fraction-addition" && <div className="fraction-addition-context-model" aria-hidden="true"><header><span dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac13", { throwOnError: false }) }} /><i>rename</i><strong dangerouslySetInnerHTML={{ __html: katex.renderToString("\\frac26", { throwOnError: false }) }} /></header><div>{[{ filled: 2, label: "\\frac26" }, { filled: 1, label: "\\frac16" }, { filled: 3, label: "\\frac36=\\frac12" }].map((item, index) => <span className="fraction-addition-part" key={item.label}><em className="fraction-strip fraction-sixths">{Array.from({ length: 6 }, (_, cell) => <i className={cell < item.filled ? "filled" : ""} key={cell} />)}</em><small dangerouslySetInnerHTML={{ __html: katex.renderToString(item.label, { throwOnError: false }) }} />{index < 2 && <b>{index === 0 ? "+" : "="}</b>}</span>)}</div></div>}
@@ -907,4 +929,14 @@ function NegativeDistributeModel({ steps, labels }: { steps: string[]; labels: s
   const [source, first, second, result] = steps;
   if (!source || !first || !second || !result) return null;
   return <div className="negative-distribute-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={source} /></header><div><span><small>{labels[1]}</small><MathStep value={first} /></span><span><small>{labels[2]}</small><MathStep value={second} /></span></div><footer><small>{labels[3]}</small><MathStep value={result} /></footer></div>;
+}
+
+function RootInverseModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  return <div className="root-inverse-context-model" aria-hidden="true">{[0, 2].map((start) => <div key={steps[start]}><span><small>{labels[start]}</small><MathStep value={steps[start]} /></span><i>↔</i><span><small>{labels[start + 1]}</small><MathStep value={steps[start + 1]} /></span></div>)}</div>;
+}
+
+function SolidCompareModel({ steps, labels }: { steps: string[]; labels: string[] }) {
+  const [dimensions, cylinder, cone, difference] = steps;
+  if (!dimensions || !cylinder || !cone || !difference) return null;
+  return <div className="solid-compare-context-model" aria-hidden="true"><header><small>{labels[0]}</small><MathStep value={dimensions} /></header><div><span><small>{labels[1]}</small><i className="solid-cylinder-mark" /><MathStep value={cylinder} /></span><span><small>{labels[2]}</small><i className="solid-cone-mark" /><MathStep value={cone} /></span></div><footer><small>{labels[3]}</small><MathStep value={difference} /></footer></div>;
 }

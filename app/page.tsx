@@ -48,7 +48,7 @@ const mathWorldScenes = [
   { grade: 7, title: "Center and spread tell the story", copy: "Compare a typical value and the amount of variation instead of judging two groups by one number.", image: "/visuals/distribution-comparison-context.jpg", lesson: "g7-compare-distributions", visual: "box-plots", accent: "teal" as const },
 ];
 
-const expandedSceneCount = 98;
+const expandedSceneCount = 100;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";

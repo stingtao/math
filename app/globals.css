@@ -2990,3 +2990,52 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .repeating-decimal-context-model small,
   .negative-distribute-context-model small { font-size: 9px; }
 }
+
+/* The final Grade 8 context models connect inverse roots and mixed solids. */
+.context-model-root-inverse .context-scene img,
+.context-model-solid-compare .context-scene img { object-position: center 50%; }
+.context-model-root-inverse .context-math-card,
+.context-model-solid-compare .context-math-card { width: min(610px, 95%); }
+.root-inverse-context-model { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.root-inverse-context-model > div { min-width: 0; min-height: 78px; padding: 9px; display: grid; grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr); align-items: center; gap: 5px; border: 1px solid #d5c9e8; border-radius: 13px; background: #f5f1fb; }
+.root-inverse-context-model > div:last-child { border-color: #c0e2d9; background: #eef8f5; }
+.root-inverse-context-model span { min-width: 0; display: grid; place-items: center; gap: 6px; text-align: center; }
+.root-inverse-context-model small,
+.solid-compare-context-model small { color: var(--muted); font-size: 8px; font-weight: 900; letter-spacing: .06em; line-height: 1.3; text-transform: uppercase; }
+.root-inverse-context-model strong { max-width: 100%; overflow-x: auto; color: var(--navy); font-size: 16px; scrollbar-width: thin; }
+.root-inverse-context-model > div > i { color: var(--violet); font-size: 18px; font-style: normal; font-weight: 900; text-align: center; }
+.root-inverse-context-model > div:last-child > i { color: var(--teal); }
+
+.solid-compare-context-model { width: 100%; display: grid; grid-template-columns: .72fr 1.45fr; gap: 9px; }
+.solid-compare-context-model > header { min-height: 76px; grid-row: 1 / 3; padding: 10px; display: grid; place-items: center; align-content: center; gap: 5px; border-radius: 13px; color: white; background: var(--blue); text-align: center; }
+.solid-compare-context-model > header small,
+.solid-compare-context-model > header strong { color: white; }
+.solid-compare-context-model > header strong { font-size: 17px; }
+.solid-compare-context-model > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.solid-compare-context-model > div > span { min-width: 0; min-height: 72px; padding: 7px 8px; display: grid; grid-template-columns: 34px minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: center; gap: 3px 7px; border: 1px solid #c9d9ea; border-radius: 12px; background: #eef4fb; }
+.solid-compare-context-model > div > span:last-child { border-color: #efd1cd; background: #fff3f1; }
+.solid-compare-context-model > div small { grid-column: 1 / -1; }
+.solid-compare-context-model > div i { width: 31px; height: 39px; display: block; justify-self: center; border: 3px solid var(--blue); background: #dceafd; }
+.solid-compare-context-model .solid-cylinder-mark { border-radius: 50% / 11%; }
+.solid-compare-context-model .solid-cone-mark { border-color: var(--coral); background: #ffe2de; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.solid-compare-context-model > div strong { min-width: 0; overflow-x: auto; color: var(--navy); font-size: 13px; scrollbar-width: thin; }
+.solid-compare-context-model > footer { min-height: 49px; padding: 8px 11px; display: grid; grid-template-columns: minmax(76px, auto) minmax(0, 1fr); align-items: center; gap: 8px; border-radius: 11px; color: white; background: var(--teal); }
+.solid-compare-context-model > footer small,
+.solid-compare-context-model > footer strong { color: white; }
+.solid-compare-context-model > footer strong { justify-self: end; overflow-x: auto; font-size: 17px; scrollbar-width: thin; }
+
+@media (max-width: 520px) {
+  .context-model-root-inverse .context-math-card,
+  .context-model-solid-compare .context-math-card { width: 94%; padding-inline: 11px; }
+  .root-inverse-context-model { grid-template-columns: 1fr; gap: 7px; }
+  .root-inverse-context-model > div { min-height: 63px; }
+  .root-inverse-context-model small,
+  .solid-compare-context-model small { font-size: 9px; }
+  .root-inverse-context-model strong { font-size: 17px; }
+  .solid-compare-context-model { grid-template-columns: 1fr; }
+  .solid-compare-context-model > header { min-height: 56px; grid-row: auto; }
+  .solid-compare-context-model > div > span { min-height: 66px; }
+  .solid-compare-context-model > div strong { font-size: 14px; }
+  .solid-compare-context-model > footer { grid-template-columns: 1fr; justify-items: center; gap: 2px; text-align: center; }
+  .solid-compare-context-model > footer strong { justify-self: center; font-size: 17px; }
+}
