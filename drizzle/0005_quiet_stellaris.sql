@@ -1,4 +1,4 @@
-CREATE TABLE `lesson_runs` (
+CREATE TABLE IF NOT EXISTS `lesson_runs` (
 	`learner_id` text NOT NULL,
 	`lesson_id` text NOT NULL,
 	`run_id` text NOT NULL,

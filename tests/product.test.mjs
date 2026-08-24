@@ -6,6 +6,8 @@ import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
 import { mathInputMode } from "../lib/math-input.ts";
 import { getQuestMilestone } from "../lib/quest-milestone.ts";
+import { ANSWER_BADGE_STEP, BADGE_CATALOG_SIZE, BADGE_CATALOG_VERSION, answerBadgeForCorrectCount, answerBadges, badgeCatalog, lessonBadges, nextAnswerBadge } from "../lib/badges.ts";
+import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../lib/learner-state.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -97,6 +99,106 @@ test("ships all three curriculum files and all source sheets", async () => {
   assert.match(curriculum, /8\.SP\.A\.4/);
   const sheets = await readdir(new URL("../public/quick-sheets/", import.meta.url));
   assert.equal(sheets.filter((name) => name.endsWith(".png")).length, 20);
+});
+
+test("builds exactly 500 deterministic badges around the full curriculum", () => {
+  assert.equal(BADGE_CATALOG_SIZE, 500);
+  assert.equal(BADGE_CATALOG_VERSION, "2026.1");
+  assert.equal(ANSWER_BADGE_STEP, 10);
+  assert.equal(lessonBadges.length, 124);
+  assert.equal(answerBadges.length, 376);
+  assert.equal(badgeCatalog.length, 500);
+  assert.equal(new Set(badgeCatalog.map((badge) => badge.id)).size, 500);
+  assert.equal(new Set(badgeCatalog.map((badge) => badge.title)).size, 500);
+  assert.equal(new Set(badgeCatalog.map((badge) => badge.catalogNumber)).size, 500);
+  assert.equal(new Set(lessonBadges.map((badge) => badge.lessonId)).size, 124);
+  assert.equal(answerBadges.at(0)?.target, 10);
+  assert.equal(answerBadges.at(-1)?.target, 3_760);
+  for (const [index, badge] of answerBadges.entries()) assert.equal(badge.target, (index + 1) * 10);
+  assert.equal(answerBadgeForCorrectCount(9), undefined);
+  assert.equal(answerBadgeForCorrectCount(10)?.id, "answer-001");
+  assert.equal(answerBadgeForCorrectCount(3_760)?.id, "answer-376");
+  assert.equal(nextAnswerBadge(0)?.target, 10);
+  assert.equal(nextAnswerBadge(3_760), null);
+});
+
+test("grants demo badges once at the same milestones as the server", () => {
+  let state = structuredClone(getDemoState());
+  const first = creditDemoCorrectAnswer(state);
+  state = first.state;
+  const second = creditDemoCorrectAnswer(state);
+  state = second.state;
+  const milestone = creditDemoCorrectAnswer(state);
+  state = milestone.state;
+  assert.equal(milestone.correctAnswers, 10);
+  assert.deepEqual(milestone.badgeUnlocks.map((item) => item.id), ["answer-001"]);
+  const after = creditDemoCorrectAnswer(state);
+  assert.equal(after.badgeUnlocks.length, 0);
+  assert.equal(after.state.badges.earnedIds.filter((id) => id === "answer-001").length, 1);
+
+  const lessonState = completeDemoLesson(after.state, "g8-r1-l2", 1);
+  assert.ok(lessonState.badges.earnedIds.includes("lesson-g8-r1-l2"));
+  const replayState = completeDemoLesson(lessonState, "g8-r1-l2", 3);
+  assert.equal(replayState.badges.earnedIds.filter((id) => id === "lesson-g8-r1-l2").length, 1);
+});
+
+test("persists badge ownership and qualified answer credits without adding badge XP", async () => {
+  const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  const bootstrap = await readFile(new URL("../db/bootstrap.ts", import.meta.url), "utf8");
+  const migration = await readFile(new URL("../drizzle/0006_closed_luminals.sql", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const answerRoute = await readFile(new URL("../app/api/answer/route.ts", import.meta.url), "utf8");
+  const reviewRoute = await readFile(new URL("../app/api/review/route.ts", import.meta.url), "utf8");
+
+  for (const source of [schema, bootstrap, migration]) {
+    assert.match(source, /badge_unlocks/);
+    assert.match(source, /answer_credits/);
+    assert.match(source, /ON DELETE CASCADE|onDelete: "cascade"/i);
+  }
+  assert.match(store, /INSERT OR IGNORE INTO answer_credits/);
+  assert.match(store, /INSERT OR IGNORE INTO badge_unlocks/);
+  assert.match(store, /lessonBadgeByLessonId/);
+  assert.match(store, /const eligibleCount = Math\.min\(answerBadges\.length/);
+  assert.match(store, /for \(let index = lastUnlocked; index < eligibleCount/);
+  assert.match(answerRoute, /correctAnswers/);
+  assert.match(answerRoute, /badgeUnlocks/);
+  assert.match(reviewRoute, /creditCorrectAnswer/);
+  const badgeGrantSource = store.slice(store.indexOf("async function unlockBadge"), store.indexOf("export async function getDueReviewItems"));
+  assert.doesNotMatch(badgeGrantSource, /awardXp/);
+});
+
+test("ships a private, progressive Badge Vault and accessible celebration controls", async () => {
+  const page = await readFile(new URL("../app/badges/page.tsx", import.meta.url), "utf8");
+  const gallery = await readFile(new URL("../app/components/BadgeGallery.tsx", import.meta.url), "utf8");
+  const reveal = await readFile(new URL("../app/components/BadgeUnlockReveal.tsx", import.meta.url), "utf8");
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(page, /<BadgeGallery/);
+  assert.match(gallery, /PRIVATE COLLECTION · 500 BADGES/);
+  assert.match(gallery, /Math\.floor\(earnedCount \/ 10\)/);
+  assert.match(gallery, /slice\(0, visibleCount\)/);
+  assert.match(gallery, /setVisibleCount\(48\)/);
+  assert.match(gallery, /No packs, purchases, or luck/);
+  assert.match(header, /badgesUrl/);
+  assert.match(header, /99\+/);
+  assert.match(reveal, /role="dialog"/);
+  assert.match(reveal, /aria-modal="true"/);
+  assert.match(reveal, /Skip animation/);
+  assert.match(reveal, /event\.key === "Escape"/);
+  assert.match(reveal, /View Badge Vault/);
+  for (const source of [lesson, review, boss]) {
+    assert.match(source, /<AnswerImpact/);
+    assert.match(source, /<BadgeUnlockReveal/);
+  }
+  assert.match(css, /@keyframes badge-card-arrive/);
+  assert.match(css, /@keyframes answer-impact-core/);
+  assert.match(css, /prefers-reduced-motion/);
+  assert.match(css, /@media \(max-width: 430px\)[\s\S]*\.badge-catalog-grid \{ grid-template-columns: 1fr/);
+  assert.match(css, /\.mobile-learner-nav \{[^}]*grid-template-columns: repeat\(5, 1fr\)/s);
 });
 
 test("makes Quick Sheets readable and actionable on small screens", async () => {
@@ -315,10 +417,10 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(lesson, /FOCUS CHAIN/);
   assert.match(lesson, /setFocusStreak\(0\)/);
   assert.match(lesson, /nextMomentumRun/);
-  assert.match(lesson, /focusStreak === 3/);
+  assert.match(lesson, /focusStreak >= 3/);
   assert.match(review, /RECALL CHAIN/);
   assert.match(review, /nextMomentumRun/);
-  assert.match(review, /recallStreak === 3/);
+  assert.match(review, /recallStreak >= 3/);
   assert.match(css, /\.momentum-run/);
   assert.match(css, /@keyframes chain-link/);
 });
@@ -839,7 +941,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.boss-settlement-summary \{ grid-template-columns: 1fr/);
   assert.match(profile, /evaluateAchievements/);
   assert.match(achievementsSource, /achievementSpecs/);
-  assert.match(profile, /PRIVATE ACHIEVEMENT SHELF/);
+  assert.match(profile, /PRIVATE LANDMARK SHELF/);
   for (const achievement of ["First Step", "Twelve Sparks", "Boss Link", "Steady Week", "Trail Builder", "Boss Pathfinder"]) assert.match(achievementsSource, new RegExp(achievement));
   assert.match(profile, /Only you see this shelf/);
   assert.match(profile, /Achievements are not added to the leaderboard/);

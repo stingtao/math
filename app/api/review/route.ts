@@ -1,6 +1,6 @@
 import { isAnswerCorrect, lessonById } from "@/lib/curriculum";
 import { rejectCrossOriginMutation } from "@/lib/http";
-import { claimMutation, completeReviewSet, getDueReviewItems, getLearnerState, learnerFromRequest, localDate } from "@/lib/store";
+import { claimMutation, completeReviewSet, creditCorrectAnswer, getDueReviewItems, getLearnerState, learnerFromRequest, localDate } from "@/lib/store";
 
 export async function GET(request: Request) {
   const learner = await learnerFromRequest(request);
@@ -32,7 +32,10 @@ export async function POST(request: Request) {
     const question = dueItem ? lessonById.get(dueItem.lesson_id)?.practice.find((item) => item.id === dueItem.question_id) : null;
     if (!question || typeof body.answer !== "string") return Response.json({ error: "That review question is not due." }, { status: 400 });
     const correct = isAnswerCorrect(body.answer, question.answer);
-    return Response.json({ correct, hint: correct ? null : question.hint }, { headers: { "Cache-Control": "no-store" } });
+    const badgeResult = correct
+      ? await creditCorrectAnswer(learner.id, `review:${localDate(learner.timezone)}:${body.lessonId}:${body.questionId}`, "review")
+      : { correctAnswers: undefined, badgeUnlocks: [] };
+    return Response.json({ correct, hint: correct ? null : question.hint, ...badgeResult }, { headers: { "Cache-Control": "no-store" } });
   }
   if (body.action !== "complete" || !body.answers?.length) return Response.json({ error: "No review answers were submitted." }, { status: 400 });
   if (body.answers.length !== due.length) return Response.json({ error: "Complete every question in today’s review set." }, { status: 400 });

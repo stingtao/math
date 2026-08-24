@@ -15,8 +15,10 @@ export async function POST(request: Request) {
     await assertLessonUnlocked(learner.id, lesson.id);
     const correct = isAnswerCorrect(body.answer, question.answer);
     const isNew = await claimMutation(learner.id, request.headers.get("Idempotency-Key"), "answer");
-    if (isNew) await recordAnswer(learner.id, lesson.id, question.id, correct, Boolean(body.usedHint), body.runId);
-    return Response.json({ correct, hint: correct ? null : question.hint });
+    const badgeResult = isNew
+      ? await recordAnswer(learner.id, lesson.id, question.id, correct, Boolean(body.usedHint), body.runId)
+      : { correctAnswers: undefined, badgeUnlocks: [] };
+    return Response.json({ correct, hint: correct ? null : question.hint, ...badgeResult });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "That answer could not be checked." }, { status: 400 });
   }

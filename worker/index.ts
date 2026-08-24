@@ -9,8 +9,9 @@ interface WorkerEnv extends Cloudflare.Env {
 function withSecurityHeaders(response: Response): Response {
   const nonce = crypto.randomUUID().replaceAll("-", "");
   let secured = new Response(response.body, response);
+  const canRewriteHtml = typeof HTMLRewriter !== "undefined";
 
-  if (secured.headers.get("content-type")?.includes("text/html") && typeof HTMLRewriter !== "undefined") {
+  if (secured.headers.get("content-type")?.includes("text/html") && canRewriteHtml) {
     secured = new HTMLRewriter()
       .on("script", {
         element(element) {
@@ -20,7 +21,10 @@ function withSecurityHeaders(response: Response): Response {
       .transform(secured);
   }
 
-  secured.headers.set("Content-Security-Policy", `default-src 'self'; object-src 'none'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https://accounts.google.com/gsi/client https://pagead2.googlesyndication.com https: http:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https:; frame-src https:; worker-src 'self' blob: https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
+  const scriptPolicy = canRewriteHtml
+    ? `'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https://accounts.google.com/gsi/client https://pagead2.googlesyndication.com https: http:`
+    : `'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com/gsi/client https://pagead2.googlesyndication.com`;
+  secured.headers.set("Content-Security-Policy", `default-src 'self'; object-src 'none'; script-src ${scriptPolicy}; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https:; frame-src https:; worker-src 'self' blob: https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
   secured.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   secured.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
   secured.headers.set("X-Content-Type-Options", "nosniff");

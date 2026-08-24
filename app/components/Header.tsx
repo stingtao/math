@@ -40,6 +40,9 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
   const reviewUrl = demo ? "/review?demo=1" : "/review";
   const profileUrl = demo ? "/profile?demo=1" : "/profile";
   const leagueUrl = demo ? "/leaderboard?demo=1" : "/leaderboard";
+  const badgesUrl = demo ? "/badges?demo=1" : "/badges";
+  const badgeCount = state.badges.earnedIds.length;
+  const badgeCountLabel = badgeCount > 99 ? "99+" : badgeCount;
   async function logout() {
     if (!demo) await fetch("/api/auth/logout", { method: "POST" });
     window.location.assign("/");
@@ -51,6 +54,7 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
         <nav className="learner-nav" aria-label="Learning navigation">
           <a href={trailUrl}>Trail</a>
           <a href={reviewUrl}>Review <span className="nav-count">{state.dueReview}</span></a>
+          <a href={badgesUrl}>Badges <span className="badge-nav-count">{badgeCountLabel}</span></a>
           <a href={leagueUrl}>League</a>
         </nav>
         <div className="learner-stats">
@@ -66,6 +70,7 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
       <nav className="mobile-learner-nav" aria-label="Mobile learning navigation">
         <a className={pathname.startsWith("/learn") || pathname.startsWith("/boss") ? "active" : ""} href={trailUrl}><span aria-hidden="true">◎</span><strong>Trail</strong></a>
         <a className={pathname.startsWith("/review") ? "active" : ""} href={reviewUrl}><span aria-hidden="true">◇</span><strong>Review</strong>{state.dueReview > 0 && <i>{state.dueReview}</i>}</a>
+        <a className={pathname.startsWith("/badges") ? "active" : ""} href={badgesUrl}><span aria-hidden="true">◆</span><strong>Vault</strong>{badgeCount > 0 && <i>{badgeCountLabel}</i>}</a>
         <a className={pathname.startsWith("/leaderboard") ? "active" : ""} href={leagueUrl}><span aria-hidden="true">★</span><strong>League</strong></a>
         <a className={pathname.startsWith("/profile") ? "active" : ""} href={profileUrl}><span aria-hidden="true">●</span><strong>Me</strong></a>
       </nav>

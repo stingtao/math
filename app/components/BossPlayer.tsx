@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import type { RegionDefinition } from "@/lib/curriculum";
 import { getGradeCurriculum, isAnswerCorrect } from "@/lib/curriculum";
-import { saveDemoState, type LearnerState } from "@/lib/learner-state";
+import { applyBadgeProgress, creditDemoCorrectAnswer, saveDemoState, type LearnerState } from "@/lib/learner-state";
+import type { BadgeUnlock } from "@/lib/badges";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
@@ -13,6 +14,8 @@ import { achievementTotalsForState, achievementUnlockedBetween, type Achievement
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { mathInputMode } from "@/lib/math-input";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
+import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
+import { AnswerImpact } from "./AnswerImpact";
 
 type BossAttempt = {
   attemptId: string;
@@ -49,6 +52,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const [unlockedLandmark, setUnlockedLandmark] = useState<AchievementSpec | null>(null);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [badgeUnlocks, setBadgeUnlocks] = useState<BadgeUnlock[]>([]);
   const question = questions[Math.min(index, questions.length - 1)];
   const questionLesson = region.lessons[Math.min(index, region.lessons.length - 1)];
   const repairLesson = region.lessons[Math.min(failedQuestion ?? index, region.lessons.length - 1)];
@@ -115,7 +119,12 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setErrorMessage("");
     try {
       if (demo) {
-        if (isAnswerCorrect(answer, question.answer)) setFeedback("correct");
+        if (isAnswerCorrect(answer, question.answer)) {
+          const badgeResult = creditDemoCorrectAnswer(activeState);
+          setState(badgeResult.state);
+          if (badgeResult.badgeUnlocks.length) setBadgeUnlocks(badgeResult.badgeUnlocks);
+          setFeedback("correct");
+        }
         else {
           const nextHearts = hearts - 1;
           setHearts(nextHearts);
@@ -130,7 +139,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         headers: mutationHeaders(),
         body: JSON.stringify({ action: "check", regionId: region.id, attemptId, questionIndex: index, answer }),
       });
-      const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; xpEarned?: number; state?: LearnerState; error?: string; attempt?: BossAttempt | null };
+      const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; xpEarned?: number; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; state?: LearnerState; error?: string; attempt?: BossAttempt | null };
       if (!response.ok) setErrorMessage(body.error ?? "We could not check that answer.");
       else if (body.attempt) applyAttempt(body.attempt);
       else {
@@ -139,13 +148,14 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         setShowHint(!body.correct);
         setServerCleared(Boolean(body.cleared));
         if (body.cleared) setBossXpEarned(body.xpEarned ?? 0);
+        if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
         if (body.state) {
           if (body.cleared) {
             const landmark = achievementUnlockedBetween(achievementTotalsForState(activeState), achievementTotalsForState(body.state));
             setUnlockedLandmark(landmark?.source === "bosses" ? landmark : null);
           }
           setState(body.state);
-        }
+        } else if (body.correct && body.correctAnswers !== undefined) setState(applyBadgeProgress(activeState, body.correctAnswers, body.badgeUnlocks));
       }
     } catch {
       setErrorMessage("Your answer is still here. Check your connection and try again.");
@@ -205,6 +215,11 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     try {
       if (demo) {
         const correct = isAnswerCorrect(repairAnswer, repairQuestion.answer);
+        if (correct) {
+          const badgeResult = creditDemoCorrectAnswer(activeState);
+          setState(badgeResult.state);
+          if (badgeResult.badgeUnlocks.length) setBadgeUnlocks(badgeResult.badgeUnlocks);
+        }
         setRepairFeedback(correct ? "correct" : "incorrect");
         if (correct && repair === 0) {
           setRepair(1);
@@ -223,7 +238,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         headers: mutationHeaders(),
         body: JSON.stringify({ action: "repair", regionId: region.id, attemptId, repairIndex: repair, answer: repairAnswer }),
       });
-      const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; repaired?: boolean; error?: string; attempt?: BossAttempt | null };
+      const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; repaired?: boolean; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string; attempt?: BossAttempt | null };
       if (!response.ok) setErrorMessage(body.error ?? "We could not check that repair answer.");
       else if (body.attempt) {
         applyAttempt(body.attempt);
@@ -232,6 +247,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       }
       else {
         applyAttempt(body);
+        if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
+        if (body.correct && body.correctAnswers !== undefined) setState(applyBadgeProgress(activeState, body.correctAnswers, body.badgeUnlocks));
         setRepairFeedback(body.correct ? "correct" : "incorrect");
         if (body.correct && body.repaired) setRepairRestored(true);
         else if (body.correct) {
@@ -251,6 +268,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   if (cleared) return (
     <main className={`boss-shell accent-${region.accent}`}>
       <SuccessBurst eventKey={`boss-${region.id}-complete`} large />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={demo} />
       <section className="boss-victory boss-region-clear" aria-labelledby="boss-clear-title">
         <div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} region cleared`} /><span aria-hidden="true">★</span></div>
@@ -290,6 +308,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   if (repairRestored) return (
     <main className={`boss-shell accent-${region.accent}`}>
       <SuccessBurst eventKey={`boss-${region.id}-hearts-restored`} large />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={demo} />
       <section className="repair-restored-card" aria-live="polite">
         <div className="repair-restored-emblem">
@@ -310,7 +329,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   if (failed) return (
     <main className={`boss-shell accent-${region.accent}`}>
-      {repairCheckpoint && <SuccessBurst eventKey={`boss-repair-${region.id}-1`} />}
+      {repairCheckpoint && <AnswerImpact eventKey={`boss-repair-${region.id}-1`} label="REPAIR LOCKED" chain={1} progress={1} total={2} tone={repairLesson.accent} />}
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={demo} />
       <section className="repair-card" aria-busy={busy}>
         <div className="repair-emblem"><TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="lg" label={`${repairLesson.title} repair`} /><span aria-hidden="true">◇</span></div>
@@ -333,6 +353,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   return (
     <main className={`boss-shell accent-${region.accent}`}>
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={demo} />
       <div className="boss-topbar"><a href={trailUrl}>← Leave</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
@@ -354,7 +375,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
           {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—repair this connection.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. The same question stays open.` : "Two focused repairs will refill every heart."}</small></div></div>}
-          {feedback === "correct" && <><SuccessBurst eventKey={`boss-${region.id}-${index}`} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
+          {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
           {errorMessage && <p id="boss-answer-error" className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === 4 ? "Finish boss" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>

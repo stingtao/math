@@ -31,6 +31,27 @@ export const avatarFrames = sqliteTable("avatar_frames", {
   unlockedAt: text("unlocked_at").notNull(),
 }, (table) => [primaryKey({ columns: [table.learnerId, table.frame] })]);
 
+export const badgeUnlocks = sqliteTable("badge_unlocks", {
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  badgeId: text("badge_id").notNull(),
+  source: text("source").notNull(),
+  sourceRef: text("source_ref").notNull(),
+  unlockedAt: text("unlocked_at").notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.learnerId, table.badgeId] }),
+  index("idx_badge_unlocks_recent").on(table.learnerId, table.unlockedAt),
+]);
+
+export const answerCredits = sqliteTable("answer_credits", {
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  creditKey: text("credit_key").notNull(),
+  source: text("source").notNull(),
+  createdAt: text("created_at").notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.learnerId, table.creditKey] }),
+  index("idx_answer_credits_count").on(table.learnerId, table.createdAt),
+]);
+
 export const sessions = sqliteTable("sessions", {
   tokenHash: text("token_hash").primaryKey(),
   learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),

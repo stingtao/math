@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import type { LessonDefinition } from "@/lib/curriculum";
 import { getGradeCurriculum, getGradeLessons, getRegion, isAnswerCorrect, nextLesson } from "@/lib/curriculum";
-import { completeDemoLesson, type LearnerState } from "@/lib/learner-state";
+import { applyBadgeProgress, completeDemoLesson, creditDemoCorrectAnswer, type LearnerState } from "@/lib/learner-state";
+import type { BadgeUnlock } from "@/lib/badges";
 import { calculateLessonReward } from "@/lib/rewards";
 import { nextMomentumRun } from "@/lib/momentum";
 import { ConceptVisual } from "./ConceptVisual";
@@ -18,6 +19,8 @@ import { achievementTotalsForState, achievementUnlockedBetween } from "@/lib/ach
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { mathInputMode } from "@/lib/math-input";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
+import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
+import { AnswerImpact } from "./AnswerImpact";
 
 const stageLabels = [
   { label: "Goal", icon: "◎" },
@@ -65,6 +68,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const [sheetOpen, setSheetOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [badgeUnlocks, setBadgeUnlocks] = useState<BadgeUnlock[]>([]);
   const [runId] = useState(() => crypto.randomUUID());
   const question = lesson.practice[questionIndex];
   const answerLocked = busy || feedback === "correct";
@@ -110,11 +114,17 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const priorAttempts = attempts[question.id] ?? 0;
     try {
       let correct = isAnswerCorrect(answer, question.answer);
-      if (!demo) {
+      if (demo && correct) {
+        const badgeResult = creditDemoCorrectAnswer(activeState);
+        setState(badgeResult.state);
+        if (badgeResult.badgeUnlocks.length) setBadgeUnlocks(badgeResult.badgeUnlocks);
+      } else if (!demo) {
         const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[question.id]), runId }) });
-        const body = await response.json() as { correct?: boolean; error?: string };
+        const body = await response.json() as { correct?: boolean; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string };
         if (!response.ok) { setErrorMessage(body.error ?? "We could not check that answer."); return; }
         correct = Boolean(body.correct);
+        if (correct && body.correctAnswers !== undefined) setState(applyBadgeProgress(activeState, body.correctAnswers, body.badgeUnlocks));
+        if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
       }
       setAttempts((current) => ({ ...current, [question.id]: priorAttempts + 1 }));
       if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [question.id]: correct }));
@@ -151,6 +161,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     try {
       if (demo) {
         const nextState = completeDemoLesson(activeState, lesson.id, earnedStars);
+        const newlyEarned = nextState.badges.recent.filter((item) => !activeState.badges.earnedIds.includes(item.id));
+        if (newlyEarned.length) setBadgeUnlocks(newlyEarned);
         setCompletionReward({
           previousStars,
           bestStars: expectedReward.bestStars,
@@ -164,7 +176,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       }
       else {
         const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(`${runId}-complete`), body: JSON.stringify({ action: "completeLesson", lessonId: lesson.id, runId }) });
-        const body = await response.json() as Partial<LessonCompletionReward> & { stars?: number; state?: LearnerState; error?: string };
+        const body = await response.json() as Partial<LessonCompletionReward> & { stars?: number; state?: LearnerState; badgeUnlocks?: BadgeUnlock[]; error?: string };
         if (!response.ok) { setErrorMessage(body.error ?? "We could not save your progress."); return; }
         const runStars = body.stars ?? earnedStars;
         const savedBest = body.bestStars ?? body.state?.completedLessons.find((item) => item.id === lesson.id)?.stars ?? Math.max(previousStars, runStars);
@@ -179,6 +191,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           starXp: body.starXp ?? Math.max(0, xpEarned - (previousStars === 0 ? Math.min(40, xpEarned) : 0)),
           xpEarned,
         });
+        if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
         if (body.state) setState(body.state);
       }
       setFinished(true);
@@ -236,6 +249,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     return (
       <main className="learner-shell celebration-page">
         <SuccessBurst eventKey={`${lesson.id}-complete-${stars}-${reward.firstCompletion ? "new" : reward.starsImproved ? "upgrade" : "replay"}`} large />
+        {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
         <LearnerHeader state={state} demo={demo} />
         <section className={`celebration-card accent-${lesson.accent}`}>
           <div className="celebration-emblem"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} completed`} /><span aria-hidden="true">✓</span></div>
@@ -282,6 +296,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
 
   return (
     <main className="learner-shell lesson-shell">
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={demo} />
       <div className="lesson-topline">
         <a href={trailUrl} className="back-link">← Trail</a>
@@ -322,7 +337,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "lesson-answer-error" : feedback ? "lesson-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
               {showHint && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <div id="lesson-answer-feedback" className="feedback-card incorrect recovery-feedback" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—try this step.</strong><p>{question.hint}</p><small>No progress lost. Correct it to add the same Focus Charge.</small><div className="recovery-charge-preview" aria-label={`Focus Charge stays safe at ${correctedCount} of ${lesson.practice.length}. Correct this step to reach ${Math.min(correctedCount + 1, lesson.practice.length)} of ${lesson.practice.length}.`}><span><b>{correctedCount}/{lesson.practice.length}</b><small>safe</small></span><i>→</i><span className="current"><b>fix</b><small>this step</small></span><i>→</i><strong><b>{Math.min(correctedCount + 1, lesson.practice.length)}/{lesson.practice.length}</b><small>charged</small></strong></div></div></div>}
-              {feedback === "correct" && <><SuccessBurst eventKey={`${lesson.id}-${question.id}-chain-${focusStreak}`} large={currentFirstTry && (focusStreak === 3 || focusStreak === lesson.practice.length)} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? focusStreak >= 3 ? `Focus chain ×${focusStreak}!` : "First-try spark!" : "Recovery complete!"}</strong><p>{practiceEncouragement[questionIndex]} Question {questionIndex + 1} is corrected.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${focusStreak}` : "Recovered +1"}</span></div></>}
+              {feedback === "correct" && <><AnswerImpact eventKey={`${lesson.id}-${question.id}-chain-${focusStreak}`} label={currentFirstTry ? "PERFECT HIT" : "RECOVERY HIT"} chain={focusStreak} progress={correctedCount} total={lesson.practice.length} tone={lesson.accent} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? focusStreak >= 3 ? `Focus chain ×${focusStreak}!` : "First-try spark!" : "Recovery complete!"}</strong><p>{practiceEncouragement[questionIndex]} Question {questionIndex + 1} is corrected.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${focusStreak}` : "Recovered +1"}</span></div></>}
               {errorMessage && <p id="lesson-answer-error" className="form-error" role="alert">{errorMessage}</p>}
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" disabled={busy} aria-busy={busy} onClick={continuePractice}>{busy ? "Saving…" : questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} aria-busy={busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
             </div>

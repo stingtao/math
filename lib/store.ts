@@ -3,6 +3,7 @@ import { getGradeCurriculum, isAnswerCorrect, lessons, regions } from "@/lib/cur
 import { getCookie, randomToken, sha256 } from "@/lib/security";
 import { getAvatarFrame } from "@/lib/avatar-frames";
 import { calculateLessonReward } from "@/lib/rewards";
+import { BADGE_CATALOG_SIZE, ANSWER_BADGE_STEP, answerBadges, badgeById, lessonBadgeByLessonId, type BadgeUnlock } from "@/lib/badges";
 
 const adjectives = ["Calm", "Bright", "Brave", "Clever", "Curious", "Gentle", "Kind", "Nimble", "Quiet", "Swift", "Wise", "Bold"];
 const nouns = ["Comet", "Compass", "Cedar", "Falcon", "Harbor", "Lantern", "Orbit", "Panda", "Pebble", "River", "Sparrow", "Summit"];
@@ -128,7 +129,7 @@ export async function deleteSessionFromRequest(request: Request) {
 export async function getLearnerState(learnerId: string) {
   await ensureSchema();
   const db = getStore();
-  const [profile, frameResult, progressResult, bossResult, xp, weekly, dueReview] = await Promise.all([
+  const [profile, frameResult, progressResult, bossResult, xp, weekly, dueReview, badgeResult, answerCreditCount] = await Promise.all([
     db.prepare("SELECT nickname, avatar_glyph, avatar_tone, frame, reroll_used, leaderboard_opt_in, trail_tokens, current_streak, longest_streak, streak_shields, reward_step, last_active_date FROM public_profiles WHERE learner_id = ?").bind(learnerId).first<ProfileRow>(),
     db.prepare("SELECT frame FROM avatar_frames WHERE learner_id = ? ORDER BY unlocked_at, frame").bind(learnerId).all<{ frame: string }>(),
     db.prepare("SELECT lesson_id, stars, first_correct_count, completed_at FROM lesson_progress WHERE learner_id = ? ORDER BY completed_at").bind(learnerId).all<{ lesson_id: string; stars: number; first_correct_count: number; completed_at: string }>(),
@@ -136,6 +137,8 @@ export async function getLearnerState(learnerId: string) {
     db.prepare("SELECT COALESCE(SUM(xp), 0) AS total FROM xp_events WHERE learner_id = ?").bind(learnerId).first<{ total: number }>(),
     db.prepare("SELECT COALESCE(SUM(xp), 0) AS total FROM xp_events WHERE learner_id = ? AND week_key = ?").bind(learnerId, weekKey()).first<{ total: number }>(),
     db.prepare("SELECT COUNT(*) AS total FROM review_items WHERE learner_id = ? AND due_at <= ?").bind(learnerId, new Date().toISOString()).first<{ total: number }>(),
+    db.prepare("SELECT badge_id, unlocked_at FROM badge_unlocks WHERE learner_id = ? ORDER BY unlocked_at DESC, badge_id LIMIT ?").bind(learnerId, BADGE_CATALOG_SIZE).all<{ badge_id: string; unlocked_at: string }>(),
+    db.prepare("SELECT COUNT(*) AS total FROM answer_credits WHERE learner_id = ?").bind(learnerId).first<{ total: number }>(),
   ]);
   if (!profile) throw new Error("Anonymous profile is missing.");
   if (profile.leaderboard_opt_in) await ensureLeagueMembership(learnerId);
@@ -164,6 +167,11 @@ export async function getLearnerState(learnerId: string) {
     dueReview: Math.min(Number(dueReview?.total ?? 0), 5),
     dailyRewardClaimed: Boolean(todayReward),
     nextLessonId: next.id,
+    badges: {
+      earnedIds: badgeResult.results.map((item) => item.badge_id),
+      recent: badgeResult.results.slice(0, 8).map((item) => ({ id: item.badge_id, unlockedAt: item.unlocked_at })),
+      correctAnswers: Number(answerCreditCount?.total ?? 0),
+    },
   };
 }
 
@@ -231,6 +239,9 @@ export async function recordAnswer(learnerId: string, lessonId: string, question
     await db.prepare("INSERT INTO review_items (learner_id, lesson_id, question_id, stage, due_at) VALUES (?, ?, ?, 0, ?) ON CONFLICT(learner_id, lesson_id, question_id) DO UPDATE SET due_at = excluded.due_at")
       .bind(learnerId, lessonId, questionId, due).run();
   }
+  return correct
+    ? creditCorrectAnswer(learnerId, `${lessonId}:${runId}:${questionId}`, "lesson")
+    : { correctAnswers: undefined, badgeUnlocks: [] as BadgeUnlock[] };
 }
 
 export async function claimMutation(learnerId: string, key: string | null, route: string) {
@@ -247,6 +258,34 @@ async function awardXp(learnerId: string, kind: string, refId: string, amount: n
   const result = await db.prepare("INSERT OR IGNORE INTO xp_events (id, learner_id, kind, ref_id, xp, week_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
     .bind(id, learnerId, kind, refId, amount, weekKey(), new Date().toISOString()).run();
   return Boolean(result.meta.changes);
+}
+
+async function unlockBadge(learnerId: string, badgeId: string, source: "lesson" | "answer", sourceRef: string) {
+  if (!badgeById.has(badgeId)) throw new Error("Badge definition not found.");
+  const unlockedAt = new Date().toISOString();
+  const result = await getStore().prepare("INSERT OR IGNORE INTO badge_unlocks (learner_id, badge_id, source, source_ref, unlocked_at) VALUES (?, ?, ?, ?, ?)")
+    .bind(learnerId, badgeId, source, sourceRef, unlockedAt).run();
+  return result.meta.changes ? [{ id: badgeId, unlockedAt }] satisfies BadgeUnlock[] : [];
+}
+
+export async function creditCorrectAnswer(learnerId: string, creditKey: string, source: "lesson" | "review" | "boss" | "repair") {
+  if (!/^[A-Za-z0-9:._-]{8,180}$/.test(creditKey)) throw new Error("Answer credit key is invalid.");
+  await ensureSchema();
+  const db = getStore();
+  const inserted = await db.prepare("INSERT OR IGNORE INTO answer_credits (learner_id, credit_key, source, created_at) VALUES (?, ?, ?, ?)")
+    .bind(learnerId, creditKey, source, new Date().toISOString()).run();
+  const count = await db.prepare("SELECT COUNT(*) AS total FROM answer_credits WHERE learner_id = ?").bind(learnerId).first<{ total: number }>();
+  const correctAnswers = Number(count?.total ?? 0);
+  if (!inserted.meta.changes) return { correctAnswers, badgeUnlocks: [] as BadgeUnlock[] };
+  const eligibleCount = Math.min(answerBadges.length, Math.floor(correctAnswers / ANSWER_BADGE_STEP));
+  const latest = await db.prepare("SELECT badge_id FROM badge_unlocks WHERE learner_id = ? AND source = 'answer' ORDER BY badge_id DESC LIMIT 1")
+    .bind(learnerId).first<{ badge_id: string }>();
+  const lastUnlocked = Number(latest?.badge_id.match(/^answer-(\d{3})$/)?.[1] ?? 0);
+  const badgeUnlocks: BadgeUnlock[] = [];
+  for (let index = lastUnlocked; index < eligibleCount; index += 1) {
+    badgeUnlocks.push(...await unlockBadge(learnerId, answerBadges[index].id, "answer", String(answerBadges[index].target)));
+  }
+  return { correctAnswers, badgeUnlocks };
 }
 
 export async function getDueReviewItems(learnerId: string) {
@@ -302,6 +341,8 @@ export async function completeLesson(learnerId: string, lessonId: string, runId:
   if (reward.previousStars < 3 && reward.bestStars >= 3 && await awardXp(learnerId, "lesson-star-3", lessonId, 5)) starXp += 5;
   await db.prepare("UPDATE lesson_runs SET completed = 1, updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND run_id = ?")
     .bind(new Date().toISOString(), learnerId, lessonId, runId).run();
+  const lessonBadge = lessonBadgeByLessonId.get(lessonId);
+  const badgeUnlocks = lessonBadge ? await unlockBadge(learnerId, lessonBadge.id, "lesson", lessonId) : [];
   return {
     stars,
     bestStars: reward.bestStars,
@@ -311,6 +352,7 @@ export async function completeLesson(learnerId: string, lessonId: string, runId:
     baseXp,
     starXp,
     xpEarned: baseXp + starXp,
+    badgeUnlocks,
   };
 }
 
@@ -415,7 +457,8 @@ export async function checkBossAnswer(learnerId: string, regionId: number, attem
   await db.prepare("UPDATE boss_attempts SET current_question = ?, cleared = ?, updated_at = ? WHERE learner_id = ? AND region_id = ? AND attempt_id = ?")
     .bind(nextQuestion, cleared ? 1 : 0, now, learnerId, regionId, attemptId).run();
   const xpEarned = cleared ? await completeBoss(learnerId, regionId, attempt.hearts) : 0;
-  return { correct: true, hint: null, attemptId, questionIndex: nextQuestion, hearts: attempt.hearts, failed: false, failedQuestion: null, repairStep: 0, cleared, xpEarned };
+  const badgeResult = await creditCorrectAnswer(learnerId, `boss:${attemptId}:q:${questionIndex}`, "boss");
+  return { correct: true, hint: null, attemptId, questionIndex: nextQuestion, hearts: attempt.hearts, failed: false, failedQuestion: null, repairStep: 0, cleared, xpEarned, ...badgeResult };
 }
 
 export async function checkBossRepairAnswer(learnerId: string, regionId: number, attemptId: string, repairIndex: number, answer: string) {
@@ -439,7 +482,8 @@ export async function checkBossRepairAnswer(learnerId: string, regionId: number,
     await db.prepare("UPDATE boss_attempts SET repair_step = 1, updated_at = ? WHERE learner_id = ? AND region_id = ? AND attempt_id = ?")
       .bind(now, learnerId, regionId, attemptId).run();
   }
-  return { correct: true, hint: null, attemptId, questionIndex: repaired ? 0 : attempt.current_question, hearts: repaired ? 3 : attempt.hearts, failed: !repaired, failedQuestion: repaired ? null : attempt.failed_question, repairStep: repaired ? 0 : 1, cleared: false, repaired };
+  const badgeResult = await creditCorrectAnswer(learnerId, `boss:${attemptId}:repair:${repairIndex}`, "repair");
+  return { correct: true, hint: null, attemptId, questionIndex: repaired ? 0 : attempt.current_question, hearts: repaired ? 3 : attempt.hearts, failed: !repaired, failedQuestion: repaired ? null : attempt.failed_question, repairStep: repaired ? 0 : 1, cleared: false, repaired, ...badgeResult };
 }
 
 export async function completeBoss(learnerId: string, regionId: number, hearts: number) {
