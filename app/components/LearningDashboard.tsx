@@ -194,7 +194,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               <div><h2 id="daily-reward-heading">Collected today</h2><p>{rewardMessage || "Trail Tokens added."}</p></div>
             </div> : <>
               <div className="daily-reward-hero">
-                <span className="daily-token-medallion" aria-hidden="true"><b>+{visibleRewardAmount}</b><small>TOKENS</small></span>
+                <span className="daily-token-medallion" aria-hidden="true"><b>+{visibleRewardAmount}</b></span>
                 <div className="daily-reward-heading">
                   <h2 id="daily-reward-heading">Tokens ready</h2>
                   <p>Claim now · ▲ {state.profile.currentStreak} day streak</p>

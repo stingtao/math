@@ -747,6 +747,7 @@ test("keeps answer chains optional while preserving the best run", () => {
 
 test("ships a readable, safe-area-aware mobile learning interface", async () => {
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
@@ -783,7 +784,7 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.momentum-run-copy > strong \{ font-size: 16px; white-space: normal/);
   assert.match(css, /\.star-path-options small \{ font-size: 16px/);
   assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 16px/);
-  assert.match(css, /\.daily-token-medallion small \{ font-size: 16px/);
+  assert.doesNotMatch(dashboard, /daily-token-medallion[^\n]*<small>/);
   assert.match(css, /\.reward-collected-status p \{[^}]*font-size: 16px/);
   assert.match(css, /\.world-replay-link \{[\s\S]*font-size: 16px/);
   assert.match(css, /\.math-world-proof-stats small \{ font-size: 16px/);
