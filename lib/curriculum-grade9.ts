@@ -2,7 +2,7 @@ import type { Accent, LessonDefinition, PracticeQuestion, RegionDefinition } fro
 import { buildPracticeQuestion } from "./question-interactions.ts";
 
 type Drill = [prompt: string, answer: string, choices?: string[]];
-type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; standard: string; visual: string; drills: Drill[] };
+type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; steps?: string[]; standard: string; visual: string; drills: Drill[] };
 const accents: Accent[] = ["violet", "blue", "teal", "coral", "gold"];
 
 function makeLesson(regionId: number, order: number, accent: Accent, spec: LessonSpec): LessonDefinition {
@@ -17,7 +17,7 @@ function makeLesson(regionId: number, order: number, accent: Accent, spec: Lesso
     goal: spec.goal,
     keyIdea: spec.key,
     example: spec.example,
-    exampleSteps: ["Identify the structure.", spec.key, `Substitute back to check: ${spec.example}.`],
+    exampleSteps: spec.steps ?? ["Identify the structure.", spec.key, `Substitute back to check: ${spec.example}.`],
     standard: spec.standard,
     accent,
     visual: spec.visual,
@@ -212,6 +212,13 @@ export const grade9Regions: RegionDefinition[] = [
     ] },
     { slug: "modeling-decisions", title: "Choose and Interpret a Model", goal: "Select a linear, quadratic, or exponential model from context and data.", key: "Look for constant difference, constant second difference, or constant ratio.", example: "Constant second differences point to a quadratic model", standard: "HSS.ID.B.6 · HSF.LE.B.5", visual: "model", drills: [
       ["Constant first differences suggest which model?", "linear"], ["Constant second differences suggest which model?", "quadratic"], ["Constant ratios suggest which model?", "exponential"], ["A projectile height over time is commonly modeled by?", "quadratic|a quadratic"], ["A fixed monthly increase is commonly modeled by?", "linear|a linear model"],
+    ] },
+    { slug: "interpret-linear-models", title: "Interpret Linear Models", goal: "Explain slope, intercept, correlation, and prediction limits in the units of a data story.", key: "Slope is predicted output change per input unit, the intercept is the prediction at input zero, and correlation alone never proves causation.", example: "y = 2.5x + 4 means 2.5 more output units per input unit and a predicted output of 4 at x = 0", steps: ["Name the input and output units before reading any coefficient.", "Read 2.5 as output units per input unit and 4 as the predicted output when x = 0.", "Keep predictions near the observed x-range, and describe association without claiming causation."], standard: "HSS.ID.C.7–9", visual: "fit-line", drills: [
+      ["A model predicts fuel y from hours x with y = 6x + 20. What does 6 mean?", "6 fuel units per hour", ["6 fuel units per hour", "20 fuel units per hour", "26 fuel units per hour", "0 fuel units per hour"]],
+      ["In y = 6x + 20, what does 20 represent?", "the predicted value when x = 0", ["the predicted value when x = 0", "the change for each x-unit", "the correlation coefficient", "the largest observed x"]],
+      ["Which r-value shows the strongest linear association?", "−0.92", ["−0.92", "0.41", "0.08", "0"]],
+      ["A study finds more practice time is associated with higher scores. Which conclusion is justified?", "the variables are associated", ["the variables are associated", "practice time alone caused every score", "all students will gain the same amount", "the intercept proves causation"]],
+      ["Predicting far beyond the observed x-values is called what?", "extrapolation", ["extrapolation", "interpolation", "randomization", "stratification"]],
     ] },
   ]),
 ];

@@ -2,12 +2,12 @@ import type { Accent, LessonDefinition, PracticeQuestion, RegionDefinition } fro
 import { buildPracticeQuestion } from "./question-interactions.ts";
 
 type Drill = [prompt: string, answer: string, choices?: string[]];
-type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; standard: string; visual: string; drills: Drill[] };
+type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; steps?: string[]; standard: string; visual: string; drills: Drill[] };
 const accents: Accent[] = ["violet", "blue", "gold", "teal", "coral"];
 
 function makeLesson(regionId: number, order: number, accent: Accent, spec: LessonSpec): LessonDefinition {
   const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => buildPracticeQuestion({ id: `q${index + 1}`, prompt, answer, choices, hint: spec.key }));
-  return { id: `g11-r${regionId}-l${order}`, grade: 11, slug: `g11-${spec.slug}`, regionId, order, title: spec.title, goal: spec.goal, keyIdea: spec.key, example: spec.example, exampleSteps: ["Identify the function family or structure.", spec.key, `Verify with the original relationship: ${spec.example}.`], standard: spec.standard, accent, visual: spec.visual, practice };
+  return { id: `g11-r${regionId}-l${order}`, grade: 11, slug: `g11-${spec.slug}`, regionId, order, title: spec.title, goal: spec.goal, keyIdea: spec.key, example: spec.example, exampleSteps: spec.steps ?? ["Identify the function family or structure.", spec.key, `Verify with the original relationship: ${spec.example}.`], standard: spec.standard, accent, visual: spec.visual, practice };
 }
 
 function makeRegion(order: number, title: string, subtitle: string, standard: string, specs: LessonSpec[]): RegionDefinition {
@@ -29,6 +29,27 @@ export const grade11Regions: RegionDefinition[] = [
     ] },
     { slug: "polynomial-roots", title: "Polynomial Roots", goal: "Find real and complex zeros using structure.", key: "Factor when possible, use the quadratic formula for quadratic factors, and remember nonreal roots occur in conjugate pairs for real coefficients.", example: "x³−4x=x(x−2)(x+2), so zeros are −2,0,2", standard: "HSA.APR.B.3", visual: "factor-chain", drills: [
       ["Zeros of x(x−5)(x+2)?", "-2,0,5|0,5,-2"], ["Solve x³−9x=0.", "-3,0,3|0,3,-3"], ["If 2+i is a zero of a real polynomial, another zero is?", "2-i|2−i"], ["Maximum number of real zeros of degree 4?", "4"], ["A repeated factor (x−3)² gives zero 3 with multiplicity?", "2"],
+    ] },
+    { slug: "complex-arithmetic", title: "Complex Number Arithmetic", goal: "Add, multiply, and conjugate complex numbers using i² = −1.", key: "Combine real and imaginary parts separately; distribute when multiplying, then replace every i² with −1.", example: "(3+2i)(1−i)=3−3i+2i−2i²=5−i", steps: ["Distribute each term: 3 − 3i + 2i − 2i².", "Replace i² with −1, so −2i² becomes +2.", "Combine real and imaginary parts to get 5 − i."], standard: "HSN.CN.A.1–3", visual: "complex-plane", drills: [
+      ["Add (2+3i)+(4−i).", "6+2i", ["6+2i", "6+4i", "−2+2i", "8i"]],
+      ["Multiply i(3+2i).", "−2+3i", ["−2+3i", "2+3i", "−3+2i", "3+2i"]],
+      ["Simplify (1+i)².", "2i", ["2i", "2", "1+i", "−2i"]],
+      ["What is the conjugate of 4−7i?", "4+7i", ["4+7i", "−4+7i", "−4−7i", "7+4i"]],
+      ["Solve x² = −9 over the complex numbers.", "x = ±3i", ["x = ±3i", "x = ±9i", "x = 3", "no solution"]],
+    ] },
+    { slug: "complex-polynomial-solutions", title: "Complex Polynomial Solutions", goal: "Use conjugate pairs and complex roots to factor and solve real-coefficient polynomials.", key: "A degree-n polynomial has n complex roots counting multiplicity; nonreal roots of a real-coefficient polynomial occur in conjugate pairs.", example: "x²+4=0 → x=±2i", steps: ["Isolate the square: x² = −4.", "Use √−1 = i to write x = ±√4 · i.", "The conjugate pair x = 2i and x = −2i gives both roots of the quadratic."], standard: "HSN.CN.C.7–9", visual: "complex-plane", drills: [
+      ["Solve x²+16=0.", "x = ±4i", ["x = ±4i", "x = ±8i", "x = ±4", "no roots"]],
+      ["If 3+2i is a root of a real-coefficient polynomial, which root must also occur?", "3−2i", ["3−2i", "−3+2i", "−3−2i", "2+3i"]],
+      ["Which polynomial has roots 2, i, and −i?", "(x−2)(x²+1)", ["(x−2)(x²+1)", "(x+2)(x²−1)", "(x−2)(x²−1)", "x²+2"]],
+      ["Counting multiplicity, how many complex roots does a quadratic have?", "2", ["1", "2", "3", "infinitely many"]],
+      ["Solve x²−6x+13=0.", "x = 3 ± 2i", ["x = 3 ± 2i", "x = −3 ± 2i", "x = 6 ± i", "x = 3 ± 4i"]],
+    ] },
+    { slug: "polynomial-identities", title: "Polynomial Identities", goal: "Prove and use identities that remain true for every allowed value.", key: "Expand both sides or use a geometric area model; an identity is true for all values, not just one solution.", example: "(x+3)²=x²+6x+9", steps: ["Partition an (x+3)-by-(x+3) square into x-by-x, two x-by-3 rectangles, and a 3-by-3 square.", "Add the four areas: x² + 3x + 3x + 9.", "Combine the middle terms to prove (x+3)² = x² + 6x + 9 for every x."], standard: "HSA.APR.C.4–5", visual: "area-model", drills: [
+      ["Expand (x+3)².", "x²+6x+9", ["x²+6x+9", "x²+9", "x²+3x+9", "x²−6x+9"]],
+      ["Which identity factors x²−25?", "(x−5)(x+5)", ["(x−5)(x+5)", "(x−5)²", "(x+5)²", "x(x−25)"]],
+      ["Expand (a−b)².", "a²−2ab+b²", ["a²−2ab+b²", "a²−b²", "a²+2ab+b²", "a²−2b²"]],
+      ["Factor x³+8 as a sum of cubes.", "(x+2)(x²−2x+4)", ["(x+2)(x²−2x+4)", "(x+2)(x²+2x+4)", "(x−2)(x²+2x+4)", "(x+8)(x²+1)"]],
+      ["What makes an equation a polynomial identity?", "it is true for every allowed value", ["it is true for every allowed value", "it has exactly one solution", "both sides have one term", "it contains no variables"]],
     ] },
   ]),
   makeRegion(2, "Rational and Radical Functions", "Control domains, asymptotes, radicals, and inverse operations.", "HSA.APR.D · HSF.BF", [

@@ -2,7 +2,7 @@ import { lessons, regions, type Accent } from "./curriculum.ts";
 
 export const ANSWER_BADGE_STEP = 10;
 export const ANSWER_BADGE_COUNT = 280;
-export const BADGE_CATALOG_VERSION = "2026.3";
+export const BADGE_CATALOG_VERSION = "2026.4";
 const LESSON_BADGE_COUNT = lessons.length;
 export const BADGE_CATALOG_SIZE = LESSON_BADGE_COUNT + ANSWER_BADGE_COUNT;
 

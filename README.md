@@ -1,8 +1,8 @@
 # Math
 
-Math is a simple English learning site for Grades 7–9. Sting built it as a parent who likes math and wanted a quiet place for his child to learn, practice, and return for review.
+Math is a simple English learning site for Grades 7–12. Sting built it as a parent who likes math and wanted a quiet place for his child to learn, practice, and return for review.
 
-The site includes 31 four-lesson regions, 124 lessons, 31 mixed boss checks, spaced review, daily rewards, anonymous identities, an opt-in weekly leaderboard, and a public feedback board whose posts are not connected to learner accounts or progress. A public Linear Graph Lab lets learners type `y = mx + b` equations and see the graph, slope, intercept, and point table update without signing in or saving the input.
+The site includes 55 regions, 237 lessons, 1,185 reviewed practice questions, mixed boss checks, spaced review, daily rewards, anonymous identities, an opt-in weekly leaderboard, and a public feedback board whose posts are not connected to learner accounts or progress. A public Linear Graph Lab lets learners type `y = mx + b` equations and see the graph, slope, intercept, nearby coordinates, and point table update without signing in or saving the input. Its point-to-line mission turns plotted coordinates into a connected line and then asks learners to read coordinates back from the graph.
 
 ## Local development
 
@@ -37,4 +37,4 @@ npx wrangler types --check
 npx wrangler deploy --dry-run
 ```
 
-`npm test` builds the production app, validates all 124 lessons and 620 reviewed questions, runs 62,000 seeded answer checks, confirms the 20 Grade 8 Quick Sheets, checks privacy boundaries, and verifies mutation/security controls.
+`npm test` builds the production app, validates all 237 lessons and 1,185 reviewed questions, runs 118,500 seeded answer checks, confirms the Grade 8 Quick Sheets, checks all 73 Grade 7, Grade 8, and high-school Common Core clusters plus the attached Algebra scope, verifies privacy boundaries, and exercises mutation, recovery-mastery, reward, responsive-layout, and security controls.

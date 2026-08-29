@@ -82,7 +82,7 @@ export function recoveryGuidance(question: PracticeQuestion, response: string, f
     return {
       label: "CHECK THE CHOICE",
       title: failedAttempts >= 2 ? "Test one condition." : "That choice misses the relationship.",
-      clue: "Compare the choice with every condition in the question.",
+      clue: question.hint,
       modelAnswer: revealModel,
     };
   }
@@ -90,7 +90,7 @@ export function recoveryGuidance(question: PracticeQuestion, response: string, f
   return {
     label: "TRY AGAIN",
     title: failedAttempts >= 2 ? "Change one step." : "Check the relationship.",
-    clue: failedAttempts >= 2 ? "Keep the useful work. Change one operation." : "Use the key idea, then retry.",
+    clue: question.hint,
     modelAnswer: revealModel,
   };
 }

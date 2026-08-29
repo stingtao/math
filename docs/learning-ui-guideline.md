@@ -144,3 +144,10 @@ A broad domain label or neighboring lesson is not proof that a topic is taught.
 - Record why a gap existed. Future audits should test the failed assumption, not merely search for the newly added title.
 
 The current Algebra I audit and topic evidence live in [curriculum-coverage.md](./curriculum-coverage.md) and `lib/curriculum-coverage.ts`.
+
+## 14. Put the useful repair clue in the first visible layer
+
+- A collapsed hint is optional depth, not evidence that the wrong-answer state teaches anything.
+- The first wrong-answer response must show a clue tied to the current question or a detected misconception. Generic directions such as “use the key idea” or “change one step” do not diagnose the learner's move.
+- Keep the visible repair compact: one diagnosis, one actionable clue, then retry. Reveal the accepted form only after repeated attempts.
+- If the misconception detector already supplies a more precise clue, keep the question-specific key idea available as an expandable second layer; do not repeat identical text in both layers.

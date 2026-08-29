@@ -100,7 +100,7 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
         ["Choose the symbol: −4 __ −1", "<", "On a number line, −4 is left of −1.", ["<", ">", "=", "≥"]],
         ["What does ≤ mean?", "less than or equal to|less than or equal", "It combines “less than” and “equal.”", ["less than", "less than or equal to", "greater than", "not equal"]],
       ], sourceSheet("10_math_symbols.png")),
-      lesson(1, 2, "signed-numbers", "Positive and Negative Numbers", "Move confidently above and below zero.", "Positive numbers sit right of zero; negative numbers sit left.", "−2 + 5 = 3", ["Start at −2.", "Adding 5 means move 5 places right.", "Land on 3."], "Grade 8 readiness", "coral", "number-line", [
+      lesson(1, 2, "signed-numbers", "Positive and Negative Numbers", "Move confidently above and below zero.", "Positive numbers sit right of zero; negative numbers sit left.", "−2 + 5 = 3", ["Begin at −2 on the number line.", "Adding 5 means move 5 places right.", "The endpoint is 3, so −2 + 5 = 3."], "Grade 8 readiness", "coral", "number-line", [
         ["Calculate −3 + 8.", "5", "Start at −3 and move 8 places right."],
         ["Calculate 4 − 9.", "-5", "Subtracting 9 means move 9 places left."],
         ["Which is greater: −7 or −2?", "-2", "The number closer to zero is greater.", ["−7", "−2"]],
@@ -259,7 +259,7 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
         ["Is √49 rational or irrational?", "rational", "√49 is the integer 7.", ["rational", "irrational"]],
         ["Which number is irrational?", "sqrt(3)|√3", "3 is not a perfect square.", ["√3", "0.4", "−8", "2/9"]],
       ]),
-      lesson(5, 3, "square-cube-roots", "Square and Cube Roots", "Use roots to undo powers.", "A square root undoes squaring; a cube root undoes cubing.", "√81 = 9 and ∛27 = 3", ["9² = 81.", "3³ = 27.", "Roots name the original factors."], "8.EE.A.2", "violet", "root-tiles", [
+      lesson(5, 3, "square-cube-roots", "Square and Cube Roots", "Use roots to undo powers.", "A square root undoes squaring; a cube root undoes cubing.", "√81 = 9 and ∛27 = 3", ["Because 9² = 81, √81 returns the factor 9.", "Because 3³ = 27, ∛27 returns the factor 3.", "Roots undo their matching powers: square with square root, cube with cube root."], "8.EE.A.2", "violet", "root-tiles", [
         ["Find √64.", "8", "Ask which positive number squared is 64."],
         ["Find ∛125.", "5", "5 × 5 × 5 = 125."],
         ["Solve x² = 36 for the positive root.", "6", "6² = 36."],
@@ -380,7 +380,7 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
         ["Does (1, 3) solve y = 2x + 1 and y = −x + 4?", "yes", "Test the point in both equations.", ["yes", "no"]],
         ["How many solutions do two intersecting lines have?", "one|1", "They share one point."],
       ]),
-      lesson(8, 4, "systems-algebra", "Systems Algebraically", "Eliminate or substitute to solve two equations.", "A solution must make both equations true.", "x + y = 7, x − y = 1 → (4, 3)", ["Add the equations: 2x = 8.", "So x = 4.", "Substitute to find y = 3."], "8.EE.C.8.b–c", "coral", "elimination", [
+      lesson(8, 4, "systems-algebra", "Systems Algebraically", "Eliminate or substitute to solve two equations.", "A solution must make both equations true.", "x + y = 7, x − y = 1 → (4, 3)", ["Add the equations so +y and −y cancel, leaving 2x = 8.", "Divide both sides by 2 to find x = 4.", "Substitute x = 4 into x + y = 7 to find y = 3, then check both equations."], "8.EE.C.8.b–c", "coral", "elimination", [
         ["Solve x + y = 9 and x − y = 3.", "(6,3)|6,3", "Add the equations to eliminate y."],
         ["Solve y = x + 2 and y = 3x − 2.", "(2,4)|2,4", "Set the expressions for y equal."],
         ["Solve 2x + y = 7 and y = 1.", "(3,1)|3,1", "Substitute y = 1."],
@@ -418,7 +418,7 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
         ["A table rises by 4 for every x-step. What is its slope?", "4", "Change in y divided by change in x."],
         ["Two functions have the same slope but different intercepts. Are their graphs parallel?", "yes", "Equal slopes give parallel lines.", ["yes", "no"]],
       ]),
-      lesson(9, 4, "linear-nonlinear", "Linear and Nonlinear Relationships", "Recognize constant and changing rates.", "Linear functions change at a constant rate.", "y = x² is nonlinear", ["Check equal x-steps.", "The y-changes are not equal.", "The graph bends, so it is nonlinear."], "8.F.A.3–B.5", "violet", "curve-line", [
+      lesson(9, 4, "linear-nonlinear", "Linear and Nonlinear Relationships", "Recognize constant and changing rates.", "Linear functions change at a constant rate.", "y = x² is nonlinear", ["Check equal x-steps.", "The y-changes are not equal.", "The graph bends, so it is nonlinear."], "8.F.A.3 · 8.F.B.4–5", "violet", "curve-line", [
         ["Is y = 5x − 2 linear?", "yes|linear", "It has the form y = mx + b."],
         ["Is y = x² linear?", "no|nonlinear", "Its rate changes."],
         ["A graph rises, stays flat, then falls. Is it increasing the whole time?", "no", "A flat or falling section breaks continuous increase."],
@@ -487,7 +487,7 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
         ["Two remote interior angles are 40° and 75°. Find the exterior angle.", "115|115°", "An exterior angle equals their sum."],
         ["Can a triangle have angles 90°, 60°, and 40°?", "no", "Their total is 190°, not 180°.", ["yes", "no"]],
       ]),
-      lesson(11, 3, "pythagorean-theorem", "Pythagorean Theorem and Converse", "Connect the sides of a right triangle.", "For a right triangle, a² + b² = c².", "3² + 4² = 5²", ["Square the legs: 9 and 16.", "Add: 25.", "√25 = 5, so the hypotenuse is 5."], "8.G.B.6–7", "violet", "right-triangle", [
+      lesson(11, 3, "pythagorean-theorem", "Pythagorean Theorem and Converse", "Connect the sides of a right triangle.", "For a right triangle, a² + b² = c².", "3² + 4² = 5²", ["Square the two legs: 3² = 9 and 4² = 16.", "Add the leg squares to get c² = 9 + 16 = 25.", "Take the positive root: c = √25 = 5, the hypotenuse length."], "8.G.B.6–7", "violet", "right-triangle", [
         ["Legs are 6 and 8. Find the hypotenuse.", "10", "Use 6² + 8² = c²."],
         ["Hypotenuse 13, one leg 5. Find the other leg.", "12", "Use 13² − 5²."],
         ["Do side lengths 5, 12, 13 form a right triangle?", "yes", "Check 5² + 12² = 13²."],
@@ -570,7 +570,7 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
         ["A table cell counts students in both categories. What is it called?", "joint frequency", "It lies at the intersection of two categories."],
         ["If two row percentages differ greatly, is association possible?", "yes", "Different conditional rates suggest association.", ["yes", "no"]],
       ]),
-      lesson(13, 4, "probability", "Probability", "Compare favorable outcomes with all outcomes.", "Probability is between 0 and 1.", "3 red of 5 total → P(red) = 3/5", ["Count favorable outcomes: 3.", "Count all outcomes: 5.", "Write 3/5."], "Grade 8 readiness", "teal", "probability", [
+      lesson(13, 4, "probability", "Probability", "Compare favorable outcomes with all outcomes.", "Probability is between 0 and 1.", "3 red of 5 total → P(red) = 3/5", ["Count the favorable red outcomes: 3.", "Count every equally likely outcome: 5 total.", "Write favorable over total, so P(red) = 3/5."], "Grade 8 readiness", "teal", "probability", [
         ["A bag has 3 red and 2 blue. Find P(red).", "3/5|0.6|60%", "Use favorable over total."],
         ["A fair coin is tossed. Find P(heads).", "1/2|0.5|50%", "One of two equally likely outcomes."],
         ["A fair die is rolled. Find P(rolling 6).", "1/6", "One favorable face out of six."],

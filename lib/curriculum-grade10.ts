@@ -2,7 +2,7 @@ import type { Accent, LessonDefinition, PracticeQuestion, RegionDefinition } fro
 import { buildPracticeQuestion } from "./question-interactions.ts";
 
 type Drill = [prompt: string, answer: string, choices?: string[]];
-type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; standard: string; visual: string; drills: Drill[] };
+type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; steps?: string[]; standard: string; visual: string; drills: Drill[] };
 const accents: Accent[] = ["blue", "teal", "violet", "coral", "gold"];
 
 function makeLesson(regionId: number, order: number, accent: Accent, spec: LessonSpec): LessonDefinition {
@@ -17,7 +17,7 @@ function makeLesson(regionId: number, order: number, accent: Accent, spec: Lesso
     goal: spec.goal,
     keyIdea: spec.key,
     example: spec.example,
-    exampleSteps: ["Name what is known and what must be found.", spec.key, `Check the result against the model: ${spec.example}.`],
+    exampleSteps: spec.steps ?? ["Name what is known and what must be found.", spec.key, `Check the result against the model: ${spec.example}.`],
     standard: spec.standard,
     accent,
     visual: spec.visual,
@@ -44,6 +44,13 @@ export const grade10Regions: RegionDefinition[] = [
     ] },
     { slug: "proof-structure", title: "Build a Geometric Proof", goal: "Link statements with reasons in a valid order.", key: "Begin with the givens, justify each step, and finish with the exact claim.", example: "Given M is midpoint of AB → AM = MB by definition of midpoint", standard: "HSG.CO.C.10", visual: "steps", drills: [
       ["A proof should begin from what information?", "givens|the givens|given information"], ["If AB = CD and CD = EF, why is AB = EF?", "transitive property|transitive"], ["If x = y, why may 3x = 3y?", "multiplication property of equality|multiplication property"], ["If two angles are each 90°, they are congruent by what idea?", "all right angles are congruent|right angle congruence"], ["What ends a proof?", "the claim|conclusion|what was to be proved"],
+    ] },
+    { slug: "geometric-constructions", title: "Geometric Constructions", goal: "Use compass-and-straightedge moves to construct bisectors, perpendiculars, and regular shapes.", key: "A valid construction uses intersections of equal-radius arcs and straight lines; measurements can check the result but do not create it.", example: "Equal-radius arcs from A and B meet on the perpendicular bisector of segment AB", steps: ["Open the compass wider than half of AB and draw equal-radius arcs from A and B.", "Connect the two arc intersections; both are equidistant from A and B.", "The connecting line crosses AB at its midpoint and forms a 90° angle."], standard: "HSG.CO.D.12–13", visual: "construction", drills: [
+      ["Which tool transfers an exact distance in a classical construction?", "compass", ["compass", "protractor", "calculator", "grid paper"]],
+      ["Points where equal-radius arcs from both endpoints meet lie on which line?", "the perpendicular bisector", ["the perpendicular bisector", "a parallel line", "the segment itself", "a tangent"]],
+      ["An angle bisector creates two angles that are what?", "congruent", ["congruent", "supplementary", "vertical", "always right"]],
+      ["Which construction locates points equidistant from A and B?", "perpendicular bisector", ["perpendicular bisector", "parallel through A", "angle copy", "tangent at A"]],
+      ["To inscribe a regular hexagon in a circle, what length can be stepped around the circle?", "the radius", ["the radius", "the diameter", "half the radius", "the circumference"]],
     ] },
   ]),
   makeRegion(2, "Congruence and Transformations", "Use rigid motions and triangle criteria to prove sameness.", "HSG.CO.A–B", [
@@ -72,6 +79,20 @@ export const grade10Regions: RegionDefinition[] = [
     ] },
     { slug: "special-right-triangles", title: "Special Right Triangles", goal: "Use exact side patterns for 45-45-90 and 30-60-90 triangles.", key: "45-45-90 sides are x,x,x√2; 30-60-90 sides are x,x√3,2x.", example: "Short leg 4 in a 30-60-90 triangle gives hypotenuse 8", standard: "HSG.SRT.C.8", visual: "right-triangle", drills: [
       ["45-45-90 leg 7. Hypotenuse?", "7sqrt(2)|7√2"], ["30-60-90 short leg 5. Hypotenuse?", "10"], ["30-60-90 short leg 3. Long leg?", "3sqrt(3)|3√3"], ["45-45-90 hypotenuse 12. Each leg?", "6sqrt(2)|6√2"], ["Which side is opposite 30° in a 30-60-90 triangle?", "short leg|the short leg"],
+    ] },
+    { slug: "similarity-proofs", title: "Similarity Proofs and Proportions", goal: "Use parallel lines and triangle similarity to prove proportional relationships.", key: "A line parallel to one side of a triangle creates a smaller similar triangle, so corresponding side lengths form equal ratios.", example: "DE ∥ BC in △ABC gives AD/AB = AE/AC = DE/BC", steps: ["Use DE ∥ BC to mark two pairs of equal corresponding angles.", "Conclude △ADE ∼ △ABC by AA similarity.", "Match vertices in order, then write AD/AB = AE/AC = DE/BC."], standard: "HSG.SRT.B.4–5", visual: "triangle", drills: [
+      ["If DE ∥ BC in △ABC, why are △ADE and △ABC similar?", "AA similarity", ["AA similarity", "SSS congruence", "vertical angles only", "the triangles share one side"]],
+      ["A parallel segment divides two triangle sides in what way?", "proportionally", ["proportionally", "into equal lengths", "perpendicularly", "randomly"]],
+      ["In similar triangles, small/large = 3/5. A large side is 20. Matching small side?", "12", ["8", "12", "15", "25"]],
+      ["Two similar triangles have scale factor 2 from small to large. Their area factor is?", "4", ["2", "3", "4", "8"]],
+      ["Which statement follows from triangle similarity?", "corresponding sides are proportional", ["corresponding sides are proportional", "all corresponding sides are equal", "areas have the same value", "every angle is 90°"]],
+    ] },
+    { slug: "laws-of-sines-and-cosines", title: "Laws of Sines and Cosines", goal: "Solve general triangles and choose the law that matches the known information.", key: "Use the Law of Sines with known opposite pairs; use the Law of Cosines with SSS or SAS data, and use area = ½ab sin C for two sides and the included angle.", example: "a = 5, b = 7, C = 60° gives c² = 5² + 7² − 2(5)(7)cos60° = 39", steps: ["The known information is SAS, so choose c² = a² + b² − 2ab cos C.", "Substitute 5, 7, and 60° to get c² = 25 + 49 − 70(0.5) = 39.", "Take the positive square root: c = √39 ≈ 6.2, which fits between |7−5| and 7+5."], standard: "HSG.SRT.D.9–11", visual: "triangle-law", drills: [
+      ["Given a=5, b=7, and included angle C=60°, which law finds c directly?", "Law of Cosines", ["Law of Cosines", "Law of Sines", "Pythagorean theorem only", "arc-length formula"]],
+      ["For a=5, b=7, C=60°, what is c²?", "39", ["24", "39", "49", "74"]],
+      ["If A=30°, a=5, and B=90°, find b.", "10", ["5", "5√2", "10", "15"]],
+      ["Find the area when a=6, b=8, and included angle C=30°.", "12", ["12", "24", "48", "96"]],
+      ["Which data naturally start with the Law of Sines?", "two angles and one side", ["two angles and one side", "three sides", "two sides and their included angle", "one side only"]],
     ] },
   ]),
   makeRegion(4, "Coordinate Geometry", "Prove geometric facts and model figures on the coordinate plane.", "HSG.GPE.B", [
@@ -114,6 +135,13 @@ export const grade10Regions: RegionDefinition[] = [
     ] },
     { slug: "modeling-with-geometry", title: "Model with Geometry", goal: "Choose assumptions, formulas, and precision for a real object.", key: "Approximate a complex object with familiar shapes, state assumptions, then report sensible units and precision.", example: "Model a can as a cylinder: V=πr²h", standard: "HSG.MG.A.1–3", visual: "cylinder", drills: [
       ["Best common model for a soup can?", "cylinder", ["sphere", "cylinder", "cone"]], ["Best common model for a ball?", "sphere", ["sphere", "prism", "cone"]], ["A cylinder r=3, h=10 has exact volume?", "90pi|90π"], ["Why state assumptions?", "to explain the model's limits|explain model limits|clarity"], ["Volume should use what kind of units?", "cubic units"],
+    ] },
+    { slug: "cross-sections-and-rotations", title: "Cross-Sections and Solids of Rotation", goal: "Predict two-dimensional slices and three-dimensional solids created by rotation.", key: "A plane intersection creates a cross-section; rotating a region around an axis sweeps out a solid whose radius is its distance from the axis.", example: "Rotating a rectangle around one side creates a cylinder", steps: ["Mark the rotation axis along one side of the rectangle.", "Every point sweeps a circle whose radius is its distance from the axis.", "The opposite side sweeps the outer cylinder; the rectangle height becomes the cylinder height."], standard: "HSG.GMD.B.4", visual: "cross-section", drills: [
+      ["A plane parallel to a cylinder's circular base creates what cross-section?", "circle", ["circle", "triangle", "parabola", "pentagon"]],
+      ["A plane through the axis of a right circular cylinder creates what cross-section?", "rectangle", ["rectangle", "circle", "ellipse only", "hexagon"]],
+      ["Rotating a rectangle around one of its sides creates a what?", "cylinder", ["cylinder", "sphere", "cone", "pyramid"]],
+      ["Rotating a right triangle around one leg creates a what?", "cone", ["cone", "prism", "sphere", "torus"]],
+      ["As a horizontal slice moves from a sphere's center toward its top, its circular radius does what?", "decreases", ["decreases", "increases", "stays constant", "becomes negative"]],
     ] },
   ]),
   makeRegion(7, "Probability", "Use counting, conditional probability, and independence.", "HSS.CP.A–B", [

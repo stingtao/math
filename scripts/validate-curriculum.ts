@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curriculum.ts";
-import { algebraCourseCoverage } from "../lib/curriculum-coverage.ts";
+import { algebraCourseCoverage, grade7To12CoreCoverage } from "../lib/curriculum-coverage.ts";
 import { inferQuestionInteraction, type QuestionInteraction } from "../lib/question-interactions.ts";
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
@@ -10,12 +10,13 @@ function writtenUnit(choice: string) {
 }
 
 assert.equal(regions.length, 55, "Grades 7–12 must contain 55 regions");
-assert.equal(lessons.length, 228, "Grades 7–12 must contain 228 lessons");
-assert.equal(curriculumStats.questions, 1140, "Every lesson must contain five reviewed questions");
+assert.equal(lessons.length, 237, "Grades 7–12 must contain 237 lessons");
+assert.equal(curriculumStats.questions, 1185, "Every lesson must contain five reviewed questions");
 assert.ok(lessons.every((lesson) => lesson.practice.length === 5), "Every lesson must contain exactly five questions");
+assert.ok(lessons.every((lesson) => lesson.exampleSteps.length >= 3 && lesson.exampleSteps.every((step) => step.trim().length >= 12)), "Every lesson needs a usable worked reasoning sequence");
 assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, lessons.length, "Lesson IDs must be unique");
 assert.equal(new Set(lessons.map((lesson) => lesson.slug)).size, lessons.length, "Lesson slugs must be unique");
-assert.deepEqual([7, 8, 9, 10, 11, 12].map((grade) => lessons.filter((lesson) => lesson.grade === grade).length), [32, 52, 46, 34, 32, 32]);
+assert.deepEqual([7, 8, 9, 10, 11, 12].map((grade) => lessons.filter((lesson) => lesson.grade === grade).length), [32, 52, 47, 38, 35, 33]);
 assert.ok(lessons.every((lesson) => hasSpecificTopicIcon(lesson.visual)), "Every lesson visual must have a specific topic icon");
 assert.equal(new Set(lessons.map((lesson) => lesson.visual)).size, topicIconVisuals.length, "Icon catalog must exactly cover curriculum visuals");
 assert.equal(Object.keys(regionLandmarks).length, regions.length, "Every current region must have one visual landmark");
@@ -35,6 +36,13 @@ for (const [grade, domains] of requiredDomains) {
 }
 
 const lessonBySlug = new Map(lessons.map((lesson) => [lesson.slug, lesson]));
+assert.equal(grade7To12CoreCoverage.length, 73, "The Common Core cluster contract must cover all Grade 7, Grade 8, and high-school clusters");
+for (const strand of grade7To12CoreCoverage) {
+  assert.ok(strand.lessonSlugs.length > 0, `${strand.cluster} needs at least one mapped lesson`);
+  for (const slug of strand.lessonSlugs) assert.ok(lessonBySlug.has(slug), `${strand.cluster} is missing required lesson ${slug}`);
+  const mappedStandards = strand.lessonSlugs.map((slug) => lessonBySlug.get(slug)?.standard ?? "").join(" ");
+  assert.ok(mappedStandards.includes(strand.cluster), `${strand.cluster} has no matching standard evidence in its mapped lessons`);
+}
 for (const strand of algebraCourseCoverage) {
   for (const slug of strand.lessonSlugs) assert.ok(lessonBySlug.has(slug), `${strand.topic} is missing required lesson ${slug}`);
   const mappedStandards = strand.lessonSlugs.map((slug) => lessonBySlug.get(slug)?.standard ?? "").join(" ");

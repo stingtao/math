@@ -2,12 +2,12 @@ import type { Accent, LessonDefinition, PracticeQuestion, RegionDefinition } fro
 import { buildPracticeQuestion } from "./question-interactions.ts";
 
 type Drill = [prompt: string, answer: string, choices?: string[]];
-type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; standard: string; visual: string; drills: Drill[] };
+type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; steps?: string[]; standard: string; visual: string; drills: Drill[] };
 const accents: Accent[] = ["gold", "violet", "blue", "coral", "teal"];
 
 function makeLesson(regionId: number, order: number, accent: Accent, spec: LessonSpec): LessonDefinition {
   const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => buildPracticeQuestion({ id: `q${index + 1}`, prompt, answer, choices, hint: spec.key }));
-  return { id: `g12-r${regionId}-l${order}`, grade: 12, slug: `g12-${spec.slug}`, regionId, order, title: spec.title, goal: spec.goal, keyIdea: spec.key, example: spec.example, exampleSteps: ["Represent the problem with a function, diagram, or distribution.", spec.key, `Interpret and check the result: ${spec.example}.`], standard: spec.standard, accent, visual: spec.visual, practice };
+  return { id: `g12-r${regionId}-l${order}`, grade: 12, slug: `g12-${spec.slug}`, regionId, order, title: spec.title, goal: spec.goal, keyIdea: spec.key, example: spec.example, exampleSteps: spec.steps ?? ["Represent the problem with a function, diagram, or distribution.", spec.key, `Interpret and check the result: ${spec.example}.`], standard: spec.standard, accent, visual: spec.visual, practice };
 }
 
 function makeRegion(order: number, title: string, subtitle: string, standard: string, specs: LessonSpec[]): RegionDefinition {
@@ -116,6 +116,13 @@ export const grade12Regions: RegionDefinition[] = [
     ] },
     { slug: "sampling-distributions", title: "Sampling Distributions", goal: "Understand how sample statistics vary across samples.", key: "Sample means center at the population mean; their standard error shrinks like 1/√n, and large samples often yield an approximately normal distribution.", example: "Quadrupling n halves the standard error", standard: "HSS.IC.A.1–2", visual: "data-line", drills: [
       ["Sample means center around the population?", "mean"], ["Increasing sample size makes standard error larger or smaller?", "smaller"], ["Quadrupling sample size changes standard error by factor?", "1/2|0.5"], ["The Central Limit Theorem concerns the distribution of sample?", "means|sample means"], ["A statistic varies from sample to sample?", "yes"],
+    ] },
+    { slug: "decision-strategies", title: "Expected Value and Decision Strategies", goal: "Compare repeated strategies by combining outcomes, probabilities, costs, and limits.", key: "Expected value ranks long-run averages, but a sound decision also states risk, assumptions, and whether the model fits a one-time or repeated choice.", example: "A sure $5 has EV $5; a 20% chance of $20 has EV $4, so the sure option has the higher long-run value", steps: ["Compute the sure option: 1.00 × $5 = $5 expected value.", "Compute the risky option: 0.20 × $20 + 0.80 × $0 = $4 expected value.", "For repeated choices the sure option has the higher long-run value; for one high-stakes choice, state risk as well."], standard: "HSS.MD.B.5–7", visual: "decision-table", drills: [
+      ["Option A pays $5 for sure. Option B pays $20 with probability 0.2 and $0 otherwise. Which has higher expected value?", "Option A", ["Option A", "Option B", "they are equal", "not enough information"]],
+      ["A game costs $3 and pays $12 with probability 0.25. What is the expected net value?", "$0", ["−$3", "$0", "$3", "$9"]],
+      ["Which statement best describes expected value?", "a long-run average across repeated trials", ["a long-run average across repeated trials", "the guaranteed result of one trial", "the largest possible prize", "the probability of losing"]],
+      ["Two strategies have the same expected value, but one has much wider outcomes. What differs?", "risk", ["risk", "expected value", "sample-space size only", "the definition of probability"]],
+      ["When is expected value alone least sufficient?", "a one-time high-stakes decision", ["a one-time high-stakes decision", "many low-stakes repeated trials", "comparing fair coins", "checking probabilities sum to 1"]],
     ] },
   ]),
   makeRegion(8, "Inference, Finance, and Discrete Models", "Make evidence-based decisions and plan quantitative futures.", "HSS.IC · HSF.LE · Discrete math", [

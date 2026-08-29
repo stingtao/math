@@ -44,6 +44,12 @@ function toolMode(lesson: LessonDefinition) {
   if (/logic-and-conditionals/.test(slug)) return "logic";
   if (/sets-and-venn/.test(slug)) return "venn";
   if (/categorical-data/.test(slug)) return "categorical";
+  if (/geometric-constructions/.test(slug)) return "construction";
+  if (/laws-of-sines-and-cosines/.test(slug)) return "triangle-law";
+  if (/cross-sections-and-rotations/.test(slug)) return "cross-section";
+  if (/complex-arithmetic|complex-polynomial-solutions|complex-plane/.test(slug)) return "complex";
+  if (/polynomial-identities/.test(slug)) return "identity";
+  if (/decision-strategies/.test(slug)) return "decision";
   if (/limit|derivative|tangent|motion|increasing|optimization|antiderivative|integral|fundamental/.test(slug)) return "calculus";
   if (/trig|radian|unit-circle|polar|complex-plane/.test(slug)) return "circle";
   if (/probability|independence|sampling|distribution|expected|binomial|hypothesis|confidence|statistical|data|regression/.test(slug)) return "probability";
@@ -72,7 +78,7 @@ export function AdvancedMathTool({ lesson }: { lesson: LessonDefinition }) {
   const mode = toolMode(lesson);
   return <section className={`advanced-math-tool tool-${mode} accent-${lesson.accent}`} aria-label={`${lesson.title} interactive concept tool`}>
     <header><span><small>MOVE IT · NOTICE IT · EXPLAIN IT</small><strong>{lesson.title} Lab</strong></span><b>Not saved</b></header>
-    {mode === "logic" ? <LogicLab /> : mode === "venn" ? <VennLab /> : mode === "categorical" ? <CategoricalDataLab /> : mode === "calculus" ? <CalculusLens /> : mode === "circle" ? <UnitCircleLab /> : mode === "probability" ? <ProbabilityLab /> : mode === "vector" ? <VectorLab /> : mode === "scale" ? <ScaleLab lesson={lesson} /> : <FunctionLab lesson={lesson} />}
+    {mode === "logic" ? <LogicLab /> : mode === "venn" ? <VennLab /> : mode === "categorical" ? <CategoricalDataLab /> : mode === "construction" ? <ConstructionLab /> : mode === "triangle-law" ? <TriangleLawLab /> : mode === "cross-section" ? <CrossSectionLab /> : mode === "complex" ? <ComplexNumberLab /> : mode === "identity" ? <PolynomialIdentityLab /> : mode === "decision" ? <DecisionLab /> : mode === "calculus" ? <CalculusLens /> : mode === "circle" ? <UnitCircleLab /> : mode === "probability" ? <ProbabilityLab /> : mode === "vector" ? <VectorLab /> : mode === "scale" ? <ScaleLab lesson={lesson} /> : <FunctionLab lesson={lesson} />}
     <footer><span aria-hidden="true">◇</span><p><strong>Move one control. Explain one change.</strong> The picture, value, and rule update together.</p></footer>
   </section>;
 }
@@ -196,6 +202,73 @@ function VectorLab() {
   const magnitude = Math.hypot(a, b);
   const dot = 2 * a - b;
   return <div className="advanced-tool-workspace"><div className="advanced-tool-visual"><Axes><defs><marker id="vector-arrow" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" /></marker></defs><line className="vector-arrow" x1="160" y1="125" x2={endpoint.x} y2={endpoint.y} markerEnd="url(#vector-arrow)" /><g className="advanced-active-point"><circle cx={endpoint.x} cy={endpoint.y} r="7" /></g></Axes></div><div className="advanced-tool-panel"><span className="advanced-tool-tag">VECTOR BUILDER</span><h3>⟨{number(a)}, {number(b)}⟩</h3><p>Components set direction. The Pythagorean theorem gives magnitude. The dot product compares alignment with ⟨2,−1⟩.</p><RangeControl label="Horizontal component" display={number(a)} value={a} min={-4} max={4} step={1} onChange={setA} /><RangeControl label="Vertical component" display={number(b)} value={b} min={-4} max={4} step={1} onChange={setB} /><div className="advanced-metric-grid"><span><small>MAGNITUDE</small><strong>{number(magnitude)}</strong></span><span><small>DOT WITH ⟨2,−1⟩</small><strong>{number(dot)}</strong></span></div></div></div>;
+}
+
+function ConstructionLab() {
+  const [construction, setConstruction] = useState<"perpendicular" | "angle">("perpendicular");
+  const description = construction === "perpendicular" ? "Equal-radius arcs locate every point that is the same distance from A and B." : "Equal arcs copy the same distance from both sides of the angle.";
+  return <div className="advanced-tool-workspace construction-workspace">
+    <div className="construction-stage" role="img" aria-label={description}>
+      <svg viewBox="0 0 360 270">
+        {construction === "perpendicular" ? <>
+          <line className="construction-base" x1="70" x2="290" y1="140" y2="140" />
+          <path className="construction-arc" d="M70 140 A135 135 0 0 1 180 62 M70 140 A135 135 0 0 0 180 218 M290 140 A135 135 0 0 0 180 62 M290 140 A135 135 0 0 1 180 218" />
+          <line className="construction-result" x1="180" x2="180" y1="45" y2="230" />
+          <circle cx="70" cy="140" r="6" /><circle cx="290" cy="140" r="6" /><circle cx="180" cy="62" r="5" /><circle cx="180" cy="218" r="5" />
+          <text x="55" y="165">A</text><text x="296" y="165">B</text><text x="188" y="118">90°</text>
+        </> : <>
+          <line className="construction-base" x1="75" x2="310" y1="215" y2="215" /><line className="construction-base" x1="75" x2="265" y1="215" y2="72" />
+          <path className="construction-arc" d="M160 215 A85 85 0 0 0 143 164 M143 164 A78 78 0 0 1 160 215 M75 215 A145 145 0 0 1 191 128" />
+          <line className="construction-result" x1="75" x2="270" y1="215" y2="143" />
+          <circle cx="75" cy="215" r="6" /><circle cx="191" cy="128" r="5" />
+          <text x="94" y="190">θ/2</text><text x="168" y="205">θ/2</text>
+        </>}
+      </svg>
+    </div>
+    <div className="advanced-tool-panel"><span className="advanced-tool-tag">COMPASS + STRAIGHTEDGE</span><h3>{construction === "perpendicular" ? "Bisect a segment at 90°." : "Split an angle into equal parts."}</h3><p>{description}</p><div className="construction-choice-grid" aria-label="Choose a construction"><button type="button" className={construction === "perpendicular" ? "selected" : ""} aria-pressed={construction === "perpendicular"} onClick={() => setConstruction("perpendicular")}>Perpendicular bisector</button><button type="button" className={construction === "angle" ? "selected" : ""} aria-pressed={construction === "angle"} onClick={() => setConstruction("angle")}>Angle bisector</button></div><div className="advanced-live-value"><small>WHY THE ARCS WORK</small><strong>Equal radius → equal distance</strong></div></div>
+  </div>;
+}
+
+function TriangleLawLab() {
+  const [sideA, setSideA] = useState(6);
+  const [sideB, setSideB] = useState(8);
+  const [angle, setAngle] = useState(60);
+  const radians = angle * Math.PI / 180;
+  const sideC = Math.sqrt(sideA ** 2 + sideB ** 2 - 2 * sideA * sideB * Math.cos(radians));
+  const area = .5 * sideA * sideB * Math.sin(radians);
+  const scale = 14;
+  const top = { x: 65 + sideB * scale * Math.cos(radians), y: 215 - sideB * scale * Math.sin(radians) };
+  return <div className="advanced-tool-workspace triangle-law-workspace"><div className="triangle-law-stage" role="img" aria-label={`Triangle with sides ${sideA} and ${sideB}, included angle ${angle} degrees, and opposite side ${number(sideC)}`}><svg viewBox="0 0 360 270"><polygon points={`65,215 ${65 + sideA * scale},215 ${top.x},${top.y}`} /><path d="M91 215 A26 26 0 0 0 78 193" /><text x="90" y="197">{angle}°</text><text x={65 + sideA * scale / 2} y="242">a={sideA}</text><text x={(65 + top.x) / 2 - 28} y={(215 + top.y) / 2 - 8}>b={sideB}</text><text x={(65 + sideA * scale + top.x) / 2 + 4} y={(215 + top.y) / 2}>c={number(sideC)}</text></svg></div><div className="advanced-tool-panel"><span className="advanced-tool-tag">NON-RIGHT TRIANGLE</span><h3>Two sides + included angle determine the third.</h3><p>Law of Cosines: c² = a² + b² − 2ab cos C.</p><RangeControl label="Side a" display={sideA} value={sideA} min={3} max={10} step={1} onChange={setSideA} /><RangeControl label="Side b" display={sideB} value={sideB} min={3} max={10} step={1} onChange={setSideB} /><RangeControl label="Included angle C" display={`${angle}°`} value={angle} min={30} max={120} step={10} onChange={setAngle} /><div className="advanced-metric-grid"><span><small>OPPOSITE SIDE c</small><strong>{number(sideC)}</strong></span><span><small>AREA · ½ab sin C</small><strong>{number(area)}</strong></span></div></div></div>;
+}
+
+function CrossSectionLab() {
+  const [height, setHeight] = useState(0);
+  const radius = Math.sqrt(Math.max(0, 25 - height ** 2));
+  const y = 135 - height * 18;
+  return <div className="advanced-tool-workspace cross-section-workspace"><div className="cross-section-stage" role="img" aria-label={`A horizontal slice ${number(height)} units from a sphere's center has radius ${number(radius)}`}><svg viewBox="0 0 360 270"><circle className="cross-section-sphere" cx="180" cy="135" r="92" /><ellipse className="cross-section-equator" cx="180" cy="135" rx="92" ry="26" /><ellipse className="cross-section-slice" cx="180" cy={y} rx={radius / 5 * 92} ry={Math.max(2, radius / 5 * 26)} /><line className="cross-section-radius" x1="180" x2={180 + radius / 5 * 92} y1={y} y2={y} /><text x="190" y={Math.max(30, y - 10)}>r={number(radius)}</text></svg></div><div className="advanced-tool-panel"><span className="advanced-tool-tag">SLICE A SPHERE</span><h3>The section shrinks away from the center.</h3><p>For sphere radius 5, the slice obeys r² + h² = 25. A rotating semicircle builds the same solid.</p><RangeControl label="Slice height h" display={number(height)} value={height} min={-5} max={5} step={.5} onChange={setHeight} /><div className="advanced-metric-grid"><span><small>SLICE RADIUS</small><strong>{number(radius)}</strong></span><span><small>SLICE AREA</small><strong>{number(Math.PI * radius ** 2)}</strong></span></div></div></div>;
+}
+
+function ComplexNumberLab() {
+  const [real, setReal] = useState(3);
+  const [imaginary, setImaginary] = useState(2);
+  const original = svgPoint({ x: real, y: imaginary });
+  const rotated = svgPoint({ x: -imaginary, y: real });
+  return <div className="advanced-tool-workspace complex-workspace"><div className="advanced-tool-visual"><Axes><defs><marker id="complex-arrow" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" /></marker></defs><line className="complex-original" x1="160" y1="125" x2={original.x} y2={original.y} markerEnd="url(#complex-arrow)" /><line className="complex-rotated" x1="160" y1="125" x2={rotated.x} y2={rotated.y} markerEnd="url(#complex-arrow)" /><text x={original.x + 8} y={original.y - 8}>z</text><text x={rotated.x + 8} y={rotated.y - 8}>iz</text></Axes></div><div className="advanced-tool-panel"><span className="advanced-tool-tag">COMPLEX PLANE</span><h3>Multiplying by i rotates 90°.</h3><p>z = a + bi becomes iz = −b + ai. The magnitude stays fixed while the direction changes.</p><RangeControl label="Real part a" display={real} value={real} min={-4} max={4} step={1} onChange={setReal} /><RangeControl label="Imaginary part b" display={imaginary} value={imaginary} min={-4} max={4} step={1} onChange={setImaginary} /><div className="advanced-metric-grid"><span><small>z</small><strong>{real} {imaginary < 0 ? "−" : "+"} {Math.abs(imaginary)}i</strong></span><span><small>i · z</small><strong>{-imaginary} {real < 0 ? "−" : "+"} {Math.abs(real)}i</strong></span><span><small>|z|</small><strong>{number(Math.hypot(real, imaginary))}</strong></span></div></div></div>;
+}
+
+function PolynomialIdentityLab() {
+  const [x, setX] = useState(3);
+  const total = (x + 2) ** 2;
+  return <div className="advanced-tool-workspace identity-workspace"><div className="identity-stage" role="img" aria-label={`Area model showing that ${x + 2} squared equals ${x} squared plus 4 times ${x} plus 4`}><div className="identity-square"><span className="identity-x2" style={{ flex: `${x} ${x} 0` }}>x²<br /><b>{x ** 2}</b></span><span className="identity-2x-vertical">2x<br /><b>{2 * x}</b></span><span className="identity-2x-horizontal">2x<br /><b>{2 * x}</b></span><span className="identity-four">4</span></div></div><div className="advanced-tool-panel"><span className="advanced-tool-tag">IDENTITY AS AREA</span><h3>(x + 2)² = x² + 4x + 4</h3><p>The four pieces always rebuild the same square, so the equality is true for every x.</p><RangeControl label="Side part x" display={x} value={x} min={1} max={6} step={1} onChange={setX} /><div className="advanced-live-value"><small>BOTH SIDES</small><strong>({x}+2)² = {x ** 2}+{4 * x}+4 = {total}</strong></div></div></div>;
+}
+
+function DecisionLab() {
+  const [probability, setProbability] = useState(.3);
+  const [payoff, setPayoff] = useState(30);
+  const sure = 8;
+  const riskyExpected = probability * payoff;
+  const better = riskyExpected > sure ? "Risky option" : riskyExpected < sure ? "Sure option" : "Equal expected value";
+  return <div className="advanced-tool-workspace decision-workspace"><div className="decision-stage" aria-label={`${better}; sure expected value ${sure}, risky expected value ${number(riskyExpected)}`}><div><small>SURE</small><strong>${sure}</strong><i style={{ width: `${sure / 30 * 100}%` }} /></div><div><small>RISKY · {Math.round(probability * 100)}% OF ${payoff}</small><strong>${number(riskyExpected)} EV</strong><i style={{ width: `${Math.min(100, riskyExpected / 30 * 100)}%` }} /></div><b>{better}</b></div><div className="advanced-tool-panel"><span className="advanced-tool-tag">COMPARE STRATEGIES</span><h3>Expected value is probability × payoff.</h3><p>Use EV for repeated choices. For one high-stakes choice, also name the risk and what the model leaves out.</p><RangeControl label="Win probability" display={`${Math.round(probability * 100)}%`} value={probability} min={.1} max={.9} step={.1} onChange={setProbability} /><RangeControl label="Risky payoff" display={`$${payoff}`} value={payoff} min={5} max={50} step={5} onChange={setPayoff} /><div className="advanced-live-value"><small>HIGHER LONG-RUN VALUE</small><strong>{better}</strong></div></div></div>;
 }
 
 function ScaleLab({ lesson }: { lesson: LessonDefinition }) {

@@ -1,16 +1,32 @@
 # Curriculum coverage baseline
 
-This document records the audited Algebra I scope that must remain covered across the Grade 7–12 learning path. It is a product coverage contract, not a claim that the United States has one federally prescribed course sequence.
+This document records the audited Grade 7–12 baseline and the attached Algebra course scope. It is a product coverage contract, not a claim that the United States has one federally prescribed course sequence.
 
 ## Standards boundary
 
 Education and curriculum decisions in the United States are primarily state and local responsibilities. This project therefore uses the [Common Core State Standards for Mathematics](https://corestandards.org/mathematics-standards/) as a public, auditable baseline and treats local course order as configurable. The Common Core document itself defines mathematical outcomes but does not mandate one high-school course sequence.
 
-The attached course table was checked against the current lesson bank and these official high-school strands:
+The attached course table and the full lesson bank were checked against Grade 7, Grade 8, and all high-school Common Core clusters in these official strands:
 
 - [Number and Quantity](https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf): real numbers, quantities, units, graph scales, and measurement precision.
 - [Algebra and Functions](https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf): expressions, equations, inequalities, systems, multiple representations, and linear, quadratic, and exponential models.
 - [Statistics and Probability](https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf): numerical data, categorical data, two-way relative frequencies, events, unions, intersections, and complements.
+
+The machine-readable contract currently contains all 73 clusters: 9 in Grade 7, 10 in Grade 8, and 54 high-school clusters. Grade 12 also includes precalculus, calculus, finance, and discrete-model extensions beyond the Common Core baseline. “Complete” in this document means every baseline cluster has named lesson evidence and reviewed questions; it does not mean every state, district, AP, IB, or local course sequence is identical.
+
+## Full-bank audit repairs
+
+| Previously missing cluster | New lesson evidence | Instructional representation |
+| --- | --- | --- |
+| HSS.ID.C · Interpret linear models | `g9-interpret-linear-models` | Fitted data, slope and intercept in context, association versus causation, extrapolation boundary. |
+| HSG.CO.D · Geometric constructions | `g10-geometric-constructions` | Interactive compass-arc perpendicular and angle bisectors. |
+| HSG.SRT.B · Similarity theorems | `g10-similarity-proofs` | Proportional side reasoning and similarity proof decisions. |
+| HSG.SRT.D · Laws of Sines and Cosines | `g10-laws-of-sines-and-cosines` | Adjustable non-right triangle with side and area calculations. |
+| HSG.GMD.B · Cross-sections and rotations | `g10-cross-sections-and-rotations` | Movable plane slicing a sphere and updating radius and area. |
+| HSN.CN.A · Complex arithmetic | `g11-complex-arithmetic` | Complex-plane controls and multiplication-by-i rotation. |
+| HSN.CN.C · Complex polynomial solutions | `g11-complex-polynomial-solutions` | Conjugate roots connected to the complex plane. |
+| HSA.APR.C · Polynomial identities | `g11-polynomial-identities` | Adjustable area proof of `(x + 2)² = x² + 4x + 4`. |
+| HSS.MD.B · Decision strategies | `g12-decision-strategies` | Interactive comparison of sure and risky expected values. |
 
 ## Audited topic map
 
@@ -36,7 +52,7 @@ The attached course table was checked against the current lesson bank and these 
 
 ## Why topics were missing
 
-The first curriculum model treated one lesson with one standard label as evidence for an entire topic. That created false coverage: a sample-space lesson stood in for Venn reasoning; one-variable inequalities stood in for two-variable half-planes; quadratic graph reading stood in for building a model; and a two-way table in Grade 8 stood in for high-school conditional relative frequency.
+The first curriculum model treated one lesson with one standard label as evidence for an entire topic. That created false coverage: a sample-space lesson stood in for Venn reasoning; one-variable inequalities stood in for two-variable half-planes; quadratic graph reading stood in for building a model; and a broad geometry or statistics domain could appear while constructions, non-right-triangle laws, cross-sections, linear-model interpretation, or decision strategies were still absent.
 
 The repair changes the definition of coverage:
 
@@ -44,7 +60,7 @@ The repair changes the definition of coverage:
 2. Distinct representations and decisions need named lesson objectives.
 3. Each named lesson needs five reviewed questions and an answer interaction suited to the response.
 4. Symbolically fragile responses use authored choices unless an equivalence-aware editor exists.
-5. Every requested strand is listed in `lib/curriculum-coverage.ts`; validation fails if a required lesson disappears or its standard mapping drifts.
+5. Every one of the 73 baseline clusters and every requested Algebra strand is listed in `lib/curriculum-coverage.ts`; validation fails if a required lesson disappears or its standard mapping drifts.
 6. New content is appended inside an existing region so saved lesson IDs do not change.
 
 ## Maintenance gate
