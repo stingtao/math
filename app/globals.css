@@ -1167,7 +1167,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .review-finish-emblem .topic-icon-xl { --topic-size: 126px; }
   .review-finish-emblem > span { width: 42px; height: 42px; }
   .review-clear-state { width: calc(100% - 28px); }
-  .review-finish-actions { flex-direction: column-reverse; }
+  .review-finish-actions { flex-direction: column; }
   .review-finish-actions a { width: 100%; min-height: 54px; font-size: 17px; }
   .repair-progress { grid-template-columns: 34px 1fr 34px; }
   .repair-progress > b { grid-column: 1 / -1; justify-self: stretch; margin-top: 8px; text-align: center; }
@@ -1337,58 +1337,34 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 
 .momentum-chip { white-space: nowrap; }
 .task-progress { margin: 18px 0 24px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 16px; }
-.task-progress > div { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.task-progress > div span { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .04em; }
-.task-progress > div strong { font-size: 16px; font-weight: 850; }
+.task-progress > div:first-child { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.task-progress > div:first-child span { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .04em; }
+.task-progress > div:first-child strong { font-size: 16px; font-weight: 850; }
 .task-progress-track { min-width: 0; height: 10px; display: block; overflow: hidden; border-radius: 99px; background: #e4ebef; }
 .task-progress-track > i { height: 100%; display: block; border-radius: inherit; background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 64%, white)); transition: width .35s ease; }
-.task-progress > small { color: var(--muted); font-size: 16px; line-height: 1.35; text-align: right; }
+.task-progress-detail { min-height: 34px; display: flex; align-items: center; justify-content: flex-end; color: var(--muted); font-size: 16px; line-height: 1.35; text-align: right; }
+.memory-return-cue { position: relative; padding: 0; display: inline-grid; place-items: center; border: 0; border-radius: 11px; outline: none; background: transparent; }
+.memory-return-icon { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent) 28%, #d9e3e9); border-radius: 11px; color: var(--accent); background: var(--accent-soft); font-size: 20px; font-weight: 900; cursor: help; }
+.memory-return-cue:focus-visible .memory-return-icon { outline: 3px solid color-mix(in srgb, var(--accent) 34%, transparent); outline-offset: 2px; }
+.memory-return-tooltip { width: max-content; max-width: min(280px, 72vw); padding: 9px 11px; position: absolute; z-index: 20; right: 0; bottom: calc(100% + 8px); visibility: hidden; border-radius: 10px; color: white; background: var(--navy); box-shadow: 0 9px 24px rgb(23 50 79 / 20%); font-size: 16px; font-weight: 750; line-height: 1.35; text-align: left; opacity: 0; transform: translateY(4px); transition: opacity .16s ease, transform .16s ease, visibility .16s;
+}
+.memory-return-cue:hover .memory-return-tooltip,
+.memory-return-cue:focus .memory-return-tooltip { visibility: visible; opacity: 1; transform: translateY(0); }
 .stage-card-compact { min-height: 430px; align-content: center; grid-template-rows: 1fr auto; }
 .stage-card-compact .stage-copy { align-self: center; }
 .stage-card-compact .stage-footer { width: 100%; align-self: end; }
 .review-actions { justify-content: flex-end; }
-
-.mastery-next-goal { width: min(560px, 100%); margin: 20px auto 0; padding: 17px 18px; display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 13px; border: 1px solid color-mix(in srgb, var(--accent) 25%, #d8e2e9); border-radius: 16px; background: linear-gradient(110deg, white, var(--accent-soft)); text-align: left; }
-.mastery-next-goal > span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--accent); font-size: 19px; font-weight: 900; }
-.mastery-next-goal > div { min-width: 0; display: grid; gap: 3px; }
-.mastery-next-goal small { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .1em; }
-.mastery-next-goal strong { font-size: 16px; }
-.mastery-next-goal p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.45; }
-.reward-receipt { width: min(560px, 100%); margin: 14px auto 0; padding: 17px 18px 15px; display: grid; gap: 14px; border: 1px solid #d7e2e8; border-radius: 17px; background: linear-gradient(135deg, #f7fafb, white); text-align: left; animation: reward-arrive .5s cubic-bezier(.2, 1.25, .3, 1) both; }
-.reward-receipt.upgrade { border-color: #ead69e; background: linear-gradient(135deg, #fff8e5, white); }
-.reward-receipt.replay { border-color: #d8e2e8; background: linear-gradient(135deg, #f4f7f9, white); }
-.reward-receipt > header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.reward-receipt > header > div { min-width: 0; display: grid; gap: 3px; }
-.reward-receipt > header small { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .1em; }
-.reward-receipt > header strong { font-size: 16px; }
-.reward-receipt > header > b { flex: 0 0 auto; padding: 8px 10px; border-radius: 11px; color: white; background: var(--accent); box-shadow: 0 6px 14px color-mix(in srgb, var(--accent) 20%, transparent); font-size: 16px; }
-.reward-receipt.replay > header > b { color: #5d7181; background: #e6edf1; box-shadow: none; }
-.reward-receipt-path { display: grid; grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr) 18px minmax(0, 1fr); align-items: center; }
-.reward-receipt-path > span { min-height: 55px; padding: 9px 8px; display: grid; place-items: center; align-content: center; gap: 2px; border: 1px solid #d9e2e7; border-radius: 12px; color: #718392; background: white; text-align: center; }
-.reward-receipt-path > span.earned { color: #087965; border-color: #bfe2d8; background: #edf8f5; }
-.reward-receipt-path > span.total { color: white; border-color: var(--accent); background: var(--accent); }
-.reward-receipt-path b { font-size: 17px; }
-.reward-receipt-path small { font-size: 16px; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
-.reward-receipt-path > i { height: 2px; background: linear-gradient(90deg, #b8c7d0, var(--accent)); }
-.reward-receipt > p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.5; }
 
 @media (max-width: 760px) {
   .world-header.with-landmark { grid-template-columns: 62px minmax(0, 1fr); }
   .world-landmark { width: 100%; height: 126px; grid-column: 1 / -1; margin-top: 5px; }
   .world-landmark > span { font-size: 16px; }
   .task-progress { grid-template-columns: 1fr; gap: 7px; }
-  .task-progress > small { text-align: left; }
-  .mastery-next-goal { padding: 15px; }
-  .mastery-next-goal p { font-size: 16px; }
-  .reward-receipt { padding: 15px; }
-  .reward-receipt > p { font-size: 16px; }
+  .task-progress-detail { min-height: 0; justify-content: flex-start; text-align: left; }
 }
 
 @media (max-width: 380px) {
   .world-landmark { height: 112px; }
-  .reward-receipt > header { align-items: flex-start; flex-direction: column; }
-  .reward-receipt-path { grid-template-columns: minmax(0, 1fr) 9px minmax(0, 1fr) 9px minmax(0, 1fr); }
-  .reward-receipt-path > span { min-height: 59px; padding-inline: 4px; }
 }
 
 /* Grade 7 and 9 real-world context models. */
@@ -1752,32 +1728,10 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .recovery-coach > footer > span { width: 28px; height: 28px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; color: white; background: var(--teal); font-size: 16px; }
 .recovery-coach > footer p { margin: 0; color: #60726d; font-size: 16px; line-height: 1.45; }
 .recovery-coach > footer strong { color: #087965; }
-.recovery-mastery-summary { width: min(580px, 100%); margin: 13px auto 0; padding: 15px 16px; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 13px; border: 1px solid #b9ddd4; border-radius: 16px; background: linear-gradient(120deg, #eef9f6, white); text-align: left; }
-.recovery-mastery-summary > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; color: white; background: var(--teal); font-size: 20px; font-weight: 900; }
-.recovery-mastery-summary > div { min-width: 0; display: grid; gap: 3px; }
-.recovery-mastery-summary small { color: #087965; font-size: 16px; font-weight: 900; letter-spacing: .08em; }
-.recovery-mastery-summary strong { font-size: 16px; line-height: 1.3; }
-.recovery-mastery-summary p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.45; }
-.recovery-mastery-summary > b { color: var(--teal); font-size: 16px; letter-spacing: 3px; }
 .feedback-celebration.first-try { border-color: #ecd18b; background: #fff8e8; }
 .feedback-celebration.first-try .feedback-symbol { background: var(--gold); }
 .feedback-celebration.first-try strong,
 .feedback-celebration.first-try .momentum-chip { color: #8e681a; }
-
-.quest-key-card { width: min(560px, 100%); margin: 18px auto 0; padding: 16px 18px; display: grid; grid-template-columns: minmax(145px, .72fr) 1.28fr; align-items: center; gap: 20px; border: 1px solid #d7e2e8; border-radius: 16px; background: #f7f9fa; text-align: left; }
-.quest-key-copy { min-width: 0; display: grid; gap: 3px; }
-.quest-key-copy small { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .1em; }
-.quest-key-copy strong { font-size: 17px; }
-.quest-key-copy span { color: var(--muted); font-size: 16px; }
-.quest-key-nodes { min-width: 0; position: relative; display: grid; grid-template-columns: repeat(4, 29px) 1fr 35px; align-items: center; justify-content: end; gap: 5px; }
-.quest-key-nodes::before { content: ""; height: 3px; position: absolute; left: 10px; right: 15px; border-radius: 99px; background: #d7e0e5; }
-.quest-key-nodes span,
-.quest-key-nodes b { width: 29px; height: 29px; position: relative; z-index: 1; display: grid; place-items: center; border: 2px solid #d1dbe1; border-radius: 10px; color: #80909d; background: white; font-size: 16px; font-weight: 900; }
-.quest-key-nodes span.collected { color: white; border-color: var(--teal); background: var(--teal); }
-.quest-key-nodes span.next { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.quest-key-nodes > i { height: 3px; position: relative; z-index: 1; background: #d7e0e5; }
-.quest-key-nodes b { width: 35px; height: 35px; color: #9b7a2d; border-color: #ead79f; background: #fff3d2; font-size: 18px; }
-.quest-key-nodes b.open { color: white; border-color: var(--gold); background: var(--gold); box-shadow: 0 5px 12px rgb(191 144 38 / 22%); }
 
 @media (max-width: 980px) {
   .game-loop-board { grid-template-columns: 1fr; }
@@ -1808,13 +1762,6 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .recovery-coach > header p,
   .recovery-model-answer p,
   .recovery-coach > footer p { font-size: 16px; }
-  .recovery-mastery-summary { grid-template-columns: 44px minmax(0, 1fr); }
-  .recovery-mastery-summary > b { grid-column: 2; }
-  .recovery-mastery-summary strong { font-size: 18px; }
-  .recovery-mastery-summary p { font-size: 16px; }
-  .quest-key-card { grid-template-columns: 1fr; gap: 14px; }
-  .quest-key-nodes { grid-template-columns: repeat(4, 32px) 1fr 37px; }
-  .quest-key-nodes span { width: 32px; height: 32px; }
 }
 
 @media (max-width: 420px) {
@@ -1831,10 +1778,6 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .game-feedback-card > strong { grid-column: 2; }
   .memory-check-banner { grid-template-columns: 38px minmax(0, 1fr); }
   .memory-check-banner > span { width: 38px; height: 38px; }
-  .recovery-mastery-summary { padding: 13px; }
-  .quest-key-card { padding: 14px; }
-  .quest-key-nodes { grid-template-columns: repeat(4, 30px) 1fr 35px; gap: 3px; }
-  .quest-key-nodes span { width: 30px; height: 30px; }
 }
 
 /* Boss skill connections and Daily Review memory pulse. */
@@ -1864,51 +1807,9 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .boss-recovery,
 .boss-link-feedback { margin-top: 23px; }
 
-.boss-region-clear { width: min(860px, calc(100% - 40px)); padding: 48px; }
+.boss-region-clear { width: min(760px, calc(100% - 40px)); padding: 48px; }
 .boss-region-clear > p { max-width: 620px; margin-inline: auto; }
-.boss-victory-map { margin: 29px 0 16px; padding: 20px 22px 16px; border: 1px solid color-mix(in srgb, var(--accent) 25%, #d6e1e8); border-radius: 21px; background: linear-gradient(135deg, white, var(--accent-soft)); box-shadow: 0 12px 28px rgb(23 50 79 / 6%); }
-.boss-victory-map > header { display: flex; align-items: center; justify-content: space-between; gap: 16px; text-align: left; }
-.boss-victory-map > header span { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .12em; }
-.boss-victory-map > header strong { color: #607485; font-size: 16px; }
-.boss-victory-route { margin-top: 17px; position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }
-.boss-victory-route::before { content: ""; height: 4px; position: absolute; left: 8%; right: 8%; top: 25px; border-radius: 99px; background: linear-gradient(90deg, var(--teal) 0 78%, var(--gold) 78%); }
-.boss-victory-skill,
-.boss-victory-seal { min-width: 0; min-height: 89px; position: relative; z-index: 1; display: grid; justify-items: center; align-content: start; gap: 7px; }
-.boss-victory-route .topic-icon-sm,
-.boss-victory-seal > span { --topic-size: 50px; width: var(--topic-size); height: var(--topic-size); }
-.boss-victory-route .topic-icon { color: white; background: var(--teal); box-shadow: 0 7px 15px rgb(17 113 91 / 18%); }
-.boss-victory-seal > span { display: grid; place-items: center; border-radius: 17px; color: white; background: linear-gradient(145deg, #efbf42, #d89524); box-shadow: 0 7px 15px rgb(177 119 22 / 22%); font-size: 24px; }
-.boss-victory-skill > b,
-.boss-victory-seal > b { width: 19px; height: 19px; position: absolute; right: calc(50% - 30px); top: -2px; display: grid; place-items: center; border: 3px solid white; border-radius: 7px; color: white; background: var(--teal); font-size: 16px; }
-.boss-victory-seal > b { background: var(--gold); }
-.boss-victory-route small { width: 100%; max-width: 118px; overflow: hidden; color: #536b7f; font-size: 16px; font-weight: 800; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
-.boss-victory-map > p { margin: 8px 0 0; padding-top: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; border-top: 1px solid #dce5ea; color: #5c726d; font-size: 16px; line-height: 1.45; }
-.boss-victory-map > p span { width: 25px; height: 25px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--teal); font-size: 16px; }
-
-.boss-settlement-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
-.boss-settlement-summary > div { min-width: 0; min-height: 94px; padding: 14px 12px; display: grid; grid-template-columns: 39px minmax(0, 1fr); align-items: center; gap: 10px; border: 1px solid #d9e3e9; border-radius: 15px; background: #f8fafb; text-align: left; }
-.boss-settlement-summary > div:first-child { border-color: color-mix(in srgb, var(--accent) 25%, #d9e3e9); background: var(--accent-soft); }
-.boss-result-icon { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--accent); font-size: 16px; font-weight: 900; }
-.boss-result-icon.hearts { color: white; background: var(--coral); font-size: 19px; }
-.boss-result-icon.badge { background: var(--teal); }
-.boss-settlement-summary p { min-width: 0; margin: 0; display: grid; gap: 3px; }
-.boss-settlement-summary strong { color: var(--navy); font-size: 17px; line-height: 1.2; }
-.boss-settlement-summary small { color: var(--muted); font-size: 16px; line-height: 1.35; }
-
-.boss-next-region { margin-top: 13px; padding: 18px; display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; align-items: center; gap: 16px; border: 1px solid color-mix(in srgb, var(--accent) 28%, #d8e2e9); border-radius: 18px; background: linear-gradient(115deg, white, var(--accent-soft)); text-align: left; }
-.boss-next-region.grade-complete { border-color: #dcc788; background: linear-gradient(115deg, white, #fff6dc); }
-.boss-next-region .topic-icon-lg { --topic-size: 58px; }
-.boss-next-region > div { min-width: 0; display: grid; gap: 3px; }
-.boss-next-region > div > span { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .11em; }
-.boss-next-region.grade-complete > div > span { color: #98701d; }
-.boss-next-region h2 { margin: 0; font-size: 19px; letter-spacing: -.025em; line-height: 1.3; }
-.boss-next-region p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.45; }
-.boss-next-region > strong { padding: 7px 9px; border-radius: 99px; color: #087965; background: #e3f5ef; font-size: 16px; letter-spacing: .08em; }
-.boss-next-region.grade-complete > strong { color: #876317; background: #ffedb9; }
-.boss-settlement-save { margin: 17px auto 19px !important; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f746e !important; font-size: 16px; line-height: 1.4 !important; }
-.boss-settlement-save > span { width: 22px; height: 22px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--teal); font-size: 16px; font-weight: 900; }
-.boss-settlement-save strong { color: #087965; }
-.boss-victory-actions { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
+.boss-victory-actions { margin-top: 17px; display: flex; align-items: center; justify-content: center; gap: 14px; }
 .boss-victory-actions > a { min-height: 49px; }
 
 /* Equivalent fractions keep the whole fixed and make every subdivision countable. */
@@ -2010,28 +1911,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .boss-connection-nodes > div > span { right: calc(50% - 26px); }
   .boss-connection-nodes > div small { max-width: 82px; font-size: 16px; }
   .boss-region-clear { margin: 38px auto; padding: 35px 18px; }
-  .boss-victory-map { padding: 17px 12px 14px; }
-  .boss-victory-route { gap: 3px; }
-  .boss-victory-route .topic-icon-sm,
-  .boss-victory-seal > span { --topic-size: 43px; }
-  .boss-victory-route::before { top: 21px; }
-  .boss-victory-skill,
-  .boss-victory-seal { min-height: 78px; gap: 6px; }
-  .boss-victory-skill > b,
-  .boss-victory-seal > b { right: calc(50% - 26px); }
-  .boss-victory-route small { max-width: 76px; font-size: 16px; }
-  .boss-settlement-summary { grid-template-columns: 1fr; gap: 7px; }
-  .boss-settlement-summary > div { min-height: 70px; padding: 11px 13px; }
-  .boss-settlement-summary strong { font-size: 18px; }
-  .boss-settlement-summary small { font-size: 16px; }
-  .boss-next-region { padding: 15px; grid-template-columns: 52px minmax(0, 1fr); gap: 13px; }
-  .boss-next-region .topic-icon-lg { --topic-size: 52px; }
-  .boss-next-region > strong { grid-column: 2; justify-self: start; }
-  .boss-next-region > div > span { font-size: 16px; }
-  .boss-next-region h2 { font-size: 20px; }
-  .boss-next-region p { font-size: 16px; }
-  .boss-settlement-save { align-items: flex-start; font-size: 16px; }
-  .boss-victory-actions { flex-direction: column-reverse; }
+  .boss-victory-actions { flex-direction: column; }
   .boss-victory-actions > a { width: 100%; min-height: 52px; }
 }
 
@@ -2045,18 +1925,6 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .boss-connection-nodes > div > span { width: 17px; height: 17px; right: calc(50% - 23px); }
   .boss-connection-nodes > div small { max-width: 53px; }
   .boss-connection-map > p { align-items: flex-start; font-size: 16px; }
-  .boss-victory-map > header { align-items: flex-start; }
-  .boss-victory-route .topic-icon-sm,
-  .boss-victory-seal > span { --topic-size: 39px; }
-  .boss-victory-route::before { top: 19px; }
-  .boss-victory-skill,
-  .boss-victory-seal { min-height: 70px; }
-  .boss-victory-skill > b,
-  .boss-victory-seal > b { width: 17px; height: 17px; right: calc(50% - 23px); }
-  .boss-victory-route small { max-width: 53px; }
-  .boss-victory-map > p { align-items: flex-start; justify-content: flex-start; font-size: 16px; text-align: left; }
-  .boss-next-region { grid-template-columns: 46px minmax(0, 1fr); padding-inline: 12px; }
-  .boss-next-region .topic-icon-lg { --topic-size: 46px; }
 }
 
 /* Private achievement shelf and long-term progress landmarks. */
@@ -2571,21 +2439,14 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .daily-card .daily-reward-heading h2 { font-size: 23px; }
 }
 
-/* Lesson settlement keeps the win, route progress, and one next action above optional details. */
+/* Completion screens show only the outcome, earned items, unlock, and next action. */
 .celebration-card { width: min(760px, calc(100% - 40px)); }
-.settlement-summary { width: min(580px, 100%); margin: 26px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-.settlement-summary > span { min-width: 0; min-height: 92px; padding: 13px 10px; display: grid; place-items: center; align-content: center; gap: 4px; border: 1px solid #d9e3e9; border-radius: 15px; background: #f8fafb; }
-.settlement-summary > span > b { min-height: 26px; display: grid; place-items: center; color: var(--accent); font-size: 23px; line-height: 1; }
-.settlement-summary > span > strong { color: var(--navy); font-size: 16px; line-height: 1.3; text-align: center; }
-.settlement-summary > span > small { color: var(--muted); font-size: 16px; line-height: 1.3; text-align: center; }
-.settlement-summary .settlement-key { border-color: #c4e2da; background: #eff9f6; }
-.settlement-summary .settlement-key > b { width: 27px; height: 27px; border-radius: 9px; color: white; background: var(--teal); font-size: 16px; }
-.settlement-summary .settlement-stars > b { color: var(--gold); font-size: 19px; letter-spacing: 2px; }
-.settlement-summary .settlement-xp { border-color: color-mix(in srgb, var(--accent) 24%, #d9e3e9); background: var(--accent-soft); }
-.settlement-summary .settlement-xp > b { font-size: 26px; }
-.settlement-summary .settlement-xp.quiet { border-color: #d9e3e9; background: #f5f7f9; }
-.settlement-summary .settlement-xp.quiet > b { color: #6e8190; }
-.celebration-card .quest-key-card { margin-top: 13px; background: white; }
+.completion-earnings { width: min(580px, 100%); margin: 24px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
+.completion-earnings > span { min-height: 54px; padding: 9px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--accent) 24%, #d9e3e9); border-radius: 14px; background: var(--accent-soft); }
+.completion-earnings b { color: var(--accent); font-size: 21px; line-height: 1; letter-spacing: 1px; }
+.completion-earnings strong { color: var(--navy); font-size: 16px; line-height: 1.25; }
+.completion-earnings > span.quiet { border-color: #d9e3e9; background: #f5f7f9; }
+.completion-earnings > span.quiet b { color: #6e8190; }
 .settlement-landmark { width: min(580px, 100%); margin: 13px auto 0; padding: 14px 15px; display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 13px; border: 1px solid color-mix(in srgb, var(--accent) 30%, #d8e2e9); border-radius: 17px; background: linear-gradient(120deg, var(--accent-soft), white 62%); box-shadow: 0 8px 20px rgb(23 50 79 / 6%); text-align: left; }
 .settlement-landmark .achievement-badge { width: 52px; height: 52px; border-radius: 17px; }
 .settlement-landmark .achievement-badge::before { width: 33px; height: 33px; }
@@ -2604,40 +2465,22 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .settlement-landmark.compact-landmark > div > strong { font-size: 16px; }
 .settlement-landmark.compact-landmark > div > p { font-size: 16px; }
 .settlement-landmark.compact-landmark > a { min-height: 38px; grid-column: 2; justify-self: start; font-size: 16px; }
+.celebration-card > .compact-landmark,
+.boss-region-clear > .compact-landmark { width: min(580px, 100%); margin: 13px auto 0; }
 .settlement-next { width: min(580px, 100%); margin: 13px auto 0; padding: 17px 18px; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 15px; border: 1px solid color-mix(in srgb, var(--accent) 28%, #d8e2e9); border-radius: 17px; background: linear-gradient(115deg, white, var(--accent-soft)); text-align: left; }
 .settlement-next .topic-icon-md { --topic-size: 54px; }
 .settlement-boss-icon { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 17px; color: white; background: var(--gold); box-shadow: 0 8px 18px rgb(176 127 24 / 18%); font-size: 25px; font-weight: 900; }
 .settlement-next > div { min-width: 0; display: grid; gap: 3px; }
 .settlement-next small { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .1em; }
 .settlement-next strong { font-size: 18px; line-height: 1.3; }
-.settlement-next p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.45; }
-.settlement-details { width: min(580px, 100%); margin: 13px auto 0; overflow: hidden; border: 1px solid #d9e3e9; border-radius: 15px; background: #f8fafb; text-align: left; }
-.settlement-details > summary { min-height: 62px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; gap: 15px; list-style: none; cursor: pointer; }
-.settlement-details > summary::-webkit-details-marker { display: none; }
-.settlement-details > summary:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 32%, transparent); outline-offset: -3px; }
-.settlement-details > summary > span { min-width: 0; display: grid; gap: 3px; }
-.settlement-details > summary strong { font-size: 16px; }
-.settlement-details > summary small { color: var(--muted); font-size: 16px; line-height: 1.35; }
-.settlement-details > summary > b { width: 29px; height: 29px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; color: var(--accent); background: white; font-size: 18px; transition: transform .2s ease; }
-.settlement-details[open] > summary > b { transform: rotate(180deg); }
-.settlement-details-body { padding: 0 13px 13px; border-top: 1px solid #e1e8ec; }
-.settlement-details .mastery-next-goal,
-.settlement-details .reward-receipt { width: 100%; margin-top: 13px; }
-.settlement-save-note { width: min(580px, 100%); margin: 16px auto 18px !important; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f746e !important; font-size: 16px; line-height: 1.4 !important; }
-.settlement-save-note > span { width: 22px; height: 22px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 8px; color: white; background: var(--teal); font-size: 16px; font-weight: 900; }
-.settlement-save-note strong { color: #087965; }
-.celebration-actions.settlement-actions { width: min(580px, 100%); margin: 0 auto; display: grid; grid-template-columns: 1.25fr .75fr; align-items: stretch; gap: 9px; }
+.celebration-actions.settlement-actions { width: min(580px, 100%); margin: 17px auto 0; display: flex; align-items: center; justify-content: center; gap: 14px; }
 .settlement-actions a { min-height: 50px; }
+.settlement-actions .text-link { padding-inline: 8px; }
 
 @media (max-width: 760px) {
   .celebration-card { width: calc(100% - 28px); margin: 32px auto; padding: 34px 17px; }
-  .settlement-summary { margin-top: 22px; grid-template-columns: 1fr; gap: 7px; }
-  .settlement-summary > span { min-height: 72px; padding: 11px 13px; grid-template-columns: 35px minmax(0, 1fr) auto; grid-template-rows: auto auto; place-items: initial; align-items: center; gap: 2px 10px; text-align: left; }
-  .settlement-summary > span > b { min-height: 0; grid-row: 1 / 3; justify-self: center; }
-  .settlement-summary > span > strong { align-self: end; font-size: 16px; text-align: left; }
-  .settlement-summary > span > small { align-self: start; font-size: 16px; text-align: left; }
-  .settlement-summary .settlement-xp > b { font-size: 22px; }
-  .settlement-summary .settlement-stars > b { font-size: 18px; }
+  .completion-earnings { margin-top: 20px; }
+  .completion-earnings > span { flex: 1 1 145px; }
   .settlement-landmark { padding: 13px; grid-template-columns: 50px minmax(0, 1fr); gap: 11px; }
   .settlement-landmark .achievement-badge { width: 50px; height: 50px; }
   .settlement-landmark > div > small { font-size: 16px; }
@@ -2649,12 +2492,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .settlement-boss-icon { width: 50px; height: 50px; }
   .settlement-next small { font-size: 16px; }
   .settlement-next strong { font-size: 19px; }
-  .settlement-next p { font-size: 16px; }
-  .settlement-details > summary { min-height: 68px; }
-  .settlement-details > summary strong { font-size: 16px; }
-  .settlement-details > summary small { font-size: 16px; }
-  .settlement-save-note { align-items: flex-start; font-size: 16px; }
-  .celebration-actions.settlement-actions { grid-template-columns: 1fr; }
+  .celebration-actions.settlement-actions { flex-direction: column; }
   .settlement-actions a { width: 100%; min-height: 52px; }
 }
 
@@ -2665,7 +2503,6 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .settlement-next { grid-template-columns: 45px minmax(0, 1fr); padding-inline: 12px; }
   .settlement-next .topic-icon-md { --topic-size: 45px; }
   .settlement-boss-icon { width: 45px; height: 45px; }
-  .settlement-details-body { padding-inline: 9px; }
 }
 
 /* Exact operation-language and decimal models for the Grade 8 foundations. */
@@ -4360,7 +4197,6 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
   .quest-landmark-copy > small,
   .quest-landmark-copy > strong,
   .boss-connection-nodes > div small,
-  .boss-victory-route small,
   .substitution-context-step small,
   .power-context-step small,
   .lesson-mobile-topic strong,

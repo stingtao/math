@@ -9,7 +9,7 @@ import { clippedLinePoints, nearestVisibleLinePoint, parseLinearFunction, valueA
 import { coordinateMissionProgress, coordinateReadTargets, isOnDoubleLine, pointToLineTargets, sameCoordinate } from "../lib/coordinate-mission.ts";
 import { publicTextPrivacyIssue } from "../lib/privacy.ts";
 import { recoveryGuidance, remixedChoices } from "../lib/practice-recovery.ts";
-import { isAnswerCorrect } from "../lib/curriculum.ts";
+import { isAnswerCorrect, lessons } from "../lib/curriculum.ts";
 import { ANSWER_BADGE_STEP, BADGE_CATALOG_SIZE, BADGE_CATALOG_VERSION, answerBadgeForCorrectCount, answerBadges, badgeCatalog, lessonBadges, nextAnswerBadge } from "../lib/badges.ts";
 import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../lib/learner-state.ts";
 import { getComboSpec } from "../lib/combo.ts";
@@ -31,6 +31,12 @@ test("keeps the right math symbols available on mobile answer keyboards", () => 
 test("accepts the exact exponent symbols shown in answer choices", () => {
   assert.equal(isAnswerCorrect("7.4 × 10³", "7.4*10^3"), true);
   assert.equal(isAnswerCorrect("x²", "x^2"), true);
+});
+
+test("keeps written-unit answer choices semantically parallel", () => {
+  const question = lessons.find((lesson) => lesson.slug === "g7-unit-rates")?.practice.find((item) => item.prompt === "Which is the unit rate for 24 pages in 6 minutes?");
+  assert.deepEqual(question?.choices, ["3 pages per minute", "4 pages per minute", "6 pages per minute", "18 pages per minute"]);
+  assert.ok(question?.choices?.every((choice) => choice.endsWith("pages per minute")));
 });
 
 test("parses safe slope-intercept equations and clips them to the visible graph", () => {
@@ -646,10 +652,13 @@ test("persists recovery mastery and blocks lesson completion until clean recall"
   assert.match(lesson, /Memory Check/);
   assert.match(lesson, /remixedChoices/);
   assert.match(lesson, /Try once more later/);
-  assert.match(lesson, /recovery-mastery-summary/);
+  assert.match(lesson, /<MemoryReturnCue count=\{recoveryCount\}/);
+  assert.match(lesson, /!inMemoryCheck && recoveryCount > 0/);
+  assert.doesNotMatch(lesson, /recovery-mastery-summary/);
   assert.match(coach, /FIX ONE MOVE/);
   assert.match(coach, /Your progress is safe/);
   assert.match(css, /\.task-progress/);
+  assert.match(css, /\.memory-return-tooltip/);
   assert.match(css, /\.memory-check-banner/);
   assert.match(css, /\.recovery-coach/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.recovery-coach-steps \{ grid-template-columns: 1fr/);
@@ -680,11 +689,11 @@ test("shows exact lesson rewards while keeping replay XP fair", async () => {
   assert.match(store, /lesson-star-3/);
   assert.match(store, /xpEarned: baseXp \+ starXp/);
   assert.match(demoState, /calculateLessonReward/);
-  assert.match(lesson, /REWARD RECEIPT/);
-  assert.match(lesson, /Fair replay · skill refreshed/);
-  assert.match(lesson, /Repeat XP stays at 0/);
-  assert.match(lesson, /saved best/);
-  assert.match(css, /\.reward-receipt-path/);
+  assert.match(lesson, /completion-earnings/);
+  assert.match(lesson, /reward\.xpEarned/);
+  assert.match(lesson, /reward\.bestStars/);
+  assert.doesNotMatch(lesson, /REWARD RECEIPT|Fair replay · skill refreshed|Repeat XP stays at 0/);
+  assert.doesNotMatch(css, /\.reward-receipt-path/);
 });
 
 test("does not send review answers to authenticated clients", async () => {
@@ -717,6 +726,8 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(review, /recallStreak >= 3/);
   assert.match(taskProgress, /role="progressbar"/);
   assert.match(taskProgress, /of \{total\} complete/);
+  assert.match(taskProgress, /MemoryReturnCue/);
+  assert.match(taskProgress, /role="tooltip"/);
   assert.doesNotMatch(lesson, /FOCUS CHARGE|FOCUS CHAIN|STAR PATH/);
   assert.doesNotMatch(review, /RECALL CHAIN|Pulse \+1/);
   assert.match(autoAdvance, /AUTO_ADVANCE_SECONDS = 6/);
@@ -762,7 +773,7 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.context-math-card\.context-math-card small \{ font-size: 16px; line-height: 1\.3/);
   assert.match(css, /\.lesson-mobile-topic small \{[^}]*font-size: 16px/);
   assert.match(css, /\.review-mobile-status > header small \{[^}]*font-size: 16px/);
-  assert.match(css, /\.task-progress > small \{[^}]*font-size: 16px/);
+  assert.match(css, /\.task-progress-detail \{[^}]*font-size: 16px/);
   assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 16px/);
   assert.doesNotMatch(dashboard, /daily-token-medallion[^\n]*<small>/);
   assert.match(css, /\.reward-collected-status p \{[^}]*font-size: 16px/);
@@ -857,12 +868,12 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /path-copy/);
   assert.match(dashboard, /<TopicIcon visual=\{item\.visual\}/);
   assert.match(lesson, /goal-concept/);
-  assert.match(lesson, /settlement-summary/);
+  assert.match(lesson, /completion-earnings/);
   assert.match(lesson, /practiceEncouragement/);
   assert.match(lesson, /<TaskProgress/);
   assert.doesNotMatch(lesson, /Start with the picture|Notice what changes/);
-  assert.match(lesson, /mastery-next-goal/);
-  assert.match(boss, /boss-victory-map/);
+  assert.doesNotMatch(lesson, /mastery-next-goal|quest-key-card|settlement-details/);
+  assert.doesNotMatch(boss, /boss-victory-map|boss-settlement-summary/);
   for (const visual of ["signed-numbers-context.webp", "operations-sequence-context.webp", "decimal-pattern-context.webp", "percent-market-context.webp", "fraction-workshop-context.webp", "substitution-machine-context.webp", "exponent-lab-context.webp", "like-terms-sorting-context.webp", "slope-trail-context.webp", "pythagorean-city-context.webp", "scatter-field-context.webp", "distributive-workshop-context.webp", "function-kiosk-context.webp", "transform-plaza-context.webp", "cylinder-tank-context.webp", "equation-balance-context.webp", "irrational-garden-context.webp", "scientific-observatory-context.webp", "multistep-workshop-context.webp", "unit-rate-bike-context.webp", "circle-fountain-context.webp", "prism-packing-context.webp", "probability-arcade-context.webp", "systems-transit-context.webp", "solution-cases-gallery-context.webp", "inequality-trail-context.webp", "polynomial-tiles-context.webp", "parabola-bridge-context.webp", "exponential-greenhouse-context.webp", "scale-drawing-studio-context.webp", "random-sample-context.webp", "arithmetic-sequence-context.webp", "quadratic-roots-context.webp", "surface-area-packaging-context.webp", "compound-events-lab-context.webp", "two-way-survey-context.webp", "exponential-decay-energy-context.webp", "discount-studio-context.webp", "angle-plaza-context.webp", "cone-measure-context.webp", "geometric-sequence-lab-context.webp", "absolute-transit-context.webp", "triangle-builder-context.webp", "cross-section-studio-context.webp", "coordinate-route-context.webp", "sphere-tank-context.webp", "difference-squares-workshop-context.webp", "distribution-comparison-context.webp", "real-number-sort-context.webp", "elimination-workshop-context.webp", "rational-exponent-lab-context.webp", "growth-comparison-context.webp", "simple-interest-growth-context.webp", "graphing-line-city-context.webp", "function-routing-context.webp", "dilation-studio-context.webp", "residual-observatory-context.webp"]) {
     assert.match(concept, new RegExp(visual.replace(".", "\\.")));
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
@@ -1132,13 +1143,13 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.task-progress/);
   assert.match(css, /\.task-progress-track/);
   assert.doesNotMatch(lesson, /practice-star-path|Stars describe this run/);
-  assert.match(lesson, /quest-key-card/);
+  assert.doesNotMatch(lesson, /quest-key-card/);
   assert.match(lesson, /correct in a row!/);
   assert.match(lesson, /Corrected!/);
   assert.match(lesson, /<RecoveryCoach/);
-  assert.match(lesson, /This is enough for today/);
+  assert.doesNotMatch(lesson, /This is enough for today/);
   assert.match(lesson, /Start the next lesson/);
-  assert.match(lesson, /Stars and XP details/);
+  assert.doesNotMatch(lesson, /Stars and XP details/);
   assert.doesNotMatch(lesson, /Everything is saved/);
   assert.match(lesson, /achievementUnlockedBetween/);
   assert.match(landmarkUnlock, /settlement-landmark/);
@@ -1157,14 +1168,14 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.game-loop-board/);
   assert.match(css, /\.game-quest-path/);
   assert.doesNotMatch(css, /\.practice-star-path/);
-  assert.match(css, /\.quest-key-card/);
+  assert.doesNotMatch(css, /\.quest-key-card/);
   assert.match(css, /\.recovery-coach/);
   assert.doesNotMatch(css, /\.recovery-score-path/);
-  assert.match(css, /\.mastery-next-goal/);
-  assert.match(css, /\.settlement-summary/);
+  assert.doesNotMatch(css, /\.mastery-next-goal/);
+  assert.match(css, /\.completion-earnings/);
   assert.match(css, /\.settlement-next/);
-  assert.match(css, /\.settlement-details/);
-  assert.match(css, /\.settlement-save-note/);
+  assert.doesNotMatch(css, /\.settlement-details/);
+  assert.doesNotMatch(css, /\.settlement-save-note/);
   assert.match(css, /\.settlement-landmark/);
   assert.match(review, /review-finish-emblem/);
   assert.match(review, /skills back online/);
@@ -1190,14 +1201,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(boss, /SKILL MAP/);
   assert.match(boss, /A correction keeps the map moving/);
   assert.match(boss, /bossXpEarned/);
-  assert.match(boss, /"Replay"/);
-  assert.match(boss, /REGION CONNECTION/);
+  assert.match(boss, /completion-earnings/);
   assert.doesNotMatch(boss, /Every skill remains open to revisit/);
   assert.match(boss, /NEXT REGION UNLOCKED/);
-  assert.match(boss, /WHOLE TRAIL COMPLETE/);
   assert.doesNotMatch(boss, /Everything is saved/);
-  assert.match(boss, /This is enough for today/);
-  assert.match(boss, /region\.lessons\.map\(\(lesson\) => <div className="boss-victory-skill"/);
+  assert.doesNotMatch(boss, /This is enough for today|REGION CONNECTION|WHOLE TRAIL COMPLETE/);
   assert.doesNotMatch(boss, /className="reward-strip"/);
   assert.doesNotMatch(boss, /className="unlock-path boss-unlock"/);
   assert.doesNotMatch(css, /\.review-memory-path/);
@@ -1213,12 +1221,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.repair-restored-path/);
   assert.match(css, /\.boss-connection-map/);
   assert.match(css, /\.boss-connection-nodes/);
-  assert.match(css, /\.boss-victory-map/);
-  assert.match(css, /\.boss-victory-route/);
-  assert.match(css, /\.boss-settlement-summary/);
-  assert.match(css, /\.boss-next-region/);
+  assert.doesNotMatch(css, /\.boss-victory-map/);
+  assert.doesNotMatch(css, /\.boss-victory-route/);
+  assert.doesNotMatch(css, /\.boss-settlement-summary/);
+  assert.doesNotMatch(css, /\.boss-next-region/);
   assert.match(css, /\.boss-victory-actions/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.boss-settlement-summary \{ grid-template-columns: 1fr/);
   assert.match(profile, /evaluateAchievements/);
   assert.match(achievementsSource, /achievementSpecs/);
   assert.match(profile, />Achievements</);

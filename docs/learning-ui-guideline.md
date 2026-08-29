@@ -42,3 +42,34 @@ For every page:
 4. Collapse items that represent the same task, scope, and time horizon.
 5. Keep corrective hints, meaningful math labels, errors, accessibility, privacy, safety, and legal information.
 6. Verify desktop and mobile layouts, keyboard behavior, reduced motion, text wrapping, and the 16–34 px type contract.
+
+## 5. Keep secondary state available, not loud
+
+Information that does not change the learner's immediate action should not compete with the question.
+
+- Use a familiar compact icon for secondary status such as a scheduled memory return.
+- Reveal the explanation in a hover and keyboard-focus tooltip, and preserve an accessible name.
+- Keep actionable information visible: errors, hints needed for the retry, mathematical labels, and the next action must never be hidden behind a tooltip.
+- Do not repeat streaks beside a persistent task-progress bar when the answer feedback already celebrates the streak.
+
+## 6. Make answer choices parallel
+
+Choices in one question must compare the same kind of object.
+
+- Use the same semantic type, notation, precision, and unit granularity across every option.
+- If the prompt supplies the unit and the task tests only the value, every choice may be a bare value.
+- If reading the unit is part of the answer, every choice must include the same unit form: `3 pages per minute`, `4 pages per minute`, `6 pages per minute`, `18 pages per minute`.
+- Never let the correct option reveal itself by being the only fully written answer.
+
+Content validation should enforce parallel units whenever the accepted multiple-choice answer contains a written unit.
+
+## 7. Make completion an outcome, not a receipt
+
+A completion screen has one short hierarchy:
+
+1. what the learner completed;
+2. what they earned;
+3. what unlocked or comes next;
+4. one dominant next-action CTA.
+
+Keep a secondary map or stop action as a quiet link. Show a newly earned badge or achievement when it actually occurs. Remove separate route-update cards, key inventories, mastery essays, reward receipts, saved-best explanations, and repeated reassurance when they do not alter the next decision. Apply the same hierarchy to lesson, review, boss, unit, and course completion states.

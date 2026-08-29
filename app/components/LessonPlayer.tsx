@@ -24,7 +24,7 @@ import { WorkedExampleFlow } from "./WorkedExampleFlow";
 import { RecoveryCoach } from "./RecoveryCoach";
 import { remixedChoices } from "@/lib/practice-recovery";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
-import { TaskProgress } from "./TaskProgress";
+import { MemoryReturnCue, TaskProgress } from "./TaskProgress";
 
 const stageLabels = [
   { label: "Goal", icon: "◎" },
@@ -266,33 +266,16 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const following = nextLesson(lesson);
     const regionFinished = lesson.order === 4;
     const reward = completionReward ?? { previousStars: 0, bestStars: stars, firstCompletion: true, starsImproved: false, baseXp: 40, starXp: stars === 3 ? 10 : stars === 2 ? 5 : 0, xpEarned: 40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0) };
-    const replayed = !reward.firstCompletion && !reward.starsImproved;
-    const masteryMessage = reward.bestStars > stars ? `Best marker kept · ${reward.bestStars}/3` : stars === 3 ? "No-hint mastery" : masteryLockedCount > 0 ? "Recovery mastery locked" : stars === 2 ? "Strong first pass" : "Complete after corrections";
-    const masteryNext = reward.bestStars === 3
-      ? { title: "Mastery marker complete", copy: "This lesson is ready for spaced review. Your three-star marker stays on the trail." }
-      : reward.bestStars === 2
-      ? { title: "One clean pass from mastery", copy: "A future no-hint review can turn this into a three-star skill." }
-      : { title: "The path stays open", copy: "Corrections finished the lesson. Daily Review will bring the useful steps back at the right time." };
     const outcome = reward.firstCompletion
-      ? { kicker: "LESSON CLEARED · NEW", title: "Skill unlocked.", copy: <><strong>{lesson.title}</strong> is complete. Corrected answers count.</> }
+      ? { kicker: "LESSON COMPLETE", title: `${lesson.title} complete.`, copy: regionFinished ? `${region?.title ?? "Region"} Boss is unlocked.` : `${following?.title ?? "The next lesson"} is unlocked.` }
       : reward.starsImproved
-      ? { kicker: "MASTERY UPGRADED", title: "New personal best.", copy: <><strong>{lesson.title}</strong> now has a {reward.bestStars}-star best.</> }
-      : { kicker: "PRACTICE COMPLETE", title: "Skill refreshed.", copy: <><strong>{lesson.title}</strong> is ready again. Your {reward.bestStars}-star best stays saved.</> };
-    const regionKeyCount = region?.lessons.filter((item) => item.id === lesson.id || completeMap.has(item.id)).length ?? lesson.order;
-    const keyStatus = reward.firstCompletion ? "New key" : reward.starsImproved ? "Key safe · marker upgraded" : "Key already safe";
-    const primaryHref = reward.firstCompletion
-      ? regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`
-      : trailUrl;
-    const primaryLabel = reward.firstCompletion ? regionFinished ? "Start the unlocked boss" : "Start the next lesson" : "Return to the map";
-    const secondaryHref = reward.firstCompletion
-      ? trailUrl
-      : regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
-    const secondaryLabel = reward.firstCompletion ? "Stop here for today" : regionFinished ? "Replay the boss" : "Try the next lesson";
-    const nextStep = reward.firstCompletion
-      ? regionFinished
-        ? { kicker: "BOSS GATE OPEN", title: `${region?.title ?? "Region"} Boss`, copy: "Five mixed questions. No timer. Misses open a repair path." }
-        : { kicker: "NEXT MISSION OPEN", title: following?.title ?? "Return to the map", copy: "The next short lesson is ready." }
-      : { kicker: "SAVE STATUS", title: "Your best stays safe.", copy: "This replay strengthened memory without removing XP, stars, or keys." };
+      ? { kicker: "NEW BEST", title: `${lesson.title}: ${reward.bestStars} stars.`, copy: "Your new best is saved." }
+      : { kicker: "PRACTICE COMPLETE", title: `${lesson.title} refreshed.`, copy: `Your ${reward.bestStars}-star best stays saved.` };
+    const primaryHref = regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
+    const primaryLabel = regionFinished ? "Start the boss" : "Start the next lesson";
+    const nextStep = regionFinished
+      ? { kicker: reward.firstCompletion ? "BOSS UNLOCKED" : "BOSS", title: `${region?.title ?? "Region"} Boss` }
+      : { kicker: reward.firstCompletion ? "NEXT LESSON UNLOCKED" : "NEXT LESSON", title: following?.title ?? "Learning map" };
     const currentAchievementTotals = achievementTotalsForState(state);
     const previousAchievementTotals = {
       ...currentAchievementTotals,
@@ -310,39 +293,19 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <span className="section-kicker">{outcome.kicker}</span>
           <h1>{outcome.title}</h1>
           <p>{outcome.copy}</p>
-          <div className="settlement-summary" aria-label={`Lesson result: ${keyStatus}, ${stars} run stars, ${reward.xpEarned} XP earned`}>
-            <span className="settlement-key"><b aria-hidden="true">✓</b><strong>{keyStatus}</strong><small>Route updated</small></span>
-            <span className="settlement-stars"><b aria-hidden="true">{"★".repeat(stars)}{"☆".repeat(3 - stars)}</b><strong>{masteryMessage}</strong><small>{reward.bestStars}/3 saved best</small></span>
-            <span className={`settlement-xp ${reward.xpEarned === 0 ? "quiet" : ""}`}><b>+{reward.xpEarned}</b><strong>XP this run</strong><small>{replayed ? "Fair replay" : "Saved to total"}</small></span>
+          <div className="completion-earnings" aria-label={`${stars} of 3 stars and ${reward.xpEarned} XP earned`}>
+            <span><b aria-hidden="true">{"★".repeat(stars)}{"☆".repeat(3 - stars)}</b><strong>{stars}/3 stars</strong></span>
+            <span className={reward.xpEarned === 0 ? "quiet" : ""}><b>+{reward.xpEarned}</b><strong>XP</strong></span>
+            {masteryLockedCount > 0 && <span><b aria-hidden="true">↻</b><strong>{masteryLockedCount} recalled</strong></span>}
           </div>
-          {masteryLockedCount > 0 && <div className="recovery-mastery-summary" role="status"><span aria-hidden="true">↻</span><div><small>REPAIR → RECALL → MASTER</small><strong>{masteryLockedCount} {masteryLockedCount === 1 ? "idea" : "ideas"} recovered and recalled correctly</strong><p>Your corrections became a later Memory Check. Those ideas will also return in Daily Review so the method can stick.</p></div><b aria-label={`${masteryLockedCount} corrected ${masteryLockedCount === 1 ? "idea" : "ideas"} recalled`}>{"◆".repeat(masteryLockedCount)}</b></div>}
-          <div className="quest-key-card" aria-label={`${regionKeyCount} of 4 quest keys collected in ${region?.title ?? "this region"}`}>
-            <div className="quest-key-copy"><small>REGION QUEST KEYS</small><strong>{regionKeyCount} / 4 collected</strong><span>{regionKeyCount === 4 ? "Boss gate open" : `${4 - regionKeyCount} ${4 - regionKeyCount === 1 ? "key" : "keys"} until the boss`}</span></div>
-            <div className="quest-key-nodes" aria-hidden="true">{region?.lessons.map((item, index) => {
-              const collected = item.id === lesson.id || completeMap.has(item.id);
-              return <span className={collected ? "collected" : index === regionKeyCount ? "next" : "locked"} key={item.id}>{collected ? "✓" : index + 1}</span>;
-            })}<i /><b className={regionKeyCount === 4 ? "open" : ""}>★</b></div>
-          </div>
-          {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={demo} />}
+          {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={demo} compact />}
           <section className="settlement-next" aria-labelledby="settlement-next-title">
             {reward.firstCompletion && regionFinished ? <span className="settlement-boss-icon" aria-hidden="true">★</span> : <TopicIcon visual={reward.firstCompletion && following ? following.visual : lesson.visual} accent={reward.firstCompletion && following ? following.accent : lesson.accent} size="md" label="" />}
-            <div><small>{nextStep.kicker}</small><strong id="settlement-next-title">{nextStep.title}</strong><p>{nextStep.copy}</p></div>
+            <div><small>{nextStep.kicker}</small><strong id="settlement-next-title">{nextStep.title}</strong></div>
           </section>
-          <details className="settlement-details">
-            <summary><span><strong>Stars and XP details</strong><small>Stars never block progress · replay XP stays fair</small></span><b aria-hidden="true">⌄</b></summary>
-            <div className="settlement-details-body">
-              <div className="mastery-next-goal"><span aria-hidden="true">{reward.bestStars === 3 ? "✦" : reward.bestStars === 2 ? "↑" : "↻"}</span><div><small>NEXT MASTERY GOAL</small><strong>{masteryNext.title}</strong><p>{masteryNext.copy}</p></div></div>
-              <div className={`reward-receipt ${replayed ? "replay" : reward.starsImproved ? "upgrade" : "new"}`} aria-label={`${reward.xpEarned} XP earned on this run`}>
-                <header><div><small>REWARD RECEIPT</small><strong>{replayed ? "Fair replay · skill refreshed" : reward.starsImproved ? "New best · bonus unlocked" : "First finish · XP banked"}</strong></div><b>+{reward.xpEarned} XP</b></header>
-                <div className="reward-receipt-path" aria-hidden="true"><span className={reward.baseXp > 0 ? "earned" : "quiet"}><b>{reward.baseXp > 0 ? `+${reward.baseXp}` : "—"}</b><small>First finish</small></span><i /><span className={reward.starXp > 0 ? "earned" : "quiet"}><b>{reward.starXp > 0 ? `+${reward.starXp}` : "—"}</b><small>Star bonus</small></span><i /><span className="total"><b>+{reward.xpEarned}</b><small>This run</small></span></div>
-                <p>{replayed ? "Repeat XP stays at 0. Your memory work still counts." : reward.starsImproved ? `Your ${reward.bestStars}-star best and bonus were added.` : "This lesson reward was added to your XP total."}</p>
-              </div>
-            </div>
-          </details>
-          <p className="settlement-save-note"><span aria-hidden="true">✓</span><strong>This is enough for today.</strong></p>
           <div className="celebration-actions settlement-actions">
             <a className="primary-button" href={primaryHref}>{primaryLabel} <span aria-hidden="true">→</span></a>
-            <a className="secondary-button" href={secondaryHref}>{secondaryLabel}</a>
+            <a className="text-link" href={trailUrl}>Back to map</a>
           </div>
         </section>
       </main>
@@ -385,7 +348,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
             <div className="practice-stage" aria-busy={busy}>
               {inMemoryCheck && <div className={`memory-check-banner accent-${lesson.accent}`}><span aria-hidden="true">◆</span><div><small>MEMORY CHECK · NO RUSH</small><strong>Use the repaired method without help.</strong><p>Choices may move. Follow the math, not the button position. A clean recall locks mastery.</p></div></div>}
               <div className="practice-heading"><div><span className="section-kicker">{inMemoryCheck ? `MEMORY CHECK · ${masteryLockedCount + 1} OF ${masteryTotal}` : `PRACTICE · ${questionIndex + 1} OF ${lesson.practice.length}`}</span><h2>{question.prompt}</h2></div></div>
-              <TaskProgress label={inMemoryCheck ? "Memory check progress" : "Practice progress"} completed={inMemoryCheck ? masteryLockedCount : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} accent={lesson.accent} detail={feedback === "incorrect" ? "Use the hint, then retry." : focusStreak > 1 ? `${focusStreak} correct in a row` : recoveryCount > 0 ? `${recoveryCount} ${recoveryCount === 1 ? "idea returns" : "ideas return"} for a quick memory check.` : "Corrected answers count."} />
+              <TaskProgress label={inMemoryCheck ? "Memory check progress" : "Practice progress"} completed={inMemoryCheck ? masteryLockedCount : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} accent={lesson.accent} detail={feedback === "incorrect" ? "Use the hint, then retry." : !inMemoryCheck && recoveryCount > 0 ? <MemoryReturnCue count={recoveryCount} /> : undefined} />
               {choiceOptions ? <div className="choice-grid">{choiceOptions.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "lesson-answer-error" : feedback ? "lesson-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
               {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <RecoveryCoach question={question} response={answer} failedAttempts={failedAttempts} memoryCheck={inMemoryCheck} />}

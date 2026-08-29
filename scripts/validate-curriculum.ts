@@ -3,6 +3,10 @@ import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curri
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
 
+function writtenUnit(choice: string) {
+  return choice.trim().match(/^[-+]?\$?\d+(?:\.\d+)?(?:\/\d+)?\s+([A-Za-z].*)$/)?.[1].trim().toLowerCase() ?? null;
+}
+
 assert.equal(regions.length, 55, "Grades 7–12 must contain 55 regions");
 assert.equal(lessons.length, 220, "Grades 7–12 must contain 220 lessons");
 assert.equal(curriculumStats.questions, 1100, "Every lesson must contain five reviewed questions");
@@ -41,6 +45,8 @@ for (const lesson of lessons) {
       assert.ok(question.choices.length >= 2 && question.choices.length <= 5, `${lesson.id}/${question.id} needs 2–5 choices`);
       assert.equal(new Set(question.choices.map((choice) => choice.trim().toLowerCase())).size, question.choices.length, `${lesson.id}/${question.id} has duplicate choices`);
       assert.ok(question.choices.some((choice) => isAnswerCorrect(choice, question.answer)), `${lesson.id}/${question.id} has no selectable correct answer`);
+      const answerUnit = writtenUnit(question.answer.split("|")[0]);
+      if (answerUnit) assert.ok(question.choices.every((choice) => writtenUnit(choice) === answerUnit), `${lesson.id}/${question.id} must use ${answerUnit} on every answer choice`);
       multipleChoiceChecks += 1;
     }
     const primary = question.answer.split("|")[0];

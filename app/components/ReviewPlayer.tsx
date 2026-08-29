@@ -73,8 +73,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <h1>No skill is due right now.</h1>
         <p>Your review is caught up. That is a complete study win—no extra work needed.</p>
         <div className="review-finish-actions">
-          <a className="secondary-button" href={trailHref}>View learning map</a>
-          {suggestedLesson && <a className="primary-button" href={suggestedHref}>Optional: {suggestedLesson.title} <span>→</span></a>}
+          {suggestedLesson && <a className="primary-button" href={suggestedHref}>Start {suggestedLesson.title} <span>→</span></a>}
+          <a className="text-link" href={trailHref}>View learning map</a>
         </div>
       </section>
     </main>
@@ -157,7 +157,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <p>They will return again when another quick recall will help them stick.</p>
         <div className="review-finish-reward"><span><strong>+20</strong> XP</span></div>
         <p className="review-stop-note">You can stop here.</p>
-        <div className="review-finish-actions"><a className="secondary-button" href={trailHref}>View learning map</a>{suggestedLesson && <a className="primary-button" href={suggestedHref}>Optional: {suggestedLesson.title} <span>→</span></a>}</div>
+        <div className="review-finish-actions">{suggestedLesson && <a className="primary-button" href={suggestedHref}>Start {suggestedLesson.title} <span>→</span></a>}<a className="text-link" href={trailHref}>View learning map</a></div>
       </section>
     </main>
   );
@@ -168,10 +168,10 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       <LearnerHeader state={state} demo={demo} />
       <div className={`review-mobile-status accent-${questionLesson?.accent ?? "teal"}`}>
         <header><div><small>5-MINUTE REVIEW</small><strong>{question.lessonTitle}</strong></div></header>
-        <TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent={questionLesson?.accent ?? "teal"} detail={recallStreak > 1 ? `${recallStreak} correct in a row` : "Corrected answers count."} />
+        <TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent={questionLesson?.accent ?? "teal"} />
       </div>
       <section className="review-layout">
-        <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Keep it ready.</h1><p>Skills return after 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent="teal" detail={recallStreak > 1 ? `${recallStreak} correct in a row` : "Corrected answers count. Complete the set for +20 XP."} /></aside>
+        <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Keep it ready.</h1><p>Skills return after 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent="teal" /></aside>
         <div className="review-card" aria-busy={busy}>
           <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div></header>
           {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
