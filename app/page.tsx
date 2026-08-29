@@ -23,6 +23,9 @@ const gradeVisuals = {
   7: { visual: "ratio-table", accent: "coral" as const },
   8: { visual: "coordinate-plane", accent: "blue" as const },
   9: { visual: "parabola", accent: "violet" as const },
+  10: { visual: "congruence", accent: "coral" as const },
+  11: { visual: "growth", accent: "teal" as const },
+  12: { visual: "curve-line", accent: "gold" as const },
 };
 
 const mathWorldScenes = [
@@ -57,7 +60,7 @@ export default function Home() {
 
     <section className="hero" id="top">
       <div className="hero-copy">
-        <span className="eyebrow">MATH · GRADES 7–9</span>
+        <span className="eyebrow">MATH · GRADES 7–12</span>
         <h1>Small steps.<br />Real math progress.</h1>
         <p>See one idea, work one example, and finish five focused questions. Every correction moves you forward.</p>
         <div className="hero-actions"><a className="primary-button" href="/learn?grade=8&demo=1">Try a lesson <span aria-hidden="true">→</span></a><a className="text-link" href="#story">Why I made this</a></div>
@@ -97,7 +100,7 @@ export default function Home() {
     </section>
 
     <section className="math-world-section" aria-labelledby="math-world-title">
-      <div className="section-heading split-heading"><div><span className="section-kicker">MATH IN THE WORLD · GRADES 7–9</span><h2 id="math-world-title">See the reason before the rule.</h2></div><p>Every lesson has a recognizable topic marker. Hard-to-picture ideas add a full visual scene before the exact math.</p></div>
+      <div className="section-heading split-heading"><div><span className="section-kicker">MATH IN THE WORLD · GRADES 7–12</span><h2 id="math-world-title">See the reason before the rule.</h2></div><p>Every lesson has a recognizable topic marker. Hard-to-picture ideas add a full visual scene before the exact math.</p></div>
       <div className="math-world-mobile-cue" aria-hidden="true"><span><b>{mathWorldScenes.length}</b> visual lessons</span><span>Swipe to explore <i>→</i></span></div>
       <div className="math-world-grid" role="region" aria-label={`${mathWorldScenes.length} visual lesson examples`}>{mathWorldScenes.map((scene, index) => <a className={`math-world-card accent-${scene.accent} scene-${index + 1}`} href={scene.lesson === "graphing-lines" ? "/labs/linear-graphs" : `/learn/${scene.lesson}?grade=${scene.grade}&demo=1`} key={scene.lesson}><div className="math-world-image"><Image src={scene.image} width={1200} height={800} sizes="(max-width: 760px) 86vw, (max-width: 1100px) 46vw, 520px" loading="lazy" decoding="async" alt="" /><span><TopicIcon visual={scene.visual} accent={scene.accent} size="md" label="" /></span></div><div className="math-world-copy"><small>GRADE {scene.grade} · {scene.lesson === "graphing-lines" ? "OPEN INTERACTIVE GRAPH LAB" : "EXPLORE A 6–8 MINUTE LESSON"}</small><h3>{scene.title}</h3><p>{scene.copy}</p><strong>{scene.lesson === "graphing-lines" ? "Try the live graph" : "See this idea"} <span aria-hidden="true">→</span></strong></div></a>)}</div>
       <div className="math-world-proof"><div className="math-world-proof-stats" aria-label={`${curriculumStats.lessons} topic icons and ${expandedSceneCount} full scenes`}><span><strong>{curriculumStats.lessons}/{curriculumStats.lessons}</strong><small>topic icons</small></span><span><strong>{expandedSceneCount}</strong><small>full scenes</small></span></div><span><b>Every lesson has a distinct visual topic marker.</b> Expanded context scenes build intuition, while exact diagrams and math stay readable on every screen.</span><i aria-hidden="true">✓</i></div>
@@ -109,7 +112,7 @@ export default function Home() {
     </section>
 
     <section className="curriculum-section" id="curriculum">
-      <div className="section-heading split-heading"><div><span className="section-kicker">CHOOSE A GRADE</span><h2>Grades 7, 8, and 9</h2></div><p>Four lessons, then one mixed check. Google is only for saving progress.</p></div>
+      <div className="section-heading split-heading"><div><span className="section-kicker">CHOOSE A GRADE</span><h2>Grades 7, 8, 9, 10, 11, and 12</h2></div><p>Four lessons, then one mixed check. Google is only for saving progress.</p></div>
       <div className="grade-cards">{gradeCurricula.map((curriculum) => {
         const lessonCount = curriculum.regions.reduce((total, region) => total + region.lessons.length, 0);
         const gradeVisual = gradeVisuals[curriculum.grade];

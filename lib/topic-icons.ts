@@ -31,6 +31,7 @@ const topicIconSpecs: Record<string, TopicIconSpec> = {
   "exponent-blocks": { kind: "power", glyph: "xⁿ" },
   expression: { kind: "algebra", glyph: "x+" },
   factor: { kind: "algebra", glyph: "( )" },
+  "factor-chain": { kind: "steps", glyph: "×" },
   "factor-tree": { kind: "steps", glyph: "×" },
   "fit-line": { kind: "graph", glyph: "≈" },
   formula: { kind: "algebra", glyph: "ƒ" },

@@ -147,7 +147,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
       {demo && <div className="demo-banner"><span>Preview mode</span><p>Your progress stays in this browser session.</p><a href="/#join">Use Google to keep it for next time</a></div>}
       <section className="dashboard-wrap">
         <nav className="grade-switcher" aria-label="Choose a grade">
-          {[7, 8, 9].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${demo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
+          {[7, 8, 9, 10, 11, 12].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${demo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
         </nav>
         <div className="dashboard-heading">
           <div><span className="section-kicker">{state.profile.nickname.toUpperCase()}</span><h1>Choose one next step.</h1><p>Your progress is saved here.</p></div>

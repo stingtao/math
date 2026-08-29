@@ -13,6 +13,9 @@ const gradeConnections = [
   { grade: 7, title: "Proportional lines", copy: "A proportional relationship such as y = 2x passes through the origin because b = 0.", equation: "y=2x", visual: "ratio-table", accent: "coral" as const },
   { grade: 8, title: "Slope and intercept", copy: "In y = mx + b, m controls the rise and run while b sets the starting height.", equation: "y=2x+1", visual: "line-graph", accent: "blue" as const },
   { grade: 9, title: "Compare linear functions", copy: "Change m or b, then use the graph and point table to explain what changed.", equation: "y=-2x+3", visual: "function", accent: "violet" as const },
+  { grade: 10, title: "Prove line relationships", copy: "Compare slopes to justify when coordinate lines are parallel or perpendicular.", equation: "y=1/2x-2", visual: "coordinate", accent: "coral" as const },
+  { grade: 11, title: "Contrast function families", copy: "Use a straight line as the constant-rate reference before studying polynomial, logarithmic, and trigonometric curves.", equation: "y=3x-4", visual: "growth", accent: "teal" as const },
+  { grade: 12, title: "Read a tangent model", copy: "Treat a line as a local approximation: its slope represents an instantaneous rate near one point.", equation: "y=-1/2x+3", visual: "slope", accent: "gold" as const },
 ];
 
 const guidedChallenges = [
@@ -29,7 +32,7 @@ export default function LinearGraphsLabPage() {
     <main className="site-shell graph-lab-page">
       <PublicHeader />
       <section className="graph-lab-hero">
-        <div><span className="eyebrow">OPEN MATH LAB · GRADES 7–9</span><h1>Make a line.<br />See what every number does.</h1><p>Plot points, connect a line, then type an equation and watch every representation change together. No sign-in, timer, score, or saved input.</p><div className="graph-lab-hero-actions"><a className="primary-button" href="#point-mission">Build a line from points <span aria-hidden="true">↓</span></a><a className="text-link" href="#live-graph">Open equation lab</a></div></div>
+        <div><span className="eyebrow">OPEN MATH LAB · GRADES 7–12</span><h1>Make a line.<br />See what every number does.</h1><p>Plot points, connect a line, then type an equation and watch every representation change together. No sign-in, timer, score, or saved input.</p><div className="graph-lab-hero-actions"><a className="primary-button" href="#point-mission">Build a line from points <span aria-hidden="true">↓</span></a><a className="text-link" href="#live-graph">Open equation lab</a></div></div>
         <div className="graph-lab-formula" aria-label="In y equals m x plus b, m is the slope and b is the y-intercept"><span>y</span><i>=</i><span className="graph-formula-term"><strong>m</strong><small>slope</small></span><b>x</b><i>+</i><span className="graph-formula-term"><em>b</em><small>y-intercept</small></span></div>
       </section>
 
@@ -49,7 +52,7 @@ export default function LinearGraphsLabPage() {
       </section>
 
       <section className="graph-lab-connections" aria-labelledby="grade-connections-heading">
-        <header><span className="section-kicker">ONE TOOL · THREE GRADE PATHS</span><h2 id="grade-connections-heading">The idea grows with you.</h2></header>
+        <header><span className="section-kicker">ONE TOOL · SIX GRADE PATHS</span><h2 id="grade-connections-heading">The idea grows with you.</h2></header>
         <div>{gradeConnections.map((item) => <article className={`accent-${item.accent}`} key={item.grade}><TopicIcon visual={item.visual} accent={item.accent} size="md" label="" /><span>GRADE {item.grade}</span><h3>{item.title}</h3><p>{item.copy}</p><code>{item.equation}</code></article>)}</div>
         <footer><span aria-hidden="true">◇</span><p><strong>Private by default.</strong> Equations entered here remain in this browser tab and are never connected to an account, lesson history, or leaderboard.</p></footer>
       </section>

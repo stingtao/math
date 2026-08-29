@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { Avatar } from "./Avatar";
 import type { LearnerState } from "@/lib/learner-state";
 
@@ -14,7 +15,7 @@ export function PublicHeader() {
       <Brand />
       <nav className="topnav" aria-label="Main navigation">
         <a href="/#story">About</a>
-        <a href="/#curriculum">Grades 7–9</a>
+        <a href="/#curriculum">Grades 7–12</a>
         <a href="/labs/linear-graphs">Graph Lab</a>
         <a href="/leaderboard">Leaderboard</a>
         <a href="/feedback">Feedback</a>
@@ -24,7 +25,7 @@ export function PublicHeader() {
           <summary aria-label="Open navigation"><span aria-hidden="true">☰</span></summary>
           <nav aria-label="Mobile navigation">
             <a href="/#story">About</a>
-            <a href="/#curriculum">Grades 7–9</a>
+            <a href="/#curriculum">Grades 7–12</a>
             <a href="/labs/linear-graphs">Graph Lab</a>
             <a href="/leaderboard">Leaderboard</a>
             <a href="/feedback">Feedback</a>
@@ -38,6 +39,11 @@ export function PublicHeader() {
 
 export function LearnerHeader({ state, demo }: { state: LearnerState; demo: boolean }) {
   const pathname = usePathname();
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = state.profile.theme;
+    return () => { delete root.dataset.theme; };
+  }, [state.profile.theme]);
   const trailUrl = demo ? "/learn?demo=1" : "/learn";
   const reviewUrl = demo ? "/review?demo=1" : "/review";
   const profileUrl = demo ? "/profile?demo=1" : "/profile";

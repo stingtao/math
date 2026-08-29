@@ -26,12 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
   const title = "Math — Small steps. Real progress.";
-  const description = "Visual English math lessons, five focused practice checks, review, and gameful progress for Grades 7–9.";
+  const description = "Visual English math lessons, five focused practice checks, review, and gameful progress for Grades 7–12.";
   return {
     metadataBase: new URL(origin),
     title,
     description,
-    openGraph: { title, description, type: "website", images: [{ url: `${origin}/og-v2.png`, width: 1672, height: 941, alt: "Math — Small steps. Real progress. Grades 7–9" }] },
+    openGraph: { title, description, type: "website", images: [{ url: `${origin}/og-v2.png`, width: 1672, height: 941, alt: "Math — Small steps. Real progress. Grades 7–12" }] },
     twitter: { card: "summary_large_image", title, description, images: [`${origin}/og-v2.png`] },
   };
 }

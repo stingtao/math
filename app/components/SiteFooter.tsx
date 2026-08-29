@@ -12,7 +12,7 @@ export function SiteFooter() {
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
       </nav>
-      <span>Grades 7–9 · English</span>
+      <span>Grades 7–12 · English</span>
     </footer>
   );
 }

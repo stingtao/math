@@ -10,6 +10,7 @@ import { avatarFrameCatalog } from "@/lib/avatar-frames";
 import { SuccessBurst } from "./SuccessBurst";
 import { evaluateAchievements } from "@/lib/achievements";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
+import { themeCatalog, type ThemeId } from "@/lib/themes";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -17,6 +18,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [busyFrame, setBusyFrame] = useState("");
   const [frameCelebrationKey, setFrameCelebrationKey] = useState("");
+  const [busyTheme, setBusyTheme] = useState("");
   if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR PRIVATE BASE" title="Loading your anonymous profile…" detail="Your trail identity, frames, and private milestones are almost ready." />;
   if (!state || error) return <LearningSignInGate glyph="✦" kicker="YOUR PROFILE IS PRIVATE" title="Sign in to view your profile." detail="Your anonymous identity and learning milestones are visible only to you." />;
   const activeState = state;
@@ -89,6 +91,24 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     }
   }
 
+  async function chooseTheme(theme: ThemeId) {
+    if (busyTheme || activeState.profile.theme === theme) return;
+    setBusyTheme(theme);
+    try {
+      if (demo) {
+        const next: LearnerState = { ...activeState, profile: { ...activeState.profile, theme } };
+        saveDemoState(next);
+        setState(next);
+      } else {
+        const ok = await action({ action: "theme", theme });
+        if (!ok) return;
+      }
+      setMessage(`${themeCatalog.find((item) => item.id === theme)?.name ?? "Theme"} is now active.`);
+    } finally {
+      setBusyTheme("");
+    }
+  }
+
   return (
     <main className="learner-shell profile-page">
       <LearnerHeader state={state} demo={demo} />
@@ -101,6 +121,20 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         <div className="profile-stats"><article><span>◆</span><strong>{state.totalXp}</strong><small>Total XP</small></article><article><span>▲</span><strong>{state.profile.longestStreak}</strong><small>Longest streak</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Lessons complete</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Bosses cleared</small></article></div>
 
         <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">◆<i /></span><div><small>500-PIECE PRIVATE COLLECTION</small><strong>Open Badge Vault</strong><p>{state.badges.earnedIds.length} badges earned · {state.badges.correctAnswers % 10}/10 toward the next Answer Quest trophy</p></div><b>{state.badges.earnedIds.length}<small> / 500</small></b><i aria-hidden="true">→</i></a>
+
+        <section className="theme-studio" aria-labelledby="theme-studio-heading">
+          <header><div><span className="section-kicker">YOUR LEARNING WORLD</span><h2 id="theme-studio-heading">Choose a theme that helps you settle in.</h2><p>Only the theme code is saved. It never changes questions, scores, difficulty, or what anyone else can see.</p></div><span className="safe-chip">Private setting</span></header>
+          <div className="theme-grid" role="radiogroup" aria-label="Choose a visual theme">
+            {themeCatalog.map((theme) => {
+              const selected = state.profile.theme === theme.id;
+              return <button className={`theme-option theme-${theme.id} ${selected ? "selected" : ""}`} type="button" role="radio" aria-checked={selected} disabled={Boolean(busyTheme)} onClick={() => chooseTheme(theme.id)} key={theme.id}>
+                <span className="theme-option-art" style={{ backgroundPosition: theme.atlasPosition }}><i aria-hidden="true">{theme.motif}</i>{selected && <b>✓</b>}</span>
+                <span className="theme-option-copy"><small>{theme.kicker}</small><strong>{theme.name}</strong><span>{theme.copy}</span></span>
+                <em>{busyTheme === theme.id ? "Saving…" : selected ? "Active" : "Use theme"}</em>
+              </button>;
+            })}
+          </div>
+        </section>
 
         <section className="achievement-section" aria-labelledby="achievement-heading">
           <header><div><span className="section-kicker">PRIVATE LANDMARK SHELF</span><h2 id="achievement-heading">Your progress has landmarks.</h2><p>Six long-term landmarks track lessons, stars, bosses, and your longest rhythm. Collectible badges live in Badge Vault.</p></div><span className="achievement-count"><strong>{unlockedAchievements}</strong> / {achievements.length} unlocked</span></header>

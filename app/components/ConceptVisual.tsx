@@ -3,6 +3,7 @@ import Image from "next/image";
 import katex from "katex";
 import { LinearGraphLab } from "./LinearGraphLab";
 import { PointToLineMission } from "./PointToLineMission";
+import { AdvancedMathTool } from "./AdvancedMathTool";
 
 type ContextScene = {
   src: string;
@@ -1018,6 +1019,7 @@ function mathFor(visual: string) {
 
 export function ConceptVisual({ lesson }: { lesson: LessonDefinition }) {
   const visual = lesson.visual;
+  if (lesson.grade >= 10) return <AdvancedMathTool lesson={lesson} />;
   const contextScene = contextScenes[lesson.slug];
   const graphEquation = lesson.slug === "g7-proportional-graphs" ? "y=2x" : lesson.slug === "graphing-lines" ? "y=2x+1" : lesson.slug === "g9-graph-linear-functions" ? "y=-2x+3" : null;
   if (contextScene && graphEquation) return <div className="interactive-concept-stack"><ContextLessonVisual scene={contextScene} /><PointToLineMission compact /><LinearGraphLab initialEquation={graphEquation} /></div>;

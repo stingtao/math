@@ -13,6 +13,8 @@ import { recoveryGuidance, remixedChoices } from "../lib/practice-recovery.ts";
 import { isAnswerCorrect } from "../lib/curriculum.ts";
 import { ANSWER_BADGE_STEP, BADGE_CATALOG_SIZE, BADGE_CATALOG_VERSION, answerBadgeForCorrectCount, answerBadges, badgeCatalog, lessonBadges, nextAnswerBadge } from "../lib/badges.ts";
 import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../lib/learner-state.ts";
+import { getComboSpec } from "../lib/combo.ts";
+import { isThemeId, themeCatalog } from "../lib/themes.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -125,14 +127,15 @@ async function render(path = "/") {
   }, { waitUntil() {}, passThroughOnException() {} });
 }
 
-test("server-renders the Math Grades 7–9 landing page", async () => {
+test("server-renders the Math Grades 7–12 landing page", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /Small steps/);
   assert.match(html, /Hi, I’m Sting/);
-  assert.match(html, /Grades 7, 8, and 9/);
-  assert.match(html, /124/);
+  assert.match(html, /Grades 7, 8, 9, 10, 11, and 12/);
+  assert.match(html, /220/);
+  assert.match(html, /1100/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Building your site/);
   assert.match(html, /og-v2\.png/);
 });
@@ -144,21 +147,30 @@ test("server-renders a public, no-sign-in linear Graph Lab", async () => {
   assert.match(html, /Make a line/);
   assert.match(html, /Type a line and watch it move/);
   assert.match(html, /No sign-in, timer, score, or saved input/);
-  assert.match(html, /ONE TOOL · THREE GRADE PATHS/);
+  assert.match(html, /ONE TOOL · SIX GRADE PATHS/);
   assert.match(html, /Turn points into a line/);
   assert.match(html, /Build y = 2x with your own points/);
 });
 
-test("ships all three curriculum files and all source sheets", async () => {
+test("ships all six curriculum files and all source sheets", async () => {
   const curriculum = await readFile(new URL("../lib/curriculum.ts", import.meta.url), "utf8");
   const lessonDefinitions = curriculum.match(/\blesson\(\d+,\s*\d+,/g) ?? [];
   assert.equal(lessonDefinitions.length, 52);
   const grade7 = await readFile(new URL("../lib/curriculum-grade7.ts", import.meta.url), "utf8");
   const grade9 = await readFile(new URL("../lib/curriculum-grade9.ts", import.meta.url), "utf8");
+  const grade10 = await readFile(new URL("../lib/curriculum-grade10.ts", import.meta.url), "utf8");
+  const grade11 = await readFile(new URL("../lib/curriculum-grade11.ts", import.meta.url), "utf8");
+  const grade12 = await readFile(new URL("../lib/curriculum-grade12.ts", import.meta.url), "utf8");
   assert.match(grade7, /7\.RP\.A\.1/);
   assert.match(grade7, /7\.SP\.C\.8/);
   assert.match(grade9, /HSA\.REI\.C\.6/);
   assert.match(grade9, /HSF\.LE\.A/);
+  assert.match(grade10, /HSG\.SRT\.C/);
+  assert.match(grade10, /HSS\.CP\.B/);
+  assert.match(grade11, /HSF\.TF\.C/);
+  assert.match(grade11, /HSN\.VM/);
+  assert.match(grade12, /AP\.CALC\.DIF/);
+  assert.match(grade12, /AP\.CALC\.INT/);
   assert.match(curriculum, /8\.NS\.A\.1/);
   assert.match(curriculum, /8\.EE\.C\.8/);
   assert.match(curriculum, /8\.F\.A\.1/);
@@ -221,23 +233,23 @@ test("ships one accessible point-line mission and an active reasoning flow acros
 
 test("builds exactly 500 deterministic badges around the full curriculum", () => {
   assert.equal(BADGE_CATALOG_SIZE, 500);
-  assert.equal(BADGE_CATALOG_VERSION, "2026.1");
+  assert.equal(BADGE_CATALOG_VERSION, "2026.2");
   assert.equal(ANSWER_BADGE_STEP, 10);
-  assert.equal(lessonBadges.length, 124);
-  assert.equal(answerBadges.length, 376);
+  assert.equal(lessonBadges.length, 220);
+  assert.equal(answerBadges.length, 280);
   assert.equal(badgeCatalog.length, 500);
   assert.equal(new Set(badgeCatalog.map((badge) => badge.id)).size, 500);
   assert.equal(new Set(badgeCatalog.map((badge) => badge.title)).size, 500);
   assert.equal(new Set(badgeCatalog.map((badge) => badge.catalogNumber)).size, 500);
-  assert.equal(new Set(lessonBadges.map((badge) => badge.lessonId)).size, 124);
+  assert.equal(new Set(lessonBadges.map((badge) => badge.lessonId)).size, 220);
   assert.equal(answerBadges.at(0)?.target, 10);
-  assert.equal(answerBadges.at(-1)?.target, 3_760);
+  assert.equal(answerBadges.at(-1)?.target, 2_800);
   for (const [index, badge] of answerBadges.entries()) assert.equal(badge.target, (index + 1) * 10);
   assert.equal(answerBadgeForCorrectCount(9), undefined);
   assert.equal(answerBadgeForCorrectCount(10)?.id, "answer-001");
-  assert.equal(answerBadgeForCorrectCount(3_760)?.id, "answer-376");
+  assert.equal(answerBadgeForCorrectCount(2_800)?.id, "answer-280");
   assert.equal(nextAnswerBadge(0)?.target, 10);
-  assert.equal(nextAnswerBadge(3_760), null);
+  assert.equal(nextAnswerBadge(2_800), null);
 });
 
 test("grants demo badges once at the same milestones as the server", () => {
@@ -308,11 +320,14 @@ test("ships a private, progressive Badge Vault and accessible celebration contro
   assert.match(reveal, /Skip animation/);
   assert.match(reveal, /event\.key === "Escape"/);
   assert.match(reveal, /View Badge Vault/);
+  assert.match(reveal, /badge-vault-flyer/);
+  assert.match(reveal, /Flying to vault/);
   for (const source of [lesson, review, boss]) {
     assert.match(source, /<AnswerImpact/);
     assert.match(source, /<BadgeUnlockReveal/);
   }
   assert.match(css, /@keyframes badge-card-arrive/);
+  assert.match(css, /@keyframes badge-fly-to-vault/);
   assert.match(css, /@keyframes answer-impact-core/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /@media \(max-width: 430px\)[\s\S]*\.badge-catalog-grid \{ grid-template-columns: 1fr/);
@@ -351,6 +366,53 @@ test("keeps real Google profile fields out of persistent schema", async () => {
   assert.match(schema, /leaderboard_opt_in/);
   assert.match(schema, /feedback_messages/);
   assert.match(schema, /ON DELETE CASCADE|onDelete: "cascade"/i);
+});
+
+test("saves one private theme code and ships five visual learning worlds", async () => {
+  const state = await readFile(new URL("../lib/learner-state.ts", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const route = await readFile(new URL("../app/api/state/route.ts", import.meta.url), "utf8");
+  const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.deepEqual(themeCatalog.map((theme) => theme.id), ["classic", "space", "blossom", "ocean", "aurora"]);
+  assert.ok(themeCatalog.every((theme) => isThemeId(theme.id)));
+  assert.match(state, /theme: ThemeId/);
+  assert.match(store, /learner_preferences/);
+  assert.match(store, /updateTheme/);
+  assert.match(route, /action: "theme"/);
+  assert.match(profile, /YOUR LEARNING WORLD/);
+  assert.match(profile, /Only the theme code is saved/);
+  assert.match(header, /root\.dataset\.theme/);
+  assert.match(css, /theme-worlds-atlas-v1\.webp/);
+  for (const theme of themeCatalog) assert.match(css, new RegExp(`data-theme="${theme.id}"`));
+  const asset = await readFile(new URL("../public/visuals/theme-worlds-atlas-v1.webp", import.meta.url));
+  assert.ok(asset.byteLength > 50_000 && asset.byteLength < 180_000);
+  assert.equal((await sharp(asset).metadata()).format, "webp");
+});
+
+test("gives every Grade 10–12 lesson an appropriate interactive concept tool", async () => {
+  const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
+  const tool = await readFile(new URL("../app/components/AdvancedMathTool.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(concept, /lesson\.grade >= 10/);
+  assert.match(concept, /<AdvancedMathTool lesson=\{lesson\}/);
+  for (const mode of ["calculus", "circle", "probability", "vector", "scale", "function"]) assert.match(tool, new RegExp(`"${mode}"`));
+  assert.match(tool, /Changes stay on this page/);
+  assert.match(tool, /nothing entered here is saved/);
+  assert.match(tool, /Run another sample/);
+  assert.match(tool, /UNIT CIRCLE/);
+  assert.match(tool, /CALCULUS LENS/);
+  assert.match(css, /\.advanced-math-tool/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.advanced-tool-workspace \{ min-height: 0; padding: 15px; grid-template-columns: 1fr/);
+});
+
+test("keeps every visible CSS font size between 12px and 34px", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const sizes = [...css.matchAll(/font-size:\s*(\d+)px/g)].map((match) => Number(match[1])).filter((size) => size !== 0);
+  assert.ok(sizes.length > 500);
+  assert.ok(sizes.every((size) => size >= 12 && size <= 34), `font-size range was ${Math.min(...sizes)}–${Math.max(...sizes)}px`);
+  assert.match(css, /font-size: clamp\(12px, var\(--badge-symbol\), 34px\)/);
 });
 
 test("keeps avatar frames permanently unlocked and makes the token goal visible", async () => {
@@ -580,7 +642,7 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(css, /\.success-ripple/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /animation:\s*none !important/);
-  assert.match(momentum, /Bonus signal only—corrections still advance/);
+  assert.match(momentum, /corrections still advance/);
   assert.match(momentum, /BEST ×\{best\}/);
   assert.match(lesson, /FOCUS CHAIN/);
   assert.match(lesson, /setFocusStreak\(0\)/);
@@ -591,6 +653,8 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(review, /recallStreak >= 3/);
   assert.match(css, /\.momentum-run/);
   assert.match(css, /@keyframes chain-link/);
+  assert.deepEqual([1, 2, 3, 5, 8].map((chain) => getComboSpec(chain).tier), ["signal", "spark", "flame", "prism", "cosmic"]);
+  for (const tier of ["signal", "spark", "flame", "prism", "cosmic"]) assert.match(css, new RegExp(`combo-${tier}`));
 });
 
 test("keeps answer chains optional while preserving the best run", () => {
@@ -638,21 +702,21 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.review-mobile-status \{[^}]*display: grid/);
   assert.match(css, /\.review-layout > aside \{ display: none/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.review-mobile-status \{[^}]*width: calc\(100% - 28px\)/);
-  assert.match(css, /\.context-math-card\.context-math-card small \{ font-size: 10px; line-height: 1\.3/);
-  assert.match(css, /\.lesson-mobile-topic small \{[^}]*font-size: 10px/);
-  assert.match(css, /\.review-mobile-status > header small \{[^}]*font-size: 10px/);
-  assert.match(css, /\.momentum-run-copy > span,[\s\S]*\.momentum-run > p \{ font-size: 10px/);
-  assert.match(css, /\.momentum-run-copy > strong \{ font-size: 13px; white-space: normal/);
-  assert.match(css, /\.star-path-options small \{ font-size: 10px/);
-  assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 12px/);
-  assert.match(css, /\.today-mission-route > span > small \{ font-size: 10px/);
-  assert.match(css, /\.daily-token-medallion small \{ font-size: 9px/);
-  assert.match(css, /\.daily-rhythm small \{ font-size: 10px/);
-  assert.match(css, /\.reward-calendar span em \{ font-size: 8px/);
-  assert.match(css, /\.math-world-proof-stats small \{ font-size: 10px/);
-  assert.match(css, /\.game-feedback-card small \{ font-size: 10px/);
-  assert.match(css, /\.game-feedback-card h3 \{ font-size: 18px/);
-  assert.match(css, /\.game-feedback-card p \{ font-size: 14px/);
+  assert.match(css, /\.context-math-card\.context-math-card small \{ font-size: 14px; line-height: 1\.3/);
+  assert.match(css, /\.lesson-mobile-topic small \{[^}]*font-size: 14px/);
+  assert.match(css, /\.review-mobile-status > header small \{[^}]*font-size: 14px/);
+  assert.match(css, /\.momentum-run-copy > span,[\s\S]*\.momentum-run > p \{ font-size: 14px/);
+  assert.match(css, /\.momentum-run-copy > strong \{ font-size: 16px; white-space: normal/);
+  assert.match(css, /\.star-path-options small \{ font-size: 14px/);
+  assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 16px/);
+  assert.match(css, /\.today-mission-route > span > small \{ font-size: 14px/);
+  assert.match(css, /\.daily-token-medallion small \{ font-size: 13px/);
+  assert.match(css, /\.daily-rhythm small \{ font-size: 14px/);
+  assert.match(css, /\.reward-calendar span em \{ font-size: 12px/);
+  assert.match(css, /\.math-world-proof-stats small \{ font-size: 14px/);
+  assert.match(css, /\.game-feedback-card small \{ font-size: 14px/);
+  assert.match(css, /\.game-feedback-card h3 \{ font-size: 20px/);
+  assert.match(css, /\.game-feedback-card p \{ font-size: 17px/);
   assert.match(css, /a,[\s\S]*button,[\s\S]*summary \{ touch-action: manipulation/);
   assert.match(css, /\.site-footer nav a,[\s\S]*\.privacy-settings-card > \.text-link,[\s\S]*\.legal-wrap > footer a \{[\s\S]*min-height: 44px/);
   for (const player of [lesson, boss, review]) {
@@ -958,7 +1022,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(landmarks, /grade7RegionLandmarks/);
   assert.match(landmarks, /grade8RegionLandmarks/);
   assert.match(landmarks, /grade9RegionLandmarks/);
-  assert.equal((landmarks.match(/^\s+\d+: \{ src:/gm) ?? []).length, 31);
+  assert.match(landmarks, /grade10RegionLandmarks/);
+  assert.match(landmarks, /grade11RegionLandmarks/);
+  assert.match(landmarks, /grade12RegionLandmarks/);
+  assert.equal((landmarks.match(/^\s+\d+: \{ src:/gm) ?? []).length, 55);
   assert.match(css, /\.topic-icon-xl/);
   assert.match(css, /\.learning-loop-grid/);
   assert.match(css, /\.feedback-celebration/);
@@ -1019,7 +1086,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.welcome-route-step/);
   assert.match(css, /\.welcome-first-win/);
   assert.match(css, /\.welcome-first-win-rewards/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-first-win-rewards strong \{ font-size: 11px/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-first-win-rewards strong \{ font-size: 15px/);
   assert.match(css, /\.review-priority-card/);
   assert.match(css, /\.review-priority-orbit/);
   assert.match(css, /\.boss-priority-card/);
@@ -1125,7 +1192,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.achievement-badge/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.achievement-grid/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-tracker/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-milestone strong \{ font-size: 13px/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-milestone strong \{ font-size: 16px/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-route/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);

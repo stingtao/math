@@ -1,5 +1,7 @@
 import { calculateLessonReward } from "./rewards.ts";
 import { answerBadgeForCorrectCount, lessonBadgeByLessonId, type BadgeUnlock } from "./badges.ts";
+import { normalizeTheme, type ThemeId } from "./themes.ts";
+import { getGradeLessons, lessonById } from "./curriculum.ts";
 
 export type AvatarSpec = { glyph: string; tone: string; frame: string };
 export type LearnerState = {
@@ -14,6 +16,7 @@ export type LearnerState = {
     streakShields: number;
     rewardStep: number;
     ownedFrames: string[];
+    theme: ThemeId;
   };
   completedLessons: Array<{ id: string; stars: number }>;
   clearedBosses: Array<{ regionId: number; hearts: number }>;
@@ -41,6 +44,7 @@ const fallback: LearnerState = {
     streakShields: 1,
     rewardStep: 3,
     ownedFrames: ["plain"],
+    theme: "classic",
   },
   completedLessons: [{ id: "g8-r1-l1", stars: 3 }],
   clearedBosses: [],
@@ -63,6 +67,7 @@ export function getDemoState(): LearnerState {
     if (!saved) return fallback;
     const parsed = JSON.parse(saved) as Partial<LearnerState>;
     const profile = { ...fallback.profile, ...parsed.profile };
+    profile.theme = normalizeTheme(parsed.profile?.theme);
     const savedFrames = Array.isArray(parsed.profile?.ownedFrames) ? parsed.profile.ownedFrames : ["plain"];
     profile.ownedFrames = [...new Set(["plain", ...savedFrames, profile.avatar.frame])];
     const parsedBadges = parsed.badges;
@@ -111,15 +116,16 @@ export function completeDemoLesson(state: LearnerState, lessonId: string, stars:
   const completedLessons = existing
     ? state.completedLessons.map((item) => item.id === lessonId ? { ...item, stars: Math.max(item.stars, stars) } : item)
     : [...state.completedLessons, { id: lessonId, stars }];
-  const nextOrder = Math.min(51, completedLessons.length);
-  const region = Math.floor(nextOrder / 4) + 1;
-  const order = (nextOrder % 4) + 1;
+  const currentLesson = lessonById.get(lessonId);
+  const gradeLessons = currentLesson ? getGradeLessons(currentLesson.grade) : [];
+  const currentIndex = gradeLessons.findIndex((item) => item.id === lessonId);
+  const followingLesson = gradeLessons[currentIndex + 1] ?? currentLesson;
   let next: LearnerState = {
     ...state,
     completedLessons,
     totalXp: state.totalXp + reward.totalXp,
     weeklyXp: state.weeklyXp + reward.totalXp,
-    nextLessonId: `g8-r${region}-l${order}`,
+    nextLessonId: followingLesson?.id ?? state.nextLessonId,
   };
   const badge = !existing ? lessonBadgeByLessonId.get(lessonId) : undefined;
   if (badge && !next.badges.earnedIds.includes(badge.id)) next = applyBadgeProgress(next, undefined, [{ id: badge.id, unlockedAt: new Date().toISOString() }]);

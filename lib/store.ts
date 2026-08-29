@@ -5,6 +5,7 @@ import { getAvatarFrame } from "@/lib/avatar-frames";
 import { calculateLessonReward } from "@/lib/rewards";
 import { BADGE_CATALOG_SIZE, ANSWER_BADGE_STEP, answerBadges, badgeById, lessonBadgeByLessonId, type BadgeUnlock } from "@/lib/badges";
 import { publicTextPrivacyIssue } from "@/lib/privacy";
+import { isThemeId, normalizeTheme, type ThemeId } from "@/lib/themes";
 
 const adjectives = ["Calm", "Bright", "Brave", "Clever", "Curious", "Gentle", "Kind", "Nimble", "Quiet", "Swift", "Wise", "Bold"];
 const nouns = ["Comet", "Compass", "Cedar", "Falcon", "Harbor", "Lantern", "Orbit", "Panda", "Pebble", "River", "Sparrow", "Summit"];
@@ -132,8 +133,9 @@ export async function deleteSessionFromRequest(request: Request) {
 export async function getLearnerState(learnerId: string) {
   await ensureSchema();
   const db = getStore();
-  const [profile, frameResult, progressResult, bossResult, xp, weekly, dueReview, badgeResult, answerCreditCount] = await Promise.all([
+  const [profile, preferences, frameResult, progressResult, bossResult, xp, weekly, dueReview, badgeResult, answerCreditCount] = await Promise.all([
     db.prepare("SELECT nickname, avatar_glyph, avatar_tone, frame, reroll_used, leaderboard_opt_in, trail_tokens, current_streak, longest_streak, streak_shields, reward_step, last_active_date FROM public_profiles WHERE learner_id = ?").bind(learnerId).first<ProfileRow>(),
+    db.prepare("SELECT theme FROM learner_preferences WHERE learner_id = ?").bind(learnerId).first<{ theme: string }>(),
     db.prepare("SELECT frame FROM avatar_frames WHERE learner_id = ? ORDER BY unlocked_at, frame").bind(learnerId).all<{ frame: string }>(),
     db.prepare("SELECT lesson_id, stars, first_correct_count, completed_at FROM lesson_progress WHERE learner_id = ? ORDER BY completed_at").bind(learnerId).all<{ lesson_id: string; stars: number; first_correct_count: number; completed_at: string }>(),
     db.prepare("SELECT region_id, cleared, best_hearts FROM boss_progress WHERE learner_id = ?").bind(learnerId).all<{ region_id: number; cleared: number; best_hearts: number }>(),
@@ -162,6 +164,7 @@ export async function getLearnerState(learnerId: string) {
       streakShields: profile.streak_shields,
       rewardStep: profile.reward_step,
       ownedFrames: [...new Set(["plain", ...frameResult.results.map((item) => item.frame), profile.frame])],
+      theme: normalizeTheme(preferences?.theme),
     },
     completedLessons: progressResult.results.map((item) => ({ id: item.lesson_id, stars: item.stars })),
     clearedBosses: bossResult.results.filter((item) => item.cleared).map((item) => ({ regionId: item.region_id, hearts: item.best_hearts })),
@@ -588,6 +591,15 @@ export async function updateProfile(learnerId: string, action: "reroll" | "leade
     await db.prepare("UPDATE public_profiles SET leaderboard_opt_in = ? WHERE learner_id = ?").bind(enabled ? 1 : 0, learnerId).run();
     if (enabled) await ensureLeagueMembership(learnerId);
   }
+}
+
+export async function updateTheme(learnerId: string, theme: ThemeId) {
+  if (!isThemeId(theme)) throw new Error("Theme not found.");
+  await ensureSchema();
+  const now = new Date().toISOString();
+  await getStore().prepare(`INSERT INTO learner_preferences (learner_id, theme, updated_at) VALUES (?, ?, ?)
+    ON CONFLICT(learner_id) DO UPDATE SET theme = excluded.theme, updated_at = excluded.updated_at`)
+    .bind(learnerId, theme, now).run();
 }
 
 async function ensureLeagueMembership(learnerId: string) {

@@ -2,7 +2,8 @@ import { getRuntimeEnv } from "@/db/bootstrap";
 import { verifyGoogleCredential } from "@/lib/google-auth";
 import { privateJson, rejectCrossOriginMutation } from "@/lib/http";
 import { clearSessionCookie, hmacIdentity } from "@/lib/security";
-import { claimDailyReward, claimMutation, completeLesson, deleteLearner, getLearnerState, learnerFromRequest, purchaseFrame, updateProfile } from "@/lib/store";
+import { claimDailyReward, claimMutation, completeLesson, deleteLearner, getLearnerState, learnerFromRequest, purchaseFrame, updateProfile, updateTheme } from "@/lib/store";
+import { type ThemeId } from "@/lib/themes";
 
 type StateAction =
   | { action: "completeLesson"; lessonId: string; runId: string }
@@ -10,6 +11,7 @@ type StateAction =
   | { action: "reroll" }
   | { action: "leaderboard"; enabled: boolean }
   | { action: "purchaseFrame"; frame: string }
+  | { action: "theme"; theme: ThemeId }
   | { action: "deleteAccount"; credential: string };
 
 export async function POST(request: Request) {
@@ -39,6 +41,10 @@ export async function POST(request: Request) {
     }
     if (body.action === "purchaseFrame") {
       await purchaseFrame(learner.id, body.frame);
+      return privateJson({ state: await getLearnerState(learner.id) });
+    }
+    if (body.action === "theme") {
+      await updateTheme(learner.id, body.theme);
       return privateJson({ state: await getLearnerState(learner.id) });
     }
     if (body.action === "deleteAccount") {

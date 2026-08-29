@@ -1,5 +1,8 @@
 import { grade7Regions } from "./curriculum-grade7.ts";
 import { grade9Regions } from "./curriculum-grade9.ts";
+import { grade10Regions } from "./curriculum-grade10.ts";
+import { grade11Regions } from "./curriculum-grade11.ts";
+import { grade12Regions } from "./curriculum-grade12.ts";
 
 export type Accent = "blue" | "teal" | "coral" | "violet" | "gold";
 
@@ -13,7 +16,7 @@ export type PracticeQuestion = {
 
 export type LessonDefinition = {
   id: string;
-  grade: 7 | 8 | 9;
+  grade: 7 | 8 | 9 | 10 | 11 | 12;
   slug: string;
   regionId: number;
   order: number;
@@ -31,7 +34,7 @@ export type LessonDefinition = {
 
 export type RegionDefinition = {
   id: number;
-  grade: 7 | 8 | 9;
+  grade: 7 | 8 | 9 | 10 | 11 | 12;
   order: number;
   slug: string;
   title: string;
@@ -587,6 +590,9 @@ export const gradeCurricula = [
   { grade: 7 as const, title: "Grade 7", subtitle: "Ratios, rational numbers, equations, geometry, statistics, and probability", regions: grade7Regions },
   { grade: 8 as const, title: "Grade 8", subtitle: "Real numbers, linear relationships, transformations, geometry, and data", regions: grade8Regions },
   { grade: 9 as const, title: "Grade 9", subtitle: "Algebra I: equations, functions, systems, polynomials, quadratics, and modeling", regions: grade9Regions },
+  { grade: 10 as const, title: "Grade 10", subtitle: "Geometry: proof, congruence, similarity, trigonometry, circles, probability, and modeling", regions: grade10Regions },
+  { grade: 11 as const, title: "Grade 11", subtitle: "Algebra II and precalculus: polynomial, rational, logarithmic, trigonometric, conic, matrix, and statistical models", regions: grade11Regions },
+  { grade: 12 as const, title: "Grade 12", subtitle: "Advanced functions, calculus, vectors, probability distributions, inference, finance, and discrete models", regions: grade12Regions },
 ];
 export const regions: RegionDefinition[] = gradeCurricula.flatMap((curriculum) => curriculum.regions);
 export const lessons: LessonDefinition[] = regions.flatMap((region) => region.lessons);
