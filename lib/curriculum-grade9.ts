@@ -1,11 +1,12 @@
 import type { Accent, LessonDefinition, PracticeQuestion, RegionDefinition } from "./curriculum.ts";
+import { buildPracticeQuestion } from "./question-interactions.ts";
 
 type Drill = [prompt: string, answer: string, choices?: string[]];
 type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; standard: string; visual: string; drills: Drill[] };
 const accents: Accent[] = ["violet", "blue", "teal", "coral", "gold"];
 
 function makeLesson(regionId: number, order: number, accent: Accent, spec: LessonSpec): LessonDefinition {
-  const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => ({ id: `q${index + 1}`, prompt, answer, choices, hint: spec.key }));
+  const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => buildPracticeQuestion({ id: `q${index + 1}`, prompt, answer, choices, hint: spec.key }));
   return {
     id: `g9-r${regionId}-l${order}`,
     grade: 9,
@@ -33,7 +34,7 @@ function makeRegion(order: number, title: string, subtitle: string, standard: st
 export const grade9Regions: RegionDefinition[] = [
   makeRegion(1, "Algebra Foundations", "Use structure, notation, and properties with confidence.", "HSA.SSE.A · HSA.CED.A", [
     { slug: "algebraic-structure", title: "Structure in Expressions", goal: "Read expressions as meaningful parts.", key: "Treat a repeated or grouped expression as one object before expanding it.", example: "3(x + 2)² has factor 3 and repeated object (x + 2)", standard: "HSA.SSE.A.1", visual: "expression", drills: [
-      ["In 5(x − 3), what is the outside factor?", "5"], ["How many terms are in 4x² − 7x + 2?", "3"], ["In (a + b)², what expression is squared?", "a+b|(a+b)"], ["Factor 6x + 12.", "6(x+2)"], ["Which is a quadratic expression?", "x^2+3x|x²+3x", ["2x+1", "x²+3x", "5/x"]],
+      ["In 5(x − 3), what is the outside factor?", "5"], ["How many terms are in 4x² − 7x + 2?", "3"], ["In (a + b)², what expression is squared?", "a+b|(a+b)"], ["Factor 6x + 12.", "6(x+2)", ["6(x + 2)", "6(x + 12)", "3(x + 4)", "2(x + 6)"]], ["Which is a quadratic expression?", "x^2+3x|x²+3x", ["2x+1", "x²+3x", "5/x"]],
     ] },
     { slug: "evaluate-formulas", title: "Evaluate Formulas", goal: "Substitute values carefully into formulas.", key: "Use parentheses around every replacement, especially a negative value.", example: "f(x)=x²−2x at x=−3 gives 15", standard: "HSA.SSE.A.1", visual: "substitute", drills: [
       ["Evaluate 2x² + 3 when x = 4.", "35"], ["Evaluate a² − 4a when a = −2.", "12"], ["For A = πr², find exact A when r = 5.", "25pi|25π"], ["For d = rt, find d when r = 60 and t = 2.5.", "150"], ["Evaluate |2x − 7| when x = 1.", "5"],
@@ -117,16 +118,16 @@ export const grade9Regions: RegionDefinition[] = [
   ]),
   makeRegion(7, "Factoring", "Reverse multiplication to expose polynomial structure.", "HSA.SSE.B.3 · HSA.APR.B.3", [
     { slug: "greatest-common-factor", title: "Greatest Common Factor", goal: "Factor out the greatest shared monomial.", key: "Take the GCF of coefficients and the smallest shared power of each variable.", example: "12x³ + 8x² = 4x²(3x + 2)", standard: "HSA.SSE.B.3", visual: "factor", drills: [
-      ["Factor 6x + 18.", "6(x+3)"], ["Factor 12x³ + 8x².", "4x^2(3x+2)|4x²(3x+2)"], ["Factor 15a²b − 10ab².", "5ab(3a-2b)"], ["What is the GCF of 18x² and 24x³?", "6x^2|6x²"], ["Factor −3x² + 12x.", "-3x(x-4)|3x(4-x)"],
+      ["Factor 6x + 18.", "6(x+3)", ["6(x + 3)", "6(x + 18)", "3(x + 6)", "2(3x + 3)"]], ["Factor 12x³ + 8x².", "4x^2(3x+2)|4x²(3x+2)", ["4x²(3x + 2)", "4x²(3x + 8)", "2x²(6x + 2)", "4x(3x + 2)"]], ["Factor 15a²b − 10ab².", "5ab(3a-2b)", ["5ab(3a − 2b)", "5ab(3a − 2)", "5ab(3 − 2b)", "5a(3a − 2b)"]], ["What is the GCF of 18x² and 24x³?", "6x^2|6x²"], ["Factor −3x² + 12x.", "-3x(x-4)|3x(4-x)", ["−3x(x − 4)", "−3(x² − 4)", "−3x(x + 4)", "3x(x − 4)"]],
     ] },
     { slug: "factor-trinomials", title: "Factor Trinomials", goal: "Factor x² + bx + c into two binomials.", key: "Find two numbers whose product is c and whose sum is b.", example: "x²+7x+12=(x+3)(x+4)", standard: "HSA.SSE.B.3", visual: "area-model", drills: [
-      ["Factor x² + 7x + 12.", "(x+3)(x+4)|(x+4)(x+3)"], ["Factor x² − x − 12.", "(x-4)(x+3)|(x+3)(x-4)"], ["Factor x² + 10x + 25.", "(x+5)^2|(x+5)(x+5)"], ["Factor x² − 9x + 20.", "(x-5)(x-4)|(x-4)(x-5)"], ["For x² + 5x + 6, the needed pair is?", "2 and 3|2,3"],
+      ["Factor x² + 7x + 12.", "(x+3)(x+4)|(x+4)(x+3)", ["(x + 3)(x + 4)", "(x + 2)(x + 6)", "(x − 3)(x − 4)", "(x + 1)(x + 12)"]], ["Factor x² − x − 12.", "(x-4)(x+3)|(x+3)(x-4)", ["(x − 4)(x + 3)", "(x − 3)(x + 4)", "(x − 6)(x + 2)", "(x + 4)(x + 3)"]], ["Factor x² + 10x + 25.", "(x+5)^2|(x+5)(x+5)", ["(x + 5)²", "(x + 25)(x + 1)", "(x − 5)²", "(x + 10)(x + 5)"]], ["Factor x² − 9x + 20.", "(x-5)(x-4)|(x-4)(x-5)", ["(x − 5)(x − 4)", "(x + 5)(x + 4)", "(x − 10)(x + 2)", "(x − 20)(x + 1)"]], ["For x² + 5x + 6, the needed pair is?", "2 and 3|2,3"],
     ] },
     { slug: "difference-squares", title: "Difference of Squares", goal: "Recognize and factor a² − b².", key: "A difference of squares factors as (a − b)(a + b).", example: "x² − 25 = (x − 5)(x + 5)", standard: "HSA.SSE.B.3", visual: "area-model", drills: [
-      ["Factor x² − 25.", "(x-5)(x+5)|(x+5)(x-5)"], ["Factor 4a² − 9.", "(2a-3)(2a+3)|(2a+3)(2a-3)"], ["Factor 49y² − 1.", "(7y-1)(7y+1)|(7y+1)(7y-1)"], ["Is x² + 16 a difference of squares over the reals?", "no"], ["Expand (m − 6)(m + 6).", "m^2-36|m²-36"],
+      ["Factor x² − 25.", "(x-5)(x+5)|(x+5)(x-5)", ["(x − 5)(x + 5)", "(x − 5)²", "(x + 5)²", "(x − 25)(x + 1)"]], ["Factor 4a² − 9.", "(2a-3)(2a+3)|(2a+3)(2a-3)", ["(2a − 3)(2a + 3)", "(4a − 3)(a + 3)", "(2a − 3)²", "(4a − 9)(a + 1)"]], ["Factor 49y² − 1.", "(7y-1)(7y+1)|(7y+1)(7y-1)", ["(7y − 1)(7y + 1)", "(49y − 1)(y + 1)", "(7y − 1)²", "(49y − 1)(49y + 1)"]], ["Is x² + 16 a difference of squares over the reals?", "no"], ["Expand (m − 6)(m + 6).", "m^2-36|m²-36"],
     ] },
     { slug: "factoring-completely", title: "Factor Completely", goal: "Use more than one factoring step when needed.", key: "Always check for a GCF first, then look for a remaining pattern.", example: "2x²−18=2(x²−9)=2(x−3)(x+3)", standard: "HSA.SSE.B.3", visual: "factor-tree", drills: [
-      ["Factor completely 2x² − 18.", "2(x-3)(x+3)|2(x+3)(x-3)"], ["Factor completely 3x² + 15x + 18.", "3(x+2)(x+3)|3(x+3)(x+2)"], ["Factor completely 5x³ − 20x.", "5x(x-2)(x+2)|5x(x+2)(x-2)"], ["What should you check before other patterns?", "greatest common factor|gcf"], ["Factor completely x³ − 9x.", "x(x-3)(x+3)|x(x+3)(x-3)"],
+      ["Factor completely 2x² − 18.", "2(x-3)(x+3)|2(x+3)(x-3)", ["2(x − 3)(x + 3)", "2(x − 9)(x + 1)", "(2x − 3)(x + 3)", "2(x − 3)²"]], ["Factor completely 3x² + 15x + 18.", "3(x+2)(x+3)|3(x+3)(x+2)", ["3(x + 2)(x + 3)", "3(x + 1)(x + 6)", "3(x − 2)(x − 3)", "(3x + 2)(x + 3)"]], ["Factor completely 5x³ − 20x.", "5x(x-2)(x+2)|5x(x+2)(x-2)", ["5x(x − 2)(x + 2)", "5x(x − 2)²", "5(x − 2)(x + 2)", "5x(x − 4)(x + 1)"]], ["What should you check before other patterns?", "greatest common factor|gcf"], ["Factor completely x³ − 9x.", "x(x-3)(x+3)|x(x+3)(x-3)", ["x(x − 3)(x + 3)", "x(x − 3)²", "(x − 3)(x + 3)", "x(x − 9)(x + 1)"]],
     ] },
   ]),
   makeRegion(8, "Quadratic Equations", "Solve and interpret equations with a squared variable.", "HSA.REI.B.4 · HSF.IF.C.7", [

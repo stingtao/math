@@ -73,3 +73,26 @@ A completion screen has one short hierarchy:
 4. one dominant next-action CTA.
 
 Keep a secondary map or stop action as a quiet link. Show a newly earned badge or achievement when it actually occurs. Remove separate route-update cards, key inventories, mastery essays, reward receipts, saved-best explanations, and repeated reassurance when they do not alter the next decision. Apply the same hierarchy to lesson, review, boss, unit, and course completion states.
+
+## 8. Design the question type before the screen
+
+The answer interaction is part of the learning design, not a formatting decision made after the prompt is written.
+
+- Use `fill-in` only when producing the value or notation is itself part of the learning goal and the checker accepts reasonable equivalent forms.
+- Use `yes-no` for Yes/No decisions and `true-false` for True/False claims. Render both as two large selectable buttons; spelling and capitalization must never become accidental difficulty.
+- Distinguish `two-choice`, `three-choice`, and `four-choice` explicitly. If a new answer structure does not fit, define a new type before adding the question rather than quietly falling back to a text field or generic renderer.
+- Use authored choices when equivalent symbolic forms are difficult to type or normalize reliably. Factoring prompts such as `Factor 6x + 12` use four mathematically plausible choices unless a purpose-built symbolic editor and equivalence checker exist.
+- Keep all options parallel in meaning, notation, unit, and precision. Distractors should expose a misconception, not a typing trap.
+- A new question family must define its data shape, answer control, keyboard and assistive behavior, validation, correct feedback, recovery path, and rendering on lesson, boss, and review surfaces before content is added.
+
+The curriculum validator must reject Yes/No or True/False questions that fall back to text input, and reject known high-friction symbolic families that lack an appropriate answer control. The same shared response component must render each type everywhere.
+
+## 9. Make feedback strong, brief, and useful
+
+Correct feedback should clearly close the action loop without making the learner wait to continue.
+
+- Use a visible magnitude cue: the success phrase grows, settles, then clears.
+- Keep duration consistent across the flash, mark, particles, and message. A longer celebration is acceptable when the next action remains available and reduced-motion removes nonessential movement.
+- Do not turn a wrong answer into a lecture. Show one short diagnosis and one actionable clue.
+- Put supporting instruction behind a clearly named control such as `Review the key idea`; opening it should reveal the exact concept needed for the retry.
+- Preserve full credit where intended and say it once. Do not stack reassurance, a three-step workflow, and game-system terminology around the same mistake.

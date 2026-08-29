@@ -12,11 +12,11 @@ import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 import { achievementTotalsForState, achievementUnlockedBetween, type AchievementSpec } from "@/lib/achievements";
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
-import { mathInputMode } from "@/lib/math-input";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
 import { AnswerImpact } from "./AnswerImpact";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
+import { QuestionResponse } from "./QuestionResponse";
 
 type BossAttempt = {
   attemptId: string;
@@ -361,7 +361,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         <div className="repair-question">
           <span>{repair + 1} OF 2 · {repairLesson.title}</span>
           <strong>{repairQuestion.prompt}</strong>
-          {repairQuestion.choices ? <div className="choice-grid">{repairQuestion.choices.map((choice) => <button className={repairAnswer === choice ? "selected" : ""} type="button" aria-pressed={repairAnswer === choice} disabled={repairAnswerLocked} onClick={() => { setRepairAnswer(choice); setRepairFeedback(""); setErrorMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={repairAnswer} inputMode={mathInputMode(repairQuestion.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={repairAnswerLocked} aria-invalid={repairFeedback === "incorrect"} aria-describedby={errorMessage ? "boss-repair-error" : repairFeedback ? "boss-repair-feedback" : undefined} onChange={(event) => { setRepairAnswer(event.target.value); setRepairFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void checkRepair(); }} placeholder="Type your answer" autoFocus /></label>}
+          <QuestionResponse question={repairQuestion} value={repairAnswer} disabled={repairAnswerLocked} invalid={repairFeedback === "incorrect"} describedBy={errorMessage ? "boss-repair-error" : repairFeedback ? "boss-repair-feedback" : undefined} onChange={(value) => { setRepairAnswer(value); setRepairFeedback(""); setErrorMessage(""); }} onSubmit={() => void checkRepair()} />
           {repairFeedback === "incorrect" && <div id="boss-repair-feedback" className="repair-answer-feedback" role="status"><span aria-hidden="true">↻</span><div><strong>Not yet—repair this step.</strong><p>{repairQuestion.hint}</p><small>Repair {repair + 1} stays open. No XP or completed repair is lost.</small></div></div>}
         </div>
         {errorMessage && <p id="boss-repair-error" className="form-error" role="alert">{errorMessage}</p>}
@@ -391,7 +391,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         <div className="boss-question-card" aria-busy={busy}>
           <span className="boss-topic">{question.lesson}</span>
           <h2>{question.prompt}</h2>
-          {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : syncMessage ? "boss-sync-message" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
+          <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : syncMessage ? "boss-sync-message" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} onSubmit={() => void check()} />
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
           {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—fix this move.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. Retry this same question.` : "Two focused repairs refill every heart."}</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}

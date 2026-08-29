@@ -3,9 +3,7 @@ import type { PracticeQuestion } from "./curriculum.ts";
 export type RecoveryGuidance = {
   label: string;
   title: string;
-  explanation: string;
-  nextMove: string;
-  selfCheck: string;
+  clue: string;
   modelAnswer?: string;
 };
 
@@ -46,67 +44,53 @@ export function recoveryGuidance(question: PracticeQuestion, response: string, f
 
   if (responseCoordinate && acceptedCoordinate && responseCoordinate[0] === acceptedCoordinate[1] && responseCoordinate[1] === acceptedCoordinate[0]) {
     return {
-      label: "ORDER CHECK",
-      title: "The coordinates are reversed.",
-      explanation: `You entered (${responseCoordinate[0]}, ${responseCoordinate[1]}). An ordered pair always records the horizontal x-value before the vertical y-value.`,
-      nextMove: question.hint,
-      selfCheck: "Point to x first, then y, before typing the pair again.",
+      label: "CHECK ORDER",
+      title: "Use x before y.",
+      clue: `You entered (${responseCoordinate[0]}, ${responseCoordinate[1]}). Read the horizontal value first.`,
       modelAnswer: revealModel,
     };
   }
 
   if (responseNumber !== null && acceptedNumber !== null && responseNumber !== acceptedNumber && Math.abs(responseNumber) === Math.abs(acceptedNumber)) {
     return {
-      label: "SIGN CHECK",
-      title: "The size is right; the direction sign changed.",
-      explanation: "Your magnitude matches the target, so focus only on whether the situation moves positive or negative.",
-      nextMove: question.hint,
-      selfCheck: "Say the direction or sign rule aloud before recalculating.",
+      label: "CHECK THE SIGN",
+      title: "The size is right.",
+      clue: "Decide whether the direction is positive or negative.",
       modelAnswer: revealModel,
     };
   }
 
   if (responseNumber !== null && acceptedNumber !== null && responseNumber !== acceptedNumber && (Math.abs(responseNumber * 100 - acceptedNumber) < 1e-9 || Math.abs(responseNumber / 100 - acceptedNumber) < 1e-9)) {
     return {
-      label: "SCALE CHECK",
-      title: "The digits are useful, but the scale is off by 100.",
-      explanation: "This often happens when moving between a decimal and a percent. Check whether the percent sign changes the place value.",
-      nextMove: question.hint,
-      selfCheck: "Write decimal → percent or percent → decimal above your next step.",
+      label: "CHECK THE SCALE",
+      title: "The value is off by 100.",
+      clue: "Use the percent sign to decide between ×100 and ÷100.",
       modelAnswer: revealModel,
     };
   }
 
   if (responseFraction && acceptedFraction && responseFraction[0] === acceptedFraction[1] && responseFraction[1] === acceptedFraction[0]) {
     return {
-      label: "FRACTION CHECK",
-      title: "The numerator and denominator traded places.",
-      explanation: "The two numbers are relevant, but their roles are different. Re-read what counts the parts and what counts the equal groups.",
-      nextMove: question.hint,
-      selfCheck: "Name what the top and bottom numbers represent before retrying.",
+      label: "CHECK THE FRACTION",
+      title: "Top and bottom are reversed.",
+      clue: "Name what each number counts, then switch only if needed.",
       modelAnswer: revealModel,
     };
   }
 
   if (question.choices?.includes(response)) {
     return {
-      label: failedAttempts >= 2 ? "COMPARE THE CHOICES" : "RELATIONSHIP CHECK",
-      title: failedAttempts >= 2 ? "Test the choice against the question, not by appearance." : "That choice uses a nearby idea, but not this relationship.",
-      explanation: "Substitute or describe what the selected choice would mean, then compare it with every condition in the prompt.",
-      nextMove: question.hint,
-      selfCheck: "Cross out each choice that fails one condition, then retry.",
+      label: "CHECK THE CHOICE",
+      title: failedAttempts >= 2 ? "Test one condition." : "That choice misses the relationship.",
+      clue: "Compare the choice with every condition in the question.",
       modelAnswer: revealModel,
     };
   }
 
   return {
-    label: failedAttempts >= 2 ? "BREAK IT INTO ONE STEP" : "METHOD CHECK",
-    title: failedAttempts >= 2 ? "Pause the full calculation and rebuild one step." : "Your answer does not match the relationship yet.",
-    explanation: failedAttempts >= 2
-      ? "Repeated misses usually mean one operation or representation needs attention—not that the whole idea is missing."
-      : "Keep the useful work, identify the next operation, and change only that step.",
-    nextMove: question.hint,
-    selfCheck: "Estimate what kind of answer should be reasonable before typing again.",
+    label: "TRY AGAIN",
+    title: failedAttempts >= 2 ? "Change one step." : "Check the relationship.",
+    clue: failedAttempts >= 2 ? "Keep the useful work. Change one operation." : "Use the key idea, then retry.",
     modelAnswer: revealModel,
   };
 }

@@ -9,14 +9,15 @@ import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
-import { mathInputMode } from "@/lib/math-input";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
 import { AnswerImpact } from "./AnswerImpact";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
 import { TaskProgress } from "./TaskProgress";
+import { QuestionResponse } from "./QuestionResponse";
+import type { QuestionInteraction } from "@/lib/question-interactions";
 
-type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; choices?: string[] };
+type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; choices?: string[] };
 
 export function ReviewPlayer({ demo }: { demo: boolean }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -48,7 +49,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const demoQuestions = useMemo(() => {
     if (!state) return [];
     const sourceLessons = state.completedLessons.map((entry) => lessonById.get(entry.id)).filter(Boolean);
-    const pool = (sourceLessons.length ? sourceLessons : [lessons[0]]).flatMap((lesson) => lesson!.practice.slice(0, 2).map((item) => ({ lessonId: lesson!.id, lessonTitle: lesson!.title, questionId: item.id, prompt: item.prompt, answer: item.answer, hint: item.hint, choices: item.choices })));
+    const pool = (sourceLessons.length ? sourceLessons : [lessons[0]]).flatMap((lesson) => lesson!.practice.slice(0, 2).map((item) => ({ lessonId: lesson!.id, lessonTitle: lesson!.title, questionId: item.id, prompt: item.prompt, answer: item.answer, hint: item.hint, interaction: item.interaction, choices: item.choices })));
     return Array.from({ length: Math.min(5, Math.max(3, state.dueReview)) }, (_, i) => pool[i % pool.length]);
   }, [state]);
 
@@ -174,7 +175,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Keep it ready.</h1><p>Skills return after 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent="teal" /></aside>
         <div className="review-card" aria-busy={busy}>
           <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div></header>
-          {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
+          <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void check()} />
           {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—use the clue and retry.</strong><p>{question.hint}</p><small>A corrected answer earns the same review credit.</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} label={currentFirstTry ? "RECALLED" : "CORRECTED"} chain={recallStreak} progress={recalledCount} total={questions.length} tone={questionLesson?.accent ?? "teal"} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `${recallStreak} correct in a row!` : "Recalled correctly!" : "Corrected!"}</strong><p>{index + 1} of {questions.length} complete.</p></div><span className="momentum-chip">{currentFirstTry && recallStreak > 1 ? `${recallStreak} in a row` : "Complete"}</span></div></>}
           {errorMessage && <p id="review-answer-error" className="form-error" role="alert">{errorMessage}</p>}

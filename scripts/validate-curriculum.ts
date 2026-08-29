@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curriculum.ts";
+import { inferQuestionInteraction, type QuestionInteraction } from "../lib/question-interactions.ts";
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
 
@@ -34,6 +35,8 @@ for (const [grade, domains] of requiredDomains) {
 
 let propertyChecks = 0;
 let multipleChoiceChecks = 0;
+let factorChoiceChecks = 0;
+const interactionCounts = new Map<QuestionInteraction, number>();
 for (const lesson of lessons) {
   assert.equal(new Set(lesson.practice.map((question) => question.id)).size, lesson.practice.length, `${lesson.id} has duplicate question IDs`);
   assert.equal(new Set(lesson.practice.map((question) => question.prompt)).size, lesson.practice.length, `${lesson.id} has duplicate question prompts`);
@@ -41,10 +44,29 @@ for (const lesson of lessons) {
     assert.ok(question.prompt.trim().length >= 3, `${lesson.id}/${question.id} needs a clear prompt`);
     assert.ok(question.hint.trim().length >= 3, `${lesson.id}/${question.id} needs a useful hint`);
     assert.ok(question.answer.split("|").every((answer) => answer.trim()), `${lesson.id}/${question.id} has an empty accepted answer`);
+    const inferredInteraction = inferQuestionInteraction(question.answer, question.choices);
+    assert.equal(question.interaction, inferredInteraction, `${lesson.id}/${question.id} has a mismatched interaction type`);
+    interactionCounts.set(question.interaction, (interactionCounts.get(question.interaction) ?? 0) + 1);
+    if (question.interaction === "fill-in") {
+      assert.equal(question.choices, undefined, `${lesson.id}/${question.id} cannot combine fill-in with choices`);
+    } else {
+      assert.ok(question.choices, `${lesson.id}/${question.id} must render selectable answers`);
+    }
+    if (question.interaction === "yes-no") {
+      assert.deepEqual(question.choices?.map((choice) => choice.toLowerCase()), ["yes", "no"], `${lesson.id}/${question.id} must use Yes/No buttons`);
+    }
+    if (question.interaction === "true-false") {
+      assert.deepEqual(question.choices?.map((choice) => choice.toLowerCase()), ["true", "false"], `${lesson.id}/${question.id} must use True/False buttons`);
+    }
+    if (/^Factor(?: completely)?\b/i.test(question.prompt)) {
+      assert.equal(question.interaction, "four-choice", `${lesson.id}/${question.id} must not use free-form factor input`);
+      assert.equal(question.choices?.length, 4, `${lesson.id}/${question.id} needs four authored factor choices`);
+      factorChoiceChecks += 1;
+    }
     if (question.choices) {
       assert.ok(question.choices.length >= 2 && question.choices.length <= 5, `${lesson.id}/${question.id} needs 2–5 choices`);
       assert.equal(new Set(question.choices.map((choice) => choice.trim().toLowerCase())).size, question.choices.length, `${lesson.id}/${question.id} has duplicate choices`);
-      assert.ok(question.choices.some((choice) => isAnswerCorrect(choice, question.answer)), `${lesson.id}/${question.id} has no selectable correct answer`);
+      assert.equal(question.choices.filter((choice) => isAnswerCorrect(choice, question.answer)).length, 1, `${lesson.id}/${question.id} must have exactly one selectable correct answer`);
       const answerUnit = writtenUnit(question.answer.split("|")[0]);
       if (answerUnit) assert.ok(question.choices.every((choice) => writtenUnit(choice) === answerUnit), `${lesson.id}/${question.id} must use ${answerUnit} on every answer choice`);
       multipleChoiceChecks += 1;
@@ -63,4 +85,5 @@ for (const [input, accepted] of [
   ["0.5", "1/2"], ["2/4", "1/2"], ["50%", "1/2"], ["−7", "-7"], [" 3 / 6 ", "0.5"], ["0.42", "42%"], ["7.4 × 10³", "7.4*10^3"],
 ]) assert.ok(isAnswerCorrect(input, accepted), `Exact checker failed: ${input} = ${accepted}`);
 
-console.log(`Validated Grades 7–12: ${lessons.length} lessons, ${curriculumStats.questions} questions (${multipleChoiceChecks} multiple choice), and ${propertyChecks} seeded answer checks.`);
+const interactionSummary = [...interactionCounts.entries()].map(([type, count]) => `${type}: ${count}`).join(", ");
+console.log(`Validated Grades 7–12: ${lessons.length} lessons, ${curriculumStats.questions} questions (${interactionSummary}), ${factorChoiceChecks} factor-choice checks, ${multipleChoiceChecks} selectable questions, and ${propertyChecks} seeded answer checks.`);

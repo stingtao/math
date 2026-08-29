@@ -65,16 +65,53 @@ test("builds a valid y = 2x point-to-line mission and reverses it into coordinat
 
 test("turns common wrong answers into specific recovery guidance and a delayed remix", () => {
   const coordinate = { id: "coordinate", prompt: "Name the point.", answer: "(2, 5)", hint: "Read x before y." };
-  assert.equal(recoveryGuidance(coordinate, "(5, 2)", 1).label, "ORDER CHECK");
+  assert.equal(recoveryGuidance(coordinate, "(5, 2)", 1).label, "CHECK ORDER");
 
   const signed = { id: "signed", prompt: "Find the change.", answer: "-7", hint: "Check the direction." };
-  assert.equal(recoveryGuidance(signed, "7", 1).label, "SIGN CHECK");
+  assert.equal(recoveryGuidance(signed, "7", 1).label, "CHECK THE SIGN");
 
   const percent = { id: "percent", prompt: "Write the percent.", answer: "50%|50", hint: "Move between decimal and percent." };
-  assert.equal(recoveryGuidance(percent, "0.5", 1).label, "SCALE CHECK");
+  assert.equal(recoveryGuidance(percent, "0.5", 1).label, "CHECK THE SCALE");
   assert.equal(recoveryGuidance(signed, "4", 3).modelAnswer, "-7");
   assert.deepEqual(remixedChoices(["A", "B", "C"], true), ["B", "C", "A"]);
   assert.deepEqual(remixedChoices(["A", "B", "C"], false), ["A", "B", "C"]);
+});
+
+test("models answer interactions before rendering all 1,100 questions", () => {
+  const questions = lessons.flatMap((lesson) => lesson.practice);
+  const yesNo = questions.filter((question) => question.interaction === "yes-no");
+  const trueFalse = questions.filter((question) => question.interaction === "true-false");
+  const factorQuestions = questions.filter((question) => /^Factor(?: completely)?\b/i.test(question.prompt));
+  const proportionalDecision = lessons.find((lesson) => lesson.slug === "g7-proportional-tables")?.practice[1];
+
+  assert.equal(questions.length, 1100);
+  assert.equal(yesNo.length, 97);
+  assert.equal(trueFalse.length, 1);
+  assert.ok(yesNo.every((question) => question.choices?.join("|") === "Yes|No"));
+  assert.ok(trueFalse.every((question) => question.choices?.join("|") === "True|False"));
+  assert.equal(proportionalDecision?.interaction, "yes-no");
+  assert.deepEqual(proportionalDecision?.choices, ["Yes", "No"]);
+  assert.equal(factorQuestions.length, 17);
+  assert.ok(factorQuestions.every((question) => question.interaction === "four-choice" && question.choices?.length === 4));
+});
+
+test("uses one answer control, concise recovery, and a longer success beat everywhere", async () => {
+  const response = await readFile(new URL("../app/components/QuestionResponse.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
+  const recovery = await readFile(new URL("../app/components/RecoveryCoach.tsx", import.meta.url), "utf8");
+  const recoveryLogic = await readFile(new URL("../lib/practice-recovery.ts", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(response, /data-question-type=\{question\.interaction\}/);
+  assert.match(response, /question\.interaction !== "fill-in"/);
+  for (const surface of [lesson, boss, review]) assert.match(surface, /<QuestionResponse/);
+  assert.match(recovery, /<summary>Review the key idea<\/summary>/);
+  assert.doesNotMatch(`${recovery}\n${recoveryLogic}`, /FIX ONE MOVE|BREAK IT INTO ONE STEP|Pause the full calculation|Say why before you calculate/);
+  assert.match(css, /answer-impact-exit 2\.94s/);
+  assert.match(css, /@keyframes answer-impact-nice-work/);
+  assert.match(css, /scale\(1\.45\)/);
 });
 
 test("blocks common contact details before anonymous public feedback is stored", () => {
@@ -655,13 +692,14 @@ test("persists recovery mastery and blocks lesson completion until clean recall"
   assert.match(lesson, /<MemoryReturnCue count=\{recoveryCount\}/);
   assert.match(lesson, /!inMemoryCheck && recoveryCount > 0/);
   assert.doesNotMatch(lesson, /recovery-mastery-summary/);
-  assert.match(coach, /FIX ONE MOVE/);
-  assert.match(coach, /Your progress is safe/);
+  assert.match(coach, /Review the key idea/);
+  assert.match(coach, /Full credit is still available/);
+  assert.doesNotMatch(coach, /FIX ONE MOVE|Your progress is safe/);
   assert.match(css, /\.task-progress/);
   assert.match(css, /\.memory-return-tooltip/);
   assert.match(css, /\.memory-check-banner/);
   assert.match(css, /\.recovery-coach/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.recovery-coach-steps \{ grid-template-columns: 1fr/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.recovery-key-idea,/);
 });
 
 test("shows exact lesson rewards while keeping replay XP fair", async () => {
@@ -715,8 +753,9 @@ test("ships five extensible success patterns and reduced-motion handling", async
   for (const pattern of ["orbit", "confetti", "ripple", "spark", "lift"]) assert.match(component, new RegExp(`"${pattern}"`));
   assert.match(css, /\.success-confetti/);
   assert.match(css, /\.success-ripple/);
-  assert.match(css, /success-flash 1\.6s/);
-  assert.match(css, /answer-impact-exit 2\.1s/);
+  assert.match(css, /success-flash 2\.24s/);
+  assert.match(css, /answer-impact-exit 2\.94s/);
+  assert.match(css, /answer-impact-nice-work 2\.55s/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /animation:\s*none !important/);
   assert.match(lesson, /setFocusStreak\(0\)/);
@@ -745,6 +784,7 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
+  const response = await readFile(new URL("../app/components/QuestionResponse.tsx", import.meta.url), "utf8");
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(header, /mobile-learner-nav/);
@@ -774,7 +814,7 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.lesson-mobile-topic small \{[^}]*font-size: 16px/);
   assert.match(css, /\.review-mobile-status > header small \{[^}]*font-size: 16px/);
   assert.match(css, /\.task-progress-detail \{[^}]*font-size: 16px/);
-  assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 16px/);
+  assert.match(css, /\.recovery-clue \{[^}]*font-size: 16px/);
   assert.doesNotMatch(dashboard, /daily-token-medallion[^\n]*<small>/);
   assert.match(css, /\.reward-collected-status p \{[^}]*font-size: 16px/);
   assert.match(css, /\.world-replay-link \{[\s\S]*font-size: 16px/);
@@ -785,11 +825,12 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /a,[\s\S]*button,[\s\S]*summary \{ touch-action: manipulation/);
   assert.match(css, /\.site-footer nav a,[\s\S]*\.privacy-settings-card > \.text-link,[\s\S]*\.legal-wrap > footer a \{[\s\S]*min-height: 44px/);
   for (const player of [lesson, boss, review]) {
-    assert.match(player, /inputMode=\{mathInputMode\(/);
-    assert.match(player, /enterKeyHint="done"/);
     assert.match(player, /aria-busy=\{busy\}/);
-    assert.match(player, /aria-invalid=/);
+    assert.match(player, /<QuestionResponse/);
   }
+  assert.match(response, /inputMode=\{mathInputMode\(/);
+  assert.match(response, /enterKeyHint="done"/);
+  assert.match(response, /aria-invalid=\{invalid\}/);
   assert.match(lesson, /role="alert">\{errorMessage\}/);
   assert.match(boss, /Your answer is still here\. Check your connection and try again\./);
   assert.match(review, /Your completed review is still here\. Check your connection and save again\./);

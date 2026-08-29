@@ -1,11 +1,12 @@
 import type { Accent, LessonDefinition, PracticeQuestion, RegionDefinition } from "./curriculum.ts";
+import { buildPracticeQuestion } from "./question-interactions.ts";
 
 type Drill = [prompt: string, answer: string, choices?: string[]];
 type LessonSpec = { slug: string; title: string; goal: string; key: string; example: string; standard: string; visual: string; drills: Drill[] };
 const accents: Accent[] = ["gold", "violet", "blue", "coral", "teal"];
 
 function makeLesson(regionId: number, order: number, accent: Accent, spec: LessonSpec): LessonDefinition {
-  const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => ({ id: `q${index + 1}`, prompt, answer, choices, hint: spec.key }));
+  const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => buildPracticeQuestion({ id: `q${index + 1}`, prompt, answer, choices, hint: spec.key }));
   return { id: `g12-r${regionId}-l${order}`, grade: 12, slug: `g12-${spec.slug}`, regionId, order, title: spec.title, goal: spec.goal, keyIdea: spec.key, example: spec.example, exampleSteps: ["Represent the problem with a function, diagram, or distribution.", spec.key, `Interpret and check the result: ${spec.example}.`], standard: spec.standard, accent, visual: spec.visual, practice };
 }
 

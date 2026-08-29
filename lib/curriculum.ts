@@ -3,6 +3,7 @@ import { grade9Regions } from "./curriculum-grade9.ts";
 import { grade10Regions } from "./curriculum-grade10.ts";
 import { grade11Regions } from "./curriculum-grade11.ts";
 import { grade12Regions } from "./curriculum-grade12.ts";
+import { buildPracticeQuestion, type QuestionInteraction } from "./question-interactions.ts";
 
 export type Accent = "blue" | "teal" | "coral" | "violet" | "gold";
 
@@ -11,6 +12,7 @@ export type PracticeQuestion = {
   prompt: string;
   answer: string;
   hint: string;
+  interaction: QuestionInteraction;
   choices?: string[];
 };
 
@@ -78,13 +80,7 @@ function lesson(
     accent,
     visual,
     quickSheet,
-    practice: questions.map(([prompt, answer, hint, choices], index) => ({
-      id: `q${index + 1}`,
-      prompt,
-      answer,
-      hint,
-      choices,
-    })),
+    practice: questions.map(([prompt, answer, hint, choices], index) => buildPracticeQuestion({ id: `q${index + 1}`, prompt, answer, hint, choices })),
   };
 }
 

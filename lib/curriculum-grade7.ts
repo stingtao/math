@@ -1,4 +1,5 @@
 import type { Accent, LessonDefinition, PracticeQuestion, RegionDefinition } from "./curriculum.ts";
+import { buildPracticeQuestion } from "./question-interactions.ts";
 
 type Drill = [prompt: string, answer: string, choices?: string[]];
 type LessonSpec = {
@@ -15,13 +16,7 @@ type LessonSpec = {
 const accents: Accent[] = ["blue", "teal", "coral", "violet", "gold"];
 
 function makeLesson(regionId: number, order: number, accent: Accent, spec: LessonSpec): LessonDefinition {
-  const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => ({
-    id: `q${index + 1}`,
-    prompt,
-    answer,
-    choices,
-    hint: spec.key,
-  }));
+  const practice: PracticeQuestion[] = spec.drills.map(([prompt, answer, choices], index) => buildPracticeQuestion({ id: `q${index + 1}`, prompt, answer, choices, hint: spec.key }));
   return {
     id: `g7-r${regionId}-l${order}`,
     grade: 7,
@@ -87,7 +82,7 @@ export const grade7Regions: RegionDefinition[] = [
   ]),
   makeRegion(3, "Expressions, Equations, and Inequalities", "Write, simplify, and solve statements with unknown values.", "7.EE.A–B", [
     { slug: "equivalent-expressions", title: "Equivalent Expressions", goal: "Rewrite expressions without changing their value.", key: "Use properties to combine like terms and factor common coefficients.", example: "3x + 6 = 3(x + 2)", standard: "7.EE.A.1–2", visual: "expression", drills: [
-      ["Simplify 4x + 3x.", "7x"], ["Expand 5(a − 2).", "5a-10"], ["Factor 6y + 18.", "6(y+3)"], ["Simplify 2m + 7 − 5m.", "-3m+7|7-3m"], ["Which equals 4(x + 3)?", "4x+12", ["4x+3", "4x+7", "4x+12", "x+12"]],
+      ["Simplify 4x + 3x.", "7x"], ["Expand 5(a − 2).", "5a-10"], ["Factor 6y + 18.", "6(y+3)", ["6(y + 3)", "6(y + 18)", "3(2y + 3)", "2(3y + 3)"]], ["Simplify 2m + 7 − 5m.", "-3m+7|7-3m"], ["Which equals 4(x + 3)?", "4x+12", ["4x+3", "4x+7", "4x+12", "x+12"]],
     ] },
     { slug: "multi-step-equations-g7", title: "Multi-Step Equations", goal: "Solve equations by undoing operations in order.", key: "Simplify each side, then use inverse operations while keeping both sides balanced.", example: "3x + 5 = 20 → x = 5", standard: "7.EE.B.4", visual: "balance", drills: [
       ["Solve 3x + 5 = 20.", "5"], ["Solve 7 − 2x = 15.", "-4"], ["Solve x/4 + 6 = 9.", "12"], ["Solve 5(x − 1) = 30.", "7"], ["Solve 0.5x + 2 = 8.", "12"],
