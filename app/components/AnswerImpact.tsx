@@ -23,7 +23,7 @@ export function AnswerImpact({ eventKey, label, chain, progress, total, tone = "
         <div className="answer-impact-core">
           <span>{combo.motif}</span>
           <strong>{label}</strong>
-          <small>{chain > 1 ? `${combo.label} ×${chain}` : combo.label}</small>
+          <small>{chain > 1 ? `${chain} correct in a row` : "Nice work"}</small>
         </div>
         <div className="answer-impact-charge"><span style={{ width: `${Math.min(100, progress / Math.max(1, total) * 100)}%` }} /><b>{progress}/{total}</b></div>
       </div>

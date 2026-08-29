@@ -114,7 +114,7 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
       {phase === "complete" && <SuccessBurst eventKey={`${missionId}-point-line-complete`} />}
       <header className="point-line-heading">
         <div><small>GRAPH MISSION · THREE MOVES</small><strong id={`${missionId}-title`}>Plot. Connect. Decode.</strong><p>Build one line from coordinates, then prove you can read it.</p></div>
-        <div className="point-line-charge" aria-label={`Mission charge ${progress} percent`}><span><i style={{ width: `${progress}%` }} /></span><b>{progress}%</b><small>SKILL CHARGE</small></div>
+        <div className="point-line-charge" role="progressbar" aria-label={`Mission progress: ${progress} percent`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span><i style={{ width: `${progress}%` }} /></span><b>{progress}%</b><small>PROGRESS</small></div>
       </header>
 
       <div className="point-line-phases" aria-label="Mission stages">

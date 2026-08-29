@@ -1133,7 +1133,7 @@ function ContextLessonVisual({ scene }: { scene: ContextScene }) {
         {scene.model === "dilation" && <div className="dilation-context-model" aria-hidden="true"><div>{[[3, 6], [4, 8], [5, 10]].map(([before, after]) => <span key={before}><b>{before}</b><i>×2</i><strong>{after}</strong></span>)}</div><small>all angles stay equal</small></div>}
         {scene.model === "residuals" && <div className="residuals-context-model" aria-hidden="true"><div><span><small>actual</small><b>14</b></span><i>−</i><span><small>predicted</small><b>11</b></span><strong><small>residual</small><b>+3</b></strong></div><em>small + no pattern → useful linear fit</em></div>}
       </div>
-      <strong>{scene.headline}</strong>
+      {scene.model !== "ratio" && <strong>{scene.headline}</strong>}
       <p>{scene.copy}</p>
     </div>
   );

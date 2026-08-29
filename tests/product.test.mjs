@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
-import { nextMomentumRun } from "../lib/momentum.ts";
 import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
 import { mathInputMode } from "../lib/math-input.ts";
@@ -650,7 +649,7 @@ test("persists recovery mastery and blocks lesson completion until clean recall"
   assert.match(lesson, /recovery-mastery-summary/);
   assert.match(coach, /FIX ONE MOVE/);
   assert.match(coach, /Your progress is safe/);
-  assert.match(css, /\.practice-method-loop/);
+  assert.match(css, /\.task-progress/);
   assert.match(css, /\.memory-check-banner/);
   assert.match(css, /\.recovery-coach/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.recovery-coach-steps \{ grid-template-columns: 1fr/);
@@ -699,7 +698,7 @@ test("does not send review answers to authenticated clients", async () => {
 test("ships five extensible success patterns and reduced-motion handling", async () => {
   const component = await readFile(new URL("../app/components/SuccessBurst.tsx", import.meta.url), "utf8");
   const autoAdvance = await readFile(new URL("../app/components/AutoAdvanceButton.tsx", import.meta.url), "utf8");
-  const momentum = await readFile(new URL("../app/components/MomentumRun.tsx", import.meta.url), "utf8");
+  const taskProgress = await readFile(new URL("../app/components/TaskProgress.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
   const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
@@ -709,40 +708,24 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(css, /\.success-ripple/);
   assert.match(css, /success-flash 1\.6s/);
   assert.match(css, /answer-impact-exit 2\.1s/);
-  assert.match(css, /cosmic-combo-pulse 1\.36s/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /animation:\s*none !important/);
-  assert.match(momentum, /corrections still advance/);
-  assert.match(momentum, /BEST ×\{best\}/);
-  assert.match(lesson, /FOCUS CHAIN/);
   assert.match(lesson, /setFocusStreak\(0\)/);
-  assert.match(lesson, /nextMomentumRun/);
+  assert.match(lesson, /correct in a row/);
   assert.match(lesson, /focusStreak >= 3/);
-  assert.match(review, /RECALL CHAIN/);
-  assert.match(review, /nextMomentumRun/);
+  assert.match(review, /correct in a row/);
   assert.match(review, /recallStreak >= 3/);
+  assert.match(taskProgress, /role="progressbar"/);
+  assert.match(taskProgress, /of \{total\} complete/);
+  assert.doesNotMatch(lesson, /FOCUS CHARGE|FOCUS CHAIN|STAR PATH/);
+  assert.doesNotMatch(review, /RECALL CHAIN|Pulse \+1/);
   assert.match(autoAdvance, /AUTO_ADVANCE_SECONDS = 6/);
   assert.match(autoAdvance, /Automatically continuing in/);
   for (const player of [lesson, boss, review]) assert.match(player, /<AutoAdvanceButton/);
   assert.match(css, /\.auto-advance-timer/);
-  assert.match(css, /\.momentum-run/);
-  assert.match(css, /@keyframes chain-link/);
+  assert.match(css, /\.task-progress-track/);
   assert.deepEqual([1, 2, 3, 5, 8].map((chain) => getComboSpec(chain).tier), ["signal", "spark", "flame", "prism", "cosmic"]);
   for (const tier of ["signal", "spark", "flame", "prism", "cosmic"]) assert.match(css, new RegExp(`combo-${tier}`));
-});
-
-test("keeps answer chains optional while preserving the best run", () => {
-  let run = nextMomentumRun({ current: 0, best: 0 }, true);
-  assert.deepEqual(run, { current: 1, best: 1 });
-  run = nextMomentumRun(run, true);
-  run = nextMomentumRun(run, true);
-  assert.deepEqual(run, { current: 3, best: 3 });
-  run = nextMomentumRun(run, false);
-  assert.deepEqual(run, { current: 0, best: 3 });
-  run = nextMomentumRun(run, true);
-  assert.deepEqual(run, { current: 1, best: 3 });
-  run = nextMomentumRun(run, false);
-  assert.deepEqual(run, { current: 0, best: 3 });
 });
 
 test("ships a readable, safe-area-aware mobile learning interface", async () => {
@@ -771,18 +754,15 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.lesson-sidebar,[\s\S]*\.lesson-stage \{ min-width: 0; width: 100%/);
   assert.match(css, /\.lesson-sidebar \.lesson-badge-quest \{ width: 100%; grid-column: 1 \/ -1/);
   assert.match(review, /review-mobile-status/);
-  assert.match(review, /5-MINUTE RECALL/);
-  assert.match(review, /Fix every miss\. Progress never resets\./);
-  assert.match(review, /aria-valuenow=\{recalledCount\}/);
+  assert.match(review, /5-MINUTE REVIEW/);
+  assert.match(review, /<TaskProgress label="Review progress"/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.review-mobile-status \{[^}]*display: grid/);
   assert.match(css, /\.review-layout > aside \{ display: none/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.review-mobile-status \{[^}]*width: calc\(100% - 28px\)/);
   assert.match(css, /\.context-math-card\.context-math-card small \{ font-size: 16px; line-height: 1\.3/);
   assert.match(css, /\.lesson-mobile-topic small \{[^}]*font-size: 16px/);
   assert.match(css, /\.review-mobile-status > header small \{[^}]*font-size: 16px/);
-  assert.match(css, /\.momentum-run-copy > span,[\s\S]*\.momentum-run > p \{ font-size: 16px/);
-  assert.match(css, /\.momentum-run-copy > strong \{ font-size: 16px; white-space: normal/);
-  assert.match(css, /\.star-path-options small \{ font-size: 16px/);
+  assert.match(css, /\.task-progress > small \{[^}]*font-size: 16px/);
   assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 16px/);
   assert.doesNotMatch(dashboard, /daily-token-medallion[^\n]*<small>/);
   assert.match(css, /\.reward-collected-status p \{[^}]*font-size: 16px/);
@@ -879,8 +859,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /goal-concept/);
   assert.match(lesson, /settlement-summary/);
   assert.match(lesson, /practiceEncouragement/);
-  assert.match(lesson, /practice-charge/);
-  assert.match(lesson, /FOCUS CHARGE/);
+  assert.match(lesson, /<TaskProgress/);
+  assert.doesNotMatch(lesson, /Start with the picture|Notice what changes/);
   assert.match(lesson, /mastery-next-goal/);
   assert.match(boss, /boss-victory-map/);
   for (const visual of ["signed-numbers-context.webp", "operations-sequence-context.webp", "decimal-pattern-context.webp", "percent-market-context.webp", "fraction-workshop-context.webp", "substitution-machine-context.webp", "exponent-lab-context.webp", "like-terms-sorting-context.webp", "slope-trail-context.webp", "pythagorean-city-context.webp", "scatter-field-context.webp", "distributive-workshop-context.webp", "function-kiosk-context.webp", "transform-plaza-context.webp", "cylinder-tank-context.webp", "equation-balance-context.webp", "irrational-garden-context.webp", "scientific-observatory-context.webp", "multistep-workshop-context.webp", "unit-rate-bike-context.webp", "circle-fountain-context.webp", "prism-packing-context.webp", "probability-arcade-context.webp", "systems-transit-context.webp", "solution-cases-gallery-context.webp", "inequality-trail-context.webp", "polynomial-tiles-context.webp", "parabola-bridge-context.webp", "exponential-greenhouse-context.webp", "scale-drawing-studio-context.webp", "random-sample-context.webp", "arithmetic-sequence-context.webp", "quadratic-roots-context.webp", "surface-area-packaging-context.webp", "compound-events-lab-context.webp", "two-way-survey-context.webp", "exponential-decay-energy-context.webp", "discount-studio-context.webp", "angle-plaza-context.webp", "cone-measure-context.webp", "geometric-sequence-lab-context.webp", "absolute-transit-context.webp", "triangle-builder-context.webp", "cross-section-studio-context.webp", "coordinate-route-context.webp", "sphere-tank-context.webp", "difference-squares-workshop-context.webp", "distribution-comparison-context.webp", "real-number-sort-context.webp", "elimination-workshop-context.webp", "rational-exponent-lab-context.webp", "growth-comparison-context.webp", "simple-interest-growth-context.webp", "graphing-line-city-context.webp", "function-routing-context.webp", "dilation-studio-context.webp", "residual-observatory-context.webp"]) {
@@ -1149,14 +1129,12 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.review-priority-orbit/);
   assert.match(css, /\.boss-priority-card/);
   assert.match(css, /\.trail-complete-card/);
-  assert.match(css, /\.practice-charge/);
-  assert.match(css, /\.charge-cells/);
-  assert.match(lesson, /practice-star-path/);
-  assert.match(lesson, /Stars describe this run—they never block progress/);
+  assert.match(css, /\.task-progress/);
+  assert.match(css, /\.task-progress-track/);
+  assert.doesNotMatch(lesson, /practice-star-path|Stars describe this run/);
   assert.match(lesson, /quest-key-card/);
-  assert.match(lesson, /First-try spark!/);
-  assert.match(lesson, /Recovery complete!/);
-  assert.match(lesson, /Repair every idea, then recall it/);
+  assert.match(lesson, /correct in a row!/);
+  assert.match(lesson, /Corrected!/);
   assert.match(lesson, /<RecoveryCoach/);
   assert.match(lesson, /This is enough for today/);
   assert.match(lesson, /Start the next lesson/);
@@ -1178,10 +1156,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.doesNotMatch(lesson, /className="unlock-path"/);
   assert.match(css, /\.game-loop-board/);
   assert.match(css, /\.game-quest-path/);
-  assert.match(css, /\.practice-star-path/);
+  assert.doesNotMatch(css, /\.practice-star-path/);
   assert.match(css, /\.quest-key-card/);
   assert.match(css, /\.recovery-coach/);
-  assert.match(css, /\.recovery-score-path/);
+  assert.doesNotMatch(css, /\.recovery-score-path/);
   assert.match(css, /\.mastery-next-goal/);
   assert.match(css, /\.settlement-summary/);
   assert.match(css, /\.settlement-next/);
@@ -1191,10 +1169,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(review, /review-finish-emblem/);
   assert.match(review, /skills back online/);
   assert.match(review, /<TopicIcon visual=\{questionLesson\.visual\}/);
-  assert.match(review, /review-memory-meter/);
-  assert.match(review, /RECALL STATUS/);
-  assert.match(review, /Quick recall!/);
-  assert.match(review, /Memory recovered!/);
+  assert.match(review, /<TaskProgress label="Review progress"/);
+  assert.doesNotMatch(review, /review-memory-meter|RECALL STATUS/);
+  assert.match(review, /Recalled correctly!/);
+  assert.match(review, /Corrected!/);
   assert.match(review, /REVIEW · ALL CLEAR/);
   assert.match(review, /review-stop-note/);
   assert.doesNotMatch(review, /SESSION WIN SAVED|PROGRESS SAVED/);
@@ -1223,8 +1201,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.doesNotMatch(boss, /className="reward-strip"/);
   assert.doesNotMatch(boss, /className="unlock-path boss-unlock"/);
   assert.doesNotMatch(css, /\.review-memory-path/);
-  assert.match(css, /\.review-memory-meter/);
-  assert.match(css, /\.review-memory-nodes/);
+  assert.doesNotMatch(css, /\.review-memory-meter/);
+  assert.doesNotMatch(css, /\.review-memory-nodes/);
   assert.match(css, /\.review-clear-state/);
   assert.doesNotMatch(css, /\.session-save-card/);
   assert.match(css, /\.review-stop-note/);
