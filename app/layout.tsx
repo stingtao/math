@@ -31,6 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(origin),
     title,
     description,
+    icons: { icon: [{ url: "/favicon.svg", type: "image/svg+xml" }], shortcut: "/favicon.svg" },
     openGraph: { title, description, type: "website", images: [{ url: `${origin}/og-frontier-v1.webp`, width: 1200, height: 630, alt: "Teen explorers overlooking the first human settlement on Mars" }] },
     twitter: { card: "summary_large_image", title, description, images: [`${origin}/og-frontier-v1.webp`] },
   };

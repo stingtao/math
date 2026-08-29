@@ -138,6 +138,142 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .success-burst { display: none !important; }
 }
 
+/* Every lesson begins with a concrete use, then closes with the origin of the idea. */
+.grade-mission-overview {
+  margin: -8px 0 26px;
+  padding: 26px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 46%);
+  align-items: center;
+  gap: 28px;
+  border: 2px solid #17364b;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #eef6ff 0%, #fff8e8 100%);
+  box-shadow: 7px 8px 0 rgb(23 54 75 / 12%);
+}
+.grade-mission-copy h2 {
+  margin: 9px 0 10px;
+  max-width: 650px;
+  font-size: 31px;
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+.grade-mission-copy > p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.55;
+}
+.grade-mission-loop {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.grade-mission-loop span {
+  padding: 8px 11px;
+  border: 1px solid #b9cad8;
+  border-radius: 10px;
+  color: #17364b;
+  background: white;
+  font-size: 16px;
+  font-weight: 850;
+}
+.grade-mission-loop i { color: #2474ed; font-size: 18px; font-style: normal; font-weight: 950; }
+.mission-scene {
+  width: 100%;
+  height: auto;
+  display: block;
+  font-family: inherit;
+}
+.mission-scene text { font-family: inherit; font-size: 16px; font-weight: 850; }
+
+.lesson-mission-story {
+  width: min(900px, 100%);
+  display: grid;
+  grid-template-columns: minmax(250px, .86fr) minmax(360px, 1.14fr);
+  align-items: center;
+  gap: 28px;
+}
+.lesson-mission-copy h2 {
+  margin: 9px 0 12px;
+  font-size: 30px;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+.lesson-mission-copy > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.58;
+}
+.lesson-mission-model {
+  margin-top: 20px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 5px;
+  border-left: 5px solid var(--accent);
+  border-radius: 0 13px 13px 0;
+  background: var(--accent-soft);
+}
+.lesson-mission-model small { color: var(--accent); font-size: 16px; font-weight: 900; letter-spacing: .08em; }
+.lesson-mission-model strong { color: var(--navy); font-size: 20px; line-height: 1.35; }
+
+.lesson-mission-thumbnail {
+  position: relative;
+  z-index: 2;
+  width: min(330px, 92%);
+  display: grid;
+  gap: 8px;
+  color: var(--navy);
+  text-align: center;
+}
+.lesson-mission-thumbnail .mission-scene { filter: drop-shadow(0 12px 13px rgb(23 54 75 / 12%)); }
+.lesson-mission-thumbnail > small { font-size: 16px; font-weight: 900; letter-spacing: .08em; }
+.next-visual:has(.lesson-mission-thumbnail)::after { display: none; }
+
+.history-stage-card { grid-template-columns: minmax(260px, .9fr) minmax(360px, 1.1fr); grid-template-rows: 1fr auto; align-items: center; column-gap: 35px; }
+.history-stage-copy { align-self: center; }
+.history-stage-copy h2 { margin: 10px 0 12px; font-size: 32px; line-height: 1.12; letter-spacing: -.04em; }
+.history-stage-copy p { margin: 0 0 15px; color: var(--muted); font-size: 17px; line-height: 1.62; }
+.history-stage-copy > strong { display: block; color: var(--navy); font-size: 18px; line-height: 1.5; }
+.history-stage-copy > a { width: fit-content; margin-top: 18px; display: inline-flex; align-items: center; gap: 8px; color: var(--blue); font-size: 16px; font-weight: 850; }
+.history-scene { width: 100%; height: auto; }
+.history-stage-card > .form-error { grid-column: 1 / -1; }
+.history-stage-card > .stage-footer { grid-column: 1 / -1; }
+
+@media (max-width: 980px) {
+  .grade-mission-overview { grid-template-columns: minmax(0, 1fr) minmax(300px, 42%); }
+  .lesson-mission-story { grid-template-columns: 1fr; }
+  .lesson-mission-story .mission-scene { width: min(620px, 100%); justify-self: center; }
+  .history-stage-card { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
+  .history-stage-card .history-scene { width: min(580px, 100%); justify-self: center; }
+}
+
+@media (max-width: 760px) {
+  .grade-mission-overview { margin-top: 0; padding: 20px 17px; grid-template-columns: 1fr; gap: 18px; border-radius: 20px; box-shadow: 4px 5px 0 rgb(23 54 75 / 12%); }
+  .grade-mission-copy h2 { font-size: 28px; }
+  .grade-mission-loop { display: grid; grid-template-columns: 1fr auto 1fr; }
+  .grade-mission-loop span { text-align: center; }
+  .grade-mission-loop i:nth-of-type(3), .grade-mission-loop span:last-child { display: none; }
+  .lesson-mission-story { gap: 20px; }
+  .lesson-mission-copy h2 { font-size: 27px; }
+  .stage-visual:has(.lesson-mission-story) { padding: 20px 0; place-items: start; }
+  .history-stage-card { padding-bottom: 20px; gap: 20px; }
+  .history-stage-copy h2 { font-size: 28px; }
+  .history-stage-card > .stage-footer { align-items: stretch; flex-direction: column; }
+  .history-stage-card > .stage-footer .mission-primary-cta { width: 100%; }
+}
+
+@media (max-width: 430px) {
+  .grade-mission-loop { grid-template-columns: 1fr 1fr; }
+  .grade-mission-loop i { display: none; }
+  .grade-mission-loop span:last-child { display: block; }
+  .lesson-mission-model strong { overflow-wrap: anywhere; }
+}
+
 /* Shared product sections */
 .section-kicker { color: var(--blue); font-size: 16px; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
 .section-heading { width: min(1180px, calc(100% - 48px)); margin: 0 auto 42px; }
@@ -4467,4 +4603,13 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
   .reward-ready-button,
   .mission-primary-cta,
   .daily-card.claim-settling { animation: none !important; transition-duration: .01ms; }
+}
+
+/* Keep the history transfer stage's two-column reading order after shared card rules. */
+.stage-card.history-stage-card {
+  grid-template-columns: minmax(260px, .9fr) minmax(360px, 1.1fr);
+  grid-template-rows: 1fr auto;
+}
+@media (max-width: 980px) {
+  .stage-card.history-stage-card { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
 }

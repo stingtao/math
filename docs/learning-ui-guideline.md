@@ -122,9 +122,12 @@ For an applied equation, map every variable, coefficient, intercept, and unit to
 
 Every section must have a unique teaching job: experience, explain, practice, transfer, motivate, or navigate. Remove generic test grids, grade catalogs, slogans, and repeated summaries that cannot name a distinct learner outcome.
 
+When the curriculum is large, use a shared experience system without making the experience generic. Classify lessons by the kind of problem they solve—such as navigation, resource allocation, structural design, uncertain evidence, repeated growth, or changing motion—then bind the lesson's own worked model to that setting. Never paste the same Mars story or illustration onto every topic.
+
 ## 12. Use history as instruction, not decoration
 
 - Include a historical story only when it changes how the learner understands the current idea.
 - Connect the story to the concept with a diagram, original mathematical object, or direct comparison. For coordinate geometry, show how an equation and a curve can describe the same relationship.
 - Verify names, dates, publications, and priority claims with reliable sources. Distinguish documented history from classroom legend and avoid assigning sole credit when the historical record is shared or disputed.
 - Link to a concise source for learners who want to go deeper; do not turn the main lesson into a long biography.
+- Place the origin story after practice and before the saved reward when it serves as the lesson's transfer step. The learner should first use the mathematics, then see why people needed it, then complete the lesson.

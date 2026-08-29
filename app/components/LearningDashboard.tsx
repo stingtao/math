@@ -15,6 +15,8 @@ import { achievementTotalsForState, achievementUnlockedBetween, type Achievement
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { getThemeJourney, getThemeSpec } from "@/lib/themes";
+import { getLessonExperience } from "@/lib/lesson-experience";
+import { GradeMissionOverview, LessonMissionThumbnail } from "./LessonMissionStory";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
@@ -59,6 +61,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const activeBossReady = activeDone === activeRegion.lessons.length;
   const reviewBatchSize = Math.min(state?.dueReview ?? 0, 5);
   const featuredLesson = activeNextLesson ?? nextLesson;
+  const featuredExperience = getLessonExperience(featuredLesson);
   const visibleRegions = showFullMap ? curriculum.regions : gradeComplete || !activeRegion ? [] : [activeRegion];
 
   if (loading) return <LoadingTrail />;
@@ -141,6 +144,8 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           </div>
         </div>
 
+        <GradeMissionOverview grade={grade} />
+
         {showWelcomeGuide && <section className={`welcome-trail-guide accent-${nextLesson.accent}`} aria-labelledby="welcome-trail-heading">
           <button className="welcome-guide-close" type="button" onClick={dismissWelcomeGuide} aria-label="Dismiss welcome guide">×</button>
           <header className="welcome-guide-heading">
@@ -180,8 +185,8 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <div className={`next-visual boss-priority-visual accent-${activeRegion.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="xl" label={`${activeRegion.title} boss quest`} /><b aria-hidden="true">★</b><small>4 KEYS COLLECTED</small></div>
             <div className="next-copy"><span className="section-kicker">YOUR NEXT MOVE · BOSS READY</span><h2>{activeRegion.title} Boss</h2><p>Use all four lesson ideas in five questions. No timer. A miss opens a repair path.</p><div className="next-meta"><span>♥ 3 hearts</span><span>◇ 5 mixed questions</span><span>◆ 100 XP</span></div><a className="primary-button mission-primary-cta" href={`/boss/${activeRegion.id}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start the challenge <span aria-hidden="true">→</span></a></div>
           </section> : <section className="next-card">
-            <div className={`next-visual accent-${featuredLesson.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={featuredLesson.visual} accent={featuredLesson.accent} size="xl" label={`${featuredLesson.title} topic icon`} /></div>
-            <div className="next-copy"><span className="section-kicker">GRADE {grade} · YOUR NEXT MOVE</span><h2>{featuredLesson.title}</h2><p>{featuredLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3-star goal</span></div><a className="primary-button mission-primary-cta" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start this mission <span aria-hidden="true">→</span></a></div>
+            <div className={`next-visual accent-${featuredLesson.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><LessonMissionThumbnail lesson={featuredLesson} /></div>
+            <div className="next-copy"><span className="section-kicker">GRADE {grade} · YOUR NEXT MOVE</span><h2>{featuredLesson.title}</h2><p>{featuredExperience.title}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3-star goal</span></div><a className="primary-button mission-primary-cta" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start this mission <span aria-hidden="true">→</span></a></div>
           </section>}
 
           {dailyCardVisible && <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed claim-settling" : "ready"}`} aria-labelledby="daily-reward-heading">

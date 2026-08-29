@@ -15,6 +15,7 @@ import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../li
 import { getComboSpec } from "../lib/combo.ts";
 import { isThemeId, themeCatalog } from "../lib/themes.ts";
 import { frontierWorlds } from "../lib/frontier-worlds.ts";
+import { getGradeMission, getLessonExperience } from "../lib/lesson-experience.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -913,7 +914,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(visualOptimizer, /maximumBytes = 100_000/);
   assert.match(dashboard, /path-copy/);
   assert.match(dashboard, /<TopicIcon visual=\{item\.visual\}/);
-  assert.match(lesson, /goal-concept/);
+  assert.match(lesson, /<LessonMissionStory lesson=\{lesson\}/);
+  assert.match(lesson, /<LessonHistory lesson=\{lesson\}/);
   assert.match(lesson, /completion-earnings/);
   assert.match(lesson, /practiceEncouragement/);
   assert.match(lesson, /<TaskProgress/);
@@ -1286,4 +1288,35 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-route/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);
+});
+
+test("gives every lesson an applied mission and a sourced history finish", async () => {
+  const lessonMission = await readFile(new URL("../app/components/LessonMissionStory.tsx", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
+  const favicon = await readFile(new URL("../public/favicon.svg", import.meta.url), "utf8");
+  const faviconIco = await readFile(new URL("../public/favicon.ico", import.meta.url));
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  const experiences = lessons.map(getLessonExperience);
+
+  assert.equal(experiences.length, 220);
+  assert.deepEqual(new Set(experiences.map((item) => item.scene)), new Set(["numbers", "resources", "systems", "navigation", "habitat", "risk", "growth", "motion"]));
+  for (const experience of experiences) {
+    assert.ok(experience.title.length > 20);
+    assert.ok(experience.problem.length > 40);
+    assert.ok(experience.model.length > 0);
+    assert.match(experience.history.sourceUrl, /^https:\/\/mathshistory\.st-andrews\.ac\.uk\//);
+    assert.ok(experience.history.story.length > 50);
+    assert.ok(experience.history.connection.length > 40);
+  }
+  assert.equal(getGradeMission(8).scene, "navigation");
+  assert.match(getGradeMission(8).title, /Mars/);
+  assert.match(lessonMission, /MISSION MODEL/);
+  assert.match(lessonMission, /WHY THIS IDEA EXISTS/);
+  assert.match(dashboard, /<GradeMissionOverview grade=\{grade\}/);
+  assert.match(dashboard, /<LessonMissionThumbnail lesson=\{featuredLesson\}/);
+  assert.match(favicon, /<title id="title">Math Frontier<\/title>/);
+  assert.match(favicon, /stroke="#4c8dff"/);
+  assert.equal(faviconIco.subarray(0, 4).toString("hex"), "00000100");
+  assert.ok(faviconIco.byteLength > 1_000);
+  assert.match(layout, /icons: \{ icon: \[\{ url: "\/favicon\.svg"/);
 });

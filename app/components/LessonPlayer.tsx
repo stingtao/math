@@ -25,13 +25,15 @@ import { remixedChoices } from "@/lib/practice-recovery";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
 import { MemoryReturnCue, TaskProgress } from "./TaskProgress";
 import { QuestionResponse } from "./QuestionResponse";
+import { LessonHistory, LessonMissionStory } from "./LessonMissionStory";
 
 const stageLabels = [
-  { label: "Goal", icon: "◎" },
-  { label: "See it", icon: "◫" },
+  { label: "Mission", icon: "◎" },
+  { label: "Model", icon: "◫" },
   { label: "Key idea", icon: "◆" },
   { label: "Example", icon: "→" },
   { label: "Practice", icon: "✓" },
+  { label: "History", icon: "⌛" },
 ];
 
 const practiceEncouragement = [
@@ -94,7 +96,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       ? masteryQueue.length === 1 ? "Lock mastery & finish" : "Next Memory Check"
       : "Try once more later"
     : questionIndex === lesson.practice.length - 1
-      ? recoveryCount > 0 ? `Start Memory Check (${recoveryCount})` : "Finish lesson"
+      ? recoveryCount > 0 ? `Start Memory Check (${recoveryCount})` : "Open the origin story"
       : "Next question";
   const region = getRegion(lesson.regionId);
   const completeMap = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
@@ -121,11 +123,11 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const isAvailable = completeMap.has(lesson.id) || regionAvailable && priorLessonComplete;
   const trailUrl = `/learn?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
   const practiceProgress = inMemoryCheck ? .9 + .1 * (masteryLockedCount / Math.max(1, masteryTotal)) : .9 * correctedCount / lesson.practice.length;
-  const lessonProgressPercent = Math.round(((stage + (stage === 4 ? practiceProgress : 0)) / stageLabels.length) * 100);
+  const lessonProgressPercent = stage === 5 ? 95 : Math.round(((stage + (stage === 4 ? practiceProgress : 0)) / stageLabels.length) * 100);
   const currentStageLabel = stage === 4 ? inMemoryCheck ? `Memory Check ${masteryLockedCount + 1} of ${masteryTotal}` : `Practice ${questionIndex + 1} of ${lesson.practice.length}` : stageLabels[stage].label;
   if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">NEXT REGION LOCKED</span><h1>Clear the current lesson first.</h1><p>Your next route opens as soon as that step is complete.</p><a className="primary-button" href={trailUrl}>Show my next move <span>→</span></a></section></main>;
 
-  function advanceStage() { setStage((value) => Math.min(4, value + 1)); }
+  function advanceStage() { setStage((value) => Math.min(5, value + 1)); }
 
   async function submitAnswer() {
     if (!answer.trim() || busy) return;
@@ -204,16 +206,24 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const correctFirst = lesson.practice.filter((item) => firstCorrect[item.id]).length;
     const usedAnyHint = lesson.practice.some((item) => hinted[item.id]);
     const earnedStars = inMemoryCheck ? 2 : correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= 4 ? 2 : 1;
-    const previousStars = activeState.completedLessons.find((item) => item.id === lesson.id)?.stars ?? 0;
-    const expectedReward = calculateLessonReward(previousStars, earnedStars);
-    if (busy) return;
-    setBusy(true);
-    setErrorMessage("");
     setStars(earnedStars);
     if (inMemoryCheck) setMasteryLockedCount(masteryTotal);
+    setAnswer("");
+    setFeedback("");
+    setShowHint(false);
+    setErrorMessage("");
+    setStage(5);
+  }
+
+  async function completeLesson() {
+    if (busy) return;
+    const previousStars = activeState.completedLessons.find((item) => item.id === lesson.id)?.stars ?? 0;
+    const expectedReward = calculateLessonReward(previousStars, stars);
+    setBusy(true);
+    setErrorMessage("");
     try {
       if (demo) {
-        const nextState = completeDemoLesson(activeState, lesson.id, earnedStars);
+        const nextState = completeDemoLesson(activeState, lesson.id, stars);
         const newlyEarned = nextState.badges.recent.filter((item) => !activeState.badges.earnedIds.includes(item.id));
         if (newlyEarned.length) setBadgeUnlocks(newlyEarned);
         setCompletionReward({
@@ -231,7 +241,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(`${runId}-complete`), body: JSON.stringify({ action: "completeLesson", lessonId: lesson.id, runId }) });
         const body = await response.json() as Partial<LessonCompletionReward> & { stars?: number; state?: LearnerState; badgeUnlocks?: BadgeUnlock[]; error?: string };
         if (!response.ok) { setErrorMessage(body.error ?? "We could not save your progress."); return; }
-        const runStars = body.stars ?? earnedStars;
+        const runStars = body.stars ?? stars;
         const savedBest = body.bestStars ?? body.state?.completedLessons.find((item) => item.id === lesson.id)?.stars ?? Math.max(previousStars, runStars);
         const xpEarned = body.xpEarned ?? Math.max(0, (body.state?.totalXp ?? activeState.totalXp) - activeState.totalXp);
         setStars(runStars);
@@ -340,7 +350,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         </aside>
 
         <section className="lesson-stage" aria-live="polite">
-          {stage === 0 && <StageCard kicker="YOUR TARGET" title={lesson.goal} visual={<div className={`goal-concept accent-${lesson.accent}`}><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} concept`} /><strong>{lesson.title}</strong></div>} onContinue={advanceStage} continueLabel="Show me" />}
+          {stage === 0 && <StageCard kicker="WHY THIS MATTERS" visual={<LessonMissionStory lesson={lesson} />} onContinue={advanceStage} continueLabel="See the math" footerText="One mission, one mathematical decision." />}
           {stage === 1 && <StageCard kicker="SEE THE MATH" visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} continueLabel="Continue" footerText="" />}
           {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} onContinue={advanceStage} continueLabel="Try an example" footerText="" />}
           {stage === 3 && <StageCard kicker="WORKED EXAMPLE" title={lesson.example} copy="Predict each move, then reveal the reasoning." visual={<WorkedExampleFlow steps={lesson.exampleSteps} accent={lesson.accent} onComplete={() => setExampleReady(true)} />} onContinue={advanceStage} continueDisabled={!exampleReady} continueLabel={exampleReady ? "Start practice" : "Reveal every step"} footerText={exampleReady ? "Example complete. Now use the move yourself." : "Open each step before practice. No timer."} />}
@@ -357,6 +367,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : inMemoryCheck ? "Use a repair hint" : "Show a hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`${lesson.id}-${attemptKey}`} label={nextActionLabel} busy={busy} onAdvance={continuePractice} /> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} aria-busy={busy} onClick={submitAnswer}>{busy ? "Checking…" : inMemoryCheck ? "Check recall" : "Check answer"} <span>→</span></button>}</div>
             </div>
           )}
+          {stage === 5 && <LessonHistory lesson={lesson} busy={busy} errorMessage={errorMessage} onComplete={() => void completeLesson()} />}
         </section>
       </div>
       {sheetOpen && lesson.quickSheet && <div className="modal-backdrop"><div className="sheet-modal" role="dialog" aria-modal="true" aria-labelledby="quick-sheet-title" aria-describedby="quick-sheet-help"><button className="modal-close" type="button" onClick={() => setSheetOpen(false)} aria-label="Close quick sheet" autoFocus>×</button><header className="sheet-modal-heading"><span className="section-kicker">QUICK SHEET</span><h2 id="quick-sheet-title">{lesson.title}</h2><p id="quick-sheet-help">Open the full-size sheet to pinch and zoom, or save it for a quick review later.</p></header><a className="sheet-preview-link" href={lesson.quickSheet} target="_blank" rel="noreferrer" aria-label={`Open the full-size ${lesson.title} quick sheet in a new tab`}><Image src={lesson.quickSheet} width={1920} height={1080} alt={`${lesson.title} visual summary with key idea, worked example, and two practice questions`} /><span>Tap to open full size <b aria-hidden="true">↗</b></span></a><div className="sheet-actions"><a className="secondary-button" href={lesson.quickSheet} target="_blank" rel="noreferrer">Open full size <span aria-hidden="true">↗</span></a><a className="primary-button" href={lesson.quickSheet} download>Download PNG <span aria-hidden="true">↓</span></a></div></div></div>}
