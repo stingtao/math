@@ -575,10 +575,10 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .site-footer > span { margin-left: 0; font-size: 16px; }
 
   /* Dashboard cards collapse into short, obvious next actions. */
-  .dashboard-wrap { padding: 14px 0 42px; }
-  .grade-switcher { margin-bottom: 12px; }
+  .dashboard-wrap { padding: 4px 0 42px; }
+  .grade-switcher { margin-bottom: 4px; }
   .grade-switcher a { min-height: 44px; font-size: 17px; }
-  .next-card { min-height: 0; padding: 17px; gap: 10px; border-radius: 20px; }
+  .next-card { min-height: 0; padding: 17px; gap: 6px; border-radius: 20px; }
   .next-visual { min-height: 100px; }
   .review-priority-orbit { transform: scale(.8); }
   .review-priority-visual > small { bottom: 12px; }
