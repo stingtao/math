@@ -1176,6 +1176,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /visibleRegions\.map/);
   assert.match(dashboard, /gradeComplete \|\| !activeRegion \? \[\] : \[activeRegion\]/);
   assert.match(dashboard, /aria-expanded=\{showFullMap\}/);
+  assert.match(dashboard, /const \[showFullMap, setShowFullMap\] = useState\(true\)/);
   assert.match(dashboard, /id=\{`region-\$\{region\.id\}`\}/);
   assert.match(dashboard, /completed-summary/);
   assert.match(dashboard, /world-lock-preview/);

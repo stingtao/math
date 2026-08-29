@@ -25,7 +25,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const [rewardLandmark, setRewardLandmark] = useState<AchievementSpec | null>(null);
   const [rewardPending, setRewardPending] = useState(false);
   const [showClaimedReward, setShowClaimedReward] = useState(false);
-  const [showFullMap, setShowFullMap] = useState(false);
+  const [showFullMap, setShowFullMap] = useState(true);
   const [welcomeReady, setWelcomeReady] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
