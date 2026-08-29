@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Avatar } from "./Avatar";
 import type { LearnerState } from "@/lib/learner-state";
 import { getThemeJourney, getThemeSpec } from "@/lib/themes";
+import { getXpProgress } from "@/lib/xp-progression";
 
 export function Brand() {
   return <a className="brand" href="/" aria-label="Math home"><span className="brand-mark" aria-hidden="true">M</span><span>Math</span></a>;
@@ -53,6 +54,7 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
   const badgesUrl = demo ? "/badges?demo=1" : "/badges";
   const world = getThemeSpec(state.profile.theme);
   const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
+  const xpProgress = getXpProgress(state.totalXp, state.profile.theme);
   async function logout() {
     if (loggingOut) return;
     setLoggingOut(true);
@@ -74,7 +76,7 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
           <a href={leagueUrl}>{world.leagueLabel}</a>
         </nav>
         <div className="learner-stats">
-          <span className="stat-chip token-chip" title="Trail Tokens">◆ {state.profile.trailTokens}</span>
+          <a className="stat-chip level-chip" href={`${profileUrl}#xp-level`} title={`${xpProgress.rankTitle} · ${state.totalXp} lifetime XP`}>LV {xpProgress.level}</a>
           <span className="stat-chip streak-chip" title="Current streak">▲ {state.profile.currentStreak}</span>
           <a className="profile-link" href={profileUrl}>
             <Avatar avatar={state.profile.avatar} size="sm" />

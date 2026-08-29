@@ -19,6 +19,7 @@ import { frontierWorlds } from "../lib/frontier-worlds.ts";
 import { getLessonExperience } from "../lib/lesson-experience.ts";
 import { isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-interactions.ts";
 import { chooseLearnerMode } from "../lib/learner-mode.ts";
+import { getXpGain, getXpProgress, XP_PER_LEVEL } from "../lib/xp-progression.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -856,6 +857,56 @@ test("shows exact lesson rewards while keeping replay XP fair", async () => {
   assert.match(lesson, /reward\.bestStars/);
   assert.doesNotMatch(lesson, /REWARD RECEIPT|Fair replay · skill refreshed|Repeat XP stays at 0/);
   assert.doesNotMatch(css, /\.reward-receipt-path/);
+});
+
+test("turns lifetime XP into clear levels, themed ranks, and visible next goals", async () => {
+  assert.equal(XP_PER_LEVEL, 100);
+  assert.deepEqual(getXpProgress(-20, "classic"), {
+    totalXp: 0,
+    level: 1,
+    levelStartXp: 0,
+    nextLevelXp: 100,
+    earnedInLevel: 0,
+    xpToNextLevel: 100,
+    percent: 0,
+    rankTitle: "Field Scout",
+    tier: 1,
+    nextRank: { level: 3, title: "Route Finder", xpRequired: 200 },
+  });
+  const garden = getXpProgress(435, "blossom");
+  assert.equal(garden.level, 5);
+  assert.equal(garden.earnedInLevel, 35);
+  assert.equal(garden.xpToNextLevel, 65);
+  assert.equal(garden.rankTitle, "Bloom Keeper");
+  assert.deepEqual(garden.nextRank, { level: 8, title: "Sky Gardener", xpRequired: 700 });
+  assert.deepEqual(getXpGain(95, 105, "space"), {
+    previous: getXpProgress(95, "space"),
+    current: getXpProgress(105, "space"),
+    levelsGained: 1,
+    rankUnlocked: null,
+  });
+  assert.equal(getXpGain(195, 205, "space").rankUnlocked, "Rover Pilot");
+
+  const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
+  const progress = await readFile(new URL("../app/components/XpProgress.tsx", import.meta.url), "utf8");
+  const themes = await readFile(new URL("../lib/themes.ts", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(profile, /<XpProgress totalXp=\{state\.totalXp\}/);
+  assert.match(profile, /Mission \{journey\.stage\}/);
+  assert.doesNotMatch(profile, /XP power|<strong>\{journey\.stage\}<\/strong><small>\{world\.levelLabel\}/);
+  assert.match(header, /level-chip/);
+  assert.doesNotMatch(header, /token-chip/);
+  for (const source of [lesson, boss, review]) assert.match(source, /<XpProgress[^>]+variant="reward"/);
+  assert.match(progress, /Level up!/);
+  assert.match(progress, /NEXT RANK · LEVEL/);
+  assert.match(themes, /headline: `Mission \$\{stage\} · \$\{location\}`/);
+  assert.match(css, /\.xp-profile-progress/);
+  assert.match(css, /\.xp-reward-progress\.level-up/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.xp-level-orb/);
 });
 
 test("does not send review answers to authenticated clients", async () => {

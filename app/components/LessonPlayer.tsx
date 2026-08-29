@@ -27,6 +27,7 @@ import { MemoryReturnCue, TaskProgress } from "./TaskProgress";
 import { QuestionResponse } from "./QuestionResponse";
 import { LessonHistory, LessonMissionStory } from "./LessonMissionStory";
 import { EnterActionLink } from "./EnterActionLink";
+import { XpProgress } from "./XpProgress";
 import { useEnterAction } from "./useEnterAction";
 import { isResponseComplete } from "@/lib/question-interactions";
 
@@ -313,6 +314,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
             <span className={reward.xpEarned === 0 ? "quiet" : ""}><b>+{reward.xpEarned}</b><strong>XP</strong></span>
             {masteryLockedCount > 0 && <span><b aria-hidden="true">↻</b><strong>{masteryLockedCount} recalled</strong></span>}
           </div>
+          <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - reward.xpEarned} theme={state.profile.theme} variant="reward" />
           {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={isDemo} compact />}
           <section className="settlement-next" aria-labelledby="settlement-next-title">
             {reward.firstCompletion && regionFinished ? <span className="settlement-boss-icon" aria-hidden="true">★</span> : <TopicIcon visual={reward.firstCompletion && following ? following.visual : lesson.visual} accent={reward.firstCompletion && following ? following.accent : lesson.accent} size="md" label="" />}

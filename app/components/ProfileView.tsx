@@ -11,6 +11,7 @@ import { SuccessBurst } from "./SuccessBurst";
 import { evaluateAchievements } from "@/lib/achievements";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { getThemeJourney, getThemeSpec, themeCatalog, type ThemeId } from "@/lib/themes";
+import { XpProgress } from "./XpProgress";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error, isDemo } = useLearner(demo);
@@ -144,7 +145,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
           <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()}</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p></div></div>
           <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${isDemo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed || Boolean(busyAction)} aria-busy={busyAction === "reroll"} onClick={reroll}>{busyAction === "reroll" ? "Rerolling…" : state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
-        <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>{journey.stage}</strong><small>{world.levelLabel}</small></article><article><span>◆</span><strong>{state.totalXp}</strong><small>XP power</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article></div>
+        <XpProgress totalXp={state.totalXp} theme={state.profile.theme} />
+        <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>Mission {journey.stage}</strong><small>{journey.location}</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article><article><span>◆</span><strong>{state.weeklyXp}</strong><small>Weekly XP</small></article></div>
 
         <section className="profile-learning-history" aria-labelledby="learning-history-heading">
           <header><div><span className="section-kicker">PRIVATE RECORD</span><h2 id="learning-history-heading">Learning history</h2></div><strong>{state.learningHistory.length} cleared</strong></header>

@@ -17,6 +17,7 @@ import { TaskProgress } from "./TaskProgress";
 import { QuestionResponse } from "./QuestionResponse";
 import { isResponseComplete, type QuestionInteraction, type QuestionInteractionConfig } from "@/lib/question-interactions";
 import { EnterActionLink } from "./EnterActionLink";
+import { XpProgress } from "./XpProgress";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; interactionConfig?: QuestionInteractionConfig; choices?: string[] };
 
@@ -159,6 +160,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <h1>{questions.length} skills back online.</h1>
         <p>They will return again when another quick recall will help them stick.</p>
         <div className="review-finish-reward"><span><strong>+20</strong> XP</span></div>
+        <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - 20} theme={state.profile.theme} variant="reward" />
         <p className="review-stop-note">You can stop here.</p>
         <div className="review-finish-actions">{suggestedLesson && <EnterActionLink className="primary-button" href={suggestedHref}>Start {suggestedLesson.title} <span>→</span></EnterActionLink>}<a className="text-link" href={trailHref}>View learning map</a></div>
       </section>

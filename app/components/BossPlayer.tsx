@@ -18,6 +18,7 @@ import { AnswerImpact } from "./AnswerImpact";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
 import { QuestionResponse } from "./QuestionResponse";
 import { EnterActionLink } from "./EnterActionLink";
+import { XpProgress } from "./XpProgress";
 import { isResponseComplete } from "@/lib/question-interactions";
 import { EnterActionButton } from "./EnterActionButton";
 
@@ -319,6 +320,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <span><b aria-hidden="true">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</b><strong>{hearts}/3 hearts</strong></span>
           <span className={bossXpEarned === 0 ? "quiet" : ""}><b>+{bossXpEarned}</b><strong>XP</strong></span>
         </div>
+        <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - bossXpEarned} theme={state.profile.theme} variant="reward" />
 
         {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={isDemo} compact />}
 
