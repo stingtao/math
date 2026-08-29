@@ -526,7 +526,10 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .profile-link { min-height: 44px; padding-left: 0; }
   .profile-link > span { display: none; }
   .icon-button { width: 44px; height: 44px; }
-  .demo-banner { padding: 10px 14px; flex-wrap: wrap; gap: 3px 8px; line-height: 1.35; text-align: center; }
+  .demo-banner { min-height: 48px; padding: 8px 14px; flex-wrap: nowrap; justify-content: space-between; gap: 12px; line-height: 1.2; text-align: left; }
+  .demo-banner > p { display: none; }
+  .demo-banner > span,
+  .demo-banner > a { white-space: nowrap; }
 
   /* Public pages use shorter sections and larger supporting text. */
   .hero { min-height: 0; margin: 32px auto 60px; gap: 38px; }
@@ -572,11 +575,11 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .site-footer > span { margin-left: 0; font-size: 16px; }
 
   /* Dashboard cards collapse into short, obvious next actions. */
-  .dashboard-wrap { padding: 30px 0 42px; }
-  .grade-switcher { margin-bottom: 24px; }
+  .dashboard-wrap { padding: 24px 0 42px; }
+  .grade-switcher { margin-bottom: 18px; }
   .grade-switcher a { min-height: 44px; font-size: 17px; }
-  .next-card { min-height: 0; padding: 17px; gap: 18px; border-radius: 20px; }
-  .next-visual { min-height: 165px; }
+  .next-card { min-height: 0; padding: 17px; gap: 14px; border-radius: 20px; }
+  .next-visual { min-height: 145px; }
   .review-priority-orbit { transform: scale(.8); }
   .review-priority-visual > small { bottom: 12px; }
   .concept-mini { transform: scale(.82); }
