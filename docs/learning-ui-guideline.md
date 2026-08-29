@@ -151,3 +151,13 @@ The current Algebra I audit and topic evidence live in [curriculum-coverage.md](
 - The first wrong-answer response must show a clue tied to the current question or a detected misconception. Generic directions such as “use the key idea” or “change one step” do not diagnose the learner's move.
 - Keep the visible repair compact: one diagnosis, one actionable clue, then retry. Reveal the accepted form only after repeated attempts.
 - If the misconception detector already supplies a more precise clue, keep the question-specific key idea available as an expandable second layer; do not repeat identical text in both layers.
+
+## 15. Name the mathematical object in every relationship
+
+Relational words such as `vertical`, `parallel`, `perpendicular`, `congruent`, `similar`, `complementary`, and `supplementary` must attach to the mathematical object they describe. Do not make a learner infer whether a pair of expressions represents angles, angle measures, lines, slopes, sides, or triangles.
+
+- Write `angles measuring 3x + 10 and 5x − 30 are vertical angles`, not `3x + 10 and 5x − 30 are vertical`.
+- Write `lines with slopes 2/3 and −3/2 are perpendicular`; the slopes are negative reciprocals, not perpendicular objects.
+- Write `triangles with side lengths ... are similar`, not `the side lengths are similar`.
+
+Keep the noun whenever removing it would change the mathematical meaning or make a modifier appear to describe the wrong type of object. Scan goals, key ideas, examples, worked steps, questions, hints, diagrams, and tooltips—not only headings.

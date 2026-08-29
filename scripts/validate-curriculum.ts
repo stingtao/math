@@ -57,6 +57,28 @@ let multipleChoiceChecks = 0;
 let factorChoiceChecks = 0;
 const interactionCounts = new Map<QuestionInteraction, number>();
 for (const lesson of lessons) {
+  const instructionalCopy = [
+    lesson.goal,
+    lesson.keyIdea,
+    lesson.example,
+    ...lesson.exampleSteps,
+    ...lesson.practice.map((question) => question.prompt),
+  ].join("\n");
+  assert.doesNotMatch(
+    instructionalCopy,
+    /^\s*\d*x\s*[+−-]\s*\d+\s+and\s+\d*x\s*[+−-]\s*\d+\s+are\s+(?:vertical|complementary|supplementary)\b/im,
+    `${lesson.id} must name the angles represented by its algebraic expressions`,
+  );
+  assert.doesNotMatch(
+    instructionalCopy,
+    /(?:^\s*(?:are\s+)?slopes?\s+[-−\d/][^.!?]{0,55}\b(?:parallel|perpendicular)\b|\b(?:parallel|perpendicular)\s+slopes?\b)/im,
+    `${lesson.id} must describe lines—not slopes—as parallel or perpendicular`,
+  );
+  assert.doesNotMatch(
+    instructionalCopy,
+    /^\s*sides?\s+[\d, ]+\s+and\s+[\d, ]+\s+are\s+similar\b/im,
+    `${lesson.id} must describe figures or triangles—not side-length lists—as similar`,
+  );
   assert.equal(new Set(lesson.practice.map((question) => question.id)).size, lesson.practice.length, `${lesson.id} has duplicate question IDs`);
   assert.equal(new Set(lesson.practice.map((question) => question.prompt)).size, lesson.practice.length, `${lesson.id} has duplicate question prompts`);
   for (const question of lesson.practice) {
