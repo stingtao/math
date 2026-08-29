@@ -1,4 +1,4 @@
-CREATE TABLE `learner_preferences` (
+CREATE TABLE IF NOT EXISTS `learner_preferences` (
 	`learner_id` text PRIMARY KEY NOT NULL,
 	`theme` text DEFAULT 'classic' NOT NULL,
 	`updated_at` text NOT NULL,

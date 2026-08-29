@@ -13,7 +13,7 @@ import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { getThemeJourney, getThemeSpec, themeCatalog, type ThemeId } from "@/lib/themes";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
-  const { state, setState, loading, error } = useLearner(demo);
+  const { state, setState, loading, error, isDemo } = useLearner(demo);
   const [message, setMessage] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [busyFrame, setBusyFrame] = useState("");
@@ -33,9 +33,15 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const nextFrameNeeded = nextFrame ? Math.max(0, nextFrame.cost - state.profile.trailTokens) : 0;
   const world = getThemeSpec(state.profile.theme);
   const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
+  const historyByGrade = [...state.learningHistory.reduce((groups, entry) => {
+    const current = groups.get(entry.grade) ?? [];
+    current.push(entry);
+    groups.set(entry.grade, current);
+    return groups;
+  }, new Map<number, typeof state.learningHistory>())];
 
   async function action(payload: Record<string, unknown>) {
-    if (demo) return null;
+    if (isDemo) return null;
     try {
       const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify(payload) });
       const body = await response.json() as { state?: LearnerState; error?: string };
@@ -52,7 +58,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     if (busyAction) return;
     setBusyAction("reroll");
     try {
-      if (demo) {
+      if (isDemo) {
         if (activeState.profile.rerollUsed) { setMessage("Your free identity reroll has already been used."); return; }
         const next: LearnerState = { ...activeState, profile: { ...activeState.profile, nickname: "NimbleOrbit731", avatar: { ...activeState.profile.avatar, glyph: "orbit", tone: "violet" }, rerollUsed: true } };
         saveDemoState(next); setState(next); setMessage("Your new anonymous identity is ready."); return;
@@ -68,7 +74,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     setBusyAction("leaderboard");
     const enabled = !activeState.profile.leaderboardOptIn;
     try {
-      if (demo) {
+      if (isDemo) {
         const next: LearnerState = { ...activeState, profile: { ...activeState.profile, leaderboardOptIn: enabled } };
         saveDemoState(next); setState(next); setMessage(enabled ? "You joined the anonymous weekly league." : "You left the public league."); return;
       }
@@ -87,7 +93,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     }
     setBusyFrame(frameSpec.id);
     try {
-      if (demo) {
+      if (isDemo) {
         const next: LearnerState = {
           ...activeState,
           profile: {
@@ -114,7 +120,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     if (busyTheme || activeState.profile.theme === theme) return;
     setBusyTheme(theme);
     try {
-      if (demo) {
+      if (isDemo) {
         const next: LearnerState = { ...activeState, profile: { ...activeState.profile, theme } };
         saveDemoState(next);
         setState(next);
@@ -130,17 +136,31 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
 
   return (
     <main className="learner-shell profile-page">
-      <LearnerHeader state={state} demo={demo} />
+      <LearnerHeader state={state} demo={isDemo} />
       {frameCelebrationKey && <SuccessBurst eventKey={`frame-${frameCelebrationKey}`} />}
       <section className="profile-wrap">
         <div className={`profile-hero profile-command-deck theme-${world.id}`}>
           <div className="profile-world-art" style={{ backgroundPosition: world.atlasPosition }} aria-hidden="true"><span>{world.motif}</span><i /><i /><i /></div>
           <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()}</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p></div></div>
-          <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${demo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed || Boolean(busyAction)} aria-busy={busyAction === "reroll"} onClick={reroll}>{busyAction === "reroll" ? "Rerolling…" : state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
+          <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${isDemo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed || Boolean(busyAction)} aria-busy={busyAction === "reroll"} onClick={reroll}>{busyAction === "reroll" ? "Rerolling…" : state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
         <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>{journey.stage}</strong><small>{world.levelLabel}</small></article><article><span>◆</span><strong>{state.totalXp}</strong><small>XP power</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article></div>
 
-        <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">{world.motif}<i /></span><div><small>{world.badgeLabel.toUpperCase()}</small><strong>Badges</strong><p>Next badge · {state.badges.correctAnswers % 10}/10 correct answers</p></div><i aria-hidden="true">→</i></a>
+        <section className="profile-learning-history" aria-labelledby="learning-history-heading">
+          <header><div><span className="section-kicker">PRIVATE RECORD</span><h2 id="learning-history-heading">Learning history</h2></div><strong>{state.learningHistory.length} cleared</strong></header>
+          {historyByGrade.length === 0 ? <div className="history-empty"><span aria-hidden="true">◇</span><div><strong>Your first completed lesson will appear here.</strong><p>Only you can open this record.</p></div></div> : <div className="history-grade-list">
+            {historyByGrade.map(([historyGrade, entries], gradeIndex) => <details open={gradeIndex === 0} key={historyGrade}>
+              <summary><span>Grade {historyGrade}</span><small>{entries.length} {entries.length === 1 ? "clear" : "clears"}</small></summary>
+              <div className="history-entry-list">{entries.map((entry) => <article className={`history-entry ${entry.kind}`} key={entry.key}>
+                <span className="history-entry-icon" aria-hidden="true">{entry.kind === "boss" ? "★" : "✓"}</span>
+                <div><strong>{entry.title}</strong><p>{entry.regionTitle} · <time dateTime={entry.completedAt}>{formatHistoryDate(entry.completedAt)}</time></p></div>
+                <span className="history-result">{entry.kind === "boss" ? `${entry.hearts ?? 0}/3 ♥` : <>{"★".repeat(entry.stars ?? 0)}{"☆".repeat(3 - (entry.stars ?? 0))}<small>{entry.firstCorrectCount ?? 0}/{entry.questionCount ?? 0} first try</small></>}</span>
+              </article>)}</div>
+            </details>)}
+          </div>}
+        </section>
+
+        <a className="profile-badge-vault" href={`/badges${isDemo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">{world.motif}<i /></span><div><small>{world.badgeLabel.toUpperCase()}</small><strong>Badges</strong><p>Next badge · {state.badges.correctAnswers % 10}/10 correct answers</p></div><i aria-hidden="true">→</i></a>
 
         <section className="theme-studio" aria-labelledby="theme-studio-heading">
           <header><div><span className="section-kicker">WORLD</span><h2 id="theme-studio-heading">Choose a world.</h2></div></header>
@@ -180,7 +200,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
           </section>
           <aside className="privacy-settings-card">
             <span className="section-kicker">PRIVACY CONTROLS</span><h2>Choose what leaves your base.</h2>
-            <div className="setting-row"><div><strong>Anonymous weekly league</strong><p>If you join, only your codename, avatar, rank, and weekly XP appear.</p></div><button className={`toggle ${state.profile.leaderboardOptIn ? "on" : ""}`} type="button" aria-pressed={state.profile.leaderboardOptIn} aria-busy={busyAction === "leaderboard"} disabled={Boolean(busyAction)} onClick={toggleLeaderboard}><span /></button></div>
+            <div className="setting-row"><div><strong>Anonymous weekly league</strong><p>Joining creates a separate weekly alias. Your private profile codename never appears.</p></div><button className={`toggle ${state.profile.leaderboardOptIn ? "on" : ""}`} type="button" aria-pressed={state.profile.leaderboardOptIn} aria-busy={busyAction === "leaderboard"} disabled={Boolean(busyAction)} onClick={toggleLeaderboard}><span /></button></div>
             <div className="setting-row static"><div><strong>Google profile data</strong><p>Name, email, and photo are never saved.</p></div><span className="safe-chip">Not stored</span></div>
             <div className="setting-row static"><div><strong>Public profile and search</strong><p>No profile page, searchable ID, or public history exists.</p></div><span className="safe-chip">Off</span></div>
             <a className="text-link" href="/privacy">Read the full privacy promise</a>
@@ -193,9 +213,15 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         </section>
         {message && <div className="toast-message" role="status">{message}</div>}
       </section>
-      {deleteOpen && <DeleteAccount demo={demo} clientId={clientId} onClose={() => setDeleteOpen(false)} />}
+      {deleteOpen && <DeleteAccount demo={isDemo} clientId={clientId} onClose={() => setDeleteOpen(false)} />}
     </main>
   );
+}
+
+function formatHistoryDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(date);
 }
 
 function DeleteAccount({ demo, clientId, onClose }: { demo: boolean; clientId: string; onClose: () => void }) {

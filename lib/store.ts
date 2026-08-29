@@ -12,6 +12,8 @@ const nouns = ["Comet", "Compass", "Cedar", "Falcon", "Harbor", "Lantern", "Orbi
 const glyphs = ["compass", "orbit", "spark", "summit", "wave", "prism"];
 const tones = ["blue", "teal", "coral", "violet", "gold"];
 const rewardTokens = [10, 12, 14, 16, 18, 20, 30];
+const lessonLookup = new Map(lessons.map((lesson) => [lesson.id, lesson]));
+const regionLookup = new Map(regions.map((region) => [region.id, region]));
 
 export type LearnerRow = { id: string; timezone: string; age_confirmed_at: string | null };
 export type ProfileRow = {
@@ -27,6 +29,13 @@ export type ProfileRow = {
   streak_shields: number;
   reward_step: number;
   last_active_date: string | null;
+};
+type PublicAliasRow = {
+  public_id: string;
+  nickname: string;
+  avatar_glyph: string;
+  avatar_tone: string;
+  frame: string;
 };
 
 function pick<T>(items: T[]) {
@@ -82,21 +91,35 @@ function dayDifference(previous: string, current: string) {
   return Math.round((Date.parse(`${current}T00:00:00Z`) - Date.parse(`${previous}T00:00:00Z`)) / 86_400_000);
 }
 
-export async function getOrCreateLearner(authKey: string, timezone = "UTC", ageConfirmed = false) {
+export async function getOrCreateLearner(authKey: string, timezone = "UTC", ageConfirmed = false, provider = "google") {
   await ensureSchema();
   const db = getStore();
   const now = new Date().toISOString();
-  let learner = await db.prepare("SELECT id, timezone, age_confirmed_at FROM learners WHERE auth_key = ?").bind(authKey).first<LearnerRow>();
+  let learner = await db.prepare(`SELECT l.id, l.timezone, l.age_confirmed_at
+    FROM auth_identities i JOIN learners l ON l.id = i.learner_id
+    WHERE i.provider = ? AND i.subject_key = ?`).bind(provider, authKey).first<LearnerRow>();
+  if (!learner) {
+    learner = await db.prepare("SELECT id, timezone, age_confirmed_at FROM learners WHERE auth_key = ?").bind(authKey).first<LearnerRow>();
+    if (learner) {
+      await db.prepare("INSERT OR IGNORE INTO auth_identities (provider, subject_key, learner_id, created_at, last_used_at) VALUES (?, ?, ?, ?, ?)")
+        .bind(provider, authKey, learner.id, now, now).run();
+    }
+  }
   if (!learner) {
     const id = crypto.randomUUID();
     await db.batch([
       db.prepare("INSERT INTO learners (id, auth_key, timezone, age_confirmed_at, created_at, last_seen_at) VALUES (?, ?, ?, ?, ?, ?)").bind(id, authKey, timezone, ageConfirmed ? now : null, now, now),
+      db.prepare("INSERT INTO auth_identities (provider, subject_key, learner_id, created_at, last_used_at) VALUES (?, ?, ?, ?, ?)").bind(provider, authKey, id, now, now),
       db.prepare("INSERT INTO public_profiles (learner_id, nickname, avatar_glyph, avatar_tone) VALUES (?, ?, ?, ?)").bind(id, randomNickname(), pick(glyphs), pick(tones)),
     ]);
     learner = { id, timezone, age_confirmed_at: ageConfirmed ? now : null };
   } else {
-    await db.prepare("UPDATE learners SET last_seen_at = ?, timezone = CASE WHEN timezone = 'UTC' THEN ? ELSE timezone END, age_confirmed_at = COALESCE(age_confirmed_at, ?) WHERE id = ?")
-      .bind(now, timezone, ageConfirmed ? now : null, learner.id).run();
+    await db.batch([
+      db.prepare("UPDATE learners SET last_seen_at = ?, timezone = CASE WHEN timezone = 'UTC' THEN ? ELSE timezone END, age_confirmed_at = COALESCE(age_confirmed_at, ?) WHERE id = ?")
+        .bind(now, timezone, ageConfirmed ? now : null, learner.id),
+      db.prepare("UPDATE auth_identities SET last_used_at = ? WHERE provider = ? AND subject_key = ?")
+        .bind(now, provider, authKey),
+    ]);
   }
   return learner;
 }
@@ -137,8 +160,8 @@ export async function getLearnerState(learnerId: string) {
     db.prepare("SELECT nickname, avatar_glyph, avatar_tone, frame, reroll_used, leaderboard_opt_in, trail_tokens, current_streak, longest_streak, streak_shields, reward_step, last_active_date FROM public_profiles WHERE learner_id = ?").bind(learnerId).first<ProfileRow>(),
     db.prepare("SELECT theme FROM learner_preferences WHERE learner_id = ?").bind(learnerId).first<{ theme: string }>(),
     db.prepare("SELECT frame FROM avatar_frames WHERE learner_id = ? ORDER BY unlocked_at, frame").bind(learnerId).all<{ frame: string }>(),
-    db.prepare("SELECT lesson_id, stars, first_correct_count, completed_at FROM lesson_progress WHERE learner_id = ? ORDER BY completed_at").bind(learnerId).all<{ lesson_id: string; stars: number; first_correct_count: number; completed_at: string }>(),
-    db.prepare("SELECT region_id, cleared, best_hearts FROM boss_progress WHERE learner_id = ?").bind(learnerId).all<{ region_id: number; cleared: number; best_hearts: number }>(),
+    db.prepare("SELECT lesson_id, stars, first_correct_count, question_count, completed_at FROM lesson_progress WHERE learner_id = ? ORDER BY completed_at").bind(learnerId).all<{ lesson_id: string; stars: number; first_correct_count: number; question_count: number; completed_at: string }>(),
+    db.prepare("SELECT region_id, cleared, best_hearts, cleared_at FROM boss_progress WHERE learner_id = ?").bind(learnerId).all<{ region_id: number; cleared: number; best_hearts: number; cleared_at: string | null }>(),
     db.prepare("SELECT COALESCE(SUM(xp), 0) AS total FROM xp_events WHERE learner_id = ?").bind(learnerId).first<{ total: number }>(),
     db.prepare("SELECT COALESCE(SUM(xp), 0) AS total FROM xp_events WHERE learner_id = ? AND week_key = ?").bind(learnerId, weekKey()).first<{ total: number }>(),
     db.prepare("SELECT COUNT(*) AS total FROM review_items WHERE learner_id = ? AND due_at <= ?").bind(learnerId, new Date().toISOString()).first<{ total: number }>(),
@@ -152,6 +175,35 @@ export async function getLearnerState(learnerId: string) {
     .bind(learnerId, localDate(learner?.timezone ?? "UTC")).first<{ claimed: number }>();
   const completed = new Map(progressResult.results.map((item) => [item.lesson_id, item]));
   const next = lessons.find((item) => !completed.has(item.id)) ?? lessons[lessons.length - 1];
+  const learningHistory = [
+    ...progressResult.results.map((item) => {
+      const lesson = lessonLookup.get(item.lesson_id);
+      const region = lesson ? regionLookup.get(lesson.regionId) : undefined;
+      return {
+        key: `lesson:${item.lesson_id}`,
+        kind: "lesson" as const,
+        title: lesson?.title ?? "Completed lesson",
+        grade: lesson?.grade ?? 0,
+        regionTitle: region?.title ?? "Math route",
+        completedAt: item.completed_at,
+        stars: item.stars,
+        firstCorrectCount: item.first_correct_count,
+        questionCount: item.question_count,
+      };
+    }),
+    ...bossResult.results.filter((item) => item.cleared && item.cleared_at).map((item) => {
+      const region = regionLookup.get(item.region_id);
+      return {
+        key: `boss:${item.region_id}`,
+        kind: "boss" as const,
+        title: `${region?.title ?? "Region"} Boss`,
+        grade: region?.grade ?? 0,
+        regionTitle: region?.title ?? "Math route",
+        completedAt: item.cleared_at!,
+        hearts: item.best_hearts,
+      };
+    }),
+  ].sort((left, right) => right.completedAt.localeCompare(left.completedAt));
   return {
     profile: {
       nickname: profile.nickname,
@@ -173,6 +225,7 @@ export async function getLearnerState(learnerId: string) {
     dueReview: Math.min(Number(dueReview?.total ?? 0), 5),
     dailyRewardClaimed: Boolean(todayReward),
     nextLessonId: next.id,
+    learningHistory,
     badges: {
       earnedIds: badgeResult.results.map((item) => item.badge_id),
       recent: badgeResult.results.slice(0, 8).map((item) => ({ id: item.badge_id, unlockedAt: item.unlocked_at })),
@@ -380,8 +433,8 @@ export async function completeLesson(learnerId: string, lessonId: string, runId:
   const firstCorrect = Number(summary?.first_correct ?? 0);
   const stars = firstCorrect === lesson.practice.length && Number(summary?.hints ?? 0) === 0 ? 3 : firstCorrect >= Math.ceil(lesson.practice.length * 0.8) || recoveryTotal > 0 && recoveryMastered === recoveryTotal ? 2 : 1;
   const reward = calculateLessonReward(Number(previous?.stars ?? 0), stars);
-  await db.prepare("INSERT INTO lesson_progress (learner_id, lesson_id, stars, first_correct_count, completed_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET stars = MAX(stars, excluded.stars), first_correct_count = MAX(first_correct_count, excluded.first_correct_count)")
-    .bind(learnerId, lessonId, stars, firstCorrect, new Date().toISOString()).run();
+  await db.prepare("INSERT INTO lesson_progress (learner_id, lesson_id, stars, first_correct_count, question_count, completed_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET stars = MAX(stars, excluded.stars), first_correct_count = MAX(first_correct_count, excluded.first_correct_count), question_count = excluded.question_count")
+    .bind(learnerId, lessonId, stars, firstCorrect, lesson.practice.length, new Date().toISOString()).run();
   let baseXp = 0;
   let starXp = 0;
   if (reward.baseXp > 0 && await awardXp(learnerId, "lesson", lessonId, reward.baseXp)) baseXp = reward.baseXp;
@@ -605,6 +658,7 @@ export async function updateTheme(learnerId: string, theme: ThemeId) {
 async function ensureLeagueMembership(learnerId: string) {
   const db = getStore();
   const week = weekKey();
+  await ensurePublicAlias(learnerId, "leaderboard", week);
   const existing = await db.prepare("SELECT league_id FROM league_members WHERE week_key = ? AND learner_id = ?").bind(week, learnerId).first<{ league_id: string }>();
   if (existing) return existing.league_id;
   const open = await db.prepare(`SELECT league_id, COUNT(*) AS members FROM league_members WHERE week_key = ? GROUP BY league_id HAVING COUNT(*) < 30 ORDER BY league_id LIMIT 1`)
@@ -617,6 +671,28 @@ async function ensureLeagueMembership(learnerId: string) {
   await db.prepare("INSERT OR IGNORE INTO league_members (week_key, league_id, learner_id, joined_at) VALUES (?, ?, ?, ?)")
     .bind(week, leagueId, learnerId, new Date().toISOString()).run();
   return leagueId;
+}
+
+async function ensurePublicAlias(learnerId: string, scope: "leaderboard", scopeKey: string) {
+  const db = getStore();
+  const existing = await db.prepare(`SELECT public_id, nickname, avatar_glyph, avatar_tone, frame
+    FROM public_aliases WHERE learner_id = ? AND scope = ? AND scope_key = ?`)
+    .bind(learnerId, scope, scopeKey).first<PublicAliasRow>();
+  if (existing) return existing;
+  const createdAt = new Date().toISOString();
+  await db.prepare(`INSERT OR IGNORE INTO public_aliases
+    (learner_id, scope, scope_key, public_id, nickname, avatar_glyph, avatar_tone, frame, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'plain', ?)`)
+    .bind(learnerId, scope, scopeKey, crypto.randomUUID(), randomNickname(), pick(glyphs), pick(tones), createdAt).run();
+  const alias = await db.prepare(`SELECT public_id, nickname, avatar_glyph, avatar_tone, frame
+    FROM public_aliases WHERE learner_id = ? AND scope = ? AND scope_key = ?`)
+    .bind(learnerId, scope, scopeKey).first<PublicAliasRow>();
+  if (!alias) throw new Error("A public alias could not be created.");
+  return alias;
+}
+
+async function ensureLeaderboardAliases(learnerIds: string[], week: string) {
+  for (const learnerId of [...new Set(learnerIds)]) await ensurePublicAlias(learnerId, "leaderboard", week);
 }
 
 export async function purchaseFrame(learnerId: string, frame: string) {
@@ -662,13 +738,23 @@ export async function deleteLearner(learnerId: string) {
 export async function getLeaderboard(limit = 30) {
   await ensureSchema();
   const currentWeek = weekKey();
-  const result = await getStore().prepare(`SELECT p.nickname, p.avatar_glyph, p.avatar_tone, p.frame, SUM(x.xp) AS weekly_xp,
-      SUM(CASE WHEN x.kind = 'boss' THEN 1 ELSE 0 END) AS bosses
+  const db = getStore();
+  const candidates = await db.prepare(`SELECT x.learner_id
     FROM xp_events x JOIN public_profiles p ON p.learner_id = x.learner_id
     WHERE x.week_key = ? AND p.leaderboard_opt_in = 1
-    GROUP BY x.learner_id, p.nickname, p.avatar_glyph, p.avatar_tone, p.frame
-    ORDER BY weekly_xp DESC, bosses DESC, p.nickname ASC LIMIT ?`).bind(currentWeek, Math.min(limit, 30)).all<{ nickname: string; avatar_glyph: string; avatar_tone: string; frame: string; weekly_xp: number }>();
+    GROUP BY x.learner_id ORDER BY SUM(x.xp) DESC LIMIT ?`)
+    .bind(currentWeek, Math.min(limit, 30)).all<{ learner_id: string }>();
+  await ensureLeaderboardAliases(candidates.results.map((entry) => entry.learner_id), currentWeek);
+  const result = await db.prepare(`SELECT a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame, SUM(x.xp) AS weekly_xp,
+      SUM(CASE WHEN x.kind = 'boss' THEN 1 ELSE 0 END) AS bosses
+    FROM xp_events x
+    JOIN public_profiles p ON p.learner_id = x.learner_id
+    JOIN public_aliases a ON a.learner_id = x.learner_id AND a.scope = 'leaderboard' AND a.scope_key = x.week_key
+    WHERE x.week_key = ? AND p.leaderboard_opt_in = 1
+    GROUP BY x.learner_id, a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame
+    ORDER BY weekly_xp DESC, bosses DESC, a.nickname ASC LIMIT ?`).bind(currentWeek, Math.min(limit, 30)).all<PublicAliasRow & { weekly_xp: number }>();
   return result.results.map((entry, index) => ({
+    id: entry.public_id,
     rank: index + 1,
     nickname: entry.nickname,
     avatar: { glyph: entry.avatar_glyph, tone: entry.avatar_tone, frame: entry.frame },
@@ -678,16 +764,24 @@ export async function getLeaderboard(limit = 30) {
 
 export async function getLearnerLeaderboard(learnerId: string) {
   await ensureSchema();
+  const db = getStore();
   const week = weekKey();
   const leagueId = await ensureLeagueMembership(learnerId);
-  const result = await getStore().prepare(`SELECT m.learner_id, p.nickname, p.avatar_glyph, p.avatar_tone, p.frame, COALESCE(SUM(x.xp), 0) AS weekly_xp,
+  const candidates = await db.prepare(`SELECT m.learner_id FROM league_members m
+    JOIN public_profiles p ON p.learner_id = m.learner_id
+    WHERE m.week_key = ? AND m.league_id = ? AND p.leaderboard_opt_in = 1 LIMIT 30`)
+    .bind(week, leagueId).all<{ learner_id: string }>();
+  await ensureLeaderboardAliases(candidates.results.map((entry) => entry.learner_id), week);
+  const result = await db.prepare(`SELECT m.learner_id, a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame, COALESCE(SUM(x.xp), 0) AS weekly_xp,
       SUM(CASE WHEN x.kind = 'boss' THEN 1 ELSE 0 END) AS bosses
-    FROM league_members m JOIN public_profiles p ON p.learner_id = m.learner_id
+    FROM league_members m
+    JOIN public_profiles p ON p.learner_id = m.learner_id
+    JOIN public_aliases a ON a.learner_id = m.learner_id AND a.scope = 'leaderboard' AND a.scope_key = m.week_key
     LEFT JOIN xp_events x ON x.learner_id = m.learner_id AND x.week_key = m.week_key
     WHERE m.week_key = ? AND m.league_id = ? AND p.leaderboard_opt_in = 1
-    GROUP BY m.learner_id, p.nickname, p.avatar_glyph, p.avatar_tone, p.frame
-    ORDER BY weekly_xp DESC, bosses DESC, p.nickname ASC LIMIT 30`).bind(week, leagueId).all<{ learner_id: string; nickname: string; avatar_glyph: string; avatar_tone: string; frame: string; weekly_xp: number }>();
-  return result.results.map((entry, index) => ({ rank: index + 1, nickname: entry.nickname, avatar: { glyph: entry.avatar_glyph, tone: entry.avatar_tone, frame: entry.frame }, weeklyXp: Number(entry.weekly_xp), isViewer: entry.learner_id === learnerId }));
+    GROUP BY m.learner_id, a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame
+    ORDER BY weekly_xp DESC, bosses DESC, a.nickname ASC LIMIT 30`).bind(week, leagueId).all<PublicAliasRow & { learner_id: string; weekly_xp: number }>();
+  return result.results.map((entry, index) => ({ id: entry.public_id, rank: index + 1, nickname: entry.nickname, avatar: { glyph: entry.avatar_glyph, tone: entry.avatar_tone, frame: entry.frame }, weeklyXp: Number(entry.weekly_xp), isViewer: entry.learner_id === learnerId }));
 }
 
 export async function isLeaderboardParticipant(learnerId: string) {

@@ -59,7 +59,7 @@ type LessonCompletionReward = {
 };
 
 export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo: boolean }) {
-  const { state, setState, loading, error } = useLearner(demo);
+  const { state, setState, loading, error, isDemo } = useLearner(demo);
   const [stage, setStage] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -126,11 +126,11 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const regionAvailable = regionPosition === 0 || state.clearedBosses.some((item) => item.regionId === gradeCurriculum.regions[regionPosition - 1]?.id);
   const priorLessonComplete = lesson.order === 1 || completeMap.has(gradeLessons[lessonPosition - 1]?.id);
   const isAvailable = completeMap.has(lesson.id) || regionAvailable && priorLessonComplete;
-  const trailUrl = `/learn?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
+  const trailUrl = `/learn?grade=${lesson.grade}${isDemo ? "&demo=1" : ""}`;
   const practiceProgress = inMemoryCheck ? .9 + .1 * (masteryLockedCount / Math.max(1, masteryTotal)) : .9 * correctedCount / lesson.practice.length;
   const lessonProgressPercent = stage === 5 ? 95 : Math.round(((stage + (stage === 4 ? practiceProgress : 0)) / stageLabels.length) * 100);
   const currentStageLabel = stage === 4 ? inMemoryCheck ? `Memory Check ${masteryLockedCount + 1} of ${masteryTotal}` : `Practice ${questionIndex + 1} of ${lesson.practice.length}` : stageLabels[stage].label;
-  if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">NEXT REGION LOCKED</span><h1>Clear the current lesson first.</h1><p>Your next route opens as soon as that step is complete.</p><a className="primary-button" href={trailUrl}>Show my next move <span>→</span></a></section></main>;
+  if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={isDemo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">NEXT REGION LOCKED</span><h1>Clear the current lesson first.</h1><p>Your next route opens as soon as that step is complete.</p><a className="primary-button" href={trailUrl}>Show my next move <span>→</span></a></section></main>;
 
   function advanceStage() { setStage((value) => Math.min(5, value + 1)); }
 
@@ -141,16 +141,16 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const priorAttempts = attempts[attemptKey] ?? 0;
     try {
       let correct = isAnswerCorrect(answer, question.answer);
-      if (inMemoryCheck && !demo) {
+      if (inMemoryCheck && !isDemo) {
         const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[attemptKey]), runId, mastery: true, masteryRound }) });
         const body = await response.json() as { correct?: boolean; error?: string };
         if (!response.ok) { setErrorMessage(body.error ?? "We could not check that Memory Check."); return; }
         correct = Boolean(body.correct);
-      } else if (demo && correct && !inMemoryCheck) {
+      } else if (isDemo && correct && !inMemoryCheck) {
         const badgeResult = creditDemoCorrectAnswer(activeState);
         setState(badgeResult.state);
         if (badgeResult.badgeUnlocks.length) setBadgeUnlocks(badgeResult.badgeUnlocks);
-      } else if (!demo && !inMemoryCheck) {
+      } else if (!isDemo && !inMemoryCheck) {
         const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[attemptKey]), runId }) });
         const body = await response.json() as { correct?: boolean; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string };
         if (!response.ok) { setErrorMessage(body.error ?? "We could not check that answer."); return; }
@@ -227,8 +227,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     setBusy(true);
     setErrorMessage("");
     try {
-      if (demo) {
-        const nextState = completeDemoLesson(activeState, lesson.id, stars);
+      if (isDemo) {
+        const nextState = completeDemoLesson(activeState, lesson.id, stars, lesson.practice.filter((item) => firstCorrect[item.id]).length);
         const newlyEarned = nextState.badges.recent.filter((item) => !activeState.badges.earnedIds.includes(item.id));
         if (newlyEarned.length) setBadgeUnlocks(newlyEarned);
         setCompletionReward({
@@ -286,7 +286,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       : reward.starsImproved
       ? { kicker: "NEW BEST", title: `${lesson.title}: ${reward.bestStars} stars.`, copy: "Your new best is saved." }
       : { kicker: "PRACTICE COMPLETE", title: `${lesson.title} refreshed.`, copy: `Your ${reward.bestStars}-star best stays saved.` };
-    const primaryHref = regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
+    const primaryHref = regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${isDemo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${isDemo ? "&demo=1" : ""}`;
     const primaryLabel = regionFinished ? "Start the boss" : "Start the next lesson";
     const nextStep = regionFinished
       ? { kicker: reward.firstCompletion ? "BOSS UNLOCKED" : "BOSS", title: `${region?.title ?? "Region"} Boss` }
@@ -301,8 +301,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     return (
       <main className="learner-shell celebration-page">
         <SuccessBurst eventKey={`${lesson.id}-complete-${stars}-${reward.firstCompletion ? "new" : reward.starsImproved ? "upgrade" : "replay"}`} large />
-        {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-        <LearnerHeader state={state} demo={demo} />
+        {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+        <LearnerHeader state={state} demo={isDemo} />
         <section className={`celebration-card accent-${lesson.accent}`}>
           <div className="celebration-emblem"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} completed`} /><span aria-hidden="true">✓</span></div>
           <span className="section-kicker">{outcome.kicker}</span>
@@ -313,7 +313,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
             <span className={reward.xpEarned === 0 ? "quiet" : ""}><b>+{reward.xpEarned}</b><strong>XP</strong></span>
             {masteryLockedCount > 0 && <span><b aria-hidden="true">↻</b><strong>{masteryLockedCount} recalled</strong></span>}
           </div>
-          {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={demo} compact />}
+          {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={isDemo} compact />}
           <section className="settlement-next" aria-labelledby="settlement-next-title">
             {reward.firstCompletion && regionFinished ? <span className="settlement-boss-icon" aria-hidden="true">★</span> : <TopicIcon visual={reward.firstCompletion && following ? following.visual : lesson.visual} accent={reward.firstCompletion && following ? following.accent : lesson.accent} size="md" label="" />}
             <div><small>{nextStep.kicker}</small><strong id="settlement-next-title">{nextStep.title}</strong></div>
@@ -329,8 +329,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
 
   return (
     <main className="learner-shell lesson-shell">
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-      <LearnerHeader state={state} demo={demo} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <LearnerHeader state={state} demo={isDemo} />
       <div className="lesson-topline">
         <a href={trailUrl} className="back-link">← Trail</a>
         <div className="lesson-progress" role="progressbar" aria-label={`Lesson progress: ${currentStageLabel}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={lessonProgressPercent}><span style={{ width: `${lessonProgressPercent}%` }} /></div>

@@ -18,6 +18,7 @@ import { isThemeId, themeCatalog } from "../lib/themes.ts";
 import { frontierWorlds } from "../lib/frontier-worlds.ts";
 import { getLessonExperience } from "../lib/lesson-experience.ts";
 import { isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-interactions.ts";
+import { chooseLearnerMode } from "../lib/learner-mode.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -416,8 +417,48 @@ test("grants demo badges once at the same milestones as the server", () => {
 
   const lessonState = completeDemoLesson(after.state, "g8-r1-l2", 1);
   assert.ok(lessonState.badges.earnedIds.includes("lesson-g8-r1-l2"));
+  assert.equal(lessonState.learningHistory[0].key, "lesson:g8-r1-l2");
   const replayState = completeDemoLesson(lessonState, "g8-r1-l2", 3);
   assert.equal(replayState.badges.earnedIds.filter((id) => id === "lesson-g8-r1-l2").length, 1);
+  assert.equal(replayState.learningHistory.filter((entry) => entry.key === "lesson:g8-r1-l2").length, 1);
+});
+
+test("always gives a signed-in account priority over a demo query", () => {
+  assert.equal(chooseLearnerMode(true, true), "account");
+  assert.equal(chooseLearnerMode(true, false), "account");
+  assert.equal(chooseLearnerMode(false, true), "demo");
+  assert.equal(chooseLearnerMode(false, false), "signed-out");
+});
+
+test("separates account identity, weekly public aliases, and private learning history", async () => {
+  const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  const bootstrap = await readFile(new URL("../db/bootstrap.ts", import.meta.url), "utf8");
+  const migration = await readFile(new URL("../drizzle/0009_breezy_the_captain.sql", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const hook = await readFile(new URL("../app/components/useLearner.ts", import.meta.url), "utf8");
+  const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+
+  for (const source of [schema, bootstrap, migration]) {
+    assert.match(source, /auth_identities/);
+    assert.match(source, /public_aliases/);
+    assert.match(source, /question_count/);
+  }
+  assert.match(migration, /SELECT 'google', `auth_key`, `id`, `created_at`, `last_seen_at` FROM `learners`/);
+  assert.match(store, /FROM auth_identities i JOIN learners l/);
+  assert.match(store, /ensurePublicAlias\(learnerId, "leaderboard", week\)/);
+  assert.match(store, /JOIN public_aliases a/);
+  assert.match(store, /id: entry\.public_id/);
+  assert.match(store, /learningHistory/);
+  assert.match(hook, /fetch\("\/api\/me"/);
+  assert.match(hook, /chooseLearnerMode\(response\.ok, demoRequested\)/);
+  assert.match(hook, /isDemo: mode === "demo"/);
+  assert.match(dashboard, /demo=\{isDemo\}/);
+  assert.match(lesson, /if \(isDemo\)/);
+  assert.match(profile, /PRIVATE RECORD/);
+  assert.match(profile, /Learning history/);
+  assert.match(profile, /separate weekly alias/);
 });
 
 test("persists badge ownership and qualified answer credits without adding badge XP", async () => {
@@ -741,7 +782,7 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.match(bossPlayer, /No XP or completed repair is lost/);
   assert.match(bossPlayer, /body\.resynced/);
   assert.match(bossPlayer, /nextQuestionIndex/);
-  assert.match(bossPlayer, /\[demo, questions\.length, region\.id, learnerReady, unlocked\]/);
+  assert.match(bossPlayer, /\[isDemo, questions\.length, region\.id, learnerReady, unlocked\]/);
   assert.match(bossPlayer, /No heart was lost/);
   assert.match(bossPlayer, /aria-valuenow=\{repair\}/);
   assert.match(css, /\.repair-answer-feedback/);

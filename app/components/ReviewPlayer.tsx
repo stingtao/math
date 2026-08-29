@@ -21,7 +21,7 @@ import { EnterActionLink } from "./EnterActionLink";
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; interactionConfig?: QuestionInteractionConfig; choices?: string[] };
 
 export function ReviewPlayer({ demo }: { demo: boolean }) {
-  const { state, setState, loading, error } = useLearner(demo);
+  const { state, setState, loading, error, isDemo } = useLearner(demo);
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [ready, setReady] = useState(false);
   const [index, setIndex] = useState(0);
@@ -40,8 +40,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const savedNextLesson = state ? lessonById.get(state.nextLessonId) : undefined;
   const suggestedLesson = savedNextLesson && !state?.completedLessons.some((item) => item.id === savedNextLesson.id) ? savedNextLesson : undefined;
   const savedGrade = suggestedLesson?.grade ?? savedNextLesson?.grade ?? 8;
-  const trailHref = `/learn?grade=${savedGrade}${demo ? "&demo=1" : ""}`;
-  const suggestedHref = suggestedLesson ? `/learn/${suggestedLesson.slug}?grade=${suggestedLesson.grade}${demo ? "&demo=1" : ""}` : trailHref;
+  const trailHref = `/learn?grade=${savedGrade}${isDemo ? "&demo=1" : ""}`;
+  const suggestedHref = suggestedLesson ? `/learn/${suggestedLesson.slug}?grade=${suggestedLesson.grade}${isDemo ? "&demo=1" : ""}` : trailHref;
   const questionKey = question ? `${question.lessonId}:${question.questionId}` : "";
   const answerLocked = busy || feedback === "correct";
   const responseReady = question ? isResponseComplete(question, answer) : false;
@@ -57,19 +57,19 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
 
   useEffect(() => {
     if (!state || ready) return;
-    if (demo) { setQuestions(demoQuestions); setReady(true); return; }
+    if (isDemo) { setQuestions(demoQuestions); setReady(true); return; }
     fetch("/api/review").then(async (response) => {
       const body = await response.json() as { questions?: ReviewQuestion[] };
       setQuestions(body.questions ?? []); setReady(true);
     }).catch(() => setReady(true));
-  }, [demo, demoQuestions, ready, state]);
+  }, [isDemo, demoQuestions, ready, state]);
 
   if (loading || !ready) return <LearningLoading glyph="◇" tone="teal" kicker="BUILDING A QUICK RECALL" title="Choosing today’s ideas…" detail="Up to five skills are coming back at the right time." />;
   if (!state || error) return <LearningSignInGate glyph="◇" kicker="PRIVATE RECALL" title="Sign in to open your review." detail="Only you can see which skills are ready to practice again." />;
   const activeState = state;
   if (!questions.length) return (
     <main className="learner-shell">
-      <LearnerHeader state={state} demo={demo} />
+      <LearnerHeader state={state} demo={isDemo} />
       <section className="review-empty review-clear-state">
         <div className="review-finish-emblem review-clear-emblem"><TopicIcon visual="steps" accent="teal" size="xl" label="Daily Review queue clear" /><span aria-hidden="true">✓</span></div>
         <span className="section-kicker">REVIEW · ALL CLEAR</span>
@@ -95,7 +95,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     setBusy(true);
     setErrorMessage("");
     try {
-      if (demo) {
+      if (isDemo) {
         const correct = isAnswerCorrect(answer, question.answer ?? "");
         if (correct) {
           const badgeResult = creditDemoCorrectAnswer(activeState);
@@ -130,7 +130,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
     setBusy(true);
     setErrorMessage("");
     try {
-      if (demo) {
+      if (isDemo) {
         const nextState: LearnerState = { ...activeState, dueReview: 0, totalXp: activeState.totalXp + 20, weeklyXp: activeState.weeklyXp + 20 };
         saveDemoState(nextState); setState(nextState);
       } else {
@@ -151,8 +151,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   if (finished) return (
     <main className="learner-shell">
       <SuccessBurst eventKey="daily-review-complete" large />
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-      <LearnerHeader state={state} demo={demo} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <LearnerHeader state={state} demo={isDemo} />
       <section className="review-finish">
         {reviewAnchorLesson && <div className="review-finish-emblem"><TopicIcon visual={reviewAnchorLesson.visual} accent={reviewAnchorLesson.accent} size="xl" label="Daily Review completed" /><span aria-hidden="true">✓</span></div>}
         <span className="section-kicker">DAILY REVIEW COMPLETE</span>
@@ -167,8 +167,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
 
   return (
     <main className="learner-shell review-shell">
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-      <LearnerHeader state={state} demo={demo} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <LearnerHeader state={state} demo={isDemo} />
       <div className={`review-mobile-status accent-${questionLesson?.accent ?? "teal"}`}>
         <header><div><small>5-MINUTE REVIEW</small><strong>{question.lessonTitle}</strong></div></header>
         <TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent={questionLesson?.accent ?? "teal"} />

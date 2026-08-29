@@ -1,9 +1,21 @@
 import { calculateLessonReward } from "./rewards.ts";
 import { answerBadgeForCorrectCount, lessonBadgeByLessonId, type BadgeUnlock } from "./badges.ts";
 import { normalizeTheme, type ThemeId } from "./themes.ts";
-import { getGradeLessons, lessonById } from "./curriculum.ts";
+import { getGradeCurriculum, getGradeLessons, lessonById } from "./curriculum.ts";
 
 export type AvatarSpec = { glyph: string; tone: string; frame: string };
+export type LearningHistoryEntry = {
+  key: string;
+  kind: "lesson" | "boss";
+  title: string;
+  grade: number;
+  regionTitle: string;
+  completedAt: string;
+  stars?: number;
+  firstCorrectCount?: number;
+  questionCount?: number;
+  hearts?: number;
+};
 export type LearnerState = {
   profile: {
     nickname: string;
@@ -25,6 +37,7 @@ export type LearnerState = {
   dueReview: number;
   dailyRewardClaimed: boolean;
   nextLessonId: string;
+  learningHistory: LearningHistoryEntry[];
   badges: {
     earnedIds: string[];
     recent: BadgeUnlock[];
@@ -53,6 +66,17 @@ const fallback: LearnerState = {
   dueReview: 3,
   dailyRewardClaimed: false,
   nextLessonId: "g8-r1-l2",
+  learningHistory: [{
+    key: "lesson:g8-r1-l1",
+    kind: "lesson",
+    title: "Integer Operations",
+    grade: 8,
+    regionTitle: "Number Foundations",
+    completedAt: "2026-08-20T08:00:00.000Z",
+    stars: 3,
+    firstCorrectCount: 5,
+    questionCount: 5,
+  }],
   badges: {
     earnedIds: ["lesson-g8-r1-l1"],
     recent: [{ id: "lesson-g8-r1-l1", unlockedAt: "2026-08-20T08:00:00.000Z" }],
@@ -110,7 +134,7 @@ export function creditDemoCorrectAnswer(state: LearnerState) {
   return { state: next, badgeUnlocks, correctAnswers };
 }
 
-export function completeDemoLesson(state: LearnerState, lessonId: string, stars: number): LearnerState {
+export function completeDemoLesson(state: LearnerState, lessonId: string, stars: number, firstCorrectCount?: number): LearnerState {
   const existing = state.completedLessons.find((item) => item.id === lessonId);
   const reward = calculateLessonReward(existing?.stars ?? 0, stars);
   const completedLessons = existing
@@ -120,9 +144,22 @@ export function completeDemoLesson(state: LearnerState, lessonId: string, stars:
   const gradeLessons = currentLesson ? getGradeLessons(currentLesson.grade) : [];
   const currentIndex = gradeLessons.findIndex((item) => item.id === lessonId);
   const followingLesson = gradeLessons[currentIndex + 1] ?? currentLesson;
+  const region = currentLesson ? getGradeCurriculum(currentLesson.grade).regions.find((item) => item.id === currentLesson.regionId) : undefined;
+  const learningHistory = existing || !currentLesson ? state.learningHistory : [{
+    key: `lesson:${lessonId}`,
+    kind: "lesson" as const,
+    title: currentLesson.title,
+    grade: currentLesson.grade,
+    regionTitle: region?.title ?? "Math route",
+    completedAt: new Date().toISOString(),
+    stars,
+    firstCorrectCount: firstCorrectCount ?? (stars === 3 ? currentLesson.practice.length : 0),
+    questionCount: currentLesson.practice.length,
+  }, ...state.learningHistory];
   let next: LearnerState = {
     ...state,
     completedLessons,
+    learningHistory,
     totalXp: state.totalXp + reward.totalXp,
     weeklyXp: state.weeklyXp + reward.totalXp,
     nextLessonId: followingLesson?.id ?? state.nextLessonId,

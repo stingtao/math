@@ -64,6 +64,13 @@
       "when": 1787979450827,
       "tag": "0008_fat_wallow",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1788016652687,
+      "tag": "0009_breezy_the_captain",
+      "breakpoints": true
     }
   ]
 }

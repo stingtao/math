@@ -32,13 +32,13 @@ type BossAttempt = {
 };
 
 export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: boolean }) {
-  const { state, setState, loading, error } = useLearner(demo);
+  const { state, setState, loading, error, isDemo } = useLearner(demo);
   const questions = useMemo(() => [...region.lessons.map((item) => ({ ...item.practice[0], lesson: item.title })), { ...region.lessons[0].practice[1], lesson: "Mixed check" }], [region]);
   const completed = new Set(state?.completedLessons.map((item) => item.id) ?? []);
   const unlocked = Boolean(state && region.lessons.every((item) => completed.has(item.id)));
   const learnerReady = Boolean(state);
   const [attemptId, setAttemptId] = useState("");
-  const [attemptReady, setAttemptReady] = useState(demo);
+  const [attemptReady, setAttemptReady] = useState(false);
   const [index, setIndex] = useState(0);
   const [nextQuestionIndex, setNextQuestionIndex] = useState<number | null>(null);
   const [answer, setAnswer] = useState("");
@@ -76,7 +76,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   useEffect(() => {
     if (!learnerReady || !unlocked) return;
-    if (demo) {
+    if (isDemo) {
       setAttemptId((value) => value || crypto.randomUUID());
       setAttemptReady(true);
       return;
@@ -104,15 +104,15 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       if (active) { setErrorMessage("We could not open this boss attempt."); setAttemptReady(true); }
     });
     return () => { active = false; };
-  }, [demo, questions.length, region.id, learnerReady, unlocked]);
+  }, [isDemo, questions.length, region.id, learnerReady, unlocked]);
 
   if (loading || unlocked && !attemptReady) return <LearningLoading glyph="★" tone="gold" kicker="OPENING THE BOSS GATE" title="Preparing the check…" detail={`${questions.length} mixed challenges and three hearts are being set in place.`} />;
   if (!state || error) return <LearningSignInGate glyph="★" kicker="PRIVATE BOSS PROGRESS" title="Sign in to open this check." detail="Your attempts and recovery practice stay connected to your anonymous trail." />;
   const activeState = state;
-  const trailUrl = `/learn?grade=${region.grade}${demo ? "&demo=1" : ""}`;
-  const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${demo ? "&demo=1" : ""}` : `/learn/${nextRegion.lessons[0].slug}?grade=${region.grade}${demo ? "&demo=1" : ""}`;
+  const trailUrl = `/learn?grade=${region.grade}${isDemo ? "&demo=1" : ""}`;
+  const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${isDemo ? "&demo=1" : ""}` : `/learn/${nextRegion.lessons[0].slug}?grade=${region.grade}${isDemo ? "&demo=1" : ""}`;
   const trailRegionUrl = nextRegion ? `${trailUrl}#region-${nextRegion.id}` : trailUrl;
-  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Clear all {region.lessons.length} lessons first.</h1><p>The {questions.length}-question challenge opens after the last lesson.</p><a className="primary-button" href={trailUrl}>Show my next lesson <span>→</span></a></section></main>;
+  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={isDemo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Clear all {region.lessons.length} lessons first.</h1><p>The {questions.length}-question challenge opens after the last lesson.</p><a className="primary-button" href={trailUrl}>Show my next lesson <span>→</span></a></section></main>;
 
   function applyAttempt(attempt: Partial<BossAttempt>) {
     if (attempt.attemptId) setAttemptId(attempt.attemptId);
@@ -128,7 +128,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setErrorMessage("");
     setSyncMessage("");
     try {
-      if (demo) {
+      if (isDemo) {
         if (isAnswerCorrect(answer, question.answer)) {
           const badgeResult = creditDemoCorrectAnswer(activeState);
           setState(badgeResult.state);
@@ -204,6 +204,9 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     const next: LearnerState = {
       ...activeState,
       clearedBosses: already ? activeState.clearedBosses.map((item) => item.regionId === region.id ? { ...item, hearts: Math.max(item.hearts, hearts) } : item) : [...activeState.clearedBosses, { regionId: region.id, hearts }],
+      learningHistory: already
+        ? activeState.learningHistory.map((item) => item.key === `boss:${region.id}` ? { ...item, hearts: Math.max(item.hearts ?? 0, hearts) } : item)
+        : [{ key: `boss:${region.id}`, kind: "boss", title: `${region.title} Boss`, grade: region.grade, regionTitle: region.title, completedAt: new Date().toISOString(), hearts }, ...activeState.learningHistory],
       totalXp: activeState.totalXp + (already ? 0 : 100),
       weeklyXp: activeState.weeklyXp + (already ? 0 : 100),
     };
@@ -223,7 +226,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       setShowHint(false);
       return;
     }
-    if (demo) finishBoss();
+    if (isDemo) finishBoss();
     else if (!serverCleared) { setErrorMessage("The server has not cleared this boss yet."); return; }
     setCleared(true);
   }
@@ -249,7 +252,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setBusy(true);
     setErrorMessage("");
     try {
-      if (demo) {
+      if (isDemo) {
         const correct = isAnswerCorrect(repairAnswer, repairQuestion.answer);
         if (correct) {
           const badgeResult = creditDemoCorrectAnswer(activeState);
@@ -304,8 +307,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   if (cleared) return (
     <main className={`boss-shell accent-${region.accent}`}>
       <SuccessBurst eventKey={`boss-${region.id}-complete`} large />
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-      <LearnerHeader state={state} demo={demo} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <LearnerHeader state={state} demo={isDemo} />
       <section className="boss-victory boss-region-clear" aria-labelledby="boss-clear-title">
         <div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} region cleared`} /><span aria-hidden="true">★</span></div>
         <span className="section-kicker">REGION COMPLETE</span>
@@ -317,7 +320,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <span className={bossXpEarned === 0 ? "quiet" : ""}><b>+{bossXpEarned}</b><strong>XP</strong></span>
         </div>
 
-        {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={demo} compact />}
+        {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={isDemo} compact />}
 
         <section className={`settlement-next ${isFinalRegion ? "grade-complete" : ""}`} aria-labelledby="boss-next-title">
           <TopicIcon visual={(nextRegion ?? region).lessons[0].visual} accent={nextRegion?.accent ?? region.accent} size="md" label="" />
@@ -332,8 +335,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   if (repairRestored) return (
     <main className={`boss-shell accent-${region.accent}`}>
       <SuccessBurst eventKey={`boss-${region.id}-hearts-restored`} large />
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-      <LearnerHeader state={state} demo={demo} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <LearnerHeader state={state} demo={isDemo} />
       <section className="repair-restored-card" aria-live="polite">
         <div className="repair-restored-emblem">
           <TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="xl" label={`${repairLesson.title} repaired`} />
@@ -354,8 +357,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   if (failed) return (
     <main className={`boss-shell accent-${region.accent}`}>
       {repairCheckpoint && <AnswerImpact eventKey={`boss-repair-${region.id}-1`} label="REPAIR LOCKED" chain={1} progress={1} total={2} tone={repairLesson.accent} />}
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-      <LearnerHeader state={state} demo={demo} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <LearnerHeader state={state} demo={isDemo} />
       <section className="repair-card" aria-busy={busy}>
         <div className="repair-emblem"><TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="lg" label={`${repairLesson.title} repair`} /><span aria-hidden="true">◇</span></div>
         <span className="section-kicker">2-QUESTION REPAIR</span>
@@ -377,8 +380,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   return (
     <main className={`boss-shell accent-${region.accent}`}>
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={demo} onDismiss={() => setBadgeUnlocks([])} />}
-      <LearnerHeader state={state} demo={demo} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <LearnerHeader state={state} demo={isDemo} />
       <div className="boss-topbar"><a href={trailUrl}>← Leave</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
         <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF {questions.length}</span><h1>{region.title}</h1><p>{questions.length} links. No timer. Every miss can be repaired.</p></div></div>

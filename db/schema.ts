@@ -9,6 +9,17 @@ export const learners = sqliteTable("learners", {
   lastSeenAt: text("last_seen_at").notNull(),
 }, (table) => [uniqueIndex("idx_learners_auth_key").on(table.authKey)]);
 
+export const authIdentities = sqliteTable("auth_identities", {
+  provider: text("provider").notNull(),
+  subjectKey: text("subject_key").notNull(),
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  createdAt: text("created_at").notNull(),
+  lastUsedAt: text("last_used_at").notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.provider, table.subjectKey] }),
+  index("idx_auth_identities_learner").on(table.learnerId),
+]);
+
 export const publicProfiles = sqliteTable("public_profiles", {
   learnerId: text("learner_id").primaryKey().references(() => learners.id, { onDelete: "cascade" }),
   nickname: text("nickname").notNull(),
@@ -24,6 +35,22 @@ export const publicProfiles = sqliteTable("public_profiles", {
   rewardStep: integer("reward_step").notNull().default(0),
   lastActiveDate: text("last_active_date"),
 });
+
+export const publicAliases = sqliteTable("public_aliases", {
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  scope: text("scope").notNull(),
+  scopeKey: text("scope_key").notNull(),
+  publicId: text("public_id").notNull(),
+  nickname: text("nickname").notNull(),
+  avatarGlyph: text("avatar_glyph").notNull(),
+  avatarTone: text("avatar_tone").notNull(),
+  frame: text("frame").notNull().default("plain"),
+  createdAt: text("created_at").notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.learnerId, table.scope, table.scopeKey] }),
+  uniqueIndex("idx_public_aliases_public_id").on(table.scope, table.scopeKey, table.publicId),
+  index("idx_public_aliases_scope").on(table.scope, table.scopeKey),
+]);
 
 export const learnerPreferences = sqliteTable("learner_preferences", {
   learnerId: text("learner_id").primaryKey().references(() => learners.id, { onDelete: "cascade" }),
@@ -108,6 +135,7 @@ export const lessonProgress = sqliteTable("lesson_progress", {
   lessonId: text("lesson_id").notNull(),
   stars: integer("stars").notNull().default(1),
   firstCorrectCount: integer("first_correct_count").notNull().default(0),
+  questionCount: integer("question_count").notNull().default(5),
   completedAt: text("completed_at").notNull(),
 }, (table) => [primaryKey({ columns: [table.learnerId, table.lessonId] }), index("idx_lesson_progress_learner").on(table.learnerId)]);
 

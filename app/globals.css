@@ -4266,6 +4266,98 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
   .frontier-hero-shade { background: linear-gradient(180deg, rgb(250 253 254 / 99%) 0%, rgb(250 253 254 / 92%) 42%, rgb(250 253 254 / 28%) 64%, rgb(238 247 249 / 94%) 100%); }
 }
 
+/* The signed-in profile owns the complete learning record; public boards use a separate weekly alias. */
+.profile-learning-history {
+  margin: 0 0 17px;
+  padding: 27px;
+  border: 1px solid var(--theme-line, var(--line));
+  border-radius: 21px;
+  background: var(--theme-panel, white);
+  box-shadow: 0 10px 26px rgb(23 50 79 / 6%);
+}
+.profile-learning-history > header {
+  margin-bottom: 17px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+.profile-learning-history h2 { margin: 6px 0 0; font-size: 26px; }
+.profile-learning-history > header > strong {
+  padding: 8px 11px;
+  border-radius: 99px;
+  color: #176f86;
+  background: #e6f5f7;
+  font-size: 16px;
+}
+.history-grade-list { display: grid; gap: 10px; }
+.history-grade-list details {
+  overflow: hidden;
+  border: 1px solid #d7e2e7;
+  border-radius: 15px;
+  background: #fbfdfe;
+}
+.history-grade-list summary {
+  min-height: 56px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  color: var(--navy);
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 900;
+}
+.history-grade-list summary small { color: var(--muted); font-size: 16px; font-weight: 750; }
+.history-entry-list { border-top: 1px solid #d7e2e7; }
+.history-entry {
+  min-height: 72px;
+  padding: 13px 16px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  background: white;
+}
+.history-entry + .history-entry { border-top: 1px solid #e5ecef; }
+.history-entry-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: white;
+  background: #218b93;
+  font-size: 19px;
+  font-weight: 950;
+}
+.history-entry.boss .history-entry-icon { color: #4b3505; background: #ffd45d; }
+.history-entry > div > strong { display: block; color: var(--navy); font-size: 17px; }
+.history-entry p { margin: 4px 0 0; color: var(--muted); font-size: 16px; line-height: 1.35; }
+.history-result { color: #8b6518; font-size: 17px; font-weight: 900; text-align: right; }
+.history-result small { display: block; margin-top: 3px; color: var(--muted); font-size: 16px; font-weight: 700; }
+.history-empty {
+  padding: 19px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  border: 1px dashed #cbd8de;
+  border-radius: 15px;
+  background: #f7fafb;
+}
+.history-empty > span { font-size: 26px; }
+.history-empty strong { font-size: 17px; }
+.history-empty p { margin: 4px 0 0; color: var(--muted); font-size: 16px; }
+
+@media (max-width: 620px) {
+  .profile-learning-history { padding: 19px 15px; }
+  .profile-learning-history > header { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .history-entry { grid-template-columns: 40px minmax(0, 1fr); }
+  .history-result { grid-column: 2; text-align: left; }
+}
+
 /* Readability contract: learner-facing type stays between 16px and 34px. */
 :where(main, section, article, header, footer, nav, aside, div, span) { min-width: 0; }
 :where(h1, h2, h3, h4, p, li, label, legend, button, a, small, strong, em, time, figcaption, td, th) {

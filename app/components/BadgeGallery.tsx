@@ -10,7 +10,7 @@ import { BadgeMedallion } from "./BadgeMedallion";
 type BadgeFilter = "all" | "earned" | BadgeKind;
 
 export function BadgeGallery({ demo }: { demo: boolean }) {
-  const { state, loading, error } = useLearner(demo);
+  const { state, loading, error, isDemo } = useLearner(demo);
   const [filter, setFilter] = useState<BadgeFilter>("earned");
   const [visibleCount, setVisibleCount] = useState(48);
   const earned = useMemo(() => new Set(state?.badges.earnedIds ?? []), [state]);
@@ -27,7 +27,7 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
 
   return (
     <main className="learner-shell badge-vault-page">
-      <LearnerHeader state={state} demo={demo} />
+      <LearnerHeader state={state} demo={isDemo} />
       <section className="badge-vault-wrap">
         <header className="badge-vault-hero">
           <div className="badge-vault-heading"><h1>Badges</h1></div>

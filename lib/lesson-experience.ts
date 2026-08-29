@@ -233,7 +233,7 @@ export function getLessonExperience(lesson: Pick<LessonDefinition, "title" | "go
     };
   }
   const storyArc = gradeStoryArcs[lesson.regionId];
-  const journeyMedia = lesson.grade >= 7 && lesson.grade <= 9 ? gradeJourneyMedia[lesson.grade] : undefined;
+  const journeyMedia = lesson.grade === 7 || lesson.grade === 8 || lesson.grade === 9 ? gradeJourneyMedia[lesson.grade] : undefined;
   if (storyArc) {
     return {
       scene,

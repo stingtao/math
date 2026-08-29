@@ -20,7 +20,7 @@ import { LessonMissionThumbnail } from "./LessonMissionStory";
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
 export function LearningDashboard({ demo, grade }: { demo: boolean; grade: number }) {
-  const { state, setState, loading, error } = useLearner(demo);
+  const { state, setState, loading, error, isDemo } = useLearner(demo);
   const [rewardMessage, setRewardMessage] = useState("");
   const [rewardLandmark, setRewardLandmark] = useState<AchievementSpec | null>(null);
   const [rewardPending, setRewardPending] = useState(false);
@@ -71,7 +71,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     setRewardMessage("");
     setRewardLandmark(null);
     try {
-      if (demo) {
+      if (isDemo) {
         const step = (state!.profile.rewardStep % 7) + 1;
         const tokens = dailyRewardAmounts[step - 1];
         const next = {
@@ -124,12 +124,12 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 
   return (
     <main className="learner-shell">
-      <LearnerHeader state={state} demo={demo} />
+      <LearnerHeader state={state} demo={isDemo} />
       {rewardMessage.startsWith("Collected") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} />}
-      {demo && <div className="demo-banner"><span>Preview mode</span><p>Try anything. This progress lasts only in this browser.</p><a href="/#join">Sign in to save it</a></div>}
+      {isDemo && <div className="demo-banner"><span>Preview mode</span><p>Try anything. This progress lasts only in this browser.</p><a href="/#join">Sign in to save it</a></div>}
       <section className="dashboard-wrap">
         <nav className="grade-switcher" aria-label="Choose a grade">
-          {[7, 8, 9, 10, 11, 12].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${demo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
+          {[7, 8, 9, 10, 11, 12].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${isDemo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
         </nav>
 
         {showWelcomeGuide && <section className={`welcome-trail-guide welcome-first-mission accent-${nextLesson.accent}`} aria-labelledby="welcome-trail-heading">
@@ -139,7 +139,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <h2 id="welcome-trail-heading">Start with {nextLesson.title}.</h2>
             <p>{getLessonExperience(nextLesson).title}</p>
             <div className="next-meta"><span>◷ 6–8 min</span><span>↻ Hints + retries</span></div>
-            <a className="primary-button mission-primary-cta" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start first mission <span aria-hidden="true">→</span></a>
+            <a className="primary-button mission-primary-cta" href={`/learn/${nextLesson.slug}?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start first mission <span aria-hidden="true">→</span></a>
           </div>
           <div className="welcome-first-mission-visual"><LessonMissionThumbnail lesson={nextLesson} /></div>
         </section>}
@@ -148,16 +148,16 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           <div className={`dashboard-grid ${dailyCardVisible ? "" : "mission-only"}`}>
           {reviewBatchSize > 0 ? <section className="next-card review-priority-card">
             <div className="next-visual review-priority-visual" role="img" aria-label={`${reviewBatchSize} ideas ready for Daily Review`}><span>{String(reviewBatchSize).padStart(2, "0")}</span><div className="review-priority-orbit"><b>◇</b>{Array.from({ length: reviewBatchSize }, (_, index) => <i key={index} />)}</div><small>MEMORY PATH</small></div>
-            <div className="next-copy"><span className="section-kicker">YOUR NEXT MOVE · REVIEW READY</span><h2>Keep this skill ready.</h2><p>{reviewBatchSize === 1 ? "One idea is ready for a fast recall." : `${reviewBatchSize} ideas are ready for a fast recall.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button mission-primary-cta" href={`/review?grade=${grade}${demo ? "&demo=1" : ""}`}>Start the recall <span aria-hidden="true">→</span></a></div>
+            <div className="next-copy"><span className="section-kicker">YOUR NEXT MOVE · REVIEW READY</span><h2>Keep this skill ready.</h2><p>{reviewBatchSize === 1 ? "One idea is ready for a fast recall." : `${reviewBatchSize} ideas are ready for a fast recall.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button mission-primary-cta" href={`/review?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start the recall <span aria-hidden="true">→</span></a></div>
           </section> : gradeComplete ? <section className="next-card trail-complete-card">
             <div className={`next-visual trail-complete-visual accent-${activeRegion.accent}`}><span>{String(curriculum.regions.length).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[3].visual} accent={activeRegion.accent} size="xl" label={`Grade ${grade} trail complete`} /><b aria-hidden="true">✓</b><small>TRAIL CLEARED</small></div>
             <div className="next-copy"><span className="section-kicker">GRADE {grade} · ALL CLEAR</span><h2>You finished what was due.</h2><p>Stop here, or open the map when you want to replay a skill.</p><div className="next-meta"><span>✓ Grade route complete</span><span>◇ review returns later</span></div><button className="secondary-button" type="button" onClick={() => setShowFullMap(true)}>Open replay map <span aria-hidden="true">↓</span></button></div>
           </section> : activeBossReady ? <section className="next-card boss-priority-card">
             <div className={`next-visual boss-priority-visual accent-${activeRegion.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="xl" label={`${activeRegion.title} boss quest`} /><b aria-hidden="true">★</b><small>4 KEYS COLLECTED</small></div>
-            <div className="next-copy"><span className="section-kicker">YOUR NEXT MOVE · BOSS READY</span><h2>{activeRegion.title} Boss</h2><p>Use all {activeRegion.lessons.length} lesson ideas in {activeRegion.lessons.length + 1} questions. No timer. A miss opens a repair path.</p><div className="next-meta"><span>♥ 3 hearts</span><span>◇ {activeRegion.lessons.length + 1} mixed questions</span><span>◆ 100 XP</span></div><a className="primary-button mission-primary-cta" href={`/boss/${activeRegion.id}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start the challenge <span aria-hidden="true">→</span></a></div>
+            <div className="next-copy"><span className="section-kicker">YOUR NEXT MOVE · BOSS READY</span><h2>{activeRegion.title} Boss</h2><p>Use all {activeRegion.lessons.length} lesson ideas in {activeRegion.lessons.length + 1} questions. No timer. A miss opens a repair path.</p><div className="next-meta"><span>♥ 3 hearts</span><span>◇ {activeRegion.lessons.length + 1} mixed questions</span><span>◆ 100 XP</span></div><a className="primary-button mission-primary-cta" href={`/boss/${activeRegion.id}?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start the challenge <span aria-hidden="true">→</span></a></div>
           </section> : <section className="next-card">
             <div className={`next-visual accent-${featuredLesson.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><LessonMissionThumbnail lesson={featuredLesson} /></div>
-            <div className="next-copy"><span className="section-kicker">GRADE {grade} · YOUR NEXT MOVE</span><h2>{featuredLesson.title}</h2><p>{featuredExperience.title}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3-star goal</span></div><a className="primary-button mission-primary-cta" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start this mission <span aria-hidden="true">→</span></a></div>
+            <div className="next-copy"><span className="section-kicker">GRADE {grade} · YOUR NEXT MOVE</span><h2>{featuredLesson.title}</h2><p>{featuredExperience.title}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3-star goal</span></div><a className="primary-button mission-primary-cta" href={`/learn/${featuredLesson.slug}?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start this mission <span aria-hidden="true">→</span></a></div>
           </section>}
 
           {dailyCardVisible && <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed claim-settling" : "ready"}`} aria-labelledby="daily-reward-heading">
@@ -179,7 +179,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               <button className="full-button reward-claim-button reward-ready-button" type="button" disabled={rewardPending} aria-busy={rewardPending} onClick={claimReward}>{rewardPending ? "Collecting…" : `Collect +${visibleRewardAmount} tokens`} <span aria-hidden="true">◆</span></button>
               {rewardMessage && <div className="reward-callout error" role="alert"><span aria-hidden="true">!</span><strong>{rewardMessage}</strong></div>}
             </>}
-            {rewardLandmark && <PrivateLandmarkUnlock achievement={rewardLandmark} demo={demo} compact />}
+            {rewardLandmark && <PrivateLandmarkUnlock achievement={rewardLandmark} demo={isDemo} compact />}
           </aside>}
           </div>
         </section>}
@@ -199,15 +199,15 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               return (
                 <article className={`world-card accent-${region.accent} ${previousCleared ? "unlocked" : "world-locked"} ${bossCleared ? "completed-summary" : ""}`} aria-label={`${region.title}: ${bossCleared ? "explored" : previousCleared ? `${regionDone} of ${region.lessons.length} lessons complete` : "locked"}`} id={`region-${region.id}`} key={region.id}>
                   <header className={`world-header ${landmark && previousCleared && !bossCleared ? "with-landmark" : ""}`}><div className="world-marker"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="md" label={`${region.title} region icon`} /><span className="world-number">{String(region.order).padStart(2, "0")}</span></div><div className="world-copy"><span>{regionLabel}</span><h3>{region.title}</h3>{!bossCleared && <p>{region.subtitle}</p>}</div>{landmark && previousCleared && !bossCleared && <div className="world-landmark"><Image src={landmark.src} width={360} height={240} sizes="(max-width: 760px) 86vw, 140px" alt={landmark.alt} /><span aria-hidden="true">LANDMARK</span></div>}<span className="world-status">{bossCleared ? "✓" : previousCleared ? `${regionDone}/${region.lessons.length}` : "Locked"}</span></header>
-                  {bossCleared ? <a className="world-replay-link" href={`/learn/${region.lessons[0].slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Replay this region <span aria-hidden="true">→</span></a> : previousCleared ? <div className="world-path">
+                  {bossCleared ? <a className="world-replay-link" href={`/learn/${region.lessons[0].slug}?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Replay this region <span aria-hidden="true">→</span></a> : previousCleared ? <div className="world-path">
                     {region.lessons.map((item, index) => {
                       const stars = completed.get(item.id);
                       const priorLessonComplete = index === 0 || completed.has(region.lessons[index - 1].id);
                       const available = previousCleared && (Boolean(stars) || priorLessonComplete);
                       const content = <><TopicIcon visual={item.visual} accent={item.accent} size="sm" /><span className="path-copy"><small>{stars ? "✓" : available ? "NEXT" : `STEP ${index + 1}`}</small><span className="path-title">{item.title}</span></span><span className="path-stars" aria-label={stars ? `${stars} stars` : available ? "Ready" : "Locked"}>{stars ? `${"★".repeat(stars)}${"☆".repeat(3 - stars)}` : available ? "Ready →" : "·"}</span></>;
-                      return available ? <a className={`path-lesson ${stars ? "complete" : "current"}`} href={`/learn/${item.slug}?grade=${grade}${demo ? "&demo=1" : ""}`} key={item.id}>{content}</a> : <div className="path-lesson locked" key={item.id}>{content}</div>;
+                      return available ? <a className={`path-lesson ${stars ? "complete" : "current"}`} href={`/learn/${item.slug}?grade=${grade}${isDemo ? "&demo=1" : ""}`} key={item.id}>{content}</a> : <div className="path-lesson locked" key={item.id}>{content}</div>;
                     })}
-                    {regionComplete ? <a className="boss-node ready" href={`/boss/${region.id}?grade=${grade}${demo ? "&demo=1" : ""}`}><span>★</span><strong>Boss ready</strong><small>5 mixed questions</small></a> : <div className="boss-node locked"><span>☆</span><strong>Region boss</strong><small>Clear the four steps</small></div>}
+                    {regionComplete ? <a className="boss-node ready" href={`/boss/${region.id}?grade=${grade}${isDemo ? "&demo=1" : ""}`}><span>★</span><strong>Boss ready</strong><small>5 mixed questions</small></a> : <div className="boss-node locked"><span>☆</span><strong>Region boss</strong><small>Clear the four steps</small></div>}
                   </div> : <div className="world-lock-preview"><span aria-hidden="true">◇</span><strong>Clear {curriculum.regions[regionIndex - 1]?.title ?? "the previous region"} to reach this region.</strong></div>}
                 </article>
               );
