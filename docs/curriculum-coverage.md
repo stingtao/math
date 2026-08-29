@@ -20,10 +20,13 @@ The 2026 depth audit also compared official sources with different jobs:
 - [New York Next Generation Mathematics Standards](https://www.nysed.gov/sites/default/files/programs/standards-instruction/nys-next-generation-mathematics-p-12-standards.pdf) for explicit course-level Algebra I outcomes such as linear–quadratic systems.
 - [AP Calculus AB and BC Course and Exam Description](https://apcentral.collegeboard.org/media/pdf/ap-calculus-ab-and-bc-course-and-exam-description.pdf) for the complete ten-unit Calculus pathway.
 - [AP Statistics](https://apcentral.collegeboard.org/courses/ap-statistics) for study design, probability, and inference for proportions, means, and regression.
+- [Cambridge International AS & A Level Mathematics 9709 syllabus (2026–2027)](https://www.cambridgeinternational.org/Images/697427-2026-2027-syllabus.pdf) for advanced pure mathematics, probability, and statistics expectations across functions, trigonometry, calculus, and distributions.
 - [Kang Chiao Xiugang school profile](https://www.kcis.com.tw/file/KCIS_Profile2021-2022.pdf) and its public course listings: Grades 7–10 follow IB MYP, while Grades 11–12 branch into IB DP or AP options including Algebra II, Geometry, Precalculus, Calculus AB/BC, and Statistics.
 - [IB Diploma Mathematics](https://ibo.org/programmes/diploma-programme/curriculum/mathematics/) for Analysis and Approaches / Applications and Interpretation expectations around inquiry, technology, proof, modeling, and interpretation.
 
 Kang Chiao is therefore represented as a pathway constraint, not a single fixed Grade 7–12 syllabus. The product preserves one continuous sequence while adding the depth needed for later AP and IB choices.
+
+Cambridge International is recorded as a separate comparison authority because it is not a U.S. grade-level standard. Its advanced function, trigonometry, calculus, discrete distribution, and sampling outcomes are mapped to existing Grade 11–12 lessons in the machine-readable contract rather than being used to relabel the U.S.-aligned sequence.
 
 ## Full-bank audit repairs
 
@@ -54,6 +57,20 @@ Kang Chiao is therefore represented as a pathway constraint, not a single fixed 
 | Study design and procedure-specific inference | `g12-study-design`; `g12-inference-for-proportions`; `g12-inference-for-means`; `g12-regression-inference` | One generic hypothesis-testing lesson cannot cover design, conditions, procedure choice, and contextual conclusions. |
 
 These 16 additions contribute 80 reviewed questions. Each new lesson includes one five-step ordering task so a learner must reconstruct a method, not only recognize a result.
+
+## Grade 10–12 representation upgrade
+
+The advanced-course audit found a second kind of gap: topic names and calculations were present, but 72–82% of questions in each advanced grade still used free-form fill-in. That over-tested symbolic entry while under-testing the representations students must interpret in Geometry, Algebra II, Precalculus, Calculus, and Statistics.
+
+The repair adds 26 authored visual-reasoning missions while preserving every existing lesson ID:
+
+- every Grade 10–12 region now contains at least one advanced interaction mission;
+- `graph-choice` renders selectable function, conic, trigonometric, derivative, and integral models from structured plot data;
+- `table-choice` renders proof reasons, conditional denominators, sequences, limits, confidence statements, probability parameters, and study designs as selectable rows;
+- coordinate plotting, number-line boundaries, and multi-select reasoning now appear in advanced lessons where those representations carry the concept;
+- every advanced grade now uses at least nine interaction families, and the validator checks plot data, table shape, answer alignment, keyboard completion, and regional coverage.
+
+Story coverage is also region-specific rather than one generic space wrapper. The 24 advanced regions now connect their own mathematics to a coherent decision—structural proof, crater rangefinding, signal phase, comet tracking, live velocity, resource accumulation, uncertainty, or network choice—and the accompanying SVG names the mathematical signals used in that decision.
 
 ## Audited topic map
 

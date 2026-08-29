@@ -8,12 +8,36 @@ export type QuestionInteraction =
   | "ordering"
   | "multi-select"
   | "coordinate-grid"
-  | "number-line";
+  | "number-line"
+  | "graph-choice"
+  | "table-choice";
+
+export type GraphChoicePlot = {
+  value: string;
+  label: string;
+  kind: "linear" | "quadratic" | "absolute" | "exponential" | "sine" | "cosine" | "circle" | "ellipse";
+  a?: number;
+  b?: number;
+  c?: number;
+  h?: number;
+  k?: number;
+  r?: number;
+  rx?: number;
+  ry?: number;
+  shadeToAxis?: boolean;
+};
+
+export type TableChoiceRow = {
+  value: string;
+  cells: string[];
+};
 
 export type QuestionInteractionConfig =
   | { kind: "multi-select"; requiredSelections: number }
   | { kind: "coordinate-grid"; xMin: number; xMax: number; yMin: number; yMax: number; step?: number }
-  | { kind: "number-line"; min: number; max: number; step?: number };
+  | { kind: "number-line"; min: number; max: number; step?: number }
+  | { kind: "graph-choice"; xMin: number; xMax: number; yMin: number; yMax: number; plots: GraphChoicePlot[] }
+  | { kind: "table-choice"; columns: string[]; rows: TableChoiceRow[] };
 
 export const ORDERING_SEPARATOR = " → ";
 export const MULTI_SELECT_SEPARATOR = " ; ";

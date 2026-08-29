@@ -81,6 +81,36 @@ function MissionScene({ scene, accent, signalA, signalB, title, compact = false 
     {scene === "numbers" && <>
       <path d="M76 164H390" stroke="#17364b" strokeWidth="6" strokeLinecap="round"/><path d="M224 134V194" stroke="#17364b" strokeWidth="6"/><circle cx="155" cy="164" r="13" fill="#e15f4f" stroke="white" strokeWidth="5"/><circle cx="327" cy="164" r="13" fill={tone.main} stroke="white" strokeWidth="5"/><path d="M164 130Q242 67 319 130" fill="none" stroke={tone.main} strokeWidth="6" strokeDasharray="10 8"/>
     </>}
+    {scene === "proof" && <>
+      <path d="M92 211L222 82L345 211Z" fill={tone.soft} stroke="#17364b" strokeWidth="5" strokeLinejoin="round"/>
+      <path d="M222 82V211M167 139L180 151L198 126" fill="none" stroke={tone.main} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M245 128H400M245 161H372M245 194H417" stroke="#17364b" strokeWidth="4" strokeLinecap="round"/>
+      <g fill={tone.main}><circle cx="235" cy="128" r="6"/><circle cx="235" cy="161" r="6"/><circle cx="235" cy="194" r="6"/></g>
+    </>}
+    {scene === "signal" && <>
+      <path d="M76 213V80M76 147H421" stroke="#17364b" strokeWidth="5" strokeLinecap="round"/>
+      <path d="M83 146C115 80 154 80 187 146S259 212 293 146S365 80 414 145" fill="none" stroke={tone.main} strokeWidth="8" strokeLinecap="round"/>
+      <path d="M151 83V211M292 83V211" stroke="#17364b" strokeWidth="3" strokeDasharray="8 7" opacity=".45"/>
+      <circle cx="187" cy="146" r="9" fill="#ffc742" stroke="#17364b" strokeWidth="4"/>
+    </>}
+    {scene === "orbit" && <>
+      <ellipse cx="247" cy="151" rx="151" ry="78" fill="none" stroke={tone.main} strokeWidth="7"/>
+      <circle cx="188" cy="151" r="16" fill="#ffc742" stroke="#17364b" strokeWidth="4"/>
+      <circle cx="306" cy="151" r="6" fill="#17364b"/>
+      <g transform="translate(364 115) rotate(18)"><rect x="0" y="0" width="47" height="27" rx="7" fill="white" stroke="#17364b" strokeWidth="4"/><path d="M-31 5H0M47 5H78M-31 22H0M47 22H78" stroke={tone.main} strokeWidth="7"/></g>
+      <path d="M188 151L397 128" stroke="#17364b" strokeWidth="3" strokeDasharray="8 7"/>
+    </>}
+    {scene === "accumulation" && <>
+      <path d="M75 220V70M75 220H420" stroke="#17364b" strokeWidth="5" strokeLinecap="round"/>
+      {[112, 148, 184, 220, 256, 292, 328].map((x, index) => <rect key={x} x={x} y={190 - index * 14} width="32" height={30 + index * 14} fill={tone.soft} stroke={tone.main} strokeWidth="2"/>)}
+      <path d="M82 204C142 197 195 178 241 145S329 88 407 80" fill="none" stroke={tone.main} strokeWidth="8" strokeLinecap="round"/>
+      <path d="M112 230H360" stroke="#17364b" strokeWidth="3" strokeDasharray="8 7"/>
+    </>}
+    {scene === "network" && <>
+      <g stroke="#17364b" strokeWidth="6"><path d="M120 112L235 76L351 121L399 208L258 224L120 112M235 76L258 224M351 121L120 112"/></g>
+      <g stroke="white" strokeWidth="5"><circle cx="120" cy="112" r="18" fill={tone.main}/><circle cx="235" cy="76" r="18" fill="#ffc742"/><circle cx="351" cy="121" r="18" fill={tone.main}/><circle cx="399" cy="208" r="18" fill="#e15f4f"/><circle cx="258" cy="224" r="18" fill={tone.main}/></g>
+      <path d="M270 201L258 224L286 218" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+    </>}
     {isSignal && <>
       <path d="M93 226V98M93 226H352" stroke="#17364b" strokeWidth="6" strokeLinecap="round"/>
       {scene === "growth" ? <path d="M112 209C167 200 194 178 223 147S288 95 337 67" fill="none" stroke={tone.main} strokeWidth="8" strokeLinecap="round"/> : <g fill={tone.main} stroke="white" strokeWidth="4"><circle cx="132" cy="182" r="10"/><circle cx="171" cy="158" r="10"/><circle cx="207" cy="171" r="10"/><circle cx="251" cy="123" r="10"/><circle cx="297" cy="135" r="10"/><circle cx="331" cy="87" r="10"/></g>}
@@ -91,7 +121,7 @@ function MissionScene({ scene, accent, signalA, signalB, title, compact = false 
 }
 
 function HistoryScene({ scene, title }: { scene: LessonScene; title: string }) {
-  const symbols: Record<LessonScene, string> = { numbers: "−2 + 5", resources: "3/4", systems: "x + 4 = 9", navigation: "(x, y)", habitat: "△", risk: "P(A)", growth: "2ⁿ", motion: "dy/dx" };
+  const symbols: Record<LessonScene, string> = { numbers: "−2 + 5", resources: "3/4", systems: "x + 4 = 9", navigation: "(x, y)", habitat: "△", risk: "P(A)", growth: "2ⁿ", motion: "dy/dx", proof: "∵ → ∴", signal: "sin θ", orbit: "r(θ)", accumulation: "∫ f(x)dx", network: "V → E" };
   return <svg className="history-scene" viewBox="0 0 560 250" role="img" aria-label={`A historical manuscript connects to the modern model ${symbols[scene]}: ${title}`}>
     <rect x="8" y="8" width="544" height="234" rx="28" fill="#f5ead2" stroke="#17364b" strokeWidth="4"/>
     <path d="M66 54Q89 34 112 54V199Q89 181 66 199ZM112 54Q164 30 217 55V199Q164 175 112 199Z" fill="#fff9e8" stroke="#17364b" strokeWidth="4"/>

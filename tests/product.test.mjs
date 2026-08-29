@@ -87,7 +87,7 @@ test("turns common wrong answers into specific recovery guidance and a delayed r
   assert.deepEqual(remixedChoices(["A", "B", "C"], false), ["A", "B", "C"]);
 });
 
-test("models answer interactions before rendering all 1,297 questions", () => {
+test("models answer interactions before rendering all 1,323 questions", () => {
   const questions = lessons.flatMap((lesson) => lesson.practice);
   const yesNo = questions.filter((question) => question.interaction === "yes-no");
   const trueFalse = questions.filter((question) => question.interaction === "true-false");
@@ -95,16 +95,20 @@ test("models answer interactions before rendering all 1,297 questions", () => {
   const multiSelect = questions.filter((question) => question.interaction === "multi-select");
   const coordinateGrid = questions.filter((question) => question.interaction === "coordinate-grid");
   const numberLine = questions.filter((question) => question.interaction === "number-line");
+  const graphChoice = questions.filter((question) => question.interaction === "graph-choice");
+  const tableChoice = questions.filter((question) => question.interaction === "table-choice");
   const factorQuestions = questions.filter((question) => /^Factor(?: completely)?\b/i.test(question.prompt));
   const proportionalDecision = lessons.find((lesson) => lesson.slug === "g7-proportional-tables")?.practice[1];
 
-  assert.equal(questions.length, 1297);
+  assert.equal(questions.length, 1323);
   assert.equal(yesNo.length, 110);
   assert.equal(trueFalse.length, 1);
   assert.equal(ordering.length, 16);
-  assert.equal(multiSelect.length, 14);
-  assert.equal(coordinateGrid.length, 11);
-  assert.equal(numberLine.length, 7);
+  assert.equal(multiSelect.length, 18);
+  assert.equal(coordinateGrid.length, 14);
+  assert.equal(numberLine.length, 8);
+  assert.equal(graphChoice.length, 11);
+  assert.equal(tableChoice.length, 7);
   assert.ok(yesNo.every((question) => question.choices?.join("|") === "Yes|No"));
   assert.ok(trueFalse.every((question) => question.choices?.join("|") === "True|False"));
   assert.equal(proportionalDecision?.interaction, "yes-no");
@@ -115,6 +119,9 @@ test("models answer interactions before rendering all 1,297 questions", () => {
   assert.ok(multiSelect.every((question) => question.interactionConfig?.kind === "multi-select" && question.answer.split(MULTI_SELECT_SEPARATOR).length === question.interactionConfig.requiredSelections));
   assert.ok(coordinateGrid.every((question) => question.interactionConfig?.kind === "coordinate-grid" && isResponseComplete(question, question.answer)));
   assert.ok(numberLine.every((question) => question.interactionConfig?.kind === "number-line" && isResponseComplete(question, question.answer)));
+  assert.ok(graphChoice.every((question) => question.interactionConfig?.kind === "graph-choice" && question.interactionConfig.plots.length === question.choices?.length));
+  assert.ok(tableChoice.every((question) => question.interactionConfig?.kind === "table-choice" && question.interactionConfig.rows.every((row) => row.cells.length === question.interactionConfig.columns.length)));
+  for (const grade of [10, 11, 12]) assert.ok(new Set(lessons.filter((lesson) => lesson.grade === grade).flatMap((lesson) => lesson.practice.map((question) => question.interaction))).size >= 9);
 });
 
 test("keeps the audited Algebra I scope tied to dedicated lessons and teaching visuals", async () => {
@@ -124,7 +131,7 @@ test("keeps the audited Algebra I scope tied to dedicated lessons and teaching v
   const slugs = new Set(lessons.map((lesson) => lesson.slug));
 
   assert.equal(algebraCourseCoverage.length, 16);
-  assert.equal(extendedProgramCoverage.length, 16);
+  assert.equal(extendedProgramCoverage.length, 18);
   assert.equal(grade7To12CoreCoverage.length, 73);
   for (const strand of grade7To12CoreCoverage) for (const slug of strand.lessonSlugs) assert.ok(slugs.has(slug), `${strand.cluster} lost ${slug}`);
   for (const strand of algebraCourseCoverage) for (const slug of strand.lessonSlugs) assert.ok(slugs.has(slug), `${strand.topic} lost ${slug}`);
@@ -1473,7 +1480,7 @@ test("gives every lesson an applied mission and a sourced history finish", async
   const experiences = lessons.map(getLessonExperience);
 
   assert.equal(experiences.length, 253);
-  assert.deepEqual(new Set(experiences.map((item) => item.scene)), new Set(["numbers", "resources", "systems", "navigation", "habitat", "risk", "growth", "motion"]));
+  assert.deepEqual(new Set(experiences.map((item) => item.scene)), new Set(["numbers", "resources", "systems", "navigation", "habitat", "risk", "growth", "motion", "proof", "signal", "orbit", "accumulation", "network"]));
   for (const experience of experiences) {
     assert.ok(experience.title.length > 20);
     assert.ok(experience.problem.length > 40);
@@ -1484,6 +1491,13 @@ test("gives every lesson an applied mission and a sourced history finish", async
   }
   assert.match(lessonMission, /MISSION MODEL/);
   assert.match(lessonMission, /WHY THIS IDEA EXISTS/);
+  assert.match(lessonMission, /scene === "proof"/);
+  assert.match(lessonMission, /scene === "signal"/);
+  assert.match(lessonMission, /scene === "orbit"/);
+  assert.match(lessonMission, /scene === "accumulation"/);
+  assert.match(lessonMission, /scene === "network"/);
+  const advancedExperiences = lessons.filter((lesson) => lesson.grade >= 10).map(getLessonExperience);
+  assert.equal(new Set(advancedExperiences.map((item) => item.kicker)).size, 24);
   assert.match(dashboard, /Start first mission/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{nextLesson\}/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{featuredLesson\}/);

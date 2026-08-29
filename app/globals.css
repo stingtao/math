@@ -3272,12 +3272,38 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .number-line-track button:hover i, .number-line-track button:focus-visible i { transform: scale(1.2); border-color: var(--blue); }
 .number-line-track button.selected { color: var(--blue); }
 .number-line-track button.selected i { transform: scale(1.22); border-color: white; background: var(--blue); box-shadow: 0 0 0 3px var(--blue); }
+.graph-choice-response, .table-choice-response { margin: 25px 0; }
+.graph-choice-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.graph-choice-options > button { min-width: 0; padding: 10px; display: grid; gap: 8px; border: 2px solid #cfdae2; border-radius: 17px; color: var(--navy); background: white; font-size: 17px; font-weight: 850; text-align: left; transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease; }
+.graph-choice-options > button:hover, .graph-choice-options > button:focus-visible { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 10px 24px rgb(23 54 75 / 10%); outline: none; }
+.graph-choice-options > button.selected { border-color: var(--blue); background: #edf4fe; box-shadow: inset 0 0 0 1px var(--blue); }
+.graph-choice-options svg { width: 100%; height: auto; display: block; overflow: hidden; border-radius: 13px; }
+.graph-choice-board { fill: #f8fbfd; stroke: #d9e4eb; stroke-width: 2; }
+.graph-choice-grid line { stroke: #dfe8ed; stroke-width: 1; }
+.graph-choice-axes line { stroke: #17364b; stroke-width: 2.2; }
+.graph-choice-curve { fill: none; stroke: var(--accent, var(--blue)); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.graph-choice-area { fill: color-mix(in srgb, var(--accent, var(--blue)) 22%, transparent); stroke: none; }
+.graph-choice-response.invalid .graph-choice-options > button, .table-choice-response.invalid .table-choice-grid { border-color: var(--coral); }
+.table-choice-grid { display: grid; border: 2px solid #cfdae2; border-radius: 17px; overflow: hidden; background: white; }
+.table-choice-header, .table-choice-grid > button { display: grid; grid-template-columns: repeat(var(--table-columns, 3), minmax(0, 1fr)); }
+.table-choice-header { color: #4c6578; background: #edf3f6; font-size: 16px; font-weight: 900; }
+.table-choice-header span, .table-choice-grid > button span { min-width: 0; padding: 13px 12px; overflow-wrap: anywhere; }
+.table-choice-grid > button { width: 100%; padding: 0; border: 0; border-top: 1px solid #d9e4eb; color: var(--navy); background: white; font-size: 17px; font-weight: 750; text-align: left; }
+.table-choice-grid > button:hover, .table-choice-grid > button:focus-visible { background: #f2f7ff; outline: 3px solid color-mix(in srgb, var(--blue) 28%, transparent); outline-offset: -3px; }
+.table-choice-grid > button.selected { color: #174f9e; background: #e8f1ff; box-shadow: inset 5px 0 0 var(--blue); }
 
 @media (max-width: 560px) {
   .coordinate-response { margin-right: -8px; margin-left: -8px; }
   .number-line-track { overflow-x: auto; justify-content: flex-start; gap: 4px; }
   .number-line-track button { flex: 0 0 45px; }
   .number-line-track::before { right: 28px; left: 28px; min-width: calc(100% - 56px); }
+  .graph-choice-options { grid-template-columns: 1fr; }
+  .table-choice-grid { gap: 9px; border: 0; overflow: visible; background: transparent; }
+  .table-choice-header { display: none; }
+  .table-choice-grid > button { grid-template-columns: 1fr !important; border: 2px solid #cfdae2; border-radius: 15px; overflow: hidden; }
+  .table-choice-grid > button span { padding: 10px 12px; display: grid; grid-template-columns: minmax(105px, .45fr) minmax(0, 1fr); gap: 10px; border-top: 1px solid #e0e8ed; }
+  .table-choice-grid > button span:first-child { border-top: 0; }
+  .table-choice-grid > button span::before { content: attr(data-label); color: #60778a; font-size: 16px; font-weight: 900; }
 }
 .primary-button[aria-busy="true"] { opacity: 1; cursor: progress; }
 .primary-button[aria-busy="true"] span { display: none; }

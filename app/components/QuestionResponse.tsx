@@ -1,4 +1,4 @@
-import { isResponseComplete, MULTI_SELECT_SEPARATOR, ORDERING_SEPARATOR, type QuestionInteraction, type QuestionInteractionConfig } from "@/lib/question-interactions";
+import { isResponseComplete, MULTI_SELECT_SEPARATOR, ORDERING_SEPARATOR, type GraphChoicePlot, type QuestionInteraction, type QuestionInteractionConfig } from "@/lib/question-interactions";
 import { mathInputMode } from "@/lib/math-input";
 
 type QuestionResponseProps = {
@@ -19,6 +19,14 @@ export function QuestionResponse({ question, value, disabled, invalid, described
 
   if (question.interaction === "number-line" && question.interactionConfig?.kind === "number-line") {
     return <NumberLineResponse config={question.interactionConfig} value={value} disabled={disabled} invalid={invalid} describedBy={describedBy} onChange={onChange} onSubmit={onSubmit} />;
+  }
+
+  if (question.interaction === "graph-choice" && question.interactionConfig?.kind === "graph-choice") {
+    return <GraphChoiceResponse config={question.interactionConfig} value={value} disabled={disabled} invalid={invalid} describedBy={describedBy} onChange={onChange} onSubmit={onSubmit} />;
+  }
+
+  if (question.interaction === "table-choice" && question.interactionConfig?.kind === "table-choice") {
+    return <TableChoiceResponse config={question.interactionConfig} value={value} disabled={disabled} invalid={invalid} describedBy={describedBy} onChange={onChange} onSubmit={onSubmit} />;
   }
 
   if (question.interaction === "multi-select" && choices) {
@@ -235,5 +243,101 @@ function NumberLineResponse({ config, value, disabled, invalid, describedBy, onC
       })}
     </div>
     <p className="plot-selection" aria-live="polite">{value ? `Selected ${value}` : "Choose a value on the number line."}</p>
+  </div>;
+}
+
+function graphValue(plot: GraphChoicePlot, x: number) {
+  const a = plot.a ?? 1;
+  const b = plot.b ?? 1;
+  const c = plot.c ?? 0;
+  const h = plot.h ?? 0;
+  const k = plot.k ?? 0;
+  if (plot.kind === "linear") return a * x + b;
+  if (plot.kind === "quadratic") return a * (x - h) ** 2 + k;
+  if (plot.kind === "absolute") return a * Math.abs(x - h) + k;
+  if (plot.kind === "exponential") return a * b ** x + k;
+  if (plot.kind === "sine") return a * Math.sin(b * x + c) + k;
+  if (plot.kind === "cosine") return a * Math.cos(b * x + c) + k;
+  return 0;
+}
+
+function GraphPreview({ plot, xMin, xMax, yMin, yMax }: { plot: GraphChoicePlot; xMin: number; xMax: number; yMin: number; yMax: number }) {
+  const width = 240;
+  const height = 150;
+  const pad = 18;
+  const xPosition = (x: number) => pad + ((x - xMin) / (xMax - xMin)) * (width - pad * 2);
+  const yPosition = (y: number) => height - pad - ((y - yMin) / (yMax - yMin)) * (height - pad * 2);
+  const samples = Array.from({ length: 81 }, (_, index) => xMin + (index / 80) * (xMax - xMin));
+  const curve = plot.kind === "circle" || plot.kind === "ellipse"
+    ? ""
+    : samples.map((x, index) => `${index ? "L" : "M"}${xPosition(x).toFixed(2)} ${yPosition(graphValue(plot, x)).toFixed(2)}`).join(" ");
+  const area = plot.shadeToAxis && curve
+    ? `${curve} L${xPosition(xMax)} ${yPosition(0)} L${xPosition(xMin)} ${yPosition(0)} Z`
+    : "";
+  const axisX = yMin <= 0 && yMax >= 0 ? yPosition(0) : height - pad;
+  const axisY = xMin <= 0 && xMax >= 0 ? xPosition(0) : pad;
+  return <svg viewBox={`0 0 ${width} ${height}`} aria-hidden="true" focusable="false">
+    <rect x="1" y="1" width={width - 2} height={height - 2} rx="15" className="graph-choice-board" />
+    <g className="graph-choice-grid" aria-hidden="true">
+      {[.25, .5, .75].map((ratio) => <line key={`v-${ratio}`} x1={pad + ratio * (width - pad * 2)} y1={pad} x2={pad + ratio * (width - pad * 2)} y2={height - pad} />)}
+      {[.25, .5, .75].map((ratio) => <line key={`h-${ratio}`} x1={pad} y1={pad + ratio * (height - pad * 2)} x2={width - pad} y2={pad + ratio * (height - pad * 2)} />)}
+    </g>
+    <g className="graph-choice-axes" aria-hidden="true"><line x1={pad} y1={axisX} x2={width - pad} y2={axisX} /><line x1={axisY} y1={pad} x2={axisY} y2={height - pad} /></g>
+    {area && <path d={area} className="graph-choice-area" />}
+    {plot.kind === "circle" || plot.kind === "ellipse"
+      ? <ellipse cx={xPosition(plot.h ?? 0)} cy={yPosition(plot.k ?? 0)} rx={Math.abs(xPosition((plot.h ?? 0) + (plot.kind === "ellipse" ? plot.rx ?? 2 : plot.r ?? 1)) - xPosition(plot.h ?? 0))} ry={Math.abs(yPosition((plot.k ?? 0) + (plot.kind === "ellipse" ? plot.ry ?? 1 : plot.r ?? 1)) - yPosition(plot.k ?? 0))} className="graph-choice-curve" />
+      : <path d={curve} className="graph-choice-curve" />}
+  </svg>;
+}
+
+function GraphChoiceResponse({ config, value, disabled, invalid, describedBy, onChange, onSubmit }: {
+  config: Extract<QuestionInteractionConfig, { kind: "graph-choice" }>;
+  value: string;
+  disabled: boolean;
+  invalid: boolean;
+  describedBy?: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return <div className={`graph-choice-response question-response ${invalid ? "invalid" : ""}`} data-question-type="graph-choice" aria-describedby={describedBy}>
+    <div className="graph-choice-options" role="group" aria-label="Choose the graph that matches the prompt.">
+      {config.plots.map((plot) => {
+        const selected = value === plot.value;
+        return <button key={plot.value} className={selected ? "selected" : ""} type="button" aria-label={plot.label} aria-pressed={selected} disabled={disabled} onClick={() => onChange(plot.value)} onKeyDown={(event) => {
+          if (event.key !== "Enter" || event.nativeEvent.isComposing || !selected) return;
+          event.preventDefault();
+          onSubmit();
+        }}>
+          <GraphPreview plot={plot} xMin={config.xMin} xMax={config.xMax} yMin={config.yMin} yMax={config.yMax} />
+          <span>{plot.label}</span>
+        </button>;
+      })}
+    </div>
+    <p className="plot-selection" aria-live="polite">{value ? `Selected ${config.plots.find((plot) => plot.value === value)?.label ?? value}` : "Choose one graph."}</p>
+  </div>;
+}
+
+function TableChoiceResponse({ config, value, disabled, invalid, describedBy, onChange, onSubmit }: {
+  config: Extract<QuestionInteractionConfig, { kind: "table-choice" }>;
+  value: string;
+  disabled: boolean;
+  invalid: boolean;
+  describedBy?: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return <div className={`table-choice-response question-response ${invalid ? "invalid" : ""}`} data-question-type="table-choice" aria-describedby={describedBy}>
+    <div className="table-choice-grid" role="radiogroup" aria-label="Choose one row.">
+      <div className="table-choice-header" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${config.columns.length}, minmax(0, 1fr))` }}>{config.columns.map((column) => <span key={column}>{column}</span>)}</div>
+      {config.rows.map((row) => {
+        const selected = value === row.value;
+        return <button key={row.value} className={selected ? "selected" : ""} type="button" role="radio" aria-label={row.cells.map((cell, index) => `${config.columns[index]}: ${cell}`).join(". ")} aria-checked={selected} disabled={disabled} onClick={() => onChange(row.value)} onKeyDown={(event) => {
+          if (event.key !== "Enter" || event.nativeEvent.isComposing || !selected) return;
+          event.preventDefault();
+          onSubmit();
+        }} style={{ gridTemplateColumns: `repeat(${config.columns.length}, minmax(0, 1fr))` }}>{row.cells.map((cell, index) => <span data-label={config.columns[index]} key={`${row.value}-${index}`}>{cell}</span>)}</button>;
+      })}
+    </div>
+    <p className="plot-selection" aria-live="polite">{value ? `Selected ${value}` : "Choose one row."}</p>
   </div>;
 }

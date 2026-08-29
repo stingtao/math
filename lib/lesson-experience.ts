@@ -1,6 +1,6 @@
 import type { LessonDefinition } from "./curriculum.ts";
 
-export type LessonScene = "numbers" | "resources" | "systems" | "navigation" | "habitat" | "risk" | "growth" | "motion";
+export type LessonScene = "numbers" | "resources" | "systems" | "navigation" | "habitat" | "risk" | "growth" | "motion" | "proof" | "signal" | "orbit" | "accumulation" | "network";
 
 export type LessonHistory = {
   era: string;
@@ -60,12 +60,45 @@ const gradeStoryArcs: Record<number, GradeStoryArc> = {
   908: { kicker: "SOLAR BRIDGE", title: "Where should a curved bridge rise, cross, and land?", problem: "Use roots, factoring, formulas, and graphs to control a quadratic path.", signalA: "vertex", signalB: "zeros" },
   909: { kicker: "COLONY FORECAST", title: "Will this signal grow steadily—or multiply?", problem: "Compare sequences and exponential models before a small change becomes enormous.", signalA: "now", signalB: "next" },
   910: { kicker: "EVIDENCE DECK", title: "Which model deserves the crew’s trust?", problem: "Use distributions, residuals, and context to judge whether data supports a decision.", signalA: "data", signalB: "model" },
+
+  1001: { kicker: "EUROPA STRUCTURE REVIEW", title: "Can every joint survive before the habitat is built?", problem: "Turn definitions and angle facts into a proof chain that catches a structural mistake before fabrication.", signalA: "claim", signalB: "reason" },
+  1002: { kicker: "DOCKING-BAY ALIGNMENT", title: "Can the docking frame move without changing shape?", problem: "Track every vertex through rotations, reflections, and translations so two spacecraft frames still match.", signalA: "original", signalB: "image" },
+  1003: { kicker: "CRATER RANGEFINDER", title: "How wide is a crater nobody can walk across?", problem: "Use similarity and trigonometry to turn one measured angle and one safe baseline into an unreachable distance.", signalA: "baseline", signalB: "distance" },
+  1004: { kicker: "ORBITAL MAP LOCK", title: "Will two navigation paths meet at the intended relay?", problem: "Use coordinates, slopes, distance, and midpoint to verify a flight plan before the vehicles commit fuel.", signalA: "coordinates", signalB: "verify" },
+  1005: { kicker: "DEEP-SPACE DISH", title: "Where should the receiver sit on a circular signal field?", problem: "Connect arcs, tangents, chords, and circle equations to aim a receiver without losing the transmission.", signalA: "center", signalB: "radius" },
+  1006: { kicker: "LUNAR FABRICATION BAY", title: "How much material will the full-scale habitat consume?", problem: "Scale area, volume, density, and cross-sections before a small prototype becomes an expensive real structure.", signalA: "scale", signalB: "material" },
+  1007: { kicker: "LANDING-RISK BOARD", title: "Which landing signal changes the chance of success?", problem: "Separate overlap, conditional information, and independence before mission control acts on uncertain evidence.", signalA: "given", signalB: "chance" },
+  1008: { kicker: "TELEMETRY MODEL CHECK", title: "Which function or data display tells the honest story?", problem: "Compare graphs, piecewise rules, distributions, and residuals so a neat-looking model does not hide a bad fit.", signalA: "represent", signalB: "judge" },
+
+  1101: { kicker: "SIGNAL-ENGINEERING LAB", title: "Which polynomial shape matches the transmission?", problem: "Use zeros, multiplicity, complex roots, and identities to rebuild a signal from the features visible in its graph.", signalA: "zeros", signalB: "shape" },
+  1102: { kicker: "REACTOR SAFETY WINDOW", title: "Where does the model stop making physical sense?", problem: "Track domains, asymptotes, radicals, and extraneous solutions before a formula controls a real reactor setting.", signalA: "domain", signalB: "constraint" },
+  1103: { kicker: "EXOPLANET GROWTH LOG", title: "Will the colony’s system multiply or decay?", problem: "Use exponentials and logarithms to predict power, population, and signal strength across vastly different scales.", signalA: "factor", signalB: "time" },
+  1104: { kicker: "REPEATING-BURST ARRAY", title: "Can a repeating signal be compressed into one rule?", problem: "Model arithmetic and geometric sequences, then add finite or infinite bursts without listing every term.", signalA: "pattern", signalB: "sum" },
+  1105: { kicker: "SATELLITE PHASE CONTROL", title: "When will two rotating signals line up again?", problem: "Use radians, unit-circle values, identities, and wave graphs to predict phase before the next transmission window.", signalA: "angle", signalB: "phase" },
+  1106: { kicker: "COMET-TRACKING SCOPE", title: "Which conic best describes the object’s path?", problem: "Read focus, vertex, and axis information to distinguish parabolic, elliptical, and hyperbolic trajectories.", signalA: "focus", signalB: "path" },
+  1107: { kicker: "3D NAVIGATION CORE", title: "Can one transformation steer every coordinate at once?", problem: "Use matrices and vectors to combine position, direction, and system constraints into a reliable navigation command.", signalA: "vector", signalB: "transform" },
+  1108: { kicker: "COLONY EVIDENCE COUNCIL", title: "Is the sample strong enough to guide a real decision?", problem: "Check bias, normal models, confidence intervals, and uncertainty before extending a sample result to everyone.", signalA: "sample", signalB: "infer" },
+
+  1201: { kicker: "AUTONOMOUS MODEL STACK", title: "Can several functions operate as one dependable system?", problem: "Compose, invert, transform, and compare advanced functions so each stage of an automated process can be reversed and tested.", signalA: "input", signalB: "inverse" },
+  1202: { kicker: "APPROACH VECTOR", title: "What happens near the target before the lander arrives?", problem: "Use tables, graphs, and limit laws to predict nearby behavior even when the exact target reading is missing.", signalA: "approach", signalB: "limit" },
+  1203: { kicker: "LIVE VELOCITY ENGINE", title: "How fast is the rover changing at this exact instant?", problem: "Translate local slope into derivative rules that update motion, power, and signal models moment by moment.", signalA: "local slope", signalB: "rate" },
+  1204: { kicker: "FLIGHT-PATH OPTIMIZER", title: "Where should the system speed up, turn, or peak?", problem: "Read derivative signs and concavity to locate safe extrema and optimize a design under real constraints.", signalA: "behavior", signalB: "optimum" },
+  1205: { kicker: "RESOURCE-FLOW INTEGRATOR", title: "How much fuel and energy accumulate during the mission?", problem: "Turn changing rates into total quantity with areas, antiderivatives, numerical sums, and differential equations.", signalA: "rate", signalB: "total" },
+  1206: { kicker: "MULTI-AXIS ORBIT LAB", title: "Which coordinate language makes this curved route simplest?", problem: "Switch among vectors, parametric paths, polar coordinates, and the complex plane to control motion in two dimensions.", signalA: "parameter", signalB: "position" },
+  1207: { kicker: "UNCERTAINTY SIMULATOR", title: "What long-run outcome should mission control expect?", problem: "Build random variables and probability distributions to compare risk, reward, and sampling behavior before a decision.", signalA: "distribution", signalB: "expected" },
+  1208: { kicker: "DECISION NETWORK", title: "Which conclusion or route survives the evidence?", problem: "Combine inference, finance, and algorithms to choose a defensible action without overstating what the data can prove.", signalA: "evidence", signalB: "decision" },
 };
 
 const gradeJourneyMedia: Record<7 | 8 | 9, { image: string; imageAlt: string }> = {
   7: { image: "/visuals/g7-frontier-mission.webp", imageAlt: "Students at a Mars greenhouse compare supplies, scaled plans, geometric panels, and chance models." },
   8: { image: "/visuals/g8-frontier-mission.webp", imageAlt: "Students in an underwater city use a coordinate table, data models, solids, and a geometric bridge." },
   9: { image: "/visuals/g9-frontier-mission.webp", imageAlt: "Students in an orbital lab compare straight and curved flight paths with energy and data models." },
+};
+
+const advancedRegionScenes: Record<number, LessonScene> = {
+  1001: "proof", 1002: "proof", 1003: "orbit", 1004: "navigation", 1005: "orbit", 1006: "habitat", 1007: "risk", 1008: "risk",
+  1101: "signal", 1102: "systems", 1103: "signal", 1104: "growth", 1105: "signal", 1106: "orbit", 1107: "network", 1108: "risk",
+  1201: "network", 1202: "motion", 1203: "motion", 1204: "motion", 1205: "accumulation", 1206: "orbit", 1207: "risk", 1208: "network",
 };
 
 const histories: Record<LessonScene, LessonHistory> = {
@@ -133,6 +166,46 @@ const histories: Record<LessonScene, LessonHistory> = {
     sourceLabel: "The rise of calculus · MacTutor",
     sourceUrl: "https://mathshistory.st-andrews.ac.uk/HistTopics/The_rise_of_calculus/",
   },
+  proof: {
+    era: "ALEXANDRIA · ABOUT 300 BCE",
+    title: "A proof made every step inspectable.",
+    story: "Euclid organized geometry so each conclusion followed from definitions, postulates, and earlier results instead of relying on how a diagram looked.",
+    connection: "That same claim-and-reason structure now verifies designs, software, and safety arguments before failure is expensive.",
+    sourceLabel: "Euclid · MacTutor",
+    sourceUrl: "https://mathshistory.st-andrews.ac.uk/Biographies/Euclid/",
+  },
+  signal: {
+    era: "FRANCE · 1822",
+    title: "Complicated signals became combinations of waves.",
+    story: "Joseph Fourier showed how periodic behavior could be studied through sine and cosine components, connecting equations to heat and repeating signals.",
+    connection: "Trigonometric models now synchronize communication, audio, imaging, and every system built from repeating cycles.",
+    sourceLabel: "Joseph Fourier · MacTutor",
+    sourceUrl: "https://mathshistory.st-andrews.ac.uk/Biographies/Fourier/",
+  },
+  orbit: {
+    era: "PRAGUE · 1609",
+    title: "An ellipse replaced the perfect circle in the sky.",
+    story: "Johannes Kepler used observations of Mars to show that planets move in elliptical orbits with the Sun at a focus.",
+    connection: "Conics, vectors, and coordinate systems still describe satellites, trajectories, reflectors, and fields in space.",
+    sourceLabel: "Johannes Kepler · MacTutor",
+    sourceUrl: "https://mathshistory.st-andrews.ac.uk/Biographies/Kepler/",
+  },
+  accumulation: {
+    era: "SYRACUSE · 3RD CENTURY BCE",
+    title: "Curved area was trapped between simpler shapes.",
+    story: "Archimedes used increasingly fine geometric approximations to calculate areas and volumes long before modern integral notation existed.",
+    connection: "The same limiting idea turns changing rates into fuel used, distance traveled, probability, and total accumulated quantity.",
+    sourceLabel: "Archimedes · MacTutor",
+    sourceUrl: "https://mathshistory.st-andrews.ac.uk/Biographies/Archimedes/",
+  },
+  network: {
+    era: "KÖNIGSBERG · 1736",
+    title: "A city walk became the first network problem.",
+    story: "Leonhard Euler ignored exact distances and studied only which land areas and bridges were connected, opening a new way to model networks.",
+    connection: "Graphs and algorithms now plan routes, data links, schedules, and decisions where connections matter more than physical shape.",
+    sourceLabel: "The bridges of Königsberg · MacTutor",
+    sourceUrl: "https://mathshistory.st-andrews.ac.uk/Extras/Konigsberg/",
+  },
 };
 
 const riskVisuals = new Set(["probability", "tree", "trials", "two-way", "sample", "scatter", "residual", "box-plots", "data-line"]);
@@ -144,7 +217,12 @@ const numberVisuals = new Set(["compare", "inequality-line", "number-line", "sig
 
 function classifyLesson(lesson: Pick<LessonDefinition, "title" | "standard" | "visual">): LessonScene {
   const text = `${lesson.title} ${lesson.standard}`.toLowerCase();
-  if (/calculus|derivative|integral|limit|instantaneous|accumulation|area under|rate of change|ap\.calc/.test(text)) return "motion";
+  if (/integral|antiderivative|accumulation|area under|fundamental theorem|differential equation|numerical integration|infinite series|ap\.calc\.int/.test(text)) return "accumulation";
+  if (/derivative|limit|continuity|instantaneous|rate of change|tangent|optimization|related rates|ap\.calc\.(?:lim|dif)/.test(text)) return "motion";
+  if (/proof|postulate|construction|congruen|angle relationship|circle theorem|corresponding parts/.test(text)) return "proof";
+  if (/matrix|determinant|network|algorithm|decision strategies/.test(text)) return "network";
+  if (/conic|ellipse|hyperbola|parabola|vector|polar|parametric|complex number|complex plane/.test(text)) return "orbit";
+  if (/trigonometric|sine|cosine|radian|unit circle|logarithm|exponential model/.test(text)) return "signal";
   if (/statistics|probability|sample|distribution|regression|correlation|residual|confidence|survey|random|data/.test(text) || riskVisuals.has(lesson.visual)) return "risk";
   if (/exponential|logarithm|growth|decay|geometric sequence|power|radical|root/.test(text) || growthVisuals.has(lesson.visual)) return "growth";
   if (/geometry|triangle|circle|angle|volume|surface area|congruen|similar|transform|trigon|sine|cosine|radian/.test(text) || habitatVisuals.has(lesson.visual)) return "habitat";
@@ -211,10 +289,45 @@ const sceneCopy: Record<LessonScene, Omit<LessonExperience, "scene" | "model" | 
     signalA: "rate: changing",
     signalB: "landing: safe",
   },
+  proof: {
+    kicker: "STRUCTURE PROOF CHECK",
+    title: "Can every design claim survive a line-by-line check?",
+    problem: "Link each geometric statement to a definition or theorem so a convincing picture cannot hide an invalid step.",
+    signalA: "claim",
+    signalB: "reason",
+  },
+  signal: {
+    kicker: "WAVE CONTROL LAB",
+    title: "When will a repeating signal reach the needed phase?",
+    problem: "Connect angles, cycles, exponentials, and logarithms to predict signals that repeat, grow, or fade over time.",
+    signalA: "phase",
+    signalB: "amplitude",
+  },
+  orbit: {
+    kicker: "ORBITAL GEOMETRY",
+    title: "Which coordinate model makes this curved route predictable?",
+    problem: "Use conics, vectors, polar coordinates, or complex numbers to describe direction and position without guessing from a sketch.",
+    signalA: "focus",
+    signalB: "trajectory",
+  },
+  accumulation: {
+    kicker: "RESOURCE FLOW",
+    title: "How much total change builds up across the mission?",
+    problem: "Add infinitely small changes through area, antiderivatives, sums, and differential equations to recover a usable total.",
+    signalA: "rate",
+    signalB: "accumulate",
+  },
+  network: {
+    kicker: "ROUTE NETWORK",
+    title: "Which connected plan reaches the target with the least waste?",
+    problem: "Use matrices, nodes, edges, and decision rules to organize many linked choices into one testable system.",
+    signalA: "connections",
+    signalB: "route",
+  },
 };
 
 export function getLessonExperience(lesson: Pick<LessonDefinition, "title" | "goal" | "example" | "standard" | "visual" | "grade" | "regionId">): LessonExperience {
-  const scene = classifyLesson(lesson);
+  const scene = advancedRegionScenes[lesson.regionId] ?? classifyLesson(lesson);
   if (/symbol/i.test(lesson.title)) {
     return {
       scene: "systems",

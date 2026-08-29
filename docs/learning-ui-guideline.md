@@ -82,9 +82,12 @@ The answer interaction is part of the learning design, not a formatting decision
 - Use `yes-no` for Yes/No decisions and `true-false` for True/False claims. Render both as two large selectable buttons; spelling and capitalization must never become accidental difficulty.
 - Distinguish `two-choice`, `three-choice`, and `four-choice` explicitly. If a new answer structure does not fit, define a new type before adding the question rather than quietly falling back to a text field or generic renderer.
 - Use `ordering` when the learning target is a procedure, proof chain, modeling cycle, or sequence of transformations. Every step must be used exactly once, the current order must stay visible, and reset must be available without losing the question.
+- Use `graph-choice` when the learner must distinguish shape, intercept, vertex, center, radius, asymptote, phase, slope, concavity, or signed area. Render authored mini-graphs from structured data; a text label alone does not test graph reading.
+- Use `table-choice` when the learner must select a valid proof row, parameter set, conditional denominator, sequence rule, limit statement, probability model, or study design. Keep column meanings visible and make the entire row selectable by mouse, touch, and keyboard.
 - Use authored choices when equivalent symbolic forms are difficult to type or normalize reliably. Factoring prompts such as `Factor 6x + 12` use four mathematically plausible choices unless a purpose-built symbolic editor and equivalence checker exist.
 - Keep all options parallel in meaning, notation, unit, and precision. Distractors should expose a misconception, not a typing trap.
 - A new question family must define its data shape, answer control, keyboard and assistive behavior, validation, correct feedback, recovery path, and rendering on lesson, boss, and review surfaces before content is added.
+- For Grade 10–12, every region must include at least one visual-reasoning mission and every grade must use at least nine interaction families. Adding more fill-in calculations does not satisfy advanced representation coverage.
 
 The curriculum validator must reject Yes/No or True/False questions that fall back to text input, and reject known high-friction symbolic families that lack an appropriate answer control. The same shared response component must render each type everywhere.
 

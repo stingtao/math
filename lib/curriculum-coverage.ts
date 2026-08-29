@@ -11,7 +11,7 @@ export type CoreClusterCoverage = {
 };
 
 export type ExtendedProgramCoverage = {
-  authority: "California" | "New York" | "Kang Chiao / IB" | "AP Calculus" | "AP Statistics";
+  authority: "California" | "New York" | "Kang Chiao / IB" | "Cambridge International" | "AP Calculus" | "AP Statistics";
   outcome: string;
   lessonSlugs: string[];
 };
@@ -121,7 +121,7 @@ export const algebraCourseCoverage: CurriculumCoverageStrand[] = [
 ];
 
 // Common Core establishes the portable baseline, while these additional
-// contracts make the requested state, AP, and Kang Chiao/IB depth explicit.
+// contracts make the requested state, AP, Cambridge, and Kang Chiao/IB depth explicit.
 // They are kept separate because Kang Chiao branches into AP and IB pathways
 // in Grades 11–12 rather than publishing one universal grade-by-grade sequence.
 export const extendedProgramCoverage: ExtendedProgramCoverage[] = [
@@ -141,4 +141,6 @@ export const extendedProgramCoverage: ExtendedProgramCoverage[] = [
   { authority: "AP Statistics", outcome: "Perform inference for one and two proportions", lessonSlugs: ["g12-inference-for-proportions"] },
   { authority: "AP Statistics", outcome: "Perform one-sample, paired, and two-sample inference for means", lessonSlugs: ["g12-inference-for-means"] },
   { authority: "AP Statistics", outcome: "Perform inference for a population regression slope", lessonSlugs: ["g12-regression-inference"] },
+  { authority: "Cambridge International", outcome: "Connect advanced functions and trigonometry to differentiation and integration", lessonSlugs: ["g11-trig-graphs", "g11-trig-identities-equations", "g12-basic-derivative-rules", "g12-definite-integrals"] },
+  { authority: "Cambridge International", outcome: "Model discrete probability distributions and sampling behavior", lessonSlugs: ["g12-random-variables", "g12-binomial-distribution", "g12-sampling-distributions"] },
 ];
