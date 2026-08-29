@@ -4033,10 +4033,22 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
 .advanced-metric-grid > span { min-width: 0; padding: 11px 7px; display: grid; gap: 4px; border: 1px solid color-mix(in srgb, var(--accent) 20%, #dbe5ed); border-radius: 12px; background: white; text-align: center; }
 .advanced-metric-grid small { color: var(--muted); font-size: 16px; font-weight: 850; letter-spacing: .06em; }
 .advanced-metric-grid strong { overflow: hidden; color: var(--accent); font-size: 16px; text-overflow: ellipsis; }
+.logic-stage { min-width: 0; min-height: 320px; padding: 24px; display: grid; place-items: center; align-content: center; gap: 18px; border: 1px solid color-mix(in srgb, var(--accent) 18%, #dbe5ed); border-radius: 20px; background: rgb(255 255 255 / 82%); text-align: center; }
+.logic-statement { display: flex; align-items: center; justify-content: center; gap: 13px; }
+.logic-statement > span { width: 104px; min-height: 96px; padding: 14px 9px; display: grid; place-items: center; align-content: center; gap: 7px; border: 2px solid currentColor; border-radius: 18px; background: white; }
+.logic-statement small, .logic-verdict small { font-size: 16px; font-weight: 900; letter-spacing: .08em; }
+.logic-statement strong, .logic-verdict strong { font-size: 18px; }
+.logic-statement > i { color: var(--accent); font-size: 30px; font-style: normal; font-weight: 900; }
+.logic-statement .is-true, .logic-verdict.is-true { color: #087965; }.logic-statement .is-false, .logic-verdict.is-false { color: #b54138; }
+.logic-verdict { min-width: 190px; padding: 13px 18px; display: grid; gap: 4px; border-radius: 14px; background: #eef4f7; }
+.logic-stage > p { max-width: 330px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.45; }
+.logic-case-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.logic-case-grid button { min-height: 48px; padding: 10px; border: 1px solid color-mix(in srgb, var(--accent) 24%, #d5e0e7); border-radius: 11px; color: var(--navy); background: white; font-size: 16px; font-weight: 850; transition: transform .16s ease, color .16s ease, background .16s ease, border-color .16s ease; }
+.logic-case-grid button:hover { border-color: var(--accent); transform: translateY(-1px); }.logic-case-grid button.selected { border-color: var(--accent); color: white; background: var(--accent); box-shadow: 0 7px 17px color-mix(in srgb, var(--accent) 24%, transparent); }
 .unit-circle-visual line { stroke: #a8b8c4; stroke-width: 1.5; }.unit-circle-visual > circle { fill: none; stroke: var(--accent); stroke-width: 3; }.unit-circle-visual > path { stroke: var(--navy); stroke-width: 3; }.unit-circle-visual .unit-circle-cos { stroke: var(--blue); stroke-width: 4; }.unit-circle-visual .unit-circle-sin { stroke: var(--coral); stroke-width: 4; }.unit-circle-point { fill: white; stroke: var(--accent); stroke-width: 4; }
 .probability-stage { padding: 22px; align-content: center; gap: 18px; }
 .probability-orbit { width: 142px; height: 142px; display: grid; place-items: center; align-content: center; border: 8px solid var(--accent-soft); border-radius: 50%; color: white; background: var(--accent); box-shadow: 0 0 0 2px var(--accent), 0 15px 30px color-mix(in srgb, var(--accent) 22%, transparent); }
-.probability-orbit strong { font-size: 34px; line-height: 1; }.probability-orbit small { margin-top: 5px; font-size: 16px; font-weight: 800; }
+.probability-orbit strong { font-size: 34px; line-height: 1; }.probability-orbit small { width: 100%; margin-top: 5px; padding: 0 8px; font-size: 16px; font-weight: 800; line-height: 1.2; text-align: center; text-wrap: balance; }
 .probability-dots { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
 .probability-dots i { width: 10px; height: 10px; border-radius: 50%; background: #d7e1e7; }.probability-dots i.success { background: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
 .probability-stage > b { color: var(--muted); font-size: 16px; }
@@ -4047,7 +4059,7 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
   .advanced-math-tool { border-radius: 20px; }
   .advanced-math-tool > header { align-items: flex-start; flex-direction: column; }
   .advanced-tool-workspace { min-height: 0; padding: 15px; grid-template-columns: 1fr; }
-  .advanced-tool-visual, .scale-stage, .probability-stage { min-height: 270px; }
+  .advanced-tool-visual, .scale-stage, .probability-stage, .logic-stage { min-height: 270px; }
   .advanced-tool-panel { padding: 3px 3px 8px; }
   .advanced-math-tool > footer { align-items: flex-start; }
 }

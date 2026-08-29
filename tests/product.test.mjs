@@ -502,13 +502,17 @@ test("gives every Grade 10–12 lesson an appropriate interactive concept tool",
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(concept, /lesson\.grade >= 10/);
   assert.match(concept, /<AdvancedMathTool lesson=\{lesson\}/);
-  for (const mode of ["calculus", "circle", "probability", "vector", "scale", "function"]) assert.match(tool, new RegExp(`"${mode}"`));
+  for (const mode of ["logic", "calculus", "circle", "probability", "vector", "scale", "function"]) assert.match(tool, new RegExp(`"${mode}"`));
+  assert.match(tool, /logic-and-conditionals[\s\S]*return "logic"/);
+  assert.doesNotMatch(tool, /probability\|conditional\|independence/);
   assert.match(tool, /Not saved/);
   assert.doesNotMatch(tool, /Private scratch space|Nothing here is saved/);
   assert.match(tool, /Run another sample/);
   assert.match(tool, /UNIT CIRCLE/);
   assert.match(tool, /CALCULUS LENS/);
   assert.match(css, /\.advanced-math-tool/);
+  assert.match(css, /\.probability-orbit small \{[^}]*width: 100%[^}]*text-align: center/);
+  assert.match(css, /\.logic-case-grid button\.selected/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.advanced-tool-workspace \{ min-height: 0; padding: 15px; grid-template-columns: 1fr/);
 });
 

@@ -41,9 +41,10 @@ function pathFor(fn: FunctionModel["fn"]) {
 
 function toolMode(lesson: LessonDefinition) {
   const slug = lesson.slug;
+  if (/logic-and-conditionals/.test(slug)) return "logic";
   if (/limit|derivative|tangent|motion|increasing|optimization|antiderivative|integral|fundamental/.test(slug)) return "calculus";
   if (/trig|radian|unit-circle|polar|complex-plane/.test(slug)) return "circle";
-  if (/probability|conditional|independence|sampling|distribution|expected|binomial|hypothesis|confidence|statistical|data|regression/.test(slug)) return "probability";
+  if (/probability|independence|sampling|distribution|expected|binomial|hypothesis|confidence|statistical|data|regression/.test(slug)) return "probability";
   if (/matrix|vector/.test(slug)) return "vector";
   if (lesson.grade === 10 || /circle|ellipse|hyperbola|parabola-as|conic|geometry|scale|volume|distance|coordinate|triangle|congruence|angle|chord|arc/.test(slug)) return "scale";
   return "function";
@@ -69,9 +70,33 @@ export function AdvancedMathTool({ lesson }: { lesson: LessonDefinition }) {
   const mode = toolMode(lesson);
   return <section className={`advanced-math-tool tool-${mode} accent-${lesson.accent}`} aria-label={`${lesson.title} interactive concept tool`}>
     <header><span><small>MOVE IT · NOTICE IT · EXPLAIN IT</small><strong>{lesson.title} Lab</strong></span><b>Not saved</b></header>
-    {mode === "calculus" ? <CalculusLens /> : mode === "circle" ? <UnitCircleLab /> : mode === "probability" ? <ProbabilityLab /> : mode === "vector" ? <VectorLab /> : mode === "scale" ? <ScaleLab lesson={lesson} /> : <FunctionLab lesson={lesson} />}
+    {mode === "logic" ? <LogicLab /> : mode === "calculus" ? <CalculusLens /> : mode === "circle" ? <UnitCircleLab /> : mode === "probability" ? <ProbabilityLab /> : mode === "vector" ? <VectorLab /> : mode === "scale" ? <ScaleLab lesson={lesson} /> : <FunctionLab lesson={lesson} />}
     <footer><span aria-hidden="true">◇</span><p><strong>Move one control. Explain one change.</strong> The picture, value, and rule update together.</p></footer>
   </section>;
+}
+
+function LogicLab() {
+  const [premise, setPremise] = useState(true);
+  const [conclusion, setConclusion] = useState(true);
+  const conditional = !premise || conclusion;
+  const cases = [
+    { premise: true, conclusion: true },
+    { premise: true, conclusion: false },
+    { premise: false, conclusion: true },
+    { premise: false, conclusion: false },
+  ];
+
+  return <div className="advanced-tool-workspace logic-workspace">
+    <div className="logic-stage" role="img" aria-label={`If p then q is ${conditional ? "true" : "false"} when p is ${premise ? "true" : "false"} and q is ${conclusion ? "true" : "false"}`}>
+      <div className="logic-statement"><span className={premise ? "is-true" : "is-false"}><small>p</small><strong>{premise ? "TRUE" : "FALSE"}</strong></span><i aria-hidden="true">→</i><span className={conclusion ? "is-true" : "is-false"}><small>q</small><strong>{conclusion ? "TRUE" : "FALSE"}</strong></span></div>
+      <div className={`logic-verdict ${conditional ? "is-true" : "is-false"}`}><small>p → q</small><strong>{conditional ? "TRUE" : "FALSE"}</strong></div>
+      <p>{conditional ? "The promise holds in this case." : "This is the one case that breaks the promise."}</p>
+    </div>
+    <div className="advanced-tool-panel"><span className="advanced-tool-tag">TRUTH TABLE</span><h3>Test every possible case.</h3><p>An if-then statement is false only when p is true and q is false.</p><div className="logic-case-grid" aria-label="Choose values for p and q">{cases.map((item) => {
+      const selected = premise === item.premise && conclusion === item.conclusion;
+      return <button className={selected ? "selected" : ""} type="button" aria-pressed={selected} onClick={() => { setPremise(item.premise); setConclusion(item.conclusion); }} key={`${item.premise}-${item.conclusion}`}>p={item.premise ? "T" : "F"} · q={item.conclusion ? "T" : "F"}</button>;
+    })}</div><div className="advanced-live-value"><small>CONTRAPOSITIVE</small><strong>not q → not p: {conditional ? "true" : "false"}</strong></div></div>
+  </div>;
 }
 
 function Axes({ children }: { children: ReactNode }) {
