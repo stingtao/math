@@ -193,15 +193,3 @@ export function getLessonExperience(lesson: Pick<LessonDefinition, "title" | "go
     history: histories[scene],
   };
 }
-
-export function getGradeMission(grade: number) {
-  const missions: Record<number, { kicker: string; title: string; copy: string; scene: LessonScene }> = {
-    7: { kicker: "MARS SUPPLY RUN", title: "Turn ratios into a working colony.", copy: "Plan water, distance, scale, and probability across a chain of short missions.", scene: "resources" },
-    8: { kicker: "ROVER ROUTE · GRADE 8", title: "Move across Mars with math as your navigation system.", copy: "Read the terrain, model the route, test the answer, then see why people invented the method.", scene: "navigation" },
-    9: { kicker: "FIRST LANDING WINDOW", title: "Use algebra to predict what happens next.", copy: "Build equations and functions that turn changing signals into a flight plan.", scene: "systems" },
-    10: { kicker: "HABITAT BLUEPRINT", title: "Build a base that fits the world around it.", copy: "Use proof, geometry, and measurement before the first structure touches the ground.", scene: "habitat" },
-    11: { kicker: "DEEP-SPACE SIGNAL", title: "Read patterns too large or distant to see directly.", copy: "Use functions, trigonometry, and growth models to decode motion and change.", scene: "growth" },
-    12: { kicker: "ORBITAL COMMAND", title: "Model motion while it is still changing.", copy: "Use limits, rates, probability, and accumulation to make high-stakes decisions.", scene: "motion" },
-  };
-  return missions[grade] ?? missions[8];
-}

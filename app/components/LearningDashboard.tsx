@@ -8,15 +8,14 @@ import { saveDemoState } from "@/lib/learner-state";
 import { LearnerHeader } from "./Header";
 import { useLearner } from "./useLearner";
 import { mutationHeaders } from "./mutation";
-import { Avatar } from "./Avatar";
 import { SuccessBurst } from "./SuccessBurst";
 import { TopicIcon } from "./TopicIcon";
 import { achievementTotalsForState, achievementUnlockedBetween, type AchievementSpec } from "@/lib/achievements";
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
-import { getThemeJourney, getThemeSpec } from "@/lib/themes";
+import { getThemeSpec } from "@/lib/themes";
 import { getLessonExperience } from "@/lib/lesson-experience";
-import { GradeMissionOverview, LessonMissionThumbnail } from "./LessonMissionStory";
+import { LessonMissionThumbnail } from "./LessonMissionStory";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
@@ -50,8 +49,6 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const curriculum = getGradeCurriculum(grade);
   const gradeLessons = getGradeLessons(grade);
   const nextLesson = gradeLessons.find((item) => !completed.has(item.id)) ?? gradeLessons[gradeLessons.length - 1];
-  const gradeCompleted = gradeLessons.filter((item) => completed.has(item.id)).length;
-  const gradeBosses = curriculum.regions.filter((item) => cleared.has(item.id)).length;
   const activeRegionIndexRaw = curriculum.regions.findIndex((item) => !cleared.has(item.id));
   const gradeComplete = activeRegionIndexRaw === -1;
   const activeRegionIndex = activeRegionIndexRaw === -1 ? Math.max(0, curriculum.regions.length - 1) : activeRegionIndexRaw;
@@ -67,7 +64,6 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   if (loading) return <LoadingTrail />;
   if (!state || error) return <SignInGate />;
   const world = getThemeSpec(state.profile.theme);
-  const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
 
   async function claimReward() {
     if (state!.dailyRewardClaimed || rewardPending) return;
@@ -135,42 +131,17 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         <nav className="grade-switcher" aria-label="Choose a grade">
           {[7, 8, 9, 10, 11, 12].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${demo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
         </nav>
-        <div className={`dashboard-heading dashboard-world-heading theme-${world.id}`}>
-          <div><span className="section-kicker">{world.worldName.toUpperCase()} · {world.role.toUpperCase()}</span><h1>{journey.headline}</h1><p>{journey.story}</p></div>
-          <div className="dashboard-summary">
-            <div><strong>{state.totalXp}</strong><span>Total XP</span></div>
-            <div><strong>{gradeCompleted}</strong><span>Lessons clear</span></div>
-            <div><strong>{gradeBosses}</strong><span>Bosses clear</span></div>
-          </div>
-        </div>
 
-        <GradeMissionOverview grade={grade} />
-
-        {showWelcomeGuide && <section className={`welcome-trail-guide accent-${nextLesson.accent}`} aria-labelledby="welcome-trail-heading">
+        {showWelcomeGuide && <section className={`welcome-trail-guide welcome-first-mission accent-${nextLesson.accent}`} aria-labelledby="welcome-trail-heading">
           <button className="welcome-guide-close" type="button" onClick={dismissWelcomeGuide} aria-label="Dismiss welcome guide">×</button>
-          <header className="welcome-guide-heading">
-            <Avatar avatar={state.profile.avatar} size="lg" label="Your random abstract avatar" />
-            <div><span className="section-kicker">WELCOME, {world.role.toUpperCase()}</span><h2 id="welcome-trail-heading">Start at {journey.location}.</h2><p>Learn one move, practice it, then clear a short check. Your random codename is the only identity shown here.</p></div>
-          </header>
-          <div className="welcome-route" aria-label="Complete short lessons, collect four region keys, then unlock the boss">
-            <div className="welcome-route-step"><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="md" label="First short lesson" /><div><small>STEP 1</small><strong>Learn one move</strong><span>6–8 minutes</span></div></div>
-            <i className="welcome-route-connector" aria-hidden="true" />
-            <div className="welcome-route-step welcome-key-step"><span className="welcome-mini-keys" aria-hidden="true"><b>1</b><b>2</b><b>3</b><b>4</b></span><div><small>REGION</small><strong>Clear 4 lessons</strong><span>Fixes still count</span></div></div>
-            <i className="welcome-route-connector" aria-hidden="true" />
-            <div className="welcome-route-step welcome-boss-step"><span aria-hidden="true">★</span><div><small>UNLOCK</small><strong>Mixed challenge</strong><span>5 questions · no timer</span></div></div>
+          <div className="welcome-first-mission-copy">
+            <span className="section-kicker">WELCOME, {world.role.toUpperCase()}</span>
+            <h2 id="welcome-trail-heading">Start with {nextLesson.title}.</h2>
+            <p>{getLessonExperience(nextLesson).title}</p>
+            <div className="next-meta"><span>◷ 6–8 min</span><span>↻ Hints + retries</span></div>
+            <a className="primary-button mission-primary-cta" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start first mission <span aria-hidden="true">→</span></a>
           </div>
-          <footer className="welcome-guide-footer">
-            <div className="welcome-first-win" aria-label="First lesson reward preview: one of four region keys, at least 40 XP, and the next lesson opens">
-              <header><span aria-hidden="true">✦</span><div><small>FIRST WIN</small><strong>Finish all five. Corrected answers count.</strong></div></header>
-              <div className="welcome-first-win-rewards" role="list">
-                <span role="listitem"><b>1/4</b><strong>Region key</strong><small>Boss path begins</small></span>
-                <span role="listitem"><b>+40</b><strong>Base XP</strong><small>Star bonus possible</small></span>
-                <span role="listitem"><b>→</b><strong>Next lesson</strong><small>Opens right away</small></span>
-              </div>
-              <p><span aria-hidden="true">✓</span><strong>Stars show fluency.</strong> A corrected answer still opens the next lesson.</p>
-            </div>
-            <div className="welcome-guide-action"><small>YOUR FIRST MISSION</small><strong>{nextLesson.title}</strong><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start this lesson <span aria-hidden="true">→</span></a></div>
-          </footer>
+          <div className="welcome-first-mission-visual"><LessonMissionThumbnail lesson={nextLesson} /></div>
         </section>}
 
         {!showWelcomeGuide && <section className="today-mission-board" aria-label="Your next move">

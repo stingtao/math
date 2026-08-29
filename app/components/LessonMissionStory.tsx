@@ -1,5 +1,5 @@
 import type { LessonDefinition } from "@/lib/curriculum";
-import { getGradeMission, getLessonExperience, type LessonScene } from "@/lib/lesson-experience";
+import { getLessonExperience, type LessonScene } from "@/lib/lesson-experience";
 
 const colors: Record<LessonDefinition["accent"], { main: string; soft: string }> = {
   blue: { main: "#2474ed", soft: "#dcecff" },
@@ -28,14 +28,6 @@ export function LessonMissionThumbnail({ lesson }: { lesson: LessonDefinition })
     <MissionScene scene={experience.scene} accent={lesson.accent} signalA={experience.signalA} signalB={experience.signalB} title={`${lesson.title} application`} compact />
     <small>{experience.kicker}</small>
   </div>;
-}
-
-export function GradeMissionOverview({ grade }: { grade: number }) {
-  const mission = getGradeMission(grade);
-  return <section className="grade-mission-overview" aria-labelledby="grade-mission-title">
-    <div className="grade-mission-copy"><span className="section-kicker">{mission.kicker}</span><h2 id="grade-mission-title">{mission.title}</h2><p>{mission.copy}</p><div className="grade-mission-loop" aria-label="Each lesson uses a real problem, a visual model, practice, and a history connection"><span>Problem</span><i>→</i><span>Model</span><i>→</i><span>Practice</span><i>→</i><span>Origin</span></div></div>
-    <MissionScene scene={mission.scene} accent="blue" signalA={`grade ${grade}`} signalB="next world" title={`Grade ${grade} mission overview`} />
-  </section>;
 }
 
 export function LessonHistory({ lesson, busy, errorMessage, onComplete }: { lesson: LessonDefinition; busy: boolean; errorMessage: string; onComplete: () => void }) {

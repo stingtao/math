@@ -15,7 +15,7 @@ import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../li
 import { getComboSpec } from "../lib/combo.ts";
 import { isThemeId, themeCatalog } from "../lib/themes.ts";
 import { frontierWorlds } from "../lib/frontier-worlds.ts";
-import { getGradeMission, getLessonExperience } from "../lib/lesson-experience.ts";
+import { getLessonExperience } from "../lib/lesson-experience.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -786,6 +786,10 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(css, /\.task-progress-track/);
   assert.deepEqual([1, 2, 3, 5, 8].map((chain) => getComboSpec(chain).tier), ["signal", "spark", "flame", "prism", "cosmic"]);
   for (const tier of ["signal", "spark", "flame", "prism", "cosmic"]) assert.match(css, new RegExp(`combo-${tier}`));
+  assert.match(css, /\.answer-impact-core \{[^}]*overflow: visible/);
+  assert.match(css, /\.answer-impact-core::before/);
+  assert.match(css, /\.answer-impact\.combo-flame \.answer-impact-core::before \{ clip-path:/);
+  assert.doesNotMatch(css, /\.answer-impact\.combo-flame \.answer-impact-core \{[^}]*clip-path:/);
 });
 
 test("ships a readable, safe-area-aware mobile learning interface", async () => {
@@ -1085,16 +1089,11 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.doesNotMatch(dashboard, /CURRENT QUEST|Continue quest|questMilestone|getQuestMilestone|getNextAchievement|quest-landmark-meter/);
   assert.match(dashboard, /welcomeReady/);
   assert.match(dashboard, /math-welcome-guide/);
-  assert.match(dashboard, /Start at \{journey\.location\}/);
-  assert.match(dashboard, /random codename is the only identity shown/);
-  assert.match(dashboard, /Clear 4 lessons/);
-  assert.match(dashboard, /Stars show fluency/);
-  assert.match(dashboard, /FIRST WIN/);
-  assert.match(dashboard, /First lesson reward preview: one of four region keys, at least 40 XP, and the next lesson opens/);
-  assert.match(dashboard, /Base XP/);
-  assert.match(dashboard, /corrected answer still opens the next lesson/i);
-  assert.match(dashboard, /Start this lesson/);
-  assert.match(dashboard, /<Avatar avatar=\{state\.profile\.avatar\}/);
+  assert.match(dashboard, /Start with \{nextLesson\.title\}/);
+  assert.match(dashboard, /Hints \+ retries/);
+  assert.match(dashboard, /Start first mission/);
+  assert.match(dashboard, /<LessonMissionThumbnail lesson=\{nextLesson\}/);
+  assert.doesNotMatch(dashboard, /random codename is the only identity shown|Clear 4 lessons|Stars show fluency|FIRST WIN|First lesson reward preview|Base XP|Start this lesson|<Avatar avatar=/i);
   assert.match(dashboard, /reviewBatchSize/);
   assert.match(dashboard, /YOUR NEXT MOVE · REVIEW READY/);
   assert.match(dashboard, /Start the recall/);
@@ -1177,10 +1176,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /overflow-x: auto/);
   assert.match(css, /\.world-landmark/);
   assert.match(css, /\.welcome-trail-guide/);
-  assert.match(css, /\.welcome-route-step/);
-  assert.match(css, /\.welcome-first-win/);
-  assert.match(css, /\.welcome-first-win-rewards/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-first-win-rewards strong \{ font-size: 16px/);
+  assert.match(css, /\.welcome-first-mission-copy/);
+  assert.match(css, /\.welcome-first-mission-visual/);
+  assert.doesNotMatch(css, /\.welcome-route-step|\.welcome-first-win|\.welcome-first-win-rewards/);
   assert.match(css, /\.review-priority-card/);
   assert.match(css, /\.review-priority-orbit/);
   assert.match(css, /\.boss-priority-card/);
@@ -1282,7 +1280,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.achievement-grid/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.mission-primary-cta \{ width: 100%; min-height: 62px/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.world-card\.completed-summary \{ grid-template-columns: 1fr/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-route/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-trail-guide \{[^}]*grid-template-columns: 1fr/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);
 });
@@ -1305,12 +1303,12 @@ test("gives every lesson an applied mission and a sourced history finish", async
     assert.ok(experience.history.story.length > 50);
     assert.ok(experience.history.connection.length > 40);
   }
-  assert.equal(getGradeMission(8).scene, "navigation");
-  assert.match(getGradeMission(8).title, /Mars/);
   assert.match(lessonMission, /MISSION MODEL/);
   assert.match(lessonMission, /WHY THIS IDEA EXISTS/);
-  assert.match(dashboard, /<GradeMissionOverview grade=\{grade\}/);
+  assert.match(dashboard, /Start first mission/);
+  assert.match(dashboard, /<LessonMissionThumbnail lesson=\{nextLesson\}/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{featuredLesson\}/);
+  assert.doesNotMatch(dashboard, /GradeMissionOverview|dashboard-summary|dashboard-world-heading|Move across Mars/);
   assert.match(favicon, /<title id="title">Math Frontier<\/title>/);
   assert.match(favicon, /stroke="#4c8dff"/);
   assert.equal(faviconIco.subarray(0, 4).toString("hex"), "00000100");
