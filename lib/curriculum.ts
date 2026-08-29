@@ -4,7 +4,8 @@ import { grade10Regions } from "./curriculum-grade10.ts";
 import { grade11Regions } from "./curriculum-grade11.ts";
 import { grade12Regions } from "./curriculum-grade12.ts";
 import { applyCoverageExtensions } from "./curriculum-extensions.ts";
-import { buildPracticeQuestion, type QuestionInteraction } from "./question-interactions.ts";
+import { buildPracticeQuestion, type QuestionInteraction, type QuestionInteractionConfig } from "./question-interactions.ts";
+import { enrichGrade79Curriculum } from "./curriculum-enrichment.ts";
 
 export type Accent = "blue" | "teal" | "coral" | "violet" | "gold";
 
@@ -14,6 +15,7 @@ export type PracticeQuestion = {
   answer: string;
   hint: string;
   interaction: QuestionInteraction;
+  interactionConfig?: QuestionInteractionConfig;
   choices?: string[];
 };
 
@@ -584,9 +586,9 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
 
 export const grade8Regions: RegionDefinition[] = regionSpecs.map((region, index) => ({ ...region, grade: 8, order: index + 1 }));
 
-const expandedGrade7Regions = applyCoverageExtensions(grade7Regions);
-const expandedGrade8Regions = applyCoverageExtensions(grade8Regions);
-const expandedGrade9Regions = applyCoverageExtensions(grade9Regions);
+const expandedGrade7Regions = enrichGrade79Curriculum(applyCoverageExtensions(grade7Regions));
+const expandedGrade8Regions = enrichGrade79Curriculum(applyCoverageExtensions(grade8Regions));
+const expandedGrade9Regions = enrichGrade79Curriculum(applyCoverageExtensions(grade9Regions));
 const expandedGrade10Regions = applyCoverageExtensions(grade10Regions);
 const expandedGrade11Regions = applyCoverageExtensions(grade11Regions);
 const expandedGrade12Regions = applyCoverageExtensions(grade12Regions);

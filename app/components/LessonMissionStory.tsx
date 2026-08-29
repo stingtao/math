@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { LessonDefinition } from "@/lib/curriculum";
 import { getLessonExperience, type LessonScene } from "@/lib/lesson-experience";
 import { useEnterAction } from "./useEnterAction";
@@ -19,7 +20,10 @@ export function LessonMissionStory({ lesson }: { lesson: LessonDefinition }) {
       <p>{experience.problem}</p>
       <div className="lesson-mission-model"><small>MISSION MODEL</small><strong>{experience.model}</strong></div>
     </div>
-    <MissionScene scene={experience.scene} accent={lesson.accent} signalA={experience.signalA} signalB={experience.signalB} title={`${lesson.title}: ${experience.title}`} />
+    {experience.image ? <div className="mission-scene-image">
+      <Image src={experience.image} alt={experience.imageAlt ?? ""} fill sizes="(max-width: 980px) 100vw, 52vw" priority={false} />
+      <div className="mission-image-signals"><span>{experience.signalA}</span><strong>{experience.signalB}</strong></div>
+    </div> : <MissionScene scene={experience.scene} accent={lesson.accent} signalA={experience.signalA} signalB={experience.signalB} title={`${lesson.title}: ${experience.title}`} />}
   </div>;
 }
 

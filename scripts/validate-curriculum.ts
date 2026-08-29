@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curriculum.ts";
 import { algebraCourseCoverage, extendedProgramCoverage, grade7To12CoreCoverage } from "../lib/curriculum-coverage.ts";
 import { expandedCoverageLessonSlugs } from "../lib/curriculum-extensions.ts";
-import { inferQuestionInteraction, type QuestionInteraction } from "../lib/question-interactions.ts";
+import { inferQuestionInteraction, MULTI_SELECT_SEPARATOR, type QuestionInteraction } from "../lib/question-interactions.ts";
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
 
@@ -12,8 +12,9 @@ function writtenUnit(choice: string) {
 
 assert.equal(regions.length, 55, "Grades 7–12 must contain 55 regions");
 assert.equal(lessons.length, 253, "Grades 7–12 must contain 253 lessons");
-assert.equal(curriculumStats.questions, 1265, "Every lesson must contain five reviewed questions");
-assert.ok(lessons.every((lesson) => lesson.practice.length === 5), "Every lesson must contain exactly five questions");
+assert.equal(curriculumStats.questions, 1297, "The reviewed curriculum and Grade 7–9 interaction missions must remain complete");
+assert.ok(lessons.every((lesson) => lesson.practice.length >= 5), "Every lesson must contain at least five reviewed questions");
+assert.equal(lessons.filter((lesson) => lesson.grade >= 7 && lesson.grade <= 9 && lesson.practice.length > 5).length, 32, "Grade 7–9 must keep all 32 enriched interaction missions");
 assert.ok(lessons.every((lesson) => lesson.exampleSteps.length >= 3 && lesson.exampleSteps.every((step) => step.trim().length >= 12)), "Every lesson needs a usable worked reasoning sequence");
 assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, lessons.length, "Lesson IDs must be unique");
 assert.equal(new Set(lessons.map((lesson) => lesson.slug)).size, lessons.length, "Lesson slugs must be unique");
@@ -94,11 +95,12 @@ for (const lesson of lessons) {
     assert.ok(question.hint.trim().length >= 3, `${lesson.id}/${question.id} needs a useful hint`);
     assert.ok(question.answer.split("|").every((answer) => answer.trim()), `${lesson.id}/${question.id} has an empty accepted answer`);
     const inferredInteraction = inferQuestionInteraction(question.answer, question.choices);
-    assert.equal(question.interaction, inferredInteraction, `${lesson.id}/${question.id} has a mismatched interaction type`);
+    if (!question.interactionConfig) assert.equal(question.interaction, inferredInteraction, `${lesson.id}/${question.id} has a mismatched interaction type`);
+    else assert.equal(question.interactionConfig.kind, question.interaction, `${lesson.id}/${question.id} interaction config must match its renderer`);
     interactionCounts.set(question.interaction, (interactionCounts.get(question.interaction) ?? 0) + 1);
     if (question.interaction === "fill-in") {
       assert.equal(question.choices, undefined, `${lesson.id}/${question.id} cannot combine fill-in with choices`);
-    } else {
+    } else if (!["coordinate-grid", "number-line"].includes(question.interaction)) {
       assert.ok(question.choices, `${lesson.id}/${question.id} must render selectable answers`);
     }
     if (question.interaction === "yes-no") {
@@ -121,6 +123,11 @@ for (const lesson of lessons) {
         assert.equal(orderedAnswer.length, question.choices.length, `${lesson.id}/${question.id} ordering answer must contain every step`);
         assert.deepEqual([...orderedAnswer].sort(), [...question.choices].sort(), `${lesson.id}/${question.id} ordering answer must use each authored step exactly once`);
         orderingChecks += 1;
+      } else if (question.interaction === "multi-select") {
+        const selectedAnswers = question.answer.split(MULTI_SELECT_SEPARATOR);
+        const requiredSelections = question.interactionConfig?.kind === "multi-select" ? question.interactionConfig.requiredSelections : 0;
+        assert.equal(selectedAnswers.length, requiredSelections, `${lesson.id}/${question.id} must define the required number of selections`);
+        assert.ok(selectedAnswers.every((answer) => question.choices?.includes(answer)), `${lesson.id}/${question.id} multi-select answers must come from its choices`);
       } else {
         assert.equal(question.choices.filter((choice) => isAnswerCorrect(choice, question.answer)).length, 1, `${lesson.id}/${question.id} must have exactly one selectable correct answer`);
         const answerUnit = writtenUnit(question.answer.split("|")[0]);
@@ -137,6 +144,10 @@ for (const lesson of lessons) {
     assert.equal(isAnswerCorrect("__definitely_not_the_answer__", question.answer), false, `${lesson.id}/${question.id} accepted unrelated text`);
   }
 }
+
+assert.ok((interactionCounts.get("coordinate-grid") ?? 0) >= 8, "Grade 7–9 needs coordinate plotting questions");
+assert.ok((interactionCounts.get("number-line") ?? 0) >= 7, "Grade 7–9 needs number-line questions");
+assert.ok((interactionCounts.get("multi-select") ?? 0) >= 14, "Grade 7–9 needs multi-select reasoning questions");
 
 for (const [input, accepted] of [
   ["0.5", "1/2"], ["2/4", "1/2"], ["50%", "1/2"], ["−7", "-7"], [" 3 / 6 ", "0.5"], ["0.42", "42%"], ["7.4 × 10³", "7.4*10^3"],

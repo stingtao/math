@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const questions = due.flatMap((item) => {
     const lesson = lessonById.get(item.lesson_id);
     const question = lesson?.practice.find((entry) => entry.id === item.question_id);
-    return lesson && question ? [{ lessonId: lesson.id, lessonTitle: lesson.title, questionId: question.id, prompt: question.prompt, hint: question.hint, interaction: question.interaction, choices: question.choices }] : [];
+    return lesson && question ? [{ lessonId: lesson.id, lessonTitle: lesson.title, questionId: question.id, prompt: question.prompt, hint: question.hint, interaction: question.interaction, interactionConfig: question.interactionConfig, choices: question.choices }] : [];
   });
   return privateJson({ questions });
 }

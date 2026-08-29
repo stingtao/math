@@ -3,7 +3,7 @@ import { AboutPage } from "../components/AboutPage";
 
 export const metadata: Metadata = {
   title: "About · Math",
-  description: "How Math uses human and AI collaboration, welcomes open reuse, and learns from corrections.",
+  description: "Why Sting built Math for his daughter—and why learning math should feel like an adventure.",
 };
 
 export default function About() {

@@ -15,10 +15,10 @@ import { AnswerImpact } from "./AnswerImpact";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
 import { TaskProgress } from "./TaskProgress";
 import { QuestionResponse } from "./QuestionResponse";
-import { isResponseComplete, type QuestionInteraction } from "@/lib/question-interactions";
+import { isResponseComplete, type QuestionInteraction, type QuestionInteractionConfig } from "@/lib/question-interactions";
 import { EnterActionLink } from "./EnterActionLink";
 
-type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; choices?: string[] };
+type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; interactionConfig?: QuestionInteractionConfig; choices?: string[] };
 
 export function ReviewPlayer({ demo }: { demo: boolean }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -51,7 +51,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const demoQuestions = useMemo(() => {
     if (!state) return [];
     const sourceLessons = state.completedLessons.map((entry) => lessonById.get(entry.id)).filter(Boolean);
-    const pool = (sourceLessons.length ? sourceLessons : [lessons[0]]).flatMap((lesson) => lesson!.practice.slice(0, 2).map((item) => ({ lessonId: lesson!.id, lessonTitle: lesson!.title, questionId: item.id, prompt: item.prompt, answer: item.answer, hint: item.hint, interaction: item.interaction, choices: item.choices })));
+    const pool = (sourceLessons.length ? sourceLessons : [lessons[0]]).flatMap((lesson) => lesson!.practice.slice(0, 2).map((item) => ({ lessonId: lesson!.id, lessonTitle: lesson!.title, questionId: item.id, prompt: item.prompt, answer: item.answer, hint: item.hint, interaction: item.interaction, interactionConfig: item.interactionConfig, choices: item.choices })));
     return Array.from({ length: Math.min(5, Math.max(3, state.dueReview)) }, (_, i) => pool[i % pool.length]);
   }, [state]);
 

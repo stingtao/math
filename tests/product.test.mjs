@@ -17,6 +17,7 @@ import { getComboSpec } from "../lib/combo.ts";
 import { isThemeId, themeCatalog } from "../lib/themes.ts";
 import { frontierWorlds } from "../lib/frontier-worlds.ts";
 import { getLessonExperience } from "../lib/lesson-experience.ts";
+import { isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-interactions.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -84,18 +85,24 @@ test("turns common wrong answers into specific recovery guidance and a delayed r
   assert.deepEqual(remixedChoices(["A", "B", "C"], false), ["A", "B", "C"]);
 });
 
-test("models answer interactions before rendering all 1,265 questions", () => {
+test("models answer interactions before rendering all 1,297 questions", () => {
   const questions = lessons.flatMap((lesson) => lesson.practice);
   const yesNo = questions.filter((question) => question.interaction === "yes-no");
   const trueFalse = questions.filter((question) => question.interaction === "true-false");
   const ordering = questions.filter((question) => question.interaction === "ordering");
+  const multiSelect = questions.filter((question) => question.interaction === "multi-select");
+  const coordinateGrid = questions.filter((question) => question.interaction === "coordinate-grid");
+  const numberLine = questions.filter((question) => question.interaction === "number-line");
   const factorQuestions = questions.filter((question) => /^Factor(?: completely)?\b/i.test(question.prompt));
   const proportionalDecision = lessons.find((lesson) => lesson.slug === "g7-proportional-tables")?.practice[1];
 
-  assert.equal(questions.length, 1265);
+  assert.equal(questions.length, 1297);
   assert.equal(yesNo.length, 110);
   assert.equal(trueFalse.length, 1);
   assert.equal(ordering.length, 16);
+  assert.equal(multiSelect.length, 14);
+  assert.equal(coordinateGrid.length, 11);
+  assert.equal(numberLine.length, 7);
   assert.ok(yesNo.every((question) => question.choices?.join("|") === "Yes|No"));
   assert.ok(trueFalse.every((question) => question.choices?.join("|") === "True|False"));
   assert.equal(proportionalDecision?.interaction, "yes-no");
@@ -103,6 +110,9 @@ test("models answer interactions before rendering all 1,265 questions", () => {
   assert.equal(factorQuestions.length, 18);
   assert.ok(factorQuestions.every((question) => question.interaction === "four-choice" && question.choices?.length === 4));
   assert.ok(ordering.every((question) => question.choices?.length === 5 && question.answer.split(" → ").length === 5));
+  assert.ok(multiSelect.every((question) => question.interactionConfig?.kind === "multi-select" && question.answer.split(MULTI_SELECT_SEPARATOR).length === question.interactionConfig.requiredSelections));
+  assert.ok(coordinateGrid.every((question) => question.interactionConfig?.kind === "coordinate-grid" && isResponseComplete(question, question.answer)));
+  assert.ok(numberLine.every((question) => question.interactionConfig?.kind === "number-line" && isResponseComplete(question, question.answer)));
 });
 
 test("keeps the audited Algebra I scope tied to dedicated lessons and teaching visuals", async () => {
@@ -117,7 +127,7 @@ test("keeps the audited Algebra I scope tied to dedicated lessons and teaching v
   for (const strand of grade7To12CoreCoverage) for (const slug of strand.lessonSlugs) assert.ok(slugs.has(slug), `${strand.cluster} lost ${slug}`);
   for (const strand of algebraCourseCoverage) for (const slug of strand.lessonSlugs) assert.ok(slugs.has(slug), `${strand.topic} lost ${slug}`);
   for (const strand of extendedProgramCoverage) for (const slug of strand.lessonSlugs) assert.ok(slugs.has(slug), `${strand.authority} lost ${slug}`);
-  for (const slug of ["g9-quantities-units-precision", "g9-absolute-value-functions", "g9-absolute-value-inequalities", "g9-graph-linear-inequalities", "g9-systems-linear-inequalities", "g9-build-quadratic-models", "g9-interpret-linear-models"]) assert.match(concept, new RegExp(slug));
+  for (const slug of ["g9-quantities-units-precision", "g9-absolute-value-functions", "g9-absolute-value-inequalities", "g9-graph-linear-inequalities", "g9-systems-linear-inequalities", "g9-linear-quadratic-systems", "g9-build-quadratic-models", "g9-interpret-linear-models"]) assert.match(concept, new RegExp(slug));
   assert.match(concept, /inequality-shade/);
   assert.match(concept, /system-shade/);
   assert.match(concept, /quadratic-model-path/);
@@ -263,10 +273,10 @@ test("publishes a plain-English AI collaboration and open reuse promise", async 
   const html = await response.text();
   const legal = await readFile(new URL("../app/components/LegalPage.tsx", import.meta.url), "utf8");
   const footer = await readFile(new URL("../app/components/SiteFooter.tsx", import.meta.url), "utf8");
-  assert.match(html, /Built with AI\. Improved by people/);
-  assert.match(html, /Copy it\. Share it\. Remix it/);
-  assert.match(html, /AI can sound certain while being wrong/);
-  assert.match(html, /humanity learning together/);
+  assert.match(html, /A dad built it for his daughter/);
+  assert.match(html, /Sting’s daughter had math to review/);
+  assert.match(html, /Sting and AI build together/);
+  assert.match(html, /Use it\. Remix it\. Make it better/);
   assert.match(html, /original learning text and original image assets/);
   assert.match(legal, /AI-assisted creation and accuracy/);
   assert.match(legal, /Open reuse of original material/);
@@ -1020,11 +1030,19 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
     assert.equal(metadata.format, "webp");
     assert.equal(metadata.width, 1600);
   }
+  for (const visual of ["g7-frontier-mission.webp", "g8-frontier-mission.webp", "g9-frontier-mission.webp"]) {
+    const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
+    assert.ok(asset.byteLength > 150_000 && asset.byteLength < 350_000, `${visual} should keep enough comic detail without slowing a lesson`);
+    const metadata = await sharp(asset).metadata();
+    assert.equal(metadata.format, "webp");
+    assert.equal(metadata.width, 1440);
+    assert.equal(metadata.height, 810);
+  }
   for (const model of ["number-line", "symbol-meaning", "sign-pairs", "operation-order", "place-value", "repeating-decimal", "negative-distribute", "root-inverse", "solid-compare", "signed-sum", "subtract-opposite", "signed-rational-quotient", "signed-change", "proportion-table", "origin-proportion", "word-equation", "scale-area", "composite-area", "experimental-probability", "sample-space", "literal-equation", "line-forms", "system-substitution", "system-model", "radical-factor", "like-radicals", "gcf-factor", "factor-chain", "plus-minus-roots", "zero-product", "fit-prediction", "model-choice", "percent", "fraction-equivalence", "fraction-addition", "substitution", "power-steps", "term-structure", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-location", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "solution-cases", "inequality-range", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay", "number-kinds", "system-elimination", "distribution-compare", "rational-exponent", "growth-compare", "simple-interest", "graph-line", "dilation", "residuals"]) assert.match(concept, new RegExp(`model: "${model}"`));
   const contextSceneSource = concept.slice(concept.indexOf("const contextScenes"), concept.indexOf("function mathFor"));
-  assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 124);
+  assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 126);
   assert.doesNotMatch(home, /expandedSceneCount/);
-  for (const representative of ["math-symbols", "signed-numbers", "sign-rules", "order-of-operations", "decimals", "negative-distribution", "repeating-decimals", "square-cube-roots", "mixed-volume", "percent", "fractions", "adding-fractions", "substitution", "g9-evaluate-formulas", "algebra-language", "combining-like-terms", "g7-equivalent-expressions", "g7-proportional-tables", "g7-proportional-graphs", "g7-add-rational-numbers", "g7-subtract-rational-numbers", "g7-multiply-divide-rationals", "g7-rational-word-problems", "g7-equation-word-models", "g7-scale-area", "g7-composite-area", "g7-experimental-probability", "g7-sample-spaces", "g9-algebraic-structure", "g9-literal-equations", "g9-linear-equation-forms", "g9-systems-substitution-g9", "g9-systems-elimination-g9", "g9-system-models", "g9-simplify-radicals", "g9-radical-operations", "g9-greatest-common-factor", "g9-factoring-completely", "g9-solve-by-square-roots", "g9-solve-by-factoring", "g9-polynomial-vocabulary", "g9-add-subtract-polynomials", "g9-scatter-models-g9", "g9-modeling-decisions", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "rational-irrational", "systems-algebra", "graphing-lines", "function-rules", "dilations-similarity", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g7-compare-distributions", "g7-simple-interest", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula", "g9-rational-exponents", "g9-linear-vs-exponential", "g9-correlation-residuals"]) {
+  for (const representative of ["math-symbols", "signed-numbers", "sign-rules", "order-of-operations", "decimals", "negative-distribution", "repeating-decimals", "square-cube-roots", "mixed-volume", "percent", "fractions", "adding-fractions", "substitution", "g9-evaluate-formulas", "algebra-language", "combining-like-terms", "g7-equivalent-expressions", "g7-proportional-tables", "g7-proportional-graphs", "g7-add-rational-numbers", "g7-subtract-rational-numbers", "g7-multiply-divide-rationals", "g7-rational-word-problems", "g7-equation-word-models", "g7-scale-area", "g7-composite-area", "g7-experimental-probability", "g7-sample-spaces", "g7-percent-decision-chains", "g8-composed-transformations", "g9-algebraic-structure", "g9-literal-equations", "g9-linear-equation-forms", "g9-systems-substitution-g9", "g9-systems-elimination-g9", "g9-system-models", "g9-simplify-radicals", "g9-radical-operations", "g9-greatest-common-factor", "g9-factoring-completely", "g9-solve-by-square-roots", "g9-solve-by-factoring", "g9-polynomial-vocabulary", "g9-add-subtract-polynomials", "g9-scatter-models-g9", "g9-modeling-decisions", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "rational-irrational", "systems-algebra", "graphing-lines", "function-rules", "dilations-similarity", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g7-compare-distributions", "g7-simple-interest", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula", "g9-rational-exponents", "g9-linear-vs-exponential", "g9-correlation-residuals"]) {
     assert.match(contextSceneSource, new RegExp(`[" ]${representative}[":]`));
   }
   for (const exactModel of [

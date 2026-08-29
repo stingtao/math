@@ -45,6 +45,7 @@ const practiceEncouragement = [
   "Three corrected—momentum is building.",
   "One more idea is connected.",
   "You closed the loop.",
+  "You used the idea in a new form.",
 ];
 
 type LessonCompletionReward = {
@@ -209,7 +210,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     }
     const correctFirst = lesson.practice.filter((item) => firstCorrect[item.id]).length;
     const usedAnyHint = lesson.practice.some((item) => hinted[item.id]);
-    const earnedStars = inMemoryCheck ? 2 : correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= 4 ? 2 : 1;
+    const earnedStars = inMemoryCheck ? 2 : correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= Math.ceil(lesson.practice.length * .8) ? 2 : 1;
     setStars(earnedStars);
     if (inMemoryCheck) setMasteryLockedCount(masteryTotal);
     setAnswer("");

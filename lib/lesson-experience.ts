@@ -19,7 +19,53 @@ export type LessonExperience = {
   model: string;
   signalA: string;
   signalB: string;
+  image?: string;
+  imageAlt?: string;
   history: LessonHistory;
+};
+
+type GradeStoryArc = Pick<LessonExperience, "kicker" | "title" | "problem" | "signalA" | "signalB">;
+
+const gradeStoryArcs: Record<number, GradeStoryArc> = {
+  701: { kicker: "MARS SUPPLY RUN", title: "Can the greenhouse support a bigger crew?", problem: "Compare water, food, and travel rates before the next crew leaves base.", signalA: "compare", signalB: "scale" },
+  702: { kicker: "CANYON ROUTE", title: "Can the rover cross zero and reach the ridge?", problem: "Track gains and losses in elevation while the route moves above and below base level.", signalA: "start", signalB: "move" },
+  703: { kicker: "POWER CONTROL", title: "What setting keeps the greenhouse stable?", problem: "Rewrite and solve a control rule before changing the power system.", signalA: "model", signalB: "solve" },
+  704: { kicker: "COLONY MARKET", title: "Which supply deal actually saves resources?", problem: "Compare discounts, fees, tips, interest, and percent change before the colony commits.", signalA: "original", signalB: "change" },
+  705: { kicker: "HABITAT FRAME", title: "Will these pieces make a safe structure?", problem: "Use angles, circles, scale, and triangle conditions before a frame is assembled.", signalA: "measure", signalB: "verify" },
+  706: { kicker: "FABRICATION BAY", title: "How much material does this design need?", problem: "Break a complex habitat into familiar solids and surfaces before printing parts.", signalA: "decompose", signalB: "build" },
+  707: { kicker: "CREW SIGNALS", title: "Does this sample represent the whole colony?", problem: "Choose fair data, compare distributions, and decide what the evidence supports.", signalA: "sample", signalB: "infer" },
+  708: { kicker: "DRONE FORECAST", title: "Which route gives the best chance of success?", problem: "Build a sample space, compare expected and observed results, then judge the risk.", signalA: "outcomes", signalB: "chance" },
+
+  1: { kicker: "DEEP-SEA CODE", title: "Can every control symbol be read without guessing?", problem: "Decode signs, operations, and number order before the dive station powers up.", signalA: "read", signalB: "decide" },
+  2: { kicker: "OXYGEN MIX", title: "Will the same blend work in every habitat?", problem: "Connect fractions, decimals, and percents to divide a limited reserve accurately.", signalA: "part", signalB: "whole" },
+  3: { kicker: "PRESSURE BALANCE", title: "What unknown setting returns the chamber to safe pressure?", problem: "Translate a control message into an equation and undo one operation at a time.", signalA: "unknown", signalB: "balance" },
+  4: { kicker: "POWER MODULES", title: "Can one compact rule control a huge energy system?", problem: "Use powers and distribution to combine repeated modules without counting each one.", signalA: "repeat", signalB: "simplify" },
+  5: { kicker: "SONAR CALIBRATION", title: "Which readings fit on the rational scale?", problem: "Classify repeating, terminating, and root values so the sensor stores them correctly.", signalA: "estimate", signalB: "classify" },
+  6: { kicker: "DEEP-OCEAN SCALE", title: "How do we compare signals that differ by millions?", problem: "Use exponent rules and scientific notation to keep extreme measurements readable.", signalA: "power", signalB: "scale" },
+  7: { kicker: "LOCK CONTROL", title: "Which value opens the pressure gate?", problem: "Combine terms, solve multi-step equations, and recognize when a control has one, none, or many solutions.", signalA: "combine", signalB: "unlock" },
+  8: { kicker: "CURRENT NAVIGATION", title: "Where do two travel routes meet?", problem: "Use slope, graphs, and systems to predict the crossing before the vehicles move.", signalA: "route A", signalB: "route B" },
+  9: { kicker: "AUTONOMOUS ROUTINES", title: "Is this input-output rule reliable enough to automate?", problem: "Connect tables, graphs, and equations, then compare how different functions behave.", signalA: "input", signalB: "output" },
+  10: { kicker: "MOVING BRIDGE", title: "Can a bridge move without changing its shape?", problem: "Translate, rotate, reflect, and dilate a design while tracking every coordinate.", signalA: "before", signalB: "after" },
+  11: { kicker: "DOME SAFETY", title: "Will this frame close with the right lengths and angles?", problem: "Use angle and triangle relationships to test a structural frame before assembly.", signalA: "length", signalB: "angle" },
+  12: { kicker: "BALLAST TANKS", title: "How much water fits inside the new station?", problem: "Model cylinders, cones, spheres, and mixed solids before filling a tank.", signalA: "shape", signalB: "volume" },
+  13: { kicker: "OCEAN SIGNAL LAB", title: "What pattern is hiding in the sensor data?", problem: "Use plots, fit lines, tables, and probability to turn observations into a decision.", signalA: "observe", signalB: "predict" },
+
+  901: { kicker: "ORBITAL FORMULA LAB", title: "Can one formula coordinate every module?", problem: "Use units, properties, and literal equations to make each quantity mean exactly one thing.", signalA: "quantity", signalB: "formula" },
+  902: { kicker: "SAFE OPERATING WINDOW", title: "Which values keep the station inside its limits?", problem: "Solve equations, inequalities, and absolute-value constraints before changing a live system.", signalA: "boundary", signalB: "solution" },
+  903: { kicker: "FLIGHT PATH", title: "Where will a constant-rate route go next?", problem: "Connect points, slope, equation forms, and arithmetic sequences to forecast a path.", signalA: "rate", signalB: "position" },
+  904: { kicker: "ROUTE INTERSECTION", title: "Where can two mission plans work at the same time?", problem: "Solve linear systems and regions, then test the point where both conditions agree.", signalA: "system A", signalB: "system B" },
+  905: { kicker: "ENERGY CELL SCALE", title: "How can a radical describe the exact power level?", problem: "Move between integer exponents, rational exponents, and radicals without changing the value.", signalA: "power", signalB: "root" },
+  906: { kicker: "MODULE ASSEMBLY", title: "How do many pieces combine into one reliable model?", problem: "Name and combine polynomial parts before the station fabricates a larger structure.", signalA: "terms", signalB: "combine" },
+  907: { kicker: "FACTOR LOCK", title: "Which smaller parts built this polynomial?", problem: "Reverse multiplication to expose shared factors and the structure hidden inside an expression.", signalA: "product", signalB: "factors" },
+  908: { kicker: "SOLAR BRIDGE", title: "Where should a curved bridge rise, cross, and land?", problem: "Use roots, factoring, formulas, and graphs to control a quadratic path.", signalA: "vertex", signalB: "zeros" },
+  909: { kicker: "COLONY FORECAST", title: "Will this signal grow steadily—or multiply?", problem: "Compare sequences and exponential models before a small change becomes enormous.", signalA: "now", signalB: "next" },
+  910: { kicker: "EVIDENCE DECK", title: "Which model deserves the crew’s trust?", problem: "Use distributions, residuals, and context to judge whether data supports a decision.", signalA: "data", signalB: "model" },
+};
+
+const gradeJourneyMedia: Record<7 | 8 | 9, { image: string; imageAlt: string }> = {
+  7: { image: "/visuals/g7-frontier-mission.webp", imageAlt: "Students at a Mars greenhouse compare supplies, scaled plans, geometric panels, and chance models." },
+  8: { image: "/visuals/g8-frontier-mission.webp", imageAlt: "Students in an underwater city use a coordinate table, data models, solids, and a geometric bridge." },
+  9: { image: "/visuals/g9-frontier-mission.webp", imageAlt: "Students in an orbital lab compare straight and curved flight paths with energy and data models." },
 };
 
 const histories: Record<LessonScene, LessonHistory> = {
@@ -167,7 +213,7 @@ const sceneCopy: Record<LessonScene, Omit<LessonExperience, "scene" | "model" | 
   },
 };
 
-export function getLessonExperience(lesson: Pick<LessonDefinition, "title" | "goal" | "example" | "standard" | "visual">): LessonExperience {
+export function getLessonExperience(lesson: Pick<LessonDefinition, "title" | "goal" | "example" | "standard" | "visual" | "grade" | "regionId">): LessonExperience {
   const scene = classifyLesson(lesson);
   if (/symbol/i.test(lesson.title)) {
     return {
@@ -184,6 +230,17 @@ export function getLessonExperience(lesson: Pick<LessonDefinition, "title" | "go
         story: "Al-Khwarizmi solved algebra problems entirely in words. Later notation compressed those instructions into symbols that people could scan and reuse.",
         connection: "Reading a symbol correctly is what turns a short expression back into a precise mathematical instruction.",
       },
+    };
+  }
+  const storyArc = gradeStoryArcs[lesson.regionId];
+  const journeyMedia = lesson.grade >= 7 && lesson.grade <= 9 ? gradeJourneyMedia[lesson.grade] : undefined;
+  if (storyArc) {
+    return {
+      scene,
+      ...storyArc,
+      ...journeyMedia,
+      model: lesson.example,
+      history: histories[scene],
     };
   }
   return {
