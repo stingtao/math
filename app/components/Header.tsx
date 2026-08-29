@@ -15,6 +15,7 @@ export function PublicHeader() {
       <nav className="topnav" aria-label="Main navigation">
         <a href="/#story">About</a>
         <a href="/#curriculum">Grades 7–9</a>
+        <a href="/labs/linear-graphs">Graph Lab</a>
         <a href="/leaderboard">Leaderboard</a>
         <a href="/feedback">Feedback</a>
       </nav>
@@ -24,6 +25,7 @@ export function PublicHeader() {
           <nav aria-label="Mobile navigation">
             <a href="/#story">About</a>
             <a href="/#curriculum">Grades 7–9</a>
+            <a href="/labs/linear-graphs">Graph Lab</a>
             <a href="/leaderboard">Leaderboard</a>
             <a href="/feedback">Feedback</a>
           </nav>

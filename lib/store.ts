@@ -4,6 +4,7 @@ import { getCookie, randomToken, sha256 } from "@/lib/security";
 import { getAvatarFrame } from "@/lib/avatar-frames";
 import { calculateLessonReward } from "@/lib/rewards";
 import { BADGE_CATALOG_SIZE, ANSWER_BADGE_STEP, answerBadges, badgeById, lessonBadgeByLessonId, type BadgeUnlock } from "@/lib/badges";
+import { publicTextPrivacyIssue } from "@/lib/privacy";
 
 const adjectives = ["Calm", "Bright", "Brave", "Clever", "Curious", "Gentle", "Kind", "Nimble", "Quiet", "Swift", "Wise", "Bold"];
 const nouns = ["Comet", "Compass", "Cedar", "Falcon", "Harbor", "Lantern", "Orbit", "Panda", "Pebble", "River", "Sparrow", "Summit"];
@@ -51,6 +52,8 @@ export async function createFeedback(requestKey: string | null, body: string) {
   const message = body.trim().replace(/\s+/g, " ");
   if (message.length < 3 || message.length > 600) throw new Error("Feedback must be between 3 and 600 characters.");
   if (/https?:\/\/|www\./i.test(message)) throw new Error("Please leave links out of public feedback.");
+  const privacyIssue = publicTextPrivacyIssue(message);
+  if (privacyIssue) throw new Error(`For privacy, remove the ${privacyIssue} before posting.`);
   await ensureSchema();
   const id = crypto.randomUUID();
   const requestKeyHash = await sha256(requestKey);
@@ -214,6 +217,7 @@ async function activateLessonRun(learnerId: string, lessonId: string, runId: str
   const now = new Date().toISOString();
   await db.batch([
     db.prepare("DELETE FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ?").bind(learnerId, lessonId),
+    db.prepare("DELETE FROM lesson_mastery_checks WHERE learner_id = ? AND lesson_id = ?").bind(learnerId, lessonId),
     db.prepare("INSERT INTO lesson_runs (learner_id, lesson_id, run_id, completed, started_at, updated_at) VALUES (?, ?, ?, 0, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET run_id = excluded.run_id, completed = 0, started_at = excluded.started_at, updated_at = excluded.updated_at")
       .bind(learnerId, lessonId, runId, now, now),
   ]);
@@ -242,6 +246,39 @@ export async function recordAnswer(learnerId: string, lessonId: string, question
   return correct
     ? creditCorrectAnswer(learnerId, `${lessonId}:${runId}:${questionId}`, "lesson")
     : { correctAnswers: undefined, badgeUnlocks: [] as BadgeUnlock[] };
+}
+
+export async function recordMasteryCheck(learnerId: string, lessonId: string, questionId: string, correct: boolean, usedHint: boolean, runId: string, round: number) {
+  await ensureSchema();
+  await assertLessonUnlocked(learnerId, lessonId);
+  validateLessonRunId(runId);
+  if (!Number.isInteger(round) || round < 0 || round > 20) throw new Error("Memory Check round is invalid.");
+  const db = getStore();
+  const activeRun = await db.prepare("SELECT run_id, completed FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
+    .bind(learnerId, lessonId).first<{ run_id: string; completed: number }>();
+  if (!activeRun || activeRun.run_id !== runId || activeRun.completed) throw new Error("Finish the active lesson run before the Memory Check.");
+  const original = await db.prepare("SELECT corrected FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
+    .bind(learnerId, lessonId, questionId).first<{ corrected: number }>();
+  if (!original?.corrected) throw new Error("Correct the practice question before its Memory Check.");
+  const current = await db.prepare("SELECT run_id, round, attempts, hints_used, clean_corrected FROM lesson_mastery_checks WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
+    .bind(learnerId, lessonId, questionId).first<{ run_id: string; round: number; attempts: number; hints_used: number; clean_corrected: number }>();
+  if (current && current.run_id === runId && (round < current.round || round > current.round + 1)) throw new Error("Continue the current Memory Check round.");
+  if (!current && round !== 0) throw new Error("Start with the first Memory Check round.");
+  const sameRound = Boolean(current && current.run_id === runId && current.round === round);
+  const priorAttempts = sameRound ? current!.attempts : 0;
+  const cleanCorrected = correct && priorAttempts === 0 && !usedHint;
+  const now = new Date().toISOString();
+  if (!current) {
+    await db.prepare("INSERT INTO lesson_mastery_checks (learner_id, lesson_id, question_id, run_id, round, attempts, hints_used, clean_corrected, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)")
+      .bind(learnerId, lessonId, questionId, runId, round, usedHint ? 1 : 0, cleanCorrected ? 1 : 0, now).run();
+  } else if (sameRound) {
+    await db.prepare("UPDATE lesson_mastery_checks SET attempts = attempts + 1, hints_used = hints_used + ?, clean_corrected = MAX(clean_corrected, ?), updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
+      .bind(usedHint ? 1 : 0, cleanCorrected ? 1 : 0, now, learnerId, lessonId, questionId).run();
+  } else {
+    await db.prepare("UPDATE lesson_mastery_checks SET run_id = ?, round = ?, attempts = 1, hints_used = ?, clean_corrected = ?, updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
+      .bind(runId, round, usedHint ? 1 : 0, cleanCorrected ? 1 : 0, now, learnerId, lessonId, questionId).run();
+  }
+  return { cleanCorrected };
 }
 
 export async function claimMutation(learnerId: string, key: string | null, route: string) {
@@ -327,10 +364,18 @@ export async function completeLesson(learnerId: string, lessonId: string, runId:
   const summary = await db.prepare("SELECT COUNT(*) AS total, SUM(first_correct) AS first_correct, SUM(hints_used) AS hints FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND corrected = 1")
     .bind(learnerId, lessonId).first<{ total: number; first_correct: number; hints: number }>();
   if (Number(summary?.total ?? 0) < lesson.practice.length) throw new Error("Correct every practice question before completing the lesson.");
+  const recovery = await db.prepare(`SELECT COUNT(*) AS total, SUM(CASE WHEN m.clean_corrected = 1 THEN 1 ELSE 0 END) AS mastered
+    FROM lesson_attempts a
+    LEFT JOIN lesson_mastery_checks m ON m.learner_id = a.learner_id AND m.lesson_id = a.lesson_id AND m.question_id = a.question_id AND m.run_id = ?
+    WHERE a.learner_id = ? AND a.lesson_id = ? AND (a.first_correct = 0 OR a.hints_used > 0)`)
+    .bind(runId, learnerId, lessonId).first<{ total: number; mastered: number }>();
+  const recoveryTotal = Number(recovery?.total ?? 0);
+  const recoveryMastered = Number(recovery?.mastered ?? 0);
+  if (recoveryMastered < recoveryTotal) throw new Error("Complete every Memory Check before finishing the lesson.");
   const previous = await db.prepare("SELECT stars FROM lesson_progress WHERE learner_id = ? AND lesson_id = ?")
     .bind(learnerId, lessonId).first<{ stars: number }>();
   const firstCorrect = Number(summary?.first_correct ?? 0);
-  const stars = firstCorrect === lesson.practice.length && Number(summary?.hints ?? 0) === 0 ? 3 : firstCorrect >= Math.ceil(lesson.practice.length * 0.8) ? 2 : 1;
+  const stars = firstCorrect === lesson.practice.length && Number(summary?.hints ?? 0) === 0 ? 3 : firstCorrect >= Math.ceil(lesson.practice.length * 0.8) || recoveryTotal > 0 && recoveryMastered === recoveryTotal ? 2 : 1;
   const reward = calculateLessonReward(Number(previous?.stars ?? 0), stars);
   await db.prepare("INSERT INTO lesson_progress (learner_id, lesson_id, stars, first_correct_count, completed_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET stars = MAX(stars, excluded.stars), first_correct_count = MAX(first_correct_count, excluded.first_correct_count)")
     .bind(learnerId, lessonId, stars, firstCorrect, new Date().toISOString()).run();

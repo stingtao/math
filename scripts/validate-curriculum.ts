@@ -15,14 +15,31 @@ assert.equal(new Set(lessons.map((lesson) => lesson.visual)).size, topicIconVisu
 assert.equal(Object.keys(regionLandmarks).length, regions.length, "Every current region must have one visual landmark");
 assert.ok(regions.every((region) => getRegionLandmark(region.grade, region.id)), "Every current region must resolve to a visual landmark");
 
-const standards = lessons.map((lesson) => lesson.standard).join(" ");
-for (const domain of ["8.NS", "8.EE", "8.F", "8.G", "8.SP"]) {
-  assert.match(standards, new RegExp(domain.replace(".", "\\.")), `Missing ${domain} coverage`);
+const requiredDomains = new Map<number, string[]>([
+  [7, ["7.RP", "7.NS", "7.EE", "7.G", "7.SP"]],
+  [8, ["8.NS", "8.EE", "8.F", "8.G", "8.SP"]],
+  [9, ["HSN.RN", "HSA.SSE", "HSA.APR", "HSA.CED", "HSA.REI", "HSF.IF", "HSF.BF", "HSF.LE", "HSS.ID"]],
+]);
+for (const [grade, domains] of requiredDomains) {
+  const gradeStandards = lessons.filter((lesson) => lesson.grade === grade).map((lesson) => lesson.standard).join(" ");
+  for (const domain of domains) assert.match(gradeStandards, new RegExp(domain.replace(".", "\\.")), `Grade ${grade} is missing ${domain} coverage`);
 }
 
 let propertyChecks = 0;
+let multipleChoiceChecks = 0;
 for (const lesson of lessons) {
+  assert.equal(new Set(lesson.practice.map((question) => question.id)).size, lesson.practice.length, `${lesson.id} has duplicate question IDs`);
+  assert.equal(new Set(lesson.practice.map((question) => question.prompt)).size, lesson.practice.length, `${lesson.id} has duplicate question prompts`);
   for (const question of lesson.practice) {
+    assert.ok(question.prompt.trim().length >= 3, `${lesson.id}/${question.id} needs a clear prompt`);
+    assert.ok(question.hint.trim().length >= 3, `${lesson.id}/${question.id} needs a useful hint`);
+    assert.ok(question.answer.split("|").every((answer) => answer.trim()), `${lesson.id}/${question.id} has an empty accepted answer`);
+    if (question.choices) {
+      assert.ok(question.choices.length >= 2 && question.choices.length <= 5, `${lesson.id}/${question.id} needs 2–5 choices`);
+      assert.equal(new Set(question.choices.map((choice) => choice.trim().toLowerCase())).size, question.choices.length, `${lesson.id}/${question.id} has duplicate choices`);
+      assert.ok(question.choices.some((choice) => isAnswerCorrect(choice, question.answer)), `${lesson.id}/${question.id} has no selectable correct answer`);
+      multipleChoiceChecks += 1;
+    }
     const primary = question.answer.split("|")[0];
     for (let seed = 0; seed < 100; seed += 1) {
       const padded = `${" ".repeat(seed % 3)}${seed % 2 ? primary.toUpperCase() : primary}${" ".repeat((seed + 1) % 3)}`;
@@ -34,7 +51,7 @@ for (const lesson of lessons) {
 }
 
 for (const [input, accepted] of [
-  ["0.5", "1/2"], ["2/4", "1/2"], ["50%", "1/2"], ["−7", "-7"], [" 3 / 6 ", "0.5"], ["0.42", "42%"],
+  ["0.5", "1/2"], ["2/4", "1/2"], ["50%", "1/2"], ["−7", "-7"], [" 3 / 6 ", "0.5"], ["0.42", "42%"], ["7.4 × 10³", "7.4*10^3"],
 ]) assert.ok(isAnswerCorrect(input, accepted), `Exact checker failed: ${input} = ${accepted}`);
 
-console.log(`Validated Grades 7–9: ${lessons.length} lessons, ${curriculumStats.questions} questions, and ${propertyChecks} seeded answer checks.`);
+console.log(`Validated Grades 7–9: ${lessons.length} lessons, ${curriculumStats.questions} questions (${multipleChoiceChecks} multiple choice), and ${propertyChecks} seeded answer checks.`);

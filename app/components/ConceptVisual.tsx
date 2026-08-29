@@ -1,6 +1,8 @@
 import type { LessonDefinition } from "@/lib/curriculum";
 import Image from "next/image";
 import katex from "katex";
+import { LinearGraphLab } from "./LinearGraphLab";
+import { PointToLineMission } from "./PointToLineMission";
 
 type ContextScene = {
   src: string;
@@ -1017,7 +1019,10 @@ function mathFor(visual: string) {
 export function ConceptVisual({ lesson }: { lesson: LessonDefinition }) {
   const visual = lesson.visual;
   const contextScene = contextScenes[lesson.slug];
+  const graphEquation = lesson.slug === "g7-proportional-graphs" ? "y=2x" : lesson.slug === "graphing-lines" ? "y=2x+1" : lesson.slug === "g9-graph-linear-functions" ? "y=-2x+3" : null;
+  if (contextScene && graphEquation) return <div className="interactive-concept-stack"><ContextLessonVisual scene={contextScene} /><PointToLineMission compact /><LinearGraphLab initialEquation={graphEquation} /></div>;
   if (contextScene) return <ContextLessonVisual scene={contextScene} />;
+  if (graphEquation) return <div className="interactive-concept-stack"><PointToLineMission compact /><LinearGraphLab initialEquation={graphEquation} /></div>;
   if (visual.includes("fraction") || visual === "percent-grid" || visual === "place-value") {
     return <div className={`lesson-visual visual-${visual}`}><div className="fraction-model"><span /><span /><span className="empty" /><span className="empty" /></div><strong>{visual === "percent-grid" ? "25% = 25/100" : "3/4"}</strong><p>Equal-size parts make the relationship visible.</p></div>;
   }

@@ -38,7 +38,7 @@ export function FeedbackBoard() {
       <form className="feedback-form" onSubmit={submit}>
         <label><span>Your note</span><textarea maxLength={600} rows={5} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="What was confusing? What should I add or change?" /></label>
         <input className="feedback-honeypot" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-        <div><small>{message.length}/600 · Please do not include names, email addresses, school names, or links.</small><button className="primary-button" type="submit" disabled={busy || message.trim().length < 3}>{busy ? "Posting…" : "Post anonymously"}</button></div>
+        <div><small>{message.length}/600 · Names, email addresses, phone numbers, social handles, school names, and links do not belong here. Contact details are blocked before posting.</small><button className="primary-button" type="submit" disabled={busy || message.trim().length < 3}>{busy ? "Posting…" : "Post anonymously"}</button></div>
         {status && <p className="signin-status" aria-live="polite">{status}</p>}
       </form>
       <section className="feedback-list" aria-live="polite">

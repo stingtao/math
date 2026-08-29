@@ -6,6 +6,11 @@ import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
 import { mathInputMode } from "../lib/math-input.ts";
 import { getQuestMilestone } from "../lib/quest-milestone.ts";
+import { clippedLinePoints, parseLinearFunction, valueAt } from "../lib/linear-function.ts";
+import { coordinateMissionProgress, coordinateReadTargets, isOnDoubleLine, pointToLineTargets, sameCoordinate } from "../lib/coordinate-mission.ts";
+import { publicTextPrivacyIssue } from "../lib/privacy.ts";
+import { recoveryGuidance, remixedChoices } from "../lib/practice-recovery.ts";
+import { isAnswerCorrect } from "../lib/curriculum.ts";
 import { ANSWER_BADGE_STEP, BADGE_CATALOG_SIZE, BADGE_CATALOG_VERSION, answerBadgeForCorrectCount, answerBadges, badgeCatalog, lessonBadges, nextAnswerBadge } from "../lib/badges.ts";
 import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../lib/learner-state.ts";
 import sharp from "sharp";
@@ -19,6 +24,54 @@ test("keeps the right math symbols available on mobile answer keyboards", () => 
   assert.equal(mathInputMode("(2, 5)"), "text");
   assert.equal(mathInputMode("x = 7|7"), "decimal");
   assert.equal(mathInputMode(), "text");
+});
+
+test("accepts the exact exponent symbols shown in answer choices", () => {
+  assert.equal(isAnswerCorrect("7.4 × 10³", "7.4*10^3"), true);
+  assert.equal(isAnswerCorrect("x²", "x^2"), true);
+});
+
+test("parses safe slope-intercept equations and clips them to the visible graph", () => {
+  assert.deepEqual(parseLinearFunction("y=2x"), { slope: 2, intercept: 0, equation: "y = 2x" });
+  assert.deepEqual(parseLinearFunction(" y = -x + 3 "), { slope: -1, intercept: 3, equation: "y = −x + 3" });
+  assert.deepEqual(parseLinearFunction("y=1/2x-2"), { slope: 0.5, intercept: -2, equation: "y = 0.5x − 2" });
+  assert.deepEqual(parseLinearFunction("y=4"), { slope: 0, intercept: 4, equation: "y = 4" });
+  assert.equal(parseLinearFunction("x=2"), null);
+  assert.equal(parseLinearFunction("y=x^2"), null);
+  assert.equal(parseLinearFunction("y=100x"), null);
+  const line = parseLinearFunction("y=2x");
+  assert.ok(line);
+  assert.equal(valueAt(line, 3), 6);
+  assert.deepEqual(clippedLinePoints(line), [{ x: -2.5, y: -5 }, { x: 2.5, y: 5 }]);
+});
+
+test("builds a valid y = 2x point-to-line mission and reverses it into coordinate reading", () => {
+  assert.deepEqual(pointToLineTargets, [{ x: 0, y: 0 }, { x: 1, y: 2 }, { x: 2, y: 4 }, { x: 3, y: 6 }, { x: 4, y: 8 }]);
+  assert.ok(pointToLineTargets.every(isOnDoubleLine));
+  assert.ok(coordinateReadTargets.every((point) => pointToLineTargets.some((candidate) => sameCoordinate(point, candidate))));
+  assert.equal(coordinateMissionProgress(0, false, 0), 0);
+  assert.equal(coordinateMissionProgress(5, true, 3), 100);
+});
+
+test("turns common wrong answers into specific recovery guidance and a delayed remix", () => {
+  const coordinate = { id: "coordinate", prompt: "Name the point.", answer: "(2, 5)", hint: "Read x before y." };
+  assert.equal(recoveryGuidance(coordinate, "(5, 2)", 1).label, "ORDER CHECK");
+
+  const signed = { id: "signed", prompt: "Find the change.", answer: "-7", hint: "Check the direction." };
+  assert.equal(recoveryGuidance(signed, "7", 1).label, "SIGN CHECK");
+
+  const percent = { id: "percent", prompt: "Write the percent.", answer: "50%|50", hint: "Move between decimal and percent." };
+  assert.equal(recoveryGuidance(percent, "0.5", 1).label, "SCALE CHECK");
+  assert.equal(recoveryGuidance(signed, "4", 3).modelAnswer, "-7");
+  assert.deepEqual(remixedChoices(["A", "B", "C"], true), ["B", "C", "A"]);
+  assert.deepEqual(remixedChoices(["A", "B", "C"], false), ["A", "B", "C"]);
+});
+
+test("blocks common contact details before anonymous public feedback is stored", () => {
+  assert.equal(publicTextPrivacyIssue("Please reply to student@example.com"), "email address");
+  assert.equal(publicTextPrivacyIssue("Call me at +886 912 345 678"), "phone number");
+  assert.equal(publicTextPrivacyIssue("My handle is @mathstudent"), "social handle");
+  assert.equal(publicTextPrivacyIssue("Please add more coordinate graph practice."), null);
 });
 
 test("turns every returning trail state into one clear milestone", () => {
@@ -82,6 +135,18 @@ test("server-renders the Math Grades 7–9 landing page", async () => {
   assert.match(html, /og-v2\.png/);
 });
 
+test("server-renders a public, no-sign-in linear Graph Lab", async () => {
+  const response = await render("/labs/linear-graphs");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /Make a line/);
+  assert.match(html, /Type a line and watch it move/);
+  assert.match(html, /No sign-in, timer, score, or saved input/);
+  assert.match(html, /ONE TOOL · THREE GRADE PATHS/);
+  assert.match(html, /Turn points into a line/);
+  assert.match(html, /Build y = 2x with your own points/);
+});
+
 test("ships all three curriculum files and all source sheets", async () => {
   const curriculum = await readFile(new URL("../lib/curriculum.ts", import.meta.url), "utf8");
   const lessonDefinitions = curriculum.match(/\blesson\(\d+,\s*\d+,/g) ?? [];
@@ -99,6 +164,53 @@ test("ships all three curriculum files and all source sheets", async () => {
   assert.match(curriculum, /8\.SP\.A\.4/);
   const sheets = await readdir(new URL("../public/quick-sheets/", import.meta.url));
   assert.equal(sheets.filter((name) => name.endsWith(".png")).length, 20);
+});
+
+test("adds one private live line grapher across Grade 7, 8, and 9 graph lessons", async () => {
+  const visual = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
+  const lab = await readFile(new URL("../app/components/LinearGraphLab.tsx", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/labs/linear-graphs/page.tsx", import.meta.url), "utf8");
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  for (const slug of ["g7-proportional-graphs", "graphing-lines", "g9-graph-linear-functions"]) assert.match(visual, new RegExp(`lesson\\.slug === "${slug}"`));
+  assert.match(lab, /Type a line and watch it move/);
+  assert.match(lab, /slope-intercept form/);
+  assert.match(lab, /role="img"/);
+  assert.match(lab, /aria-live="polite"/);
+  assert.match(lab, /not saved or sent anywhere/);
+  assert.match(page, /<LinearGraphLab initialEquation="y=2x"/);
+  assert.match(page, /Six changes worth noticing/);
+  assert.match(page, /guidedChallenges\.map/);
+  assert.match(page, /Check my reasoning/);
+  assert.match(page, /Private by default/);
+  assert.match(header, /href="\/labs\/linear-graphs"/);
+  assert.match(css, /\.linear-graph-workspace/);
+  assert.match(css, /\.linear-example-buttons button \{ min-height: 44px/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.linear-graph-workspace \{ grid-template-columns: 1fr/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.linear-graph-line/);
+});
+
+test("ships one accessible point-line mission and an active reasoning flow across every lesson", async () => {
+  const mission = await readFile(new URL("../app/components/PointToLineMission.tsx", import.meta.url), "utf8");
+  const flow = await readFile(new URL("../app/components/WorkedExampleFlow.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const visual = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(mission, /Plot this point/);
+  assert.match(mission, /Connect my points/);
+  assert.match(mission, /Check coordinate/);
+  assert.match(mission, /Keyboard users can enter/);
+  assert.match(mission, /never saved or tied to an identity/);
+  assert.match(flow, /Predict what the next mathematical move/);
+  assert.match(flow, /REASONING CHAIN COMPLETE/);
+  assert.match(lesson, /<WorkedExampleFlow steps=\{lesson\.exampleSteps\}/);
+  assert.match(lesson, /continueDisabled=\{!exampleReady\}/);
+  assert.match(lesson, /<BadgeMedallion badge=\{lessonBadge\}/);
+  assert.doesNotMatch(lesson, /<ol className="example-steps"/);
+  assert.match(visual, /<PointToLineMission compact \/>/);
+  assert.match(css, /\.point-line-workspace/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.point-line-workspace \{ grid-template-columns: 1fr/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.point-line-connection/);
 });
 
 test("builds exactly 500 deterministic badges around the full curriculum", () => {
@@ -312,9 +424,12 @@ test("keeps signed-in navigation and a private self marker on the weekly league"
 
 test("keeps feedback rows unlinkable from learner progress", async () => {
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
   const feedback = schema.slice(schema.indexOf("feedbackMessages"), schema.indexOf("leagueMembers"));
   assert.doesNotMatch(feedback, /learnerId|learner_id|authKey|auth_key/);
   assert.match(feedback, /requestKeyHash/);
+  assert.match(store, /publicTextPrivacyIssue/);
+  assert.match(store, /For privacy, remove the/);
 });
 
 test("guards authenticated mutations and production responses", async () => {
@@ -325,6 +440,13 @@ test("guards authenticated mutations and production responses", async () => {
     assert.match(route, /rejectCrossOriginMutation/);
     assert.match(route, /Idempotency-Key/);
   }
+  const privateRoutes = await Promise.all([
+    "answer", "state", "review", "boss", "me", "auth/google", "auth/logout",
+  ].map((name) => readFile(new URL(`../app/api/${name}/route.ts`, import.meta.url), "utf8")));
+  for (const route of privateRoutes) assert.match(route, /privateJson/);
+  const http = await readFile(new URL("../lib/http.ts", import.meta.url), "utf8");
+  assert.match(http, /private, no-store, max-age=0/);
+  assert.match(http, /Pragma/);
   const worker = await readFile(new URL("../worker/index.ts", import.meta.url), "utf8");
   assert.match(worker, /Content-Security-Policy/);
   assert.match(worker, /frame-ancestors 'none'/);
@@ -359,6 +481,38 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.match(bossPlayer, /aria-valuenow=\{repair\}/);
   assert.match(css, /\.repair-answer-feedback/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.repair-answer-feedback/);
+});
+
+test("persists recovery mastery and blocks lesson completion until clean recall", async () => {
+  const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  const bootstrap = await readFile(new URL("../db/bootstrap.ts", import.meta.url), "utf8");
+  const migration = await readFile(new URL("../drizzle/0007_demonic_jack_power.sql", import.meta.url), "utf8");
+  const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const answerRoute = await readFile(new URL("../app/api/answer/route.ts", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const coach = await readFile(new URL("../app/components/RecoveryCoach.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  for (const source of [schema, bootstrap, migration]) {
+    assert.match(source, /lesson_mastery_checks/);
+    assert.match(source, /ON DELETE CASCADE|onDelete: "cascade"/i);
+  }
+  assert.match(store, /recordMasteryCheck/);
+  assert.match(store, /clean_corrected/);
+  assert.match(store, /Complete every Memory Check before finishing the lesson/);
+  assert.match(answerRoute, /body\.mastery/);
+  assert.match(answerRoute, /recordMasteryCheck/);
+  assert.match(lesson, /masteryQueue/);
+  assert.match(lesson, /Memory Check/);
+  assert.match(lesson, /remixedChoices/);
+  assert.match(lesson, /Try once more later/);
+  assert.match(lesson, /recovery-mastery-summary/);
+  assert.match(coach, /MISTAKE → METHOD/);
+  assert.match(coach, /No progress lost/);
+  assert.match(css, /\.practice-method-loop/);
+  assert.match(css, /\.memory-check-banner/);
+  assert.match(css, /\.recovery-coach/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.recovery-coach-steps \{ grid-template-columns: 1fr/);
 });
 
 test("shows exact lesson rewards while keeping replay XP fair", async () => {
@@ -461,6 +615,8 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.lesson-mobile-status \{[^}]*display: grid/);
   assert.match(css, /\.lesson-sidebar \.stage-list,[\s\S]*\.lesson-sidebar \.standard-chip \{ display: none/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.lesson-mobile-status \{[^}]*grid-template-columns: 1fr/);
+  assert.match(css, /\.lesson-sidebar,[\s\S]*\.lesson-stage \{ min-width: 0; width: 100%/);
+  assert.match(css, /\.lesson-sidebar \.lesson-badge-quest \{ width: 100%; grid-column: 1 \/ -1/);
   assert.match(review, /review-mobile-status/);
   assert.match(review, /5-MINUTE MEMORY QUEST/);
   assert.match(review, /Correct every recall\. Nothing resets\./);
@@ -474,7 +630,7 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.momentum-run-copy > span,[\s\S]*\.momentum-run > p \{ font-size: 10px/);
   assert.match(css, /\.momentum-run-copy > strong \{ font-size: 13px; white-space: normal/);
   assert.match(css, /\.star-path-options small \{ font-size: 10px/);
-  assert.match(css, /\.recovery-feedback small \{ font-size: 11px/);
+  assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 12px/);
   assert.match(css, /\.today-mission-route > span > small \{ font-size: 10px/);
   assert.match(css, /\.daily-token-medallion small \{ font-size: 9px/);
   assert.match(css, /\.daily-rhythm small \{ font-size: 10px/);
@@ -856,8 +1012,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /quest-key-card/);
   assert.match(lesson, /First-try spark!/);
   assert.match(lesson, /Recovery complete!/);
-  assert.match(lesson, /No progress lost/);
-  assert.match(lesson, /recovery-charge-preview/);
+  assert.match(lesson, /Repair every idea, then recall it/);
+  assert.match(lesson, /<RecoveryCoach/);
   assert.match(lesson, /This is enough for today/);
   assert.match(lesson, /Continue to the next lesson/);
   assert.match(lesson, /Stars and XP details/);
@@ -880,8 +1036,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.game-quest-path/);
   assert.match(css, /\.practice-star-path/);
   assert.match(css, /\.quest-key-card/);
-  assert.match(css, /\.recovery-feedback/);
-  assert.match(css, /\.recovery-charge-preview/);
+  assert.match(css, /\.recovery-coach/);
+  assert.match(css, /\.recovery-score-path/);
   assert.match(css, /\.mastery-next-goal/);
   assert.match(css, /\.settlement-summary/);
   assert.match(css, /\.settlement-next/);

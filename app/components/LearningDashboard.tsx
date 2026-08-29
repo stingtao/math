@@ -135,8 +135,8 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   }
 
   function rewardCellClass(claimNumber: number) {
-    if (state.dailyRewardClaimed) return claimNumber <= visibleRewardStep ? "done" : "";
-    if (state.profile.rewardStep < 7 && claimNumber <= state.profile.rewardStep) return "done";
+    if (state!.dailyRewardClaimed) return claimNumber <= visibleRewardStep ? "done" : "";
+    if (state!.profile.rewardStep < 7 && claimNumber <= state!.profile.rewardStep) return "done";
     return claimNumber === nextRewardStep ? "today" : "";
   }
 

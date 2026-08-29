@@ -2,7 +2,7 @@
 
 Math is a simple English learning site for Grades 7–9. Sting built it as a parent who likes math and wanted a quiet place for his child to learn, practice, and return for review.
 
-The site includes 31 four-lesson regions, 124 lessons, 31 mixed boss checks, spaced review, daily rewards, anonymous identities, an opt-in weekly leaderboard, and a public feedback board whose posts are not connected to learner accounts or progress.
+The site includes 31 four-lesson regions, 124 lessons, 31 mixed boss checks, spaced review, daily rewards, anonymous identities, an opt-in weekly leaderboard, and a public feedback board whose posts are not connected to learner accounts or progress. A public Linear Graph Lab lets learners type `y = mx + b` equations and see the graph, slope, intercept, and point table update without signing in or saving the input.
 
 ## Local development
 
@@ -24,7 +24,7 @@ Set a Google Web client ID in the `GOOGLE_CLIENT_ID` Worker binding, then set a 
 - Live custom domain: `https://math.stingtao.info`
 - R2 is not required; the teaching and social images are versioned static assets.
 
-The database stores learning data under anonymous internal IDs. Google name, email, profile photo, and raw `sub` are not stored. Feedback rows contain no learner or account foreign key.
+The database stores learning data under anonymous internal IDs. Google name, email, profile photo, and raw `sub` are not stored. Feedback rows contain no learner or account foreign key, and common contact details are rejected before a public post is stored. Authenticated JSON responses are marked private and non-cacheable.
 
 ## Validation
 

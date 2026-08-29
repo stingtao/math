@@ -6,6 +6,7 @@ export function SiteFooter() {
         <p>Made by Sting, a parent who likes math.</p>
       </div>
       <nav aria-label="Footer navigation">
+        <a href="/labs/linear-graphs">Graph Lab</a>
         <a href="/feedback">Feedback</a>
         <a href="/leaderboard">Leaderboard</a>
         <a href="/privacy">Privacy</a>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import type { LessonDefinition } from "@/lib/curriculum";
 import { getGradeCurriculum, getGradeLessons, getRegion, isAnswerCorrect, nextLesson } from "@/lib/curriculum";
 import { applyBadgeProgress, completeDemoLesson, creditDemoCorrectAnswer, type LearnerState } from "@/lib/learner-state";
-import type { BadgeUnlock } from "@/lib/badges";
+import { lessonBadgeByLessonId, type BadgeUnlock } from "@/lib/badges";
 import { calculateLessonReward } from "@/lib/rewards";
 import { nextMomentumRun } from "@/lib/momentum";
 import { ConceptVisual } from "./ConceptVisual";
@@ -21,6 +21,10 @@ import { mathInputMode } from "@/lib/math-input";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
 import { AnswerImpact } from "./AnswerImpact";
+import { BadgeMedallion } from "./BadgeMedallion";
+import { WorkedExampleFlow } from "./WorkedExampleFlow";
+import { RecoveryCoach } from "./RecoveryCoach";
+import { remixedChoices } from "@/lib/practice-recovery";
 
 const stageLabels = [
   { label: "Goal", icon: "◎" },
@@ -69,17 +73,40 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [badgeUnlocks, setBadgeUnlocks] = useState<BadgeUnlock[]>([]);
+  const [exampleReady, setExampleReady] = useState(false);
+  const [recoveryNeeded, setRecoveryNeeded] = useState<Record<string, boolean>>({});
+  const [masteryQueue, setMasteryQueue] = useState<string[]>([]);
+  const [masteryRounds, setMasteryRounds] = useState<Record<string, number>>({});
+  const [masteryTotal, setMasteryTotal] = useState(0);
+  const [masteryLockedCount, setMasteryLockedCount] = useState(0);
   const [runId] = useState(() => crypto.randomUUID());
-  const question = lesson.practice[questionIndex];
+  const inMemoryCheck = masteryQueue.length > 0;
+  const masteryQuestionId = masteryQueue[0];
+  const question = inMemoryCheck ? lesson.practice.find((item) => item.id === masteryQuestionId) ?? lesson.practice[questionIndex] : lesson.practice[questionIndex];
+  const masteryRound = masteryRounds[question.id] ?? 0;
+  const attemptKey = inMemoryCheck ? `${question.id}:memory:${masteryRound}` : question.id;
+  const choiceOptions = remixedChoices(question.choices, inMemoryCheck);
   const answerLocked = busy || feedback === "correct";
-  const correctedCount = questionIndex + (feedback === "correct" ? 1 : 0);
-  const firstTryCount = Object.values(firstCorrect).filter(Boolean).length;
-  const firstTryAnswered = Object.keys(firstCorrect).length;
+  const correctedCount = inMemoryCheck ? lesson.practice.length : questionIndex + (feedback === "correct" ? 1 : 0);
+  const firstTryCount = lesson.practice.filter((item) => firstCorrect[item.id]).length;
+  const firstTryAnswered = lesson.practice.filter((item) => item.id in firstCorrect).length;
+  const recoveryCount = lesson.practice.filter((item) => recoveryNeeded[item.id]).length;
   const twoStarPathOpen = firstTryCount + (lesson.practice.length - firstTryAnswered) >= 4;
-  const threeStarPathOpen = Object.values(firstCorrect).every(Boolean) && Object.keys(hinted).length === 0;
-  const currentFirstTry = feedback === "correct" && Boolean(firstCorrect[question.id]) && !hinted[question.id];
+  const threeStarPathOpen = lesson.practice.every((item) => firstCorrect[item.id]) && lesson.practice.every((item) => !hinted[item.id]);
+  const currentFirstTry = feedback === "correct" && Boolean(firstCorrect[attemptKey]) && !hinted[attemptKey];
+  const failedAttempts = attempts[attemptKey] ?? 0;
+  const questionPosition = Math.max(0, lesson.practice.findIndex((item) => item.id === question.id));
+  const methodStep = inMemoryCheck ? 3 : feedback === "incorrect" || showHint ? 2 : 1;
+  const nextActionLabel = inMemoryCheck
+    ? currentFirstTry
+      ? masteryQueue.length === 1 ? "Lock mastery & finish" : "Next Memory Check"
+      : "Try once more later"
+    : questionIndex === lesson.practice.length - 1
+      ? recoveryCount > 0 ? `Start Memory Check (${recoveryCount})` : "Finish lesson"
+      : "Next question";
   const region = getRegion(lesson.regionId);
   const completeMap = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
+  const lessonBadge = lessonBadgeByLessonId.get(lesson.id);
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -101,8 +128,9 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const priorLessonComplete = lesson.order === 1 || completeMap.has(gradeLessons[lessonPosition - 1]?.id);
   const isAvailable = completeMap.has(lesson.id) || regionAvailable && priorLessonComplete;
   const trailUrl = `/learn?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
-  const lessonProgressPercent = Math.round(((stage + (stage === 4 ? correctedCount / lesson.practice.length : 0)) / stageLabels.length) * 100);
-  const currentStageLabel = stage === 4 ? `Practice ${questionIndex + 1} of ${lesson.practice.length}` : stageLabels[stage].label;
+  const practiceProgress = inMemoryCheck ? .9 + .1 * (masteryLockedCount / Math.max(1, masteryTotal)) : .9 * correctedCount / lesson.practice.length;
+  const lessonProgressPercent = Math.round(((stage + (stage === 4 ? practiceProgress : 0)) / stageLabels.length) * 100);
+  const currentStageLabel = stage === 4 ? inMemoryCheck ? `Memory Check ${masteryLockedCount + 1} of ${masteryTotal}` : `Practice ${questionIndex + 1} of ${lesson.practice.length}` : stageLabels[stage].label;
   if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">FOLLOW THE TRAIL</span><h1>This lesson is just ahead.</h1><p>Complete your current step first. The trail will bring you here next.</p><a className="primary-button" href={trailUrl}>Back to your trail <span>→</span></a></section></main>;
 
   function advanceStage() { setStage((value) => Math.min(4, value + 1)); }
@@ -111,24 +139,30 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     if (!answer.trim() || busy) return;
     setBusy(true);
     setErrorMessage("");
-    const priorAttempts = attempts[question.id] ?? 0;
+    const priorAttempts = attempts[attemptKey] ?? 0;
     try {
       let correct = isAnswerCorrect(answer, question.answer);
-      if (demo && correct) {
+      if (inMemoryCheck && !demo) {
+        const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[attemptKey]), runId, mastery: true, masteryRound }) });
+        const body = await response.json() as { correct?: boolean; error?: string };
+        if (!response.ok) { setErrorMessage(body.error ?? "We could not check that Memory Check."); return; }
+        correct = Boolean(body.correct);
+      } else if (demo && correct && !inMemoryCheck) {
         const badgeResult = creditDemoCorrectAnswer(activeState);
         setState(badgeResult.state);
         if (badgeResult.badgeUnlocks.length) setBadgeUnlocks(badgeResult.badgeUnlocks);
-      } else if (!demo) {
-        const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[question.id]), runId }) });
+      } else if (!demo && !inMemoryCheck) {
+        const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[attemptKey]), runId }) });
         const body = await response.json() as { correct?: boolean; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string };
         if (!response.ok) { setErrorMessage(body.error ?? "We could not check that answer."); return; }
         correct = Boolean(body.correct);
         if (correct && body.correctAnswers !== undefined) setState(applyBadgeProgress(activeState, body.correctAnswers, body.badgeUnlocks));
         if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
       }
-      setAttempts((current) => ({ ...current, [question.id]: priorAttempts + 1 }));
-      if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [question.id]: correct }));
-      const cleanFirstTry = correct && priorAttempts === 0 && !hinted[question.id];
+      setAttempts((current) => ({ ...current, [attemptKey]: priorAttempts + 1 }));
+      if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [attemptKey]: correct }));
+      if (!correct && !inMemoryCheck) setRecoveryNeeded((current) => ({ ...current, [question.id]: true }));
+      const cleanFirstTry = correct && priorAttempts === 0 && !hinted[attemptKey];
       const nextStreak = nextMomentumRun({ current: focusStreak, best: bestFocusStreak }, cleanFirstTry);
       setFocusStreak(nextStreak.current);
       setBestFocusStreak(nextStreak.best);
@@ -142,22 +176,51 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
 
   async function continuePractice() {
     if (feedback !== "correct") return;
-    if (questionIndex < lesson.practice.length - 1) {
+    if (inMemoryCheck && !currentFirstTry) {
+      setMasteryQueue((current) => [...current.slice(1), current[0]]);
+      setMasteryRounds((current) => ({ ...current, [question.id]: (current[question.id] ?? 0) + 1 }));
+      setAnswer("");
+      setFeedback("");
+      setShowHint(false);
+      return;
+    }
+    if (inMemoryCheck && masteryQueue.length > 1) {
+      setMasteryQueue((current) => current.slice(1));
+      setMasteryLockedCount((value) => value + 1);
+      setAnswer("");
+      setFeedback("");
+      setShowHint(false);
+      return;
+    }
+    if (!inMemoryCheck && questionIndex < lesson.practice.length - 1) {
       setQuestionIndex((value) => value + 1);
       setAnswer("");
       setFeedback("");
       setShowHint(false);
       return;
     }
-    const correctFirst = Object.values(firstCorrect).filter(Boolean).length + (attempts[question.id] === undefined ? 1 : 0);
-    const usedAnyHint = Object.keys(hinted).length > 0;
-    const earnedStars = correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= 4 ? 2 : 1;
+    if (!inMemoryCheck) {
+      const queue = lesson.practice.filter((item) => recoveryNeeded[item.id]).map((item) => item.id);
+      if (queue.length) {
+        setMasteryQueue(queue);
+        setMasteryTotal(queue.length);
+        setMasteryLockedCount(0);
+        setAnswer("");
+        setFeedback("");
+        setShowHint(false);
+        return;
+      }
+    }
+    const correctFirst = lesson.practice.filter((item) => firstCorrect[item.id]).length;
+    const usedAnyHint = lesson.practice.some((item) => hinted[item.id]);
+    const earnedStars = inMemoryCheck ? 2 : correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= 4 ? 2 : 1;
     const previousStars = activeState.completedLessons.find((item) => item.id === lesson.id)?.stars ?? 0;
     const expectedReward = calculateLessonReward(previousStars, earnedStars);
     if (busy) return;
     setBusy(true);
     setErrorMessage("");
     setStars(earnedStars);
+    if (inMemoryCheck) setMasteryLockedCount(masteryTotal);
     try {
       if (demo) {
         const nextState = completeDemoLesson(activeState, lesson.id, earnedStars);
@@ -205,7 +268,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   function useHint() {
     setShowHint(true);
     setFocusStreak(0);
-    setHinted((current) => ({ ...current, [question.id]: true }));
+    setHinted((current) => ({ ...current, [attemptKey]: true }));
+    if (!inMemoryCheck) setRecoveryNeeded((current) => ({ ...current, [question.id]: true }));
   }
 
   if (finished) {
@@ -213,7 +277,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const regionFinished = lesson.order === 4;
     const reward = completionReward ?? { previousStars: 0, bestStars: stars, firstCompletion: true, starsImproved: false, baseXp: 40, starXp: stars === 3 ? 10 : stars === 2 ? 5 : 0, xpEarned: 40 + (stars === 3 ? 10 : stars === 2 ? 5 : 0) };
     const replayed = !reward.firstCompletion && !reward.starsImproved;
-    const masteryMessage = reward.bestStars > stars ? `Best marker kept · ${reward.bestStars}/3` : stars === 3 ? "No-hint mastery" : stars === 2 ? "Strong first pass" : "Complete after corrections";
+    const masteryMessage = reward.bestStars > stars ? `Best marker kept · ${reward.bestStars}/3` : stars === 3 ? "No-hint mastery" : masteryLockedCount > 0 ? "Recovery mastery locked" : stars === 2 ? "Strong first pass" : "Complete after corrections";
     const masteryNext = reward.bestStars === 3
       ? { title: "Mastery marker complete", copy: "This lesson is ready for spaced review. Your three-star marker stays on the trail." }
       : reward.bestStars === 2
@@ -261,6 +325,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
             <span className="settlement-stars"><b aria-hidden="true">{"★".repeat(stars)}{"☆".repeat(3 - stars)}</b><strong>{masteryMessage}</strong><small>{reward.bestStars}/3 saved best</small></span>
             <span className={`settlement-xp ${reward.xpEarned === 0 ? "quiet" : ""}`}><b>+{reward.xpEarned}</b><strong>XP this run</strong><small>{replayed ? "Fair replay" : "Saved to total"}</small></span>
           </div>
+          {masteryLockedCount > 0 && <div className="recovery-mastery-summary" role="status"><span aria-hidden="true">↻</span><div><small>REPAIR → RECALL → MASTER</small><strong>{masteryLockedCount} {masteryLockedCount === 1 ? "idea" : "ideas"} recovered and recalled cleanly</strong><p>Your corrections became a later Memory Check. Those ideas will also return in Daily Review so the method can stick.</p></div><b aria-label={`${masteryLockedCount} Memory Locks earned`}>{"◆".repeat(masteryLockedCount)}</b></div>}
           <div className="quest-key-card" aria-label={`${regionKeyCount} of 4 quest keys collected in ${region?.title ?? "this region"}`}>
             <div className="quest-key-copy"><small>REGION QUEST KEYS</small><strong>{regionKeyCount} / 4 collected</strong><span>{regionKeyCount === 4 ? "Boss gate open" : `${4 - regionKeyCount} ${4 - regionKeyCount === 1 ? "key" : "keys"} until the boss`}</span></div>
             <div className="quest-key-nodes" aria-hidden="true">{region?.lessons.map((item, index) => {
@@ -314,6 +379,10 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <h1>{lesson.title}</h1>
           <p>{lesson.goal}</p>
           <ol className="stage-list">{stageLabels.map((item, index) => <li className={index < stage ? "done" : index === stage ? "active" : ""} key={item.label}><span aria-hidden="true">{index < stage ? "✓" : item.icon}</span>{item.label}</li>)}</ol>
+          {lessonBadge && <div className={`lesson-badge-quest accent-${lesson.accent}`}>
+            <BadgeMedallion badge={lessonBadge} earned={completeMap.has(lesson.id)} size="sm" />
+            <div><small>{completeMap.has(lesson.id) ? "CREST EARNED" : "LESSON CREST"}</small><strong>{lessonBadge.title}</strong><p>{completeMap.has(lesson.id) ? "Replay to strengthen your mastery marker." : `Complete all ${stageLabels.length} quest steps to add it to your private vault.`}</p><span aria-label={`${lessonProgressPercent} percent charged`}><i style={{ width: `${lessonProgressPercent}%` }} /></span></div>
+          </div>}
           <span className="standard-chip">{lesson.standard}</span>
         </aside>
 
@@ -321,25 +390,27 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           {stage === 0 && <StageCard kicker="GOAL" title={lesson.goal} copy="Read the goal. Take your time." visual={<div className={`goal-concept accent-${lesson.accent}`}><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} concept`} /><span>Today’s focus</span><strong>{lesson.title}</strong></div>} onContinue={advanceStage} />}
           {stage === 1 && <StageCard kicker="SEE IT" title="Picture it first." copy="Use the diagram. Notice what stays the same." visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} />}
           {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} copy="One sentence to remember." visual={<div className={`key-idea-card accent-${lesson.accent}`}><span>KEY IDEA</span><strong>{lesson.keyIdea}</strong></div>} onContinue={advanceStage} />}
-          {stage === 3 && <StageCard kicker="EXAMPLE" title={lesson.example} copy="Follow each step." visual={<ol className="example-steps">{lesson.exampleSteps.map((step, index) => <li key={step}><span>{index + 1}</span><p>{step}</p></li>)}</ol>} onContinue={advanceStage} />}
+          {stage === 3 && <StageCard kicker="EXAMPLE QUEST" title={lesson.example} copy="Predict the next move, then reveal one reasoning step at a time." visual={<WorkedExampleFlow steps={lesson.exampleSteps} accent={lesson.accent} onComplete={() => setExampleReady(true)} />} onContinue={advanceStage} continueDisabled={!exampleReady} continueLabel={exampleReady ? "Start practice" : "Complete the reasoning chain"} footerText={exampleReady ? "Reasoning chain complete. You’re ready to apply it." : "Reveal every step before practice. There is no countdown."} />}
           {stage === 4 && (
             <div className="practice-stage" aria-busy={busy}>
-              <div className="practice-heading"><div><span className="section-kicker">PRACTICE · {questionIndex + 1} OF {lesson.practice.length}</span><h2>{question.prompt}</h2></div><div className="practice-dots">{lesson.practice.map((item, index) => <span className={index < questionIndex ? "done" : index === questionIndex ? "active" : ""} key={item.id} />)}</div></div>
-              <div className="practice-game-status"><div className={`practice-charge accent-${lesson.accent}`} aria-label={`Focus charge: ${correctedCount} of ${lesson.practice.length} questions corrected`}><div><span>FOCUS CHARGE</span><strong>{focusChargeLabels[correctedCount]}</strong></div><div className="charge-cells" aria-hidden="true">{lesson.practice.map((item, index) => <i className={index < correctedCount ? "done" : index === correctedCount ? "current" : ""} key={item.id}>{index < correctedCount ? "✓" : index + 1}</i>)}</div><small>{correctedCount}/{lesson.practice.length}</small></div><MomentumRun label="FOCUS CHAIN" current={focusStreak} best={bestFocusStreak} total={lesson.practice.length} tone="focus" justLinked={feedback === "correct" && currentFirstTry} /></div>
+              <div className={`practice-method-loop accent-${lesson.accent}`} aria-label={`Learning loop: step ${methodStep} of 3`}><span className={methodStep >= 1 ? "active" : ""}><b>1</b><small>TRY</small><strong>Work it</strong></span><i aria-hidden="true">→</i><span className={methodStep >= 2 ? "active" : ""}><b>2</b><small>REPAIR</small><strong>Fix the method</strong></span><i aria-hidden="true">→</i><span className={methodStep >= 3 ? "active" : ""}><b>3</b><small>RECALL</small><strong>Lock it later</strong></span></div>
+              {inMemoryCheck && <div className={`memory-check-banner accent-${lesson.accent}`}><span aria-hidden="true">◆</span><div><small>MEMORY CHECK · NO RUSH</small><strong>Recall this repaired idea without help.</strong><p>The choices may move. Use the method, not the position. A clean first try locks mastery and restores the two-star path.</p></div></div>}
+              <div className="practice-heading"><div><span className="section-kicker">{inMemoryCheck ? `MEMORY CHECK · ${masteryLockedCount + 1} OF ${masteryTotal}` : `PRACTICE · ${questionIndex + 1} OF ${lesson.practice.length}`}</span><h2>{question.prompt}</h2></div><div className="practice-dots">{inMemoryCheck ? Array.from({ length: masteryTotal }, (_, index) => <span className={index < masteryLockedCount ? "done" : index === masteryLockedCount ? "active" : ""} key={`memory-${index}`} />) : lesson.practice.map((item, index) => <span className={index < questionIndex ? "done" : index === questionIndex ? "active" : ""} key={item.id} />)}</div></div>
+              <div className="practice-game-status"><div className={`practice-charge accent-${lesson.accent}`} aria-label={inMemoryCheck ? `Memory Locks: ${masteryLockedCount} of ${masteryTotal}` : `Focus charge: ${correctedCount} of ${lesson.practice.length} questions corrected`}><div><span>{inMemoryCheck ? "MEMORY LOCKS" : "FOCUS CHARGE"}</span><strong>{inMemoryCheck ? masteryLockedCount === masteryTotal ? "Mastered" : "Recall in progress" : focusChargeLabels[correctedCount]}</strong></div><div className="charge-cells" aria-hidden="true">{inMemoryCheck ? Array.from({ length: masteryTotal }, (_, index) => <i className={index < masteryLockedCount ? "done" : index === masteryLockedCount ? "current" : ""} key={`lock-${index}`}>{index < masteryLockedCount ? "◆" : index + 1}</i>) : lesson.practice.map((item, index) => <i className={index < correctedCount ? "done" : index === correctedCount ? "current" : ""} key={item.id}>{index < correctedCount ? "✓" : index + 1}</i>)}</div><small>{inMemoryCheck ? `${masteryLockedCount}/${masteryTotal}` : `${correctedCount}/${lesson.practice.length}`}</small></div><MomentumRun label={inMemoryCheck ? "RECALL CHAIN" : "FOCUS CHAIN"} current={focusStreak} best={bestFocusStreak} total={lesson.practice.length} tone="focus" justLinked={feedback === "correct" && currentFirstTry} /></div>
               <div className={`practice-star-path accent-${lesson.accent}`} aria-live="polite">
-                <div className="star-path-heading"><div><span>STAR PATH</span><strong>Corrections always finish the lesson.</strong></div><small>Stars describe this run—they never block progress.</small></div>
+                <div className="star-path-heading"><div><span>STAR PATH</span><strong>{recoveryCount > 0 ? "Repair every idea, then recall it to earn ★★." : "Corrections always finish the lesson."}</strong></div><small>Stars describe this run—they never block progress.</small></div>
                 <div className="star-path-options">
-                  <span className="live"><b>★</b><strong>Complete all 5</strong><small>{correctedCount}/5 corrected</small></span>
-                  <span className={firstTryCount >= 4 ? "earned" : twoStarPathOpen ? "live" : "review"}><b>★★</b><strong>4 first tries</strong><small>{firstTryCount >= 4 ? "secured" : twoStarPathOpen ? `${firstTryCount}/4 so far` : "future review goal"}</small></span>
+                  <span className="live"><b>★</b><strong>Correct all 5</strong><small>{correctedCount}/5 corrected</small></span>
+                  <span className={firstTryCount >= 4 || inMemoryCheck ? "earned" : twoStarPathOpen || recoveryCount > 0 ? "live" : "review"}><b>★★</b><strong>{recoveryCount > 0 ? "Clean Memory Check" : "4 first tries"}</strong><small>{inMemoryCheck ? `${masteryLockedCount}/${masteryTotal} locks` : firstTryCount >= 4 ? "secured" : recoveryCount > 0 ? `${recoveryCount} to recall later` : twoStarPathOpen ? `${firstTryCount}/4 so far` : "future review goal"}</small></span>
                   <span className={threeStarPathOpen ? "live" : "review"}><b>★★★</b><strong>Clean, no-hint run</strong><small>{threeStarPathOpen ? "path open" : "future review goal"}</small></span>
                 </div>
               </div>
-              {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "lesson-answer-error" : feedback ? "lesson-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
-              {showHint && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
-              {feedback === "incorrect" && <div id="lesson-answer-feedback" className="feedback-card incorrect recovery-feedback" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—try this step.</strong><p>{question.hint}</p><small>No progress lost. Correct it to add the same Focus Charge.</small><div className="recovery-charge-preview" aria-label={`Focus Charge stays safe at ${correctedCount} of ${lesson.practice.length}. Correct this step to reach ${Math.min(correctedCount + 1, lesson.practice.length)} of ${lesson.practice.length}.`}><span><b>{correctedCount}/{lesson.practice.length}</b><small>safe</small></span><i>→</i><span className="current"><b>fix</b><small>this step</small></span><i>→</i><strong><b>{Math.min(correctedCount + 1, lesson.practice.length)}/{lesson.practice.length}</b><small>charged</small></strong></div></div></div>}
-              {feedback === "correct" && <><AnswerImpact eventKey={`${lesson.id}-${question.id}-chain-${focusStreak}`} label={currentFirstTry ? "PERFECT HIT" : "RECOVERY HIT"} chain={focusStreak} progress={correctedCount} total={lesson.practice.length} tone={lesson.accent} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? focusStreak >= 3 ? `Focus chain ×${focusStreak}!` : "First-try spark!" : "Recovery complete!"}</strong><p>{practiceEncouragement[questionIndex]} Question {questionIndex + 1} is corrected.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${focusStreak}` : "Recovered +1"}</span></div></>}
+              {choiceOptions ? <div className="choice-grid">{choiceOptions.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" key={choice} aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "lesson-answer-error" : feedback ? "lesson-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void submitAnswer(); }} placeholder="Type your answer" autoFocus /></label>}
+              {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
+              {feedback === "incorrect" && <RecoveryCoach question={question} response={answer} failedAttempts={failedAttempts} correctedCount={correctedCount} total={lesson.practice.length} memoryCheck={inMemoryCheck} />}
+              {feedback === "correct" && <><AnswerImpact eventKey={`${lesson.id}-${attemptKey}-chain-${focusStreak}`} label={inMemoryCheck ? currentFirstTry ? "MEMORY LOCK" : "METHOD REPAIRED" : currentFirstTry ? "PERFECT HIT" : "RECOVERY HIT"} chain={focusStreak} progress={inMemoryCheck ? masteryLockedCount + (currentFirstTry ? 1 : 0) : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} tone={lesson.accent} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{inMemoryCheck ? currentFirstTry ? "Memory locked!" : "Method repaired—one clean recall remains." : currentFirstTry ? focusStreak >= 3 ? `Focus chain ×${focusStreak}!` : "First-try spark!" : "Recovery complete!"}</strong><p>{inMemoryCheck ? currentFirstTry ? "You recalled the method on the first try. This idea is now secure for the lesson." : "This correct answer proves the repair worked. It will return after another idea so you can recall it cleanly." : `${practiceEncouragement[questionPosition]} Question ${questionPosition + 1} is corrected.${recoveryNeeded[question.id] ? " It will return in Memory Check." : ""}`}</p></div><span className="momentum-chip">{inMemoryCheck ? currentFirstTry ? "Clean recall +1" : "Requeue once" : currentFirstTry ? `Chain ×${focusStreak}` : "Recovered +1"}</span></div></>}
               {errorMessage && <p id="lesson-answer-error" className="form-error" role="alert">{errorMessage}</p>}
-              <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" disabled={busy} aria-busy={busy} onClick={continuePractice}>{busy ? "Saving…" : questionIndex === lesson.practice.length - 1 ? "Finish lesson" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} aria-busy={busy} onClick={submitAnswer}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
+              <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : inMemoryCheck ? "Use a repair hint" : "Show a hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" disabled={busy} aria-busy={busy} onClick={continuePractice}>{busy ? "Saving…" : nextActionLabel} <span>→</span></button> : <button className="primary-button" type="button" disabled={!answer.trim() || busy} aria-busy={busy} onClick={submitAnswer}>{busy ? "Checking…" : inMemoryCheck ? "Check recall" : "Check answer"} <span>→</span></button>}</div>
             </div>
           )}
         </section>
@@ -349,8 +420,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   );
 }
 
-function StageCard({ kicker, title, copy, visual, onContinue }: { kicker: string; title: string; copy: string; visual: React.ReactNode; onContinue: () => void }) {
-  return <div className="stage-card"><div className="stage-copy"><span className="section-kicker">{kicker}</span><h2>{title}</h2><p>{copy}</p></div><div className="stage-visual">{visual}</div><div className="stage-footer"><span>Take your time. There is no countdown.</span><button className="primary-button" type="button" onClick={onContinue}>I’m ready <span>→</span></button></div></div>;
+function StageCard({ kicker, title, copy, visual, onContinue, continueDisabled = false, continueLabel = "I’m ready", footerText = "Take your time. There is no countdown." }: { kicker: string; title: string; copy: string; visual: React.ReactNode; onContinue: () => void; continueDisabled?: boolean; continueLabel?: string; footerText?: string }) {
+  return <div className="stage-card"><div className="stage-copy"><span className="section-kicker">{kicker}</span><h2>{title}</h2><p>{copy}</p></div><div className="stage-visual">{visual}</div><div className="stage-footer"><span>{footerText}</span><button className="primary-button" type="button" disabled={continueDisabled} onClick={onContinue}>{continueLabel} <span>→</span></button></div></div>;
 }
 
 function LessonGate() {
