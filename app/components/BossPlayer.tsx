@@ -32,9 +32,11 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const questions = useMemo(() => [...region.lessons.map((item) => ({ ...item.practice[0], lesson: item.title })), { ...region.lessons[0].practice[1], lesson: "Mixed check" }], [region]);
   const completed = new Set(state?.completedLessons.map((item) => item.id) ?? []);
   const unlocked = Boolean(state && region.lessons.every((item) => completed.has(item.id)));
+  const learnerReady = Boolean(state);
   const [attemptId, setAttemptId] = useState("");
   const [attemptReady, setAttemptReady] = useState(demo);
   const [index, setIndex] = useState(0);
+  const [nextQuestionIndex, setNextQuestionIndex] = useState<number | null>(null);
   const [answer, setAnswer] = useState("");
   const [hearts, setHearts] = useState(3);
   const [feedback, setFeedback] = useState<"" | "correct" | "incorrect">("");
@@ -52,6 +54,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const [unlockedLandmark, setUnlockedLandmark] = useState<AchievementSpec | null>(null);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [syncMessage, setSyncMessage] = useState("");
   const [badgeUnlocks, setBadgeUnlocks] = useState<BadgeUnlock[]>([]);
   const question = questions[Math.min(index, questions.length - 1)];
   const questionLesson = region.lessons[Math.min(index, region.lessons.length - 1)];
@@ -66,7 +69,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const isFinalRegion = !nextRegion;
 
   useEffect(() => {
-    if (!state || !unlocked) return;
+    if (!learnerReady || !unlocked) return;
     if (demo) {
       setAttemptId((value) => value || crypto.randomUUID());
       setAttemptReady(true);
@@ -95,7 +98,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       if (active) { setErrorMessage("We could not open this boss attempt."); setAttemptReady(true); }
     });
     return () => { active = false; };
-  }, [demo, questions.length, region.id, state, unlocked]);
+  }, [demo, questions.length, region.id, learnerReady, unlocked]);
 
   if (loading || unlocked && !attemptReady) return <LearningLoading glyph="★" tone="gold" kicker="OPENING THE BOSS GATE" title="Preparing the check…" detail="Five mixed challenges and three hearts are being set in place." />;
   if (!state || error) return <LearningSignInGate glyph="★" kicker="PRIVATE BOSS PROGRESS" title="Sign in to open this check." detail="Your attempts and recovery practice stay connected to your anonymous trail." />;
@@ -117,6 +120,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     if (!answer.trim() || busy) return;
     setBusy(true);
     setErrorMessage("");
+    setSyncMessage("");
     try {
       if (demo) {
         if (isAnswerCorrect(answer, question.answer)) {
@@ -124,6 +128,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           setState(badgeResult.state);
           if (badgeResult.badgeUnlocks.length) setBadgeUnlocks(badgeResult.badgeUnlocks);
           setFeedback("correct");
+          setNextQuestionIndex(Math.min(index + 1, questions.length - 1));
         }
         else {
           const nextHearts = hearts - 1;
@@ -139,13 +144,36 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         headers: mutationHeaders(),
         body: JSON.stringify({ action: "check", regionId: region.id, attemptId, questionIndex: index, answer }),
       });
-      const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; xpEarned?: number; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; state?: LearnerState; error?: string; attempt?: BossAttempt | null };
+      const body = await response.json() as Partial<BossAttempt> & { correct?: boolean; resynced?: boolean; xpEarned?: number; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; state?: LearnerState; error?: string; attempt?: BossAttempt | null };
       if (!response.ok) setErrorMessage(body.error ?? "We could not check that answer.");
       else if (body.attempt) applyAttempt(body.attempt);
+      else if (body.resynced) {
+        applyAttempt(body);
+        setAnswer("");
+        setFeedback("");
+        setShowHint(false);
+        setNextQuestionIndex(null);
+        setServerCleared(Boolean(body.cleared));
+        if (body.state) {
+          if (body.cleared && !activeState.clearedBosses.some((item) => item.regionId === region.id)) {
+            setBossXpEarned(100);
+            const landmark = achievementUnlockedBetween(achievementTotalsForState(activeState), achievementTotalsForState(body.state));
+            setUnlockedLandmark(landmark?.source === "bosses" ? landmark : null);
+          }
+          setState(body.state);
+        }
+        if (body.cleared) setCleared(true);
+        else if (typeof body.questionIndex === "number") {
+          const restoredIndex = Math.min(body.questionIndex, questions.length - 1);
+          setIndex(restoredIndex);
+          setSyncMessage(`Progress restored. Continue with question ${restoredIndex + 1}. No heart was lost.`);
+        }
+      }
       else {
         applyAttempt(body);
         setFeedback(body.correct ? "correct" : "incorrect");
         setShowHint(!body.correct);
+        setNextQuestionIndex(body.correct && typeof body.questionIndex === "number" ? Math.min(body.questionIndex, questions.length - 1) : null);
         setServerCleared(Boolean(body.cleared));
         if (body.cleared) setBossXpEarned(body.xpEarned ?? 0);
         if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
@@ -182,7 +210,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   function next() {
     if (feedback !== "correct") return;
     if (index < questions.length - 1) {
-      setIndex((value) => value + 1);
+      setIndex(nextQuestionIndex ?? Math.min(index + 1, questions.length - 1));
+      setNextQuestionIndex(null);
       setAnswer("");
       setFeedback("");
       setShowHint(false);
@@ -198,6 +227,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     setAnswer("");
     setHearts(3);
     setFeedback("");
+    setNextQuestionIndex(null);
     setShowHint(false);
     setFailed(false);
     setFailedQuestion(null);
@@ -372,10 +402,11 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         <div className="boss-question-card" aria-busy={busy}>
           <span className="boss-topic">{question.lesson}</span>
           <h2>{question.prompt}</h2>
-          {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
+          {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : syncMessage ? "boss-sync-message" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
           {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—repair this connection.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. The same question stays open.` : "Two focused repairs will refill every heart."}</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
+          {syncMessage && <div id="boss-sync-message" className="boss-sync-message" role="status"><span aria-hidden="true">↻</span><div><strong>You are back in the right place.</strong><p>{syncMessage}</p></div></div>}
           {errorMessage && <p id="boss-answer-error" className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === 4 ? "Finish boss" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>

@@ -4208,6 +4208,11 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .lesson-badge-quest > div > span { height: 5px; margin-top: 8px; display: block; overflow: hidden; border-radius: 99px; background: #dce6ec; }
 .lesson-badge-quest > div > span i { height: 100%; display: block; border-radius: inherit; background: var(--accent); transition: width .35s ease; }
 
+.boss-sync-message { margin: 18px 0; padding: 15px 17px; display: flex; align-items: center; gap: 13px; border: 1px solid #b9d5f5; border-radius: 13px; color: #245f9e; background: #eef6ff; }
+.boss-sync-message > span { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--blue); font-size: 17px; font-weight: 900; }
+.boss-sync-message strong { display: block; color: var(--navy); font-size: 12px; }
+.boss-sync-message p { margin: 4px 0 0; color: #55718a; font-size: 11px; line-height: 1.5; }
+
 @media (max-width: 760px) {
   .public-point-mission { width: calc(100% - 28px); margin-bottom: 70px; }
   .public-point-mission > header { text-align: left; }
@@ -4236,6 +4241,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .worked-example-node { grid-template-columns: 36px 1fr; gap: 9px; }
   .worked-example-node > span { width: 36px; height: 36px; border-radius: 12px; }
   .worked-example-node > div { min-height: 68px; padding: 11px; }
+  .boss-sync-message { align-items: flex-start; padding: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

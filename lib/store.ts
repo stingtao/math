@@ -454,6 +454,10 @@ async function getOrCreateBossAttempt(learnerId: string, regionId: number, attem
   validateBossAttemptId(attemptId);
   await assertBossUnlocked(learnerId, regionId);
   const db = getStore();
+  const existing = await db.prepare(`SELECT learner_id, region_id, attempt_id, current_question, hearts, failed, failed_question, repair_step, cleared, started_at, updated_at
+    FROM boss_attempts WHERE learner_id = ? AND region_id = ? AND attempt_id = ?`)
+    .bind(learnerId, regionId, attemptId).first<BossAttemptRow>();
+  if (existing) return existing;
   const active = await db.prepare(`SELECT learner_id, region_id, attempt_id, current_question, hearts, failed, failed_question, repair_step, cleared, started_at, updated_at
     FROM boss_attempts WHERE learner_id = ? AND region_id = ? AND cleared = 0 ORDER BY updated_at DESC LIMIT 1`)
     .bind(learnerId, regionId).first<BossAttemptRow>();
@@ -485,8 +489,9 @@ export async function checkBossAnswer(learnerId: string, regionId: number, attem
   const questions = [...region.lessons.map((item) => item.practice[0]), region.lessons[0].practice[1]];
   if (!Number.isInteger(questionIndex) || questionIndex < 0 || questionIndex >= questions.length) throw new Error("Boss question not found.");
   const attempt = await getOrCreateBossAttempt(learnerId, regionId, attemptId);
+  if (attempt.cleared) return { resynced: true, hint: null, ...publicBossAttempt(attempt) };
   if (attempt.failed) return { correct: false, hint: questions[attempt.current_question]?.hint ?? "Complete the repair questions first.", ...publicBossAttempt(attempt) };
-  if (attempt.current_question !== questionIndex) throw new Error("Continue from the current boss question.");
+  if (attempt.current_question !== questionIndex) return { resynced: true, hint: null, ...publicBossAttempt(attempt) };
   const correct = isAnswerCorrect(answer, questions[questionIndex].answer);
   const db = getStore();
   const now = new Date().toISOString();

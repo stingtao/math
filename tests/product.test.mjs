@@ -466,6 +466,9 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.match(store, /assertBossUnlocked/);
   assert.match(store, /UPDATE boss_attempts SET hearts/);
   assert.match(store, /checkBossRepairAnswer/);
+  assert.match(store, /if \(existing\) return existing/);
+  assert.match(store, /resynced: true/);
+  assert.doesNotMatch(store, /Continue from the current boss question/);
   assert.match(store, /const xpEarned = cleared \? await completeBoss/);
   assert.match(store, /return \(await awardXp\(learnerId, "boss", String\(regionId\), 100\)\) \? 100 : 0/);
   assert.match(schema, /bossAttempts/);
@@ -478,8 +481,13 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.doesNotMatch(stateRoute, /action: "completeBoss"/);
   assert.match(bossPlayer, /repair-answer-feedback/);
   assert.match(bossPlayer, /No XP or completed repair is lost/);
+  assert.match(bossPlayer, /body\.resynced/);
+  assert.match(bossPlayer, /nextQuestionIndex/);
+  assert.match(bossPlayer, /\[demo, questions\.length, region\.id, learnerReady, unlocked\]/);
+  assert.match(bossPlayer, /No heart was lost/);
   assert.match(bossPlayer, /aria-valuenow=\{repair\}/);
   assert.match(css, /\.repair-answer-feedback/);
+  assert.match(css, /\.boss-sync-message/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.repair-answer-feedback/);
 });
 
