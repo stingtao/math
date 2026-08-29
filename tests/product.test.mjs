@@ -15,6 +15,7 @@ import { ANSWER_BADGE_STEP, BADGE_CATALOG_SIZE, BADGE_CATALOG_VERSION, answerBad
 import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../lib/learner-state.ts";
 import { getComboSpec } from "../lib/combo.ts";
 import { isThemeId, themeCatalog } from "../lib/themes.ts";
+import { frontierWorlds } from "../lib/frontier-worlds.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -131,13 +132,13 @@ test("server-renders the Math Grades 7–12 landing page", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Small steps/);
-  assert.match(html, /Hi, I’m Sting/);
-  assert.match(html, /Grades 7, 8, 9, 10, 11, and 12/);
+  assert.match(html, /Build the worlds no one has reached yet/);
+  assert.match(html, /The next frontier is six minutes away/);
+  assert.match(html, /GRADES 7–12/);
   assert.match(html, /220/);
   assert.match(html, /1100/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Building your site/);
-  assert.match(html, /og-v2\.png/);
+  assert.match(html, /og-frontier-v1\.webp/);
 });
 
 test("server-renders a public, no-sign-in linear Graph Lab", async () => {
@@ -401,6 +402,23 @@ test("saves one private theme code and ships five visual learning worlds", async
   const asset = await readFile(new URL("../public/visuals/theme-worlds-atlas-v1.webp", import.meta.url));
   assert.ok(asset.byteLength > 50_000 && asset.byteLength < 180_000);
   assert.equal((await sharp(asset).metadata()).format, "webp");
+});
+
+test("previews every theme as a private, deterministic frontier mission", async () => {
+  const explorer = await readFile(new URL("../app/components/FrontierWorldExplorer.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const direction = await readFile(new URL("../docs/homepage-frontier-direction.md", import.meta.url), "utf8");
+  assert.deepEqual(frontierWorlds.map((world) => world.id), ["classic", "space", "blossom", "ocean", "aurora"]);
+  assert.ok(frontierWorlds.every((world) => world.worldName && world.mission && world.image && world.href && world.skills.length === 3));
+  assert.match(explorer, /useState<ThemeId>\("space"\)/);
+  assert.match(explorer, /aria-pressed=/);
+  assert.match(explorer, /aria-live="polite"/);
+  assert.doesNotMatch(explorer, /localStorage|sessionStorage|Math\.random|new Date|document\.cookie/);
+  assert.match(css, /\.frontier-world-switcher/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.frontier-world-switcher/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.frontier-hero-media img/);
+  assert.match(direction, /Math expands the human frontier/);
+  assert.match(direction, /Generated art assets and final prompts/);
 });
 
 test("gives every Grade 10–12 lesson an appropriate interactive concept tool", async () => {
@@ -807,9 +825,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(home, /math-trail-hero\.webp/);
-  assert.match(home, /learning-loop-grid/);
-  assert.match(home, /grade-card-visual/);
+  assert.match(home, /FrontierWorldExplorer/);
+  assert.match(home, /frontier-loop-grid/);
+  assert.match(home, /frontier-grade-card/);
   for (const family of ["parts", "ratio", "chance", "data", "graph", "shape", "solid", "power", "algebra", "number", "steps"]) assert.match(topicIconCatalog, new RegExp(`kind: "${family}"`));
   assert.match(topicIcon, /data-visual=\{visual\}/);
   assert.match(topicIconCatalog, /topicIconSpecs/);
@@ -844,6 +862,13 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   for (const visual of ["math-trail-hero.webp", "signed-numbers-context.webp"]) {
     const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
     assert.ok(asset.byteLength < 100_000, `${visual} should stay below 100 KB for mobile delivery`);
+  }
+  for (const visual of ["frontier-mars-v1.webp", "frontier-deepglass-v1.webp", "frontier-aurora-v1.webp"]) {
+    const asset = await readFile(new URL(`../public/visuals/${visual}`, import.meta.url));
+    assert.ok(asset.byteLength > 50_000 && asset.byteLength < 180_000, `${visual} should remain a compressed homepage scene`);
+    const metadata = await sharp(asset).metadata();
+    assert.equal(metadata.format, "webp");
+    assert.equal(metadata.width, 1600);
   }
   for (const model of ["number-line", "symbol-meaning", "sign-pairs", "operation-order", "place-value", "repeating-decimal", "negative-distribute", "root-inverse", "solid-compare", "signed-sum", "subtract-opposite", "signed-rational-quotient", "signed-change", "proportion-table", "origin-proportion", "word-equation", "scale-area", "composite-area", "experimental-probability", "sample-space", "literal-equation", "line-forms", "system-substitution", "system-model", "radical-factor", "like-radicals", "gcf-factor", "factor-chain", "plus-minus-roots", "zero-product", "fit-prediction", "model-choice", "percent", "fraction-equivalence", "fraction-addition", "substitution", "power-steps", "term-structure", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-location", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "solution-cases", "inequality-range", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay", "number-kinds", "system-elimination", "distribution-compare", "rational-exponent", "growth-compare", "simple-interest", "graph-line", "dilation", "residuals"]) assert.match(concept, new RegExp(`model: "${model}"`));
   const contextSceneSource = concept.slice(concept.indexOf("const contextScenes"), concept.indexOf("function mathFor"));
@@ -887,42 +912,21 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   for (const expandedLesson of ["powers", "exponent-rules", "exponents-parentheses", "zero-negative-exponents", "scientific-operations", "coordinate-plane", "g9-integer-exponents-g9", "g9-multiply-monomials"]) {
     assert.match(contextSceneSource, new RegExp('[" ]' + expandedLesson + '[":]'));
   }
-  assert.match(home, /mathWorldScenes/);
-  assert.match(home, /math-world-grid/);
-  assert.match(home, /math-world-mobile-cue/);
+  assert.match(home, /featuredFrontierWorlds/);
+  assert.match(home, /frontier-world-cards/);
+  assert.match(home, /frontier-world-card-image/);
   assert.match(home, /loading="lazy"/);
-  assert.match(home, /full scenes/);
+  assert.match(home, /full visual scenes/);
   assert.match(home, /curriculumStats\.lessons/);
-  assert.match(home, /Every lesson has a distinct visual topic marker/);
-  assert.match(home, /GRADE \{scene\.grade\}/);
-  assert.match(home, /surface-area-packaging-context\.webp/);
-  assert.match(home, /compound-events-lab-context\.webp/);
-  assert.match(home, /two-way-survey-context\.webp/);
-  assert.match(home, /exponential-decay-energy-context\.webp/);
-  assert.match(home, /simple-interest-growth-context\.webp/);
+  assert.match(home, /Every world turns Grade 7–9 ideas into a mission/);
+  assert.match(home, /world\.skills\.map/);
+  assert.match(home, /frontier-mars-v1\.webp|featuredFrontierWorlds/);
+  assert.match(home, /frontier-deepglass-v1\.webp|featuredFrontierWorlds/);
+  assert.match(home, /frontier-aurora-v1\.webp|featuredFrontierWorlds/);
   assert.match(home, /graphing-line-city-context\.webp/);
-  assert.match(home, /function-routing-context\.webp/);
-  assert.match(home, /dilation-studio-context\.webp/);
-  assert.match(home, /residual-observatory-context\.webp/);
-  assert.match(home, /solution-cases-gallery-context\.webp/);
-  assert.match(home, /inequality-trail-context\.webp/);
-  assert.match(home, /fraction-workshop-context\.webp/);
-  assert.match(home, /substitution-machine-context\.webp/);
-  assert.match(home, /exponent-lab-context\.webp/);
-  assert.match(home, /like-terms-sorting-context\.webp/);
-  assert.match(home, /operations-sequence-context\.webp/);
-  assert.match(home, /decimal-pattern-context\.webp/);
-  assert.match(home, /distribution-comparison-context\.webp/);
-  assert.match(home, /Put the value in its place/);
-  assert.match(home, /Four factors, one power/);
-  assert.match(home, /Only matching terms combine/);
-  assert.match(home, /Read the instruction first/);
-  assert.match(home, /Zoom in, then follow the loop/);
-  assert.match(home, /Center and spread tell the story/);
-  assert.match(home, /x first, then y/);
-  assert.match(home, /Different pieces, same amount/);
-  assert.match(home, /A boundary and every value beyond it/);
-  assert.match(home, /Three ways two lines can relate/);
+  assert.match(home, /Plot it\. Connect it\. Read the line back/);
+  assert.match(home, /Wrong does not end the run/);
+  assert.match(home, /Somewhere along the way, the math clicks/);
   assert.match(concept, /solution-cases-context-model/);
   assert.match(concept, /inequality-range-context-model/);
   assert.match(concept, /fraction-equivalence-context-model/);
@@ -1006,9 +1010,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.root-inverse-context-model \{ grid-template-columns: 1fr/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.symbol-meaning-context-model > div,[\s\S]*\.repeating-decimal-context-model \{ grid-template-columns: 1fr/);
   assert.match(css, /\.coordinate-location-context-model/);
-  assert.match(home, /game-loop-board/);
-  assert.match(home, /Four lesson keys, then the boss/);
-  assert.match(home, /RECOVERY COUNTS/);
+  assert.match(home, /frontier-recovery-board/);
+  assert.match(home, /3 \/ 4 online/);
+  assert.match(home, /Correction earns the key/);
   assert.match(dashboard, /CURRENT QUEST/);
   assert.match(dashboard, /questMilestone/);
   assert.match(dashboard, /getQuestMilestone/);

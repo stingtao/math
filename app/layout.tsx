@@ -25,14 +25,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
-  const title = "Math — Small steps. Real progress.";
-  const description = "Visual English math lessons, five focused practice checks, review, and gameful progress for Grades 7–12.";
+  const title = "Math — Build the worlds no one has reached yet.";
+  const description = "Launch a 6–8 minute math mission. Settle Mars, engineer an ocean city, and explore the unknown through examples, practice, corrections, and bosses.";
   return {
     metadataBase: new URL(origin),
     title,
     description,
-    openGraph: { title, description, type: "website", images: [{ url: `${origin}/og-v2.png`, width: 1672, height: 941, alt: "Math — Small steps. Real progress. Grades 7–12" }] },
-    twitter: { card: "summary_large_image", title, description, images: [`${origin}/og-v2.png`] },
+    openGraph: { title, description, type: "website", images: [{ url: `${origin}/og-frontier-v1.webp`, width: 1200, height: 630, alt: "Teen explorers overlooking the first human settlement on Mars" }] },
+    twitter: { card: "summary_large_image", title, description, images: [`${origin}/og-frontier-v1.webp`] },
   };
 }
 

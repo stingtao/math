@@ -15,7 +15,7 @@ export function PublicHeader() {
     <header className="topbar">
       <Brand />
       <nav className="topnav" aria-label="Main navigation">
-        <a href="/#story">About</a>
+        <a href="/#story">How it works</a>
         <a href="/#curriculum">Grades 7–12</a>
         <a href="/labs/linear-graphs">Graph Lab</a>
         <a href="/leaderboard">Leaderboard</a>
@@ -25,7 +25,7 @@ export function PublicHeader() {
         <details className="mobile-public-menu">
           <summary aria-label="Open navigation"><span aria-hidden="true">☰</span></summary>
           <nav aria-label="Mobile navigation">
-            <a href="/#story">About</a>
+            <a href="/#story">How it works</a>
             <a href="/#curriculum">Grades 7–12</a>
             <a href="/labs/linear-graphs">Graph Lab</a>
             <a href="/leaderboard">Leaderboard</a>
