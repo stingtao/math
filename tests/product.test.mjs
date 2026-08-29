@@ -217,6 +217,9 @@ test("ships one accessible point-line mission and an active reasoning flow acros
   assert.match(mission, /Connect my points/);
   assert.match(mission, /Check coordinate/);
   assert.match(mission, /Keyboard users can enter/);
+  assert.match(mission, /hasTrace/);
+  assert.match(mission, /point-line-marker-coordinate/);
+  assert.match(mission, /connected \? "confirmed" : "progressive"/);
   assert.match(mission, /getScreenCTM/);
   assert.match(mission, /never saved or tied to an identity/);
   assert.match(flow, /Predict what the next mathematical move/);
@@ -374,6 +377,7 @@ test("saves one private theme code and ships five visual learning worlds", async
   const route = await readFile(new URL("../app/api/state/route.ts", import.meta.url), "utf8");
   const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const learnerHook = await readFile(new URL("../app/components/useLearner.ts", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.deepEqual(themeCatalog.map((theme) => theme.id), ["classic", "space", "blossom", "ocean", "aurora"]);
   assert.ok(themeCatalog.every((theme) => isThemeId(theme.id)));
@@ -381,10 +385,18 @@ test("saves one private theme code and ships five visual learning worlds", async
   assert.match(store, /learner_preferences/);
   assert.match(store, /updateTheme/);
   assert.match(route, /action: "theme"/);
-  assert.match(profile, /YOUR LEARNING WORLD/);
-  assert.match(profile, /Only the theme code is saved/);
+  assert.match(profile, /WORLD SELECT/);
+  assert.match(profile, /Story and scenery change. Math progress stays/);
+  assert.match(profile, /profile-command-deck/);
   assert.match(header, /root\.dataset\.theme/);
+  assert.match(header, /theme-world-hud/);
+  assert.match(header, /getThemeJourney/);
+  assert.match(learnerHook, /useState<LearnerState \| null>\(null\)/);
+  assert.match(learnerHook, /useState\(true\)/);
   assert.match(css, /theme-worlds-atlas-v1\.webp/);
+  assert.match(css, /\.profile-command-deck/);
+  assert.match(css, /\.theme-world-hud/);
+  assert.ok(themeCatalog.every((theme) => theme.worldName && theme.role && theme.locations.length >= 6));
   for (const theme of themeCatalog) assert.match(css, new RegExp(`data-theme="${theme.id}"`));
   const asset = await readFile(new URL("../public/visuals/theme-worlds-atlas-v1.webp", import.meta.url));
   assert.ok(asset.byteLength > 50_000 && asset.byteLength < 180_000);
@@ -407,12 +419,12 @@ test("gives every Grade 10–12 lesson an appropriate interactive concept tool",
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.advanced-tool-workspace \{ min-height: 0; padding: 15px; grid-template-columns: 1fr/);
 });
 
-test("keeps every visible CSS font size between 12px and 34px", async () => {
+test("keeps every visible CSS font size between 14px and 34px", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const sizes = [...css.matchAll(/font-size:\s*(\d+)px/g)].map((match) => Number(match[1])).filter((size) => size !== 0);
   assert.ok(sizes.length > 500);
-  assert.ok(sizes.every((size) => size >= 12 && size <= 34), `font-size range was ${Math.min(...sizes)}–${Math.max(...sizes)}px`);
-  assert.match(css, /font-size: clamp\(12px, var\(--badge-symbol\), 34px\)/);
+  assert.ok(sizes.every((size) => size >= 14 && size <= 34), `font-size range was ${Math.min(...sizes)}–${Math.max(...sizes)}px`);
+  assert.match(css, /font-size: clamp\(14px, var\(--badge-symbol\), 34px\)/);
 });
 
 test("keeps avatar frames permanently unlocked and makes the token goal visible", async () => {
@@ -454,9 +466,9 @@ test("presents daily rewards as a fixed, forgiving seven-claim journey", async (
   assert.match(dashboard, /rewardPending \? "Collecting…"/);
   assert.match(dashboard, /Today’s reward is collected/);
   assert.match(dashboard, /Streak Shields available/);
-  assert.match(dashboard, /TODAY’S MISSION BOARD/);
-  assert.match(dashboard, /Daily check-in is optional/);
-  assert.match(dashboard, /learning progress never resets/);
+  assert.match(dashboard, /MISSION BOARD/);
+  assert.match(dashboard, /OPTIONAL DAILY CHECK-IN/);
+  assert.match(dashboard, /Move toward \$\{journey\.nextLocation\}/);
   assert.match(dashboard, /className="daily-reward-details" open=\{!state\.dailyRewardClaimed\}/);
   assert.match(dashboard, /Current streak/);
   assert.match(dashboard, /Longest kept/);
@@ -633,13 +645,18 @@ test("does not send review answers to authenticated clients", async () => {
 
 test("ships five extensible success patterns and reduced-motion handling", async () => {
   const component = await readFile(new URL("../app/components/SuccessBurst.tsx", import.meta.url), "utf8");
+  const autoAdvance = await readFile(new URL("../app/components/AutoAdvanceButton.tsx", import.meta.url), "utf8");
   const momentum = await readFile(new URL("../app/components/MomentumRun.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
   const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   for (const pattern of ["orbit", "confetti", "ripple", "spark", "lift"]) assert.match(component, new RegExp(`"${pattern}"`));
   assert.match(css, /\.success-confetti/);
   assert.match(css, /\.success-ripple/);
+  assert.match(css, /success-flash 1\.6s/);
+  assert.match(css, /answer-impact-exit 2\.1s/);
+  assert.match(css, /cosmic-combo-pulse 1\.36s/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /animation:\s*none !important/);
   assert.match(momentum, /corrections still advance/);
@@ -651,6 +668,10 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(review, /RECALL CHAIN/);
   assert.match(review, /nextMomentumRun/);
   assert.match(review, /recallStreak >= 3/);
+  assert.match(autoAdvance, /AUTO_ADVANCE_SECONDS = 6/);
+  assert.match(autoAdvance, /Automatically continuing in/);
+  for (const player of [lesson, boss, review]) assert.match(player, /<AutoAdvanceButton/);
+  assert.match(css, /\.auto-advance-timer/);
   assert.match(css, /\.momentum-run/);
   assert.match(css, /@keyframes chain-link/);
   assert.deepEqual([1, 2, 3, 5, 8].map((chain) => getComboSpec(chain).tier), ["signal", "spark", "flame", "prism", "cosmic"]);
@@ -710,9 +731,9 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.star-path-options small \{ font-size: 14px/);
   assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 16px/);
   assert.match(css, /\.today-mission-route > span > small \{ font-size: 14px/);
-  assert.match(css, /\.daily-token-medallion small \{ font-size: 13px/);
+  assert.match(css, /\.daily-token-medallion small \{ font-size: 14px/);
   assert.match(css, /\.daily-rhythm small \{ font-size: 14px/);
-  assert.match(css, /\.reward-calendar span em \{ font-size: 12px/);
+  assert.match(css, /\.reward-calendar span em \{ font-size: 14px/);
   assert.match(css, /\.math-world-proof-stats small \{ font-size: 14px/);
   assert.match(css, /\.game-feedback-card small \{ font-size: 14px/);
   assert.match(css, /\.game-feedback-card h3 \{ font-size: 20px/);
@@ -997,8 +1018,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /quest-landmark-meter/);
   assert.match(dashboard, /welcomeReady/);
   assert.match(dashboard, /math-welcome-guide/);
-  assert.match(dashboard, /Your private trail starts with one small step/);
-  assert.match(dashboard, /Your Google name, email, and photo are not saved/);
+  assert.match(dashboard, /Enter \{world\.worldName\}/);
+  assert.match(dashboard, /callsign stay anonymous/);
+  assert.match(dashboard, /Google name, email, and photo are never shown here/);
   assert.match(dashboard, /Collect 4 keys/);
   assert.match(dashboard, /Stars are feedback/);
   assert.match(dashboard, /FIRST WIN PREVIEW/);
@@ -1186,10 +1208,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.boss-settlement-summary \{ grid-template-columns: 1fr/);
   assert.match(profile, /evaluateAchievements/);
   assert.match(achievementsSource, /achievementSpecs/);
-  assert.match(profile, /PRIVATE LANDMARK SHELF/);
+  assert.match(profile, /QUEST TROPHIES/);
   for (const achievement of ["First Step", "Twelve Sparks", "Boss Link", "Steady Week", "Trail Builder", "Boss Pathfinder"]) assert.match(achievementsSource, new RegExp(achievement));
-  assert.match(profile, /Only you see this shelf/);
-  assert.match(profile, /Achievements are not added to the leaderboard/);
+  assert.match(profile, /Private collection/);
+  assert.match(profile, /Only you can open it/);
   assert.match(css, /\.achievement-section/);
   assert.match(css, /\.achievement-grid/);
   assert.match(css, /\.achievement-badge/);

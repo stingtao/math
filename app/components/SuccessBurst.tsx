@@ -25,7 +25,7 @@ export function SuccessBurst({ eventKey, large = false }: { eventKey: string; la
             style={{
               "--particle-angle": `${index * (360 / 14)}deg`,
               "--particle-distance": `${large ? 150 + index % 3 * 22 : 95 + index % 3 * 16}px`,
-              animationDelay: `${index * 16}ms`,
+              animationDelay: `${index * 32}ms`,
             } as CSSProperties}
           />
         ))}

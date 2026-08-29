@@ -16,6 +16,7 @@ import { mathInputMode } from "@/lib/math-input";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
 import { AnswerImpact } from "./AnswerImpact";
+import { AutoAdvanceButton } from "./AutoAdvanceButton";
 
 type BossAttempt = {
   attemptId: string;
@@ -408,7 +409,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
           {syncMessage && <div id="boss-sync-message" className="boss-sync-message" role="status"><span aria-hidden="true">↻</span><div><strong>You are back in the right place.</strong><p>{syncMessage}</p></div></div>}
           {errorMessage && <p id="boss-answer-error" className="form-error" role="alert">{errorMessage}</p>}
-          <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next}>{index === 4 ? "Finish boss" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
+          <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`boss-${region.id}-${index}`} label={index === questions.length - 1 ? "Finish boss" : "Next question"} busy={busy} busyLabel="Saving boss…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>
       </section>
     </main>

@@ -15,6 +15,7 @@ import { achievementTotalsForState, achievementUnlockedBetween, getNextAchieveme
 import { PrivateLandmarkUnlock } from "./PrivateLandmarkUnlock";
 import { getQuestMilestone } from "@/lib/quest-milestone";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
+import { getThemeJourney, getThemeSpec } from "@/lib/themes";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
@@ -61,6 +62,8 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   if (loading) return <LoadingTrail />;
   if (!state || error) return <SignInGate />;
   const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
+  const world = getThemeSpec(state.profile.theme);
+  const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
   const nextPrivateAchievement = getNextAchievement({
     lessons: state.completedLessons.length,
     stars: totalStars,
@@ -149,12 +152,12 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         <nav className="grade-switcher" aria-label="Choose a grade">
           {[7, 8, 9, 10, 11, 12].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${demo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
         </nav>
-        <div className="dashboard-heading">
-          <div><span className="section-kicker">{state.profile.nickname.toUpperCase()}</span><h1>Choose one next step.</h1><p>Your progress is saved here.</p></div>
+        <div className={`dashboard-heading dashboard-world-heading theme-${world.id}`}>
+          <div><span className="section-kicker">{world.worldName.toUpperCase()} · {world.role.toUpperCase()}</span><h1>{journey.headline}</h1><p>{journey.story} {journey.status}</p></div>
           <div className="dashboard-summary">
-            <div><strong>{state.totalXp}</strong><span>Total XP</span></div>
-            <div><strong>{gradeCompleted}<small>/{gradeLessons.length}</small></strong><span>Grade {grade} lessons</span></div>
-            <div><strong>{gradeBosses}<small>/{curriculum.regions.length}</small></strong><span>Bosses</span></div>
+            <div><strong>{state.totalXp}</strong><span>XP power</span></div>
+            <div><strong>{gradeCompleted}<small>/{gradeLessons.length}</small></strong><span>Routes cleared</span></div>
+            <div><strong>{gradeBosses}<small>/{curriculum.regions.length}</small></strong><span>Boss gates</span></div>
           </div>
         </div>
 
@@ -162,7 +165,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           <button className="welcome-guide-close" type="button" onClick={dismissWelcomeGuide} aria-label="Dismiss welcome guide">×</button>
           <header className="welcome-guide-heading">
             <Avatar avatar={state.profile.avatar} size="lg" label="Your random abstract avatar" />
-            <div><span className="section-kicker">WELCOME, {state.profile.nickname.toUpperCase()}</span><h2 id="welcome-trail-heading">Your private trail starts with one small step.</h2><p>Math created a random nickname and abstract avatar for you. Your Google name, email, and photo are not saved.</p></div>
+            <div><span className="section-kicker">WELCOME, {world.role.toUpperCase()}</span><h2 id="welcome-trail-heading">Enter {world.worldName}.</h2><p>Your first mission begins at {journey.location}. Your avatar and callsign stay anonymous; your Google name, email, and photo are never shown here.</p></div>
           </header>
           <div className="welcome-route" aria-label="Complete short lessons, collect four region keys, then unlock the boss">
             <div className="welcome-route-step"><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="md" label="First short lesson" /><div><small>STEP 1</small><strong>Short lesson</strong><span>6–8 minutes</span></div></div>
@@ -187,7 +190,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 
         <section className="today-mission-board" aria-labelledby="today-mission-heading">
           <header className="today-mission-header">
-            <div><span className="section-kicker">TODAY’S MISSION BOARD</span><h2 id="today-mission-heading">{mainMissionDone ? "Nothing is required today." : "One clear math step. Then stop."}</h2><p>Daily check-in is optional. Your learning progress never resets when you miss a day.</p></div>
+            <div><span className="section-kicker">{world.baseName.toUpperCase()} · MISSION BOARD</span><h2 id="today-mission-heading">{mainMissionDone ? `${journey.location} is secure.` : `Move toward ${journey.nextLocation}.`}</h2><p>{mainMissionDone ? "Rest here or revisit any cleared route." : world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1) + "."}</p></div>
             <div className="today-mission-route" aria-label={`Daily check-in ${state.dailyRewardClaimed ? "collected" : "ready and optional"}; main math step: ${mainMissionTitle}`}>
               <span className={state.dailyRewardClaimed ? "done" : "optional"}><b aria-hidden="true">{state.dailyRewardClaimed ? "✓" : "◆"}</b><small>OPTIONAL CHECK-IN</small><strong>{state.dailyRewardClaimed ? "Reward saved" : `+${visibleRewardAmount} tokens ready`}</strong></span>
               <i aria-hidden="true" />
@@ -260,7 +263,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         <section className={`quest-tracker accent-${activeRegion.accent}`} aria-labelledby="current-quest-heading">
           <div className="quest-visual"><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="lg" label={`${activeRegion.title} current quest`} /><span>{String(activeRegion.order).padStart(2, "0")}</span></div>
           <div className="quest-copy">
-            <span className="section-kicker">CURRENT QUEST · {activeRegion.standard}</span>
+            <span className="section-kicker">{world.mapLabel.toUpperCase()} · CURRENT QUEST · {activeRegion.standard}</span>
             <h2 id="current-quest-heading">{activeRegion.title}</h2>
             <p>{gradeComplete ? reviewBatchSize > 0 ? `Grade ${grade} is cleared, and ${reviewBatchSize} ${reviewBatchSize === 1 ? "idea is" : "ideas are"} ready for a quick review.` : `Grade ${grade} is cleared and nothing is due. Your progress is saved; revisit any lesson only when you want to.` : activeBossReady ? "All four lessons are complete. Your boss quest is ready—take your time and use all three hearts." : `${activeRegion.lessons.length - activeDone} short ${activeRegion.lessons.length - activeDone === 1 ? "lesson" : "lessons"} until the boss quest. Corrections count as progress.`}</p>
             <div className="quest-progress" aria-label={`${activeDone} of ${activeRegion.lessons.length} lessons complete`}><span style={{ width: `${activeDone / activeRegion.lessons.length * 100}%` }} /></div>
@@ -292,7 +295,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         </section>
 
         <section className="trail-overview">
-          <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade}</span><h2>Learning map</h2></div><div className="map-controls"><p>{showFullMap ? `Showing all ${curriculum.regions.length} regions.` : "Showing your current region and nearby trail."} Stars do not block progress.</p><button type="button" aria-expanded={showFullMap} aria-controls="grade-map" onClick={() => setShowFullMap((value) => !value)}>{showFullMap ? "Focus on current quest" : `Show full Grade ${grade} map`}</button></div></div>
+          <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade} · {world.worldName.toUpperCase()}</span><h2>{world.mapLabel}</h2></div><div className="map-controls"><p>{showFullMap ? `All ${curriculum.regions.length} regions visible.` : `Current position: ${journey.location}.`} Stars do not block progress.</p><button type="button" aria-expanded={showFullMap} aria-controls="grade-map" onClick={() => setShowFullMap((value) => !value)}>{showFullMap ? "Focus current mission" : `Open full ${world.mapLabel}`}</button></div></div>
           {!showFullMap && <p className="map-window-note" role="status"><span aria-hidden="true">◎</span> A focused map keeps your next step close. You can open the full trail anytime.</p>}
           <div className="world-list" id="grade-map">
             {visibleRegions.map((region) => {

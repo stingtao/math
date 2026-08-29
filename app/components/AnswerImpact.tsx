@@ -19,7 +19,7 @@ export function AnswerImpact({ eventKey, label, chain, progress, total, tone = "
       <SuccessBurst eventKey={eventKey} large={powerful} />
       <div className={`answer-impact accent-${tone} combo-${combo.tier} ${powerful ? "powerful" : ""}`} aria-hidden="true">
         <span className="answer-impact-wash" />
-        <span className="answer-impact-lines">{Array.from({ length: 20 }, (_, index) => <i key={index} style={{ "--impact-angle": `${(index + offset) * 18}deg`, "--impact-delay": `${index * 11}ms` } as CSSProperties} />)}</span>
+        <span className="answer-impact-lines">{Array.from({ length: 20 }, (_, index) => <i key={index} style={{ "--impact-angle": `${(index + offset) * 18}deg`, "--impact-delay": `${index * 22}ms` } as CSSProperties} />)}</span>
         <div className="answer-impact-core">
           <span>{combo.motif}</span>
           <strong>{label}</strong>

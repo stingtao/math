@@ -38,6 +38,8 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
   const activePlot = pointToLineTargets[plotted.length];
   const activeRead = coordinateReadTargets[readIndex];
   const connected = phase === "read" || phase === "complete";
+  const visiblePoints = connected ? pointToLineTargets : plotted;
+  const hasTrace = visiblePoints.length >= 2;
   const progress = coordinateMissionProgress(plotted.length, connected, phase === "complete" ? coordinateReadTargets.length : readIndex);
 
   function tryPlot(point: CoordinatePoint) {
@@ -50,9 +52,9 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
     setPlotted(next);
     if (next.length === pointToLineTargets.length) {
       setPhase("connect");
-      setFeedback("Every point is placed. Now connect them and look for the rule.");
+      setFeedback("Every point is placed. The dashed trace shows the path from point to point. Confirm it to reveal the full relationship.");
     } else {
-      setFeedback(`${pointText(point)} is locked in. Next, plot ${pointText(pointToLineTargets[next.length])}.`);
+      setFeedback(`${pointText(point)} is locked in.${next.length > 1 ? " It is now connected to the previous point." : " The point is highlighted on the graph."} Next, plot ${pointText(pointToLineTargets[next.length])}.`);
       setXValue(String(pointToLineTargets[next.length].x));
       setYValue(String(pointToLineTargets[next.length].y));
     }
@@ -137,13 +139,20 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
             {yTicks.filter((tick) => tick > 0 && tick % 2 === 0).map((tick) => <text className="point-line-label" x={plotLeft - 12} y={graphY(tick) + 4} textAnchor="end" key={`yl-${tick}`}>{tick}</text>)}
             <text className="point-line-axis-name" x={plotLeft + plotWidth - 4} y={plotTop + plotHeight - 10}>x</text>
             <text className="point-line-axis-name" x={plotLeft + 10} y={plotTop + 15}>y</text>
-            {connected && <polyline className="point-line-connection" points={pointToLineTargets.map((point) => `${graphX(point.x)},${graphY(point.y)}`).join(" ")} />}
-            {(connected ? pointToLineTargets : plotted).map((point) => {
+            {hasTrace && <polyline className={`point-line-connection ${connected ? "confirmed" : "progressive"}`} points={visiblePoints.map((point) => `${graphX(point.x)},${graphY(point.y)}`).join(" ")} />}
+            {visiblePoints.map((point, index) => {
               const highlighted = phase === "read" && activeRead && sameCoordinate(point, activeRead);
-              return <g key={`${point.x}-${point.y}`} className={highlighted ? "point-line-marker highlighted" : "point-line-marker"}><circle cx={graphX(point.x)} cy={graphY(point.y)} r={highlighted ? 10 : 7} /><text x={graphX(point.x)} y={graphY(point.y) - 14} textAnchor="middle">{highlighted ? "?" : ""}</text></g>;
+              const showCoordinate = phase === "plot" || phase === "connect";
+              const labelX = point.x === 0 ? graphX(point.x) + 13 : graphX(point.x);
+              return <g key={`${point.x}-${point.y}`} className={highlighted ? "point-line-marker highlighted" : "point-line-marker"}>
+                <circle className="point-line-marker-halo" cx={graphX(point.x)} cy={graphY(point.y)} r={highlighted ? 16 : 14} />
+                <circle className="point-line-marker-dot" cx={graphX(point.x)} cy={graphY(point.y)} r={highlighted ? 10 : 8} />
+                <text className="point-line-marker-index" x={graphX(point.x)} y={graphY(point.y) + 5} textAnchor="middle">{highlighted ? "?" : index + 1}</text>
+                <text className="point-line-marker-coordinate" x={labelX} y={graphY(point.y) - 16} textAnchor={point.x === 0 ? "start" : "middle"}>{showCoordinate ? pointText(point) : highlighted ? "Find (x, y)" : ""}</text>
+              </g>;
             })}
           </svg>
-          <p>Tap an intersection to plot. Keyboard users can enter the same coordinate with the controls.</p>
+          <p>Each plotted point is numbered and labelled. From point 2 onward, the dashed trace grows one segment at a time. Keyboard users can enter the same coordinate beside the graph.</p>
         </div>
 
         <aside className="point-line-task">
@@ -160,7 +169,7 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
           {phase === "connect" && <>
             <span className="point-line-kicker">PATTERN FOUND</span>
             <h3>Five points are ready.</h3>
-            <p>Each time x grows by 1, y grows by 2. Connect them to reveal one straight relationship.</p>
+            <p>Each time x grows by 1, y grows by 2. Confirm the dashed point-to-point trace to reveal one straight relationship.</p>
             <button className="primary-button" type="button" onClick={connectPoints}>Connect my points <span aria-hidden="true">↗</span></button>
           </>}
           {phase === "read" && activeRead && <>

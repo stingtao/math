@@ -10,7 +10,7 @@ import { avatarFrameCatalog } from "@/lib/avatar-frames";
 import { SuccessBurst } from "./SuccessBurst";
 import { evaluateAchievements } from "@/lib/achievements";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
-import { themeCatalog, type ThemeId } from "@/lib/themes";
+import { getThemeJourney, getThemeSpec, themeCatalog, type ThemeId } from "@/lib/themes";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error } = useLearner(demo);
@@ -31,6 +31,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const nextFrame = avatarFrameCatalog.find((item) => item.cost > 0 && !ownedFrames.has(item.id));
   const nextFrameProgress = nextFrame ? Math.min(100, Math.round(state.profile.trailTokens / nextFrame.cost * 100)) : 100;
   const nextFrameNeeded = nextFrame ? Math.max(0, nextFrame.cost - state.profile.trailTokens) : 0;
+  const world = getThemeSpec(state.profile.theme);
+  const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
 
   async function action(payload: Record<string, unknown>) {
     if (demo) return null;
@@ -114,16 +116,17 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
       <LearnerHeader state={state} demo={demo} />
       {frameCelebrationKey && <SuccessBurst eventKey={`frame-${frameCelebrationKey}`} />}
       <section className="profile-wrap">
-        <div className="profile-hero">
-          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your abstract avatar" /><div><span className="section-kicker">YOUR ANONYMOUS IDENTITY</span><h1>{state.profile.nickname}</h1><p>No custom text. No real name. Nothing another learner can search.</p></div></div>
-          <button className="secondary-button" type="button" disabled={state.profile.rerollUsed} onClick={reroll}>{state.profile.rerollUsed ? "Free reroll used" : "Reroll once"}</button>
+        <div className={`profile-hero profile-command-deck theme-${world.id}`}>
+          <div className="profile-world-art" style={{ backgroundPosition: world.atlasPosition }} aria-hidden="true"><span>{world.motif}</span><i /><i /><i /></div>
+          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()} · PRIVATE SAVE</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p><div className="profile-world-tags"><span>{world.worldName}</span><span>{journey.status}</span><span>Anonymous · no real name</span></div></div></div>
+          <div className="profile-current-mission"><small>CURRENT MISSION</small><strong>{journey.headline}</strong><p>Next: {world.missionFocus}.</p><div><a className="primary-button" href={`/learn${demo ? "?demo=1" : ""}`}>Resume adventure <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed} onClick={reroll}>{state.profile.rerollUsed ? "ID reroll used" : "Reroll private ID"}</button></div></div>
         </div>
-        <div className="profile-stats"><article><span>◆</span><strong>{state.totalXp}</strong><small>Total XP</small></article><article><span>▲</span><strong>{state.profile.longestStreak}</strong><small>Longest streak</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Lessons complete</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Bosses cleared</small></article></div>
+        <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>{journey.stage}</strong><small>{world.levelLabel}</small></article><article><span>◆</span><strong>{state.totalXp}</strong><small>XP power</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article></div>
 
-        <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">◆<i /></span><div><small>500-PIECE PRIVATE COLLECTION</small><strong>Open Badge Vault</strong><p>{state.badges.earnedIds.length} badges earned · {state.badges.correctAnswers % 10}/10 toward the next Answer Quest trophy</p></div><b>{state.badges.earnedIds.length}<small> / 500</small></b><i aria-hidden="true">→</i></a>
+        <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">{world.motif}<i /></span><div><small>{world.badgeLabel.toUpperCase()}</small><strong>Open your private collection</strong><p>{state.badges.correctAnswers % 10}/10 answers toward the next trophy</p></div><b>{state.badges.earnedIds.length}<small> / 500</small></b><i aria-hidden="true">→</i></a>
 
         <section className="theme-studio" aria-labelledby="theme-studio-heading">
-          <header><div><span className="section-kicker">YOUR LEARNING WORLD</span><h2 id="theme-studio-heading">Choose a theme that helps you settle in.</h2><p>Only the theme code is saved. It never changes questions, scores, difficulty, or what anyone else can see.</p></div><span className="safe-chip">Private setting</span></header>
+          <header><div><span className="section-kicker">WORLD SELECT</span><h2 id="theme-studio-heading">Choose your next adventure.</h2><p>Story and scenery change. Math progress stays.</p></div><span className="safe-chip">Private setting</span></header>
           <div className="theme-grid" role="radiogroup" aria-label="Choose a visual theme">
             {themeCatalog.map((theme) => {
               const selected = state.profile.theme === theme.id;
@@ -137,16 +140,16 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         </section>
 
         <section className="achievement-section" aria-labelledby="achievement-heading">
-          <header><div><span className="section-kicker">PRIVATE LANDMARK SHELF</span><h2 id="achievement-heading">Your progress has landmarks.</h2><p>Six long-term landmarks track lessons, stars, bosses, and your longest rhythm. Collectible badges live in Badge Vault.</p></div><span className="achievement-count"><strong>{unlockedAchievements}</strong> / {achievements.length} unlocked</span></header>
+          <header><div><span className="section-kicker">QUEST TROPHIES</span><h2 id="achievement-heading">{world.badgeLabel}</h2></div><span className="achievement-count"><strong>{unlockedAchievements}</strong> / {achievements.length} unlocked</span></header>
           {nextAchievement ? <div className={`next-achievement accent-${nextAchievement.tone}`}><span className="achievement-badge" aria-hidden="true"><b>{nextAchievement.glyph}</b><i /></span><div><small>UP NEXT</small><strong>{nextAchievement.title}</strong><p>{nextAchievement.copy}</p></div><div className="next-achievement-progress"><span><b>{nextAchievement.value}</b> / {nextAchievement.target} {nextAchievement.unit}{nextAchievement.target === 1 ? "" : "s"}</span><i><b style={{ width: `${nextAchievement.progress}%` }} /></i></div></div> : <div className="next-achievement shelf-complete"><span className="achievement-badge" aria-hidden="true"><b>✓</b><i /></span><div><small>SHELF COMPLETE</small><strong>Every current landmark is yours.</strong><p>Keep exploring—the next trail landmark can arrive in a future update.</p></div></div>}
           <div className="achievement-grid" role="list">{achievements.map((item) => <article className={`achievement-card accent-${item.tone} ${item.unlocked ? "unlocked" : "locked"}`} role="listitem" aria-label={`${item.title}: ${item.unlocked ? "unlocked" : `${item.value} of ${item.target}`}`} key={item.id}><span className="achievement-badge" aria-hidden="true"><b>{item.glyph}</b><i /></span><div><h3>{item.title}</h3><p>{item.copy}</p></div><div className="achievement-card-status"><span>{item.unlocked ? "UNLOCKED" : `${item.value}/${item.target}`}</span><i><b style={{ width: `${item.progress}%` }} /></i></div></article>)}</div>
-          <footer><span aria-hidden="true">◇</span><p><strong>Only you see this shelf.</strong> Achievements are not added to the leaderboard or a public profile.</p></footer>
+          <footer><span aria-hidden="true">◇</span><p><strong>Private collection.</strong> Only you can open it.</p></footer>
         </section>
 
         <div className="profile-grid">
           <section className="locker-card">
-            <header><div><span className="section-kicker">AVATAR LOCKER</span><h2>Earned, never purchased.</h2></div><span className="token-balance">◆ {state.profile.trailTokens} tokens</span></header>
-            <p>Trail Tokens come from showing up. Unlock a frame once, then switch your collection anytime without spending again.</p>
+            <header><div><span className="section-kicker">{world.baseName.toUpperCase()} · COSMETICS</span><h2>Avatar loadout</h2></div><span className="token-balance">◆ {state.profile.trailTokens} tokens</span></header>
+            <p>Unlock once. Equip anytime.</p>
             {nextFrame ? <div className={`locker-goal ${nextFrameNeeded === 0 ? "ready" : ""}`}>
               <Avatar avatar={{ ...state.profile.avatar, frame: nextFrame.id }} size="md" label={`${nextFrame.label} preview`} />
               <div><small>{nextFrameNeeded === 0 ? "READY TO UNLOCK" : "NEXT COLLECTION GOAL"}</small><strong>{nextFrame.label}</strong><p>{nextFrameNeeded === 0 ? `You have enough tokens. Unlock it below.` : `${nextFrameNeeded} more ${nextFrameNeeded === 1 ? "token" : "tokens"} to make it yours forever.`}</p><span className="locker-goal-meter" role="progressbar" aria-label={`${nextFrame.label} token progress`} aria-valuemin={0} aria-valuemax={nextFrame.cost} aria-valuenow={Math.min(state.profile.trailTokens, nextFrame.cost)}><i style={{ width: `${nextFrameProgress}%` }} /></span></div>

@@ -15,6 +15,7 @@ import { mathInputMode } from "@/lib/math-input";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
 import { AnswerImpact } from "./AnswerImpact";
+import { AutoAdvanceButton } from "./AutoAdvanceButton";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; choices?: string[] };
 
@@ -192,7 +193,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
           {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—wake the memory.</strong><p>{question.hint}</p><small>Correcting it will fill the same Memory Pulse.</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} label={currentFirstTry ? "MEMORY HIT" : "RECALL RESTORED"} chain={recallStreak} progress={recalledCount} total={questions.length} tone={questionLesson?.accent ?? "teal"} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `Recall chain ×${recallStreak}!` : "Quick recall!" : "Memory recovered!"}</strong><p>{index + 1} of {questions.length} recharged. Keep the rhythm going.</p></div><span className="momentum-chip">{currentFirstTry ? `Chain ×${recallStreak}` : "Pulse +1"}</span></div></>}
           {errorMessage && <p id="review-answer-error" className="form-error" role="alert">{errorMessage}</p>}
-          <div className="practice-actions"><span className="review-dots">{questions.map((item, dot) => <i className={dot < index ? "done" : dot === index ? "active" : ""} key={`${item.lessonId}-${dot}`} />)}</span>{feedback === "correct" ? <button className="primary-button" type="button" onClick={next} disabled={busy} aria-busy={busy}>{busy ? "Saving review…" : index === questions.length - 1 ? "Finish review" : "Next question"} <span>→</span></button> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
+          <div className="practice-actions"><span className="review-dots">{questions.map((item, dot) => <i className={dot < index ? "done" : dot === index ? "active" : ""} key={`${item.lessonId}-${dot}`} />)}</span>{feedback === "correct" ? <AutoAdvanceButton eventKey={`review-${question.lessonId}-${question.questionId}-${index}`} label={index === questions.length - 1 ? "Finish review" : "Next question"} busy={busy} busyLabel="Saving review…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>
       </section>
     </main>

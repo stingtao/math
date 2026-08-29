@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { getDemoState, type LearnerState } from "@/lib/learner-state";
 
 export function useLearner(demo: boolean) {
-  const [state, setState] = useState<LearnerState | null>(demo ? getDemoState() : null);
-  const [loading, setLoading] = useState(!demo);
+  const [state, setState] = useState<LearnerState | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const refresh = useCallback(async () => {
