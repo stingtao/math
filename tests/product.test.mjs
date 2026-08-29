@@ -153,6 +153,25 @@ test("server-renders a public, no-sign-in linear Graph Lab", async () => {
   assert.match(html, /Turn five points into y = 2x/);
 });
 
+test("publishes a plain-English AI collaboration and open reuse promise", async () => {
+  const response = await render("/about");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const legal = await readFile(new URL("../app/components/LegalPage.tsx", import.meta.url), "utf8");
+  const footer = await readFile(new URL("../app/components/SiteFooter.tsx", import.meta.url), "utf8");
+  assert.match(html, /Built with AI\. Improved by people/);
+  assert.match(html, /Copy it\. Share it\. Remix it/);
+  assert.match(html, /AI can sound certain while being wrong/);
+  assert.match(html, /humanity learning together/);
+  assert.match(html, /original learning text and original image assets/);
+  assert.match(legal, /AI-assisted creation and accuracy/);
+  assert.match(legal, /Open reuse of original material/);
+  assert.match(legal, /freely copy, share, and adapt/);
+  assert.match(legal, /responsible for checking its accuracy/);
+  assert.match(footer, /href="\/about"/);
+  assert.match(footer, /Built with AI and human review/);
+});
+
 test("ships all six curriculum files and all source sheets", async () => {
   const curriculum = await readFile(new URL("../lib/curriculum.ts", import.meta.url), "utf8");
   const lessonDefinitions = curriculum.match(/\blesson\(\d+,\s*\d+,/g) ?? [];
