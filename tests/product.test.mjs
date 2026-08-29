@@ -833,8 +833,9 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.reward-collected-status p \{[^}]*font-size: 16px/);
   assert.match(css, /\.world-replay-link \{[\s\S]*font-size: 16px/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.demo-banner > p \{ display: none; \}/);
-  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.dashboard-wrap \{ padding: 24px 0 42px; \}/);
-  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.next-visual \{ min-height: 145px; \}/);
+  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.dashboard-wrap \{ padding: 14px 0 42px; \}/);
+  assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.next-visual \{ min-height: 120px; \}/);
+  assert.match(css, /@media \(max-width: 560px\)[\s\S]*\.grade-switcher \{ display: flex; overflow-x: auto/);
   assert.match(css, /\.math-world-proof-stats small \{ font-size: 16px/);
   assert.match(css, /\.game-feedback-card small \{ font-size: 16px/);
   assert.match(css, /\.game-feedback-card h3 \{ font-size: 20px/);

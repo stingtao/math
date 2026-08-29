@@ -575,11 +575,11 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .site-footer > span { margin-left: 0; font-size: 16px; }
 
   /* Dashboard cards collapse into short, obvious next actions. */
-  .dashboard-wrap { padding: 24px 0 42px; }
-  .grade-switcher { margin-bottom: 18px; }
+  .dashboard-wrap { padding: 14px 0 42px; }
+  .grade-switcher { margin-bottom: 12px; }
   .grade-switcher a { min-height: 44px; font-size: 17px; }
-  .next-card { min-height: 0; padding: 17px; gap: 14px; border-radius: 20px; }
-  .next-visual { min-height: 145px; }
+  .next-card { min-height: 0; padding: 17px; gap: 10px; border-radius: 20px; }
+  .next-visual { min-height: 120px; }
   .review-priority-orbit { transform: scale(.8); }
   .review-priority-visual > small { bottom: 12px; }
   .concept-mini { transform: scale(.82); }
@@ -3837,8 +3837,9 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
   .theme-option:last-child { grid-column: auto; }
   html[data-theme] .learner-shell::before,
   html[data-theme] .boss-shell::before { height: 300px; background-size: 100% 100%, 500% 100%; }
-  .grade-switcher { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .grade-switcher a { min-width: 0; padding-inline: 8px; }
+  .grade-switcher { display: flex; overflow-x: auto; gap: 6px; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .grade-switcher::-webkit-scrollbar { display: none; }
+  .grade-switcher a { min-width: 74px; padding-inline: 8px; flex: 0 0 74px; scroll-snap-align: start; }
 }
 
 .answer-impact.combo-signal { --accent: #4c91e6; }
