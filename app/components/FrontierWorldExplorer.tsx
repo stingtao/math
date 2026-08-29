@@ -25,22 +25,20 @@ export function FrontierWorldExplorer() {
       <div className="frontier-hero-content">
         <span className="frontier-eyebrow">THE FRONTIER RUNS ON MATH</span>
         <h1 id="frontier-title">Build the worlds no one has reached yet.</h1>
-        <p>Settle Mars. Engineer a city beneath the ocean. Decode places no one has mapped. Every mission takes only a few minutes—and every new world runs on the math you are learning.</p>
+        <p>Choose a world. Solve one short mission. Learn the math that keeps it moving.</p>
         <div className="frontier-hero-actions">
-          <a className="frontier-primary" href={activeWorld.href}>Launch a 6–8 minute mission <span aria-hidden="true">→</span></a>
-          <a className="frontier-secondary" href="#worlds">Explore the worlds</a>
+          <a className="frontier-primary" href={activeWorld.href}>{activeWorld.cta} <span aria-hidden="true">→</span></a>
+          <a className="frontier-secondary" href="#curriculum">Choose your grade</a>
         </div>
         <div className="frontier-promises" aria-label="Mission promises">
-          <span><b>6–8 min</b> one focused mission</span>
-          <span><b>Hints + retries</b> mistakes reveal clues</span>
-          <span><b>Private</b> no public real identity</span>
+          <span><b>6–8 min</b> per mission</span>
+          <span><b>Hints + retries</b> included</span>
         </div>
       </div>
 
       <div className="frontier-active-mission" key={activeWorld.id}>
-        <div><small>{activeWorld.kicker}</small><strong>{activeWorld.worldName}</strong></div>
-        <p><b>{activeWorld.missionLabel}:</b> {activeWorld.mission}</p>
-        <span className="frontier-mission-ready"><i aria-hidden="true">◆</i> Mission ready</span>
+        <small>{activeWorld.worldName}</small>
+        <strong>{activeWorld.mission}</strong>
       </div>
 
       <div className="frontier-world-switcher" id="worlds" aria-label="Choose an expedition world">

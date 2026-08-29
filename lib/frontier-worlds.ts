@@ -99,5 +99,3 @@ export const frontierWorlds = [
     cta: "Follow the signal",
   },
 ] satisfies readonly FrontierWorld[];
-
-export const featuredFrontierWorlds = frontierWorlds.filter((world) => ["space", "ocean", "aurora"].includes(world.id));

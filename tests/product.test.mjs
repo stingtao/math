@@ -176,7 +176,7 @@ test("server-renders the Math Grades 7–12 landing page", async () => {
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /Build the worlds no one has reached yet/);
-  assert.match(html, /The next frontier is six minutes away/);
+  assert.match(html, /Play one short mission/);
   assert.match(html, /GRADES 7–12/);
   assert.doesNotMatch(html, /220 lessons|1100 questions|full visual scenes/i);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Building your site/);
@@ -989,20 +989,15 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   for (const expandedLesson of ["powers", "exponent-rules", "exponents-parentheses", "zero-negative-exponents", "scientific-operations", "coordinate-plane", "g9-integer-exponents-g9", "g9-multiply-monomials"]) {
     assert.match(contextSceneSource, new RegExp('[" ]' + expandedLesson + '[":]'));
   }
-  assert.match(home, /featuredFrontierWorlds/);
-  assert.match(home, /frontier-world-cards/);
-  assert.match(home, /frontier-world-card-image/);
+  assert.doesNotMatch(home, /featuredFrontierWorlds|frontier-world-cards|frontier-world-card-image/);
   assert.match(home, /loading="lazy"/);
   assert.doesNotMatch(home, /full visual scenes|curriculumStats\.lessons/);
-  assert.match(home, /Each world gives Grade 7–9 math a job/);
-  assert.match(home, /world\.skills\.map/);
-  assert.match(home, /frontier-mars-comic-v2\.webp|featuredFrontierWorlds/);
-  assert.match(home, /frontier-deepglass-comic-v2\.webp|featuredFrontierWorlds/);
-  assert.match(home, /frontier-aurora-comic-v2\.webp|featuredFrontierWorlds/);
+  assert.doesNotMatch(home, /frontier-manifesto|frontier-world-gallery|frontier-recovery|frontier-privacy|frontier-content-proof/);
+  assert.doesNotMatch(home, /curriculum\.subtitle|world\.skills\.map/);
   assert.match(home, /graphing-line-city-context\.webp/);
   assert.match(home, /Plot it\. Connect it\. Read the line back/);
-  assert.match(home, /Wrong does not end the run/);
-  assert.match(home, /Somewhere along the way, the math clicks/);
+  assert.match(home, /Hints and retries are built in/);
+  assert.match(home, /No sign-in required/);
   assert.match(concept, /solution-cases-context-model/);
   assert.match(concept, /inequality-range-context-model/);
   assert.match(concept, /fraction-equivalence-context-model/);
@@ -1086,9 +1081,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.root-inverse-context-model \{ grid-template-columns: 1fr/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*\.symbol-meaning-context-model > div,[\s\S]*\.repeating-decimal-context-model \{ grid-template-columns: 1fr/);
   assert.match(css, /\.coordinate-location-context-model/);
-  assert.match(home, /frontier-recovery-board/);
-  assert.match(home, /3 \/ 4 online/);
-  assert.match(home, /Correction earns the key/);
+  assert.doesNotMatch(home, /frontier-recovery-board|3 \/ 4 online|Correction earns the key/);
   assert.doesNotMatch(dashboard, /CURRENT QUEST|Continue quest|questMilestone|getQuestMilestone|getNextAchievement|quest-landmark-meter/);
   assert.match(dashboard, /welcomeReady/);
   assert.match(dashboard, /math-welcome-guide/);
