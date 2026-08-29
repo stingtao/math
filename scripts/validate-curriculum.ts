@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curriculum.ts";
-import { algebraCourseCoverage, grade7To12CoreCoverage } from "../lib/curriculum-coverage.ts";
+import { algebraCourseCoverage, extendedProgramCoverage, grade7To12CoreCoverage } from "../lib/curriculum-coverage.ts";
+import { expandedCoverageLessonSlugs } from "../lib/curriculum-extensions.ts";
 import { inferQuestionInteraction, type QuestionInteraction } from "../lib/question-interactions.ts";
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
@@ -10,13 +11,13 @@ function writtenUnit(choice: string) {
 }
 
 assert.equal(regions.length, 55, "Grades 7–12 must contain 55 regions");
-assert.equal(lessons.length, 237, "Grades 7–12 must contain 237 lessons");
-assert.equal(curriculumStats.questions, 1185, "Every lesson must contain five reviewed questions");
+assert.equal(lessons.length, 253, "Grades 7–12 must contain 253 lessons");
+assert.equal(curriculumStats.questions, 1265, "Every lesson must contain five reviewed questions");
 assert.ok(lessons.every((lesson) => lesson.practice.length === 5), "Every lesson must contain exactly five questions");
 assert.ok(lessons.every((lesson) => lesson.exampleSteps.length >= 3 && lesson.exampleSteps.every((step) => step.trim().length >= 12)), "Every lesson needs a usable worked reasoning sequence");
 assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, lessons.length, "Lesson IDs must be unique");
 assert.equal(new Set(lessons.map((lesson) => lesson.slug)).size, lessons.length, "Lesson slugs must be unique");
-assert.deepEqual([7, 8, 9, 10, 11, 12].map((grade) => lessons.filter((lesson) => lesson.grade === grade).length), [32, 52, 47, 38, 35, 33]);
+assert.deepEqual([7, 8, 9, 10, 11, 12].map((grade) => lessons.filter((lesson) => lesson.grade === grade).length), [33, 53, 48, 39, 37, 43]);
 assert.ok(lessons.every((lesson) => hasSpecificTopicIcon(lesson.visual)), "Every lesson visual must have a specific topic icon");
 assert.equal(new Set(lessons.map((lesson) => lesson.visual)).size, topicIconVisuals.length, "Icon catalog must exactly cover curriculum visuals");
 assert.equal(Object.keys(regionLandmarks).length, regions.length, "Every current region must have one visual landmark");
@@ -51,10 +52,17 @@ for (const strand of algebraCourseCoverage) {
     assert.ok(mappedStandards.includes(standard) || mappedStandards.includes(family), `${strand.topic} is missing standard evidence for ${standard}`);
   }
 }
+const extendedContractSlugs = new Set(extendedProgramCoverage.flatMap((strand) => strand.lessonSlugs));
+for (const strand of extendedProgramCoverage) {
+  assert.ok(strand.lessonSlugs.length > 0, `${strand.authority}: ${strand.outcome} needs lesson evidence`);
+  for (const slug of strand.lessonSlugs) assert.ok(lessonBySlug.has(slug), `${strand.authority}: ${strand.outcome} is missing ${slug}`);
+}
+for (const slug of expandedCoverageLessonSlugs) assert.ok(extendedContractSlugs.has(slug), `${slug} must be recorded in the extended coverage contract`);
 
 let propertyChecks = 0;
 let multipleChoiceChecks = 0;
 let factorChoiceChecks = 0;
+let orderingChecks = 0;
 const interactionCounts = new Map<QuestionInteraction, number>();
 for (const lesson of lessons) {
   const instructionalCopy = [
@@ -107,9 +115,17 @@ for (const lesson of lessons) {
     if (question.choices) {
       assert.ok(question.choices.length >= 2 && question.choices.length <= 5, `${lesson.id}/${question.id} needs 2–5 choices`);
       assert.equal(new Set(question.choices.map((choice) => choice.trim().toLowerCase())).size, question.choices.length, `${lesson.id}/${question.id} has duplicate choices`);
-      assert.equal(question.choices.filter((choice) => isAnswerCorrect(choice, question.answer)).length, 1, `${lesson.id}/${question.id} must have exactly one selectable correct answer`);
-      const answerUnit = writtenUnit(question.answer.split("|")[0]);
-      if (answerUnit) assert.ok(question.choices.every((choice) => writtenUnit(choice) === answerUnit), `${lesson.id}/${question.id} must use ${answerUnit} on every answer choice`);
+      if (question.interaction === "ordering") {
+        const orderedAnswer = question.answer.split(" → ");
+        assert.equal(question.choices.length, 5, `${lesson.id}/${question.id} ordering tasks need five steps`);
+        assert.equal(orderedAnswer.length, question.choices.length, `${lesson.id}/${question.id} ordering answer must contain every step`);
+        assert.deepEqual([...orderedAnswer].sort(), [...question.choices].sort(), `${lesson.id}/${question.id} ordering answer must use each authored step exactly once`);
+        orderingChecks += 1;
+      } else {
+        assert.equal(question.choices.filter((choice) => isAnswerCorrect(choice, question.answer)).length, 1, `${lesson.id}/${question.id} must have exactly one selectable correct answer`);
+        const answerUnit = writtenUnit(question.answer.split("|")[0]);
+        if (answerUnit) assert.ok(question.choices.every((choice) => writtenUnit(choice) === answerUnit), `${lesson.id}/${question.id} must use ${answerUnit} on every answer choice`);
+      }
       multipleChoiceChecks += 1;
     }
     const primary = question.answer.split("|")[0];
@@ -127,4 +143,4 @@ for (const [input, accepted] of [
 ]) assert.ok(isAnswerCorrect(input, accepted), `Exact checker failed: ${input} = ${accepted}`);
 
 const interactionSummary = [...interactionCounts.entries()].map(([type, count]) => `${type}: ${count}`).join(", ");
-console.log(`Validated Grades 7–12: ${lessons.length} lessons, ${curriculumStats.questions} questions (${interactionSummary}), ${factorChoiceChecks} factor-choice checks, ${multipleChoiceChecks} selectable questions, and ${propertyChecks} seeded answer checks.`);
+console.log(`Validated Grades 7–12: ${lessons.length} lessons, ${curriculumStats.questions} questions (${interactionSummary}), ${orderingChecks} ordering checks, ${factorChoiceChecks} factor-choice checks, ${multipleChoiceChecks} selectable questions, and ${propertyChecks} seeded answer checks.`);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEnterAction } from "./useEnterAction";
 
 export const AUTO_ADVANCE_SECONDS = 6;
 
@@ -51,6 +52,8 @@ export function AutoAdvanceButton({
     void advanceRef.current();
   }
 
+  useEnterAction(advanceNow, !busy);
+
   const progress = Math.max(0, Math.min(1, remaining / AUTO_ADVANCE_SECONDS));
 
   return (
@@ -59,6 +62,7 @@ export function AutoAdvanceButton({
       type="button"
       disabled={busy}
       aria-busy={busy}
+      aria-keyshortcuts="Enter"
       aria-label={busy ? busyLabel : `${label}. Automatically continuing in ${remaining} seconds.`}
       onClick={advanceNow}
       style={{ "--auto-advance-progress": `${progress * 360}deg` } as CSSProperties}

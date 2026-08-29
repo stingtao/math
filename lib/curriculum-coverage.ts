@@ -10,6 +10,12 @@ export type CoreClusterCoverage = {
   lessonSlugs: string[];
 };
 
+export type ExtendedProgramCoverage = {
+  authority: "California" | "New York" | "Kang Chiao / IB" | "AP Calculus" | "AP Statistics";
+  outcome: string;
+  lessonSlugs: string[];
+};
+
 // Common Core is a state-led baseline rather than a federal curriculum. This
 // cluster-level contract is deliberately more precise than checking whether a
 // broad domain appears somewhere. It prevents a missing cluster from hiding
@@ -112,4 +118,27 @@ export const algebraCourseCoverage: CurriculumCoverageStrand[] = [
   { topic: "Solve quadratic equations by square roots", standards: ["HSA.REI.B.4"], lessonSlugs: ["g9-solve-by-square-roots"] },
   { topic: "Build quadratic functions and models", standards: ["HSF.BF.A.1", "HSF.IF.C.8a"], lessonSlugs: ["g9-build-quadratic-models"] },
   { topic: "Exponential functions", standards: ["HSF.LE.A.1–2"], lessonSlugs: ["g9-exponential-growth", "g9-exponential-decay", "g9-linear-vs-exponential"] },
+];
+
+// Common Core establishes the portable baseline, while these additional
+// contracts make the requested state, AP, and Kang Chiao/IB depth explicit.
+// They are kept separate because Kang Chiao branches into AP and IB pathways
+// in Grades 11–12 rather than publishing one universal grade-by-grade sequence.
+export const extendedProgramCoverage: ExtendedProgramCoverage[] = [
+  { authority: "California", outcome: "Investigate multi-step proportional decisions and explain model assumptions", lessonSlugs: ["g7-percent-decision-chains"] },
+  { authority: "Kang Chiao / IB", outcome: "Compose transformations and reason through spatial sequences", lessonSlugs: ["g8-composed-transformations"] },
+  { authority: "New York", outcome: "Solve a system consisting of one linear and one quadratic equation", lessonSlugs: ["g9-linear-quadratic-systems"] },
+  { authority: "Kang Chiao / IB", outcome: "Construct complete geometric proof chains for circle theorems", lessonSlugs: ["g10-circle-theorem-proofs"] },
+  { authority: "Kang Chiao / IB", outcome: "Model contextual restrictions with rational functions", lessonSlugs: ["g11-rational-function-models"] },
+  { authority: "Kang Chiao / IB", outcome: "Use inverse trigonometric functions with principal values and intervals", lessonSlugs: ["g11-inverse-trigonometric-functions"] },
+  { authority: "AP Calculus", outcome: "Differentiate implicit and inverse relationships", lessonSlugs: ["g12-implicit-differentiation"] },
+  { authority: "AP Calculus", outcome: "Model quantities that change together with related rates", lessonSlugs: ["g12-related-rates"] },
+  { authority: "AP Calculus", outcome: "Estimate accumulation numerically from tables and graphs", lessonSlugs: ["g12-numerical-integration"] },
+  { authority: "AP Calculus", outcome: "Solve differential equations and interpret slope fields", lessonSlugs: ["g12-differential-equations"] },
+  { authority: "AP Calculus", outcome: "Test convergence of infinite sequences and series", lessonSlugs: ["g12-infinite-series"] },
+  { authority: "AP Calculus", outcome: "Apply calculus to parametric and polar curves", lessonSlugs: ["g12-parametric-polar-calculus"] },
+  { authority: "AP Statistics", outcome: "Choose sampling and experimental designs that support the intended claim", lessonSlugs: ["g12-study-design"] },
+  { authority: "AP Statistics", outcome: "Perform inference for one and two proportions", lessonSlugs: ["g12-inference-for-proportions"] },
+  { authority: "AP Statistics", outcome: "Perform one-sample, paired, and two-sample inference for means", lessonSlugs: ["g12-inference-for-means"] },
+  { authority: "AP Statistics", outcome: "Perform inference for a population regression slope", lessonSlugs: ["g12-regression-inference"] },
 ];

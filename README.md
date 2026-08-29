@@ -2,7 +2,7 @@
 
 Math is a simple English learning site for Grades 7–12. Sting built it as a parent who likes math and wanted a quiet place for his child to learn, practice, and return for review.
 
-The site includes 55 regions, 237 lessons, 1,185 reviewed practice questions, mixed boss checks, spaced review, daily rewards, anonymous identities, an opt-in weekly leaderboard, and a public feedback board whose posts are not connected to learner accounts or progress. A public Linear Graph Lab lets learners type `y = mx + b` equations and see the graph, slope, intercept, nearby coordinates, and point table update without signing in or saving the input. Its point-to-line mission turns plotted coordinates into a connected line and then asks learners to read coordinates back from the graph.
+The site includes 55 regions, 253 lessons, 1,265 reviewed practice questions, mixed boss checks, spaced review, daily rewards, anonymous identities, an opt-in weekly leaderboard, and a public feedback board whose posts are not connected to learner accounts or progress. A public Linear Graph Lab lets learners type `y = mx + b` equations and see the graph, slope, intercept, nearby coordinates, and point table update without signing in or saving the input. Its point-to-line mission turns plotted coordinates into a connected line and then asks learners to read coordinates back from the graph.
 
 ## Local development
 
@@ -37,4 +37,4 @@ npx wrangler types --check
 npx wrangler deploy --dry-run
 ```
 
-`npm test` builds the production app, validates all 237 lessons and 1,185 reviewed questions, runs 118,500 seeded answer checks, confirms the Grade 8 Quick Sheets, checks all 73 Grade 7, Grade 8, and high-school Common Core clusters plus the attached Algebra scope, verifies privacy boundaries, and exercises mutation, recovery-mastery, reward, responsive-layout, and security controls.
+`npm test` builds the production app, validates all 253 lessons and 1,265 reviewed questions, runs 126,500 seeded answer checks, confirms the Grade 8 Quick Sheets, checks all 73 Grade 7, Grade 8, and high-school Common Core clusters plus the Algebra, state, AP, and Kang Chiao/IB extensions, verifies privacy boundaries, and exercises mutation, recovery-mastery, reward, responsive-layout, and security controls.

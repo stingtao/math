@@ -81,6 +81,7 @@ The answer interaction is part of the learning design, not a formatting decision
 - Use `fill-in` only when producing the value or notation is itself part of the learning goal and the checker accepts reasonable equivalent forms.
 - Use `yes-no` for Yes/No decisions and `true-false` for True/False claims. Render both as two large selectable buttons; spelling and capitalization must never become accidental difficulty.
 - Distinguish `two-choice`, `three-choice`, and `four-choice` explicitly. If a new answer structure does not fit, define a new type before adding the question rather than quietly falling back to a text field or generic renderer.
+- Use `ordering` when the learning target is a procedure, proof chain, modeling cycle, or sequence of transformations. Every step must be used exactly once, the current order must stay visible, and reset must be available without losing the question.
 - Use authored choices when equivalent symbolic forms are difficult to type or normalize reliably. Factoring prompts such as `Factor 6x + 12` use four mathematically plausible choices unless a purpose-built symbolic editor and equivalence checker exist.
 - Keep all options parallel in meaning, notation, unit, and precision. Distractors should expose a misconception, not a typing trap.
 - A new question family must define its data shape, answer control, keyboard and assistive behavior, validation, correct feedback, recovery path, and rendering on lesson, boss, and review surfaces before content is added.
@@ -161,3 +162,25 @@ Relational words such as `vertical`, `parallel`, `perpendicular`, `congruent`, `
 - Write `triangles with side lengths ... are similar`, not `the side lengths are similar`.
 
 Keep the noun whenever removing it would change the mathematical meaning or make a modifier appear to describe the wrong type of object. Scan goals, key ideas, examples, worked steps, questions, hints, diagrams, and tooltips—not only headings.
+
+## 16. Let Enter follow the learning path
+
+Keyboard speed is part of practice fluency. Enter should trigger the one primary action that advances the current learning state.
+
+- In a text response, Enter submits only when the response is complete and the learner is not composing text with an input method editor.
+- On a selected choice, the first activation selects it and the next Enter submits it. Never submit an unselected option by surprise.
+- After feedback, Enter advances to the next question, retry, lesson, boss, or completion action represented by the dominant CTA.
+- Do not steal Enter from text areas, links, alternate buttons, open dialogs, hints, or editable controls. Ignore key repeat and modifier shortcuts.
+- Add an accessible keyboard-shortcut name to the primary control and keep click/tap behavior identical.
+- The shortcut must respect busy, disabled, and duplicate-submission guards. One keypress creates one state transition.
+
+## 17. Triangulate curriculum depth
+
+Coverage audits must compare several kinds of authority instead of treating one broad standards label as a complete course.
+
+- Use Common Core as the portable Grade 7–12 baseline, then compare state frameworks for sequencing and mathematical practices.
+- Use current AP course descriptions for advanced Calculus and Statistics depth.
+- Treat Kang Chiao Grades 7–10 as an MYP/Common Core-informed pathway and Grades 11–12 as branching AP or IB pathways. Do not invent one universal Kang Chiao grade sequence.
+- Use IB Mathematics AA/AI guides to test inquiry, modeling, technology, proof, and interpretation—not only topic names.
+- Record every confirmed gap in the machine-readable coverage contract with named lesson evidence and five reviewed questions.
+- A topic is not complete until it includes a suitable representation, a worked reasoning chain, practice across more than recall, and an interaction type that fits the response.

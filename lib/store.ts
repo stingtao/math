@@ -441,7 +441,7 @@ export async function assertBossUnlocked(learnerId: string, regionId: number) {
   const placeholders = region.lessons.map(() => "?").join(",");
   const completed = await getStore().prepare(`SELECT COUNT(*) AS total FROM lesson_progress WHERE learner_id = ? AND lesson_id IN (${placeholders})`)
     .bind(learnerId, ...region.lessons.map((item) => item.id)).first<{ total: number }>();
-  if (Number(completed?.total ?? 0) < region.lessons.length) throw new Error("Complete all four lessons first.");
+  if (Number(completed?.total ?? 0) < region.lessons.length) throw new Error(`Complete all ${region.lessons.length} lessons first.`);
   return region;
 }
 

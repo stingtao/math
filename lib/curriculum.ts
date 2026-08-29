@@ -3,6 +3,7 @@ import { grade9Regions } from "./curriculum-grade9.ts";
 import { grade10Regions } from "./curriculum-grade10.ts";
 import { grade11Regions } from "./curriculum-grade11.ts";
 import { grade12Regions } from "./curriculum-grade12.ts";
+import { applyCoverageExtensions } from "./curriculum-extensions.ts";
 import { buildPracticeQuestion, type QuestionInteraction } from "./question-interactions.ts";
 
 export type Accent = "blue" | "teal" | "coral" | "violet" | "gold";
@@ -582,13 +583,20 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
 ];
 
 export const grade8Regions: RegionDefinition[] = regionSpecs.map((region, index) => ({ ...region, grade: 8, order: index + 1 }));
+
+const expandedGrade7Regions = applyCoverageExtensions(grade7Regions);
+const expandedGrade8Regions = applyCoverageExtensions(grade8Regions);
+const expandedGrade9Regions = applyCoverageExtensions(grade9Regions);
+const expandedGrade10Regions = applyCoverageExtensions(grade10Regions);
+const expandedGrade11Regions = applyCoverageExtensions(grade11Regions);
+const expandedGrade12Regions = applyCoverageExtensions(grade12Regions);
 export const gradeCurricula = [
-  { grade: 7 as const, title: "Grade 7", subtitle: "Ratios, rational numbers, equations, geometry, statistics, and probability", regions: grade7Regions },
-  { grade: 8 as const, title: "Grade 8", subtitle: "Real numbers, linear relationships, transformations, geometry, and data", regions: grade8Regions },
-  { grade: 9 as const, title: "Grade 9", subtitle: "Algebra I: equations, functions, systems, polynomials, quadratics, and modeling", regions: grade9Regions },
-  { grade: 10 as const, title: "Grade 10", subtitle: "Geometry: proof, congruence, similarity, trigonometry, circles, probability, and modeling", regions: grade10Regions },
-  { grade: 11 as const, title: "Grade 11", subtitle: "Algebra II and precalculus: polynomial, rational, logarithmic, trigonometric, conic, matrix, and statistical models", regions: grade11Regions },
-  { grade: 12 as const, title: "Grade 12", subtitle: "Advanced functions, calculus, vectors, probability distributions, inference, finance, and discrete models", regions: grade12Regions },
+  { grade: 7 as const, title: "Grade 7", subtitle: "Ratios, rational numbers, equations, geometry, statistics, and probability", regions: expandedGrade7Regions },
+  { grade: 8 as const, title: "Grade 8", subtitle: "Real numbers, linear relationships, transformations, geometry, and data", regions: expandedGrade8Regions },
+  { grade: 9 as const, title: "Grade 9", subtitle: "Algebra I: equations, functions, systems, polynomials, quadratics, and modeling", regions: expandedGrade9Regions },
+  { grade: 10 as const, title: "Grade 10", subtitle: "Geometry: proof, congruence, similarity, trigonometry, circles, probability, and modeling", regions: expandedGrade10Regions },
+  { grade: 11 as const, title: "Grade 11", subtitle: "Algebra II and precalculus: polynomial, rational, logarithmic, trigonometric, conic, matrix, and statistical models", regions: expandedGrade11Regions },
+  { grade: 12 as const, title: "Grade 12", subtitle: "Advanced functions, calculus, vectors, probability distributions, inference, finance, and discrete models", regions: expandedGrade12Regions },
 ];
 export const regions: RegionDefinition[] = gradeCurricula.flatMap((curriculum) => curriculum.regions);
 export const lessons: LessonDefinition[] = regions.flatMap((region) => region.lessons);

@@ -1,5 +1,6 @@
 import type { LessonDefinition } from "@/lib/curriculum";
 import { getLessonExperience, type LessonScene } from "@/lib/lesson-experience";
+import { useEnterAction } from "./useEnterAction";
 
 const colors: Record<LessonDefinition["accent"], { main: string; soft: string }> = {
   blue: { main: "#2474ed", soft: "#dcecff" },
@@ -32,6 +33,7 @@ export function LessonMissionThumbnail({ lesson }: { lesson: LessonDefinition })
 
 export function LessonHistory({ lesson, busy, errorMessage, onComplete }: { lesson: LessonDefinition; busy: boolean; errorMessage: string; onComplete: () => void }) {
   const { history, scene } = getLessonExperience(lesson);
+  useEnterAction(onComplete, !busy);
   return <div className={`stage-card history-stage-card accent-${lesson.accent}`}>
     <div className="history-stage-copy">
       <span className="section-kicker">WHY THIS IDEA EXISTS · {history.era}</span>
@@ -42,7 +44,7 @@ export function LessonHistory({ lesson, busy, errorMessage, onComplete }: { less
     </div>
     <HistoryScene scene={scene} title={history.title} />
     {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
-    <div className="stage-footer"><span>Practice complete. Finish to save rewards.</span><button className="primary-button mission-primary-cta" type="button" disabled={busy} aria-busy={busy} onClick={onComplete}>{busy ? "Saving…" : "Complete lesson"} <span aria-hidden="true">→</span></button></div>
+    <div className="stage-footer"><span>Practice complete. Finish to save rewards.</span><button className="primary-button mission-primary-cta" type="button" disabled={busy} aria-busy={busy} aria-keyshortcuts="Enter" onClick={onComplete}>{busy ? "Saving…" : "Complete lesson"} <span aria-hidden="true">→</span></button></div>
   </div>;
 }
 

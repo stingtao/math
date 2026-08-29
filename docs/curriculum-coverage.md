@@ -14,6 +14,17 @@ The attached course table and the full lesson bank were checked against Grade 7,
 
 The machine-readable contract currently contains all 73 clusters: 9 in Grade 7, 10 in Grade 8, and 54 high-school clusters. Grade 12 also includes precalculus, calculus, finance, and discrete-model extensions beyond the Common Core baseline. “Complete” in this document means every baseline cluster has named lesson evidence and reviewed questions; it does not mean every state, district, AP, IB, or local course sequence is identical.
 
+The 2026 depth audit also compared official sources with different jobs:
+
+- [California Mathematics Framework](https://www.cde.ca.gov/ci/ma/cf/) for coherent big ideas, investigations, modeling, and equitable access.
+- [New York Next Generation Mathematics Standards](https://www.nysed.gov/sites/default/files/programs/standards-instruction/nys-next-generation-mathematics-p-12-standards.pdf) for explicit course-level Algebra I outcomes such as linear–quadratic systems.
+- [AP Calculus AB and BC Course and Exam Description](https://apcentral.collegeboard.org/media/pdf/ap-calculus-ab-and-bc-course-and-exam-description.pdf) for the complete ten-unit Calculus pathway.
+- [AP Statistics](https://apcentral.collegeboard.org/courses/ap-statistics) for study design, probability, and inference for proportions, means, and regression.
+- [Kang Chiao Xiugang school profile](https://www.kcis.com.tw/file/KCIS_Profile2021-2022.pdf) and its public course listings: Grades 7–10 follow IB MYP, while Grades 11–12 branch into IB DP or AP options including Algebra II, Geometry, Precalculus, Calculus AB/BC, and Statistics.
+- [IB Diploma Mathematics](https://ibo.org/programmes/diploma-programme/curriculum/mathematics/) for Analysis and Approaches / Applications and Interpretation expectations around inquiry, technology, proof, modeling, and interpretation.
+
+Kang Chiao is therefore represented as a pathway constraint, not a single fixed Grade 7–12 syllabus. The product preserves one continuous sequence while adding the depth needed for later AP and IB choices.
+
 ## Full-bank audit repairs
 
 | Previously missing cluster | New lesson evidence | Instructional representation |
@@ -27,6 +38,22 @@ The machine-readable contract currently contains all 73 clusters: 9 in Grade 7, 
 | HSN.CN.C · Complex polynomial solutions | `g11-complex-polynomial-solutions` | Conjugate roots connected to the complex plane. |
 | HSA.APR.C · Polynomial identities | `g11-polynomial-identities` | Adjustable area proof of `(x + 2)² = x² + 4x + 4`. |
 | HSS.MD.B · Decision strategies | `g12-decision-strategies` | Interactive comparison of sure and risky expected values. |
+
+## 2026 state, AP, and Kang Chiao/IB depth repairs
+
+| Gap found in the broader comparison | Added lesson evidence | Why it is distinct |
+| --- | --- | --- |
+| Multi-step proportional decisions | `g7-percent-decision-chains` | Successive percentages require a changing base and a modeling decision, not one percent calculation. |
+| Composed transformations | `g8-composed-transformations` | Learners must preserve intermediate images and reason about order. |
+| Linear–quadratic systems | `g9-linear-quadratic-systems` | A linear-only systems unit does not satisfy the Algebra I mixed-system outcome. |
+| Circle theorem proof chains | `g10-circle-theorem-proofs` | Using a theorem is different from proving it from radii, triangles, arcs, and angles. |
+| Rational models and inverse trig | `g11-rational-function-models`; `g11-inverse-trigonometric-functions` | Precalculus/IB pathways require domain interpretation and inverse-function reasoning beyond algebraic manipulation. |
+| Implicit differentiation and related rates | `g12-implicit-differentiation`; `g12-related-rates` | Both require differentiating a relationship before isolating the requested rate. |
+| Numerical integration and differential equations | `g12-numerical-integration`; `g12-differential-equations` | These cover table-based accumulation, slope fields, initial conditions, and separable models. |
+| BC series and non-Cartesian calculus | `g12-infinite-series`; `g12-parametric-polar-calculus` | Precalculus representations alone do not cover BC convergence or calculus on parametric/polar curves. |
+| Study design and procedure-specific inference | `g12-study-design`; `g12-inference-for-proportions`; `g12-inference-for-means`; `g12-regression-inference` | One generic hypothesis-testing lesson cannot cover design, conditions, procedure choice, and contextual conclusions. |
+
+These 16 additions contribute 80 reviewed questions. Each new lesson includes one five-step ordering task so a learner must reconstruct a method, not only recognize a result.
 
 ## Audited topic map
 
@@ -60,7 +87,7 @@ The repair changes the definition of coverage:
 2. Distinct representations and decisions need named lesson objectives.
 3. Each named lesson needs five reviewed questions and an answer interaction suited to the response.
 4. Symbolically fragile responses use authored choices unless an equivalence-aware editor exists.
-5. Every one of the 73 baseline clusters and every requested Algebra strand is listed in `lib/curriculum-coverage.ts`; validation fails if a required lesson disappears or its standard mapping drifts.
+5. Every one of the 73 baseline clusters, every requested Algebra strand, and each state/AP/Kang Chiao/IB extension is listed in `lib/curriculum-coverage.ts`; validation fails if required lesson evidence disappears.
 6. New content is appended inside an existing region so saved lesson IDs do not change.
 
 ## Maintenance gate

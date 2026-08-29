@@ -17,6 +17,9 @@ import { BadgeUnlockReveal } from "./BadgeUnlockReveal";
 import { AnswerImpact } from "./AnswerImpact";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
 import { QuestionResponse } from "./QuestionResponse";
+import { EnterActionLink } from "./EnterActionLink";
+import { isResponseComplete } from "@/lib/question-interactions";
+import { EnterActionButton } from "./EnterActionButton";
 
 type BossAttempt = {
   attemptId: string;
@@ -63,6 +66,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const repairQuestion = repairLesson.practice[Math.min(repair + 2, repairLesson.practice.length - 1)];
   const answerLocked = busy || feedback === "correct";
   const repairAnswerLocked = busy || repairFeedback === "correct";
+  const responseReady = isResponseComplete(question, answer);
+  const repairResponseReady = isResponseComplete(repairQuestion, repairAnswer);
   const connectedLinks = index + (feedback === "correct" ? 1 : 0);
   const gradeCurriculum = getGradeCurriculum(region.grade);
   const regionIndex = gradeCurriculum.regions.findIndex((item) => item.id === region.id);
@@ -101,13 +106,13 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
     return () => { active = false; };
   }, [demo, questions.length, region.id, learnerReady, unlocked]);
 
-  if (loading || unlocked && !attemptReady) return <LearningLoading glyph="★" tone="gold" kicker="OPENING THE BOSS GATE" title="Preparing the check…" detail="Five mixed challenges and three hearts are being set in place." />;
+  if (loading || unlocked && !attemptReady) return <LearningLoading glyph="★" tone="gold" kicker="OPENING THE BOSS GATE" title="Preparing the check…" detail={`${questions.length} mixed challenges and three hearts are being set in place.`} />;
   if (!state || error) return <LearningSignInGate glyph="★" kicker="PRIVATE BOSS PROGRESS" title="Sign in to open this check." detail="Your attempts and recovery practice stay connected to your anonymous trail." />;
   const activeState = state;
   const trailUrl = `/learn?grade=${region.grade}${demo ? "&demo=1" : ""}`;
   const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${demo ? "&demo=1" : ""}` : `/learn/${nextRegion.lessons[0].slug}?grade=${region.grade}${demo ? "&demo=1" : ""}`;
   const trailRegionUrl = nextRegion ? `${trailUrl}#region-${nextRegion.id}` : trailUrl;
-  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Clear all four lessons first.</h1><p>The five-question challenge opens after the last lesson.</p><a className="primary-button" href={trailUrl}>Show my next lesson <span>→</span></a></section></main>;
+  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Clear all {region.lessons.length} lessons first.</h1><p>The {questions.length}-question challenge opens after the last lesson.</p><a className="primary-button" href={trailUrl}>Show my next lesson <span>→</span></a></section></main>;
 
   function applyAttempt(attempt: Partial<BossAttempt>) {
     if (attempt.attemptId) setAttemptId(attempt.attemptId);
@@ -118,7 +123,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   }
 
   async function check() {
-    if (!answer.trim() || busy) return;
+    if (!responseReady || busy) return;
     setBusy(true);
     setErrorMessage("");
     setSyncMessage("");
@@ -240,7 +245,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   }
 
   async function checkRepair() {
-    if (!repairAnswer.trim() || busy) return;
+    if (!repairResponseReady || busy) return;
     setBusy(true);
     setErrorMessage("");
     try {
@@ -319,7 +324,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <div><small>{isFinalRegion ? "NEXT" : "NEXT REGION UNLOCKED"}</small><strong id="boss-next-title">{isFinalRegion ? "Daily Review" : `Region ${nextRegion.order}: ${nextRegion.title}`}</strong></div>
         </section>
 
-        <div className="boss-victory-actions"><a className="primary-button" href={victoryUrl}>{isFinalRegion ? "Open Daily Review" : `Start ${nextRegion.title}`} <span>→</span></a><a className="text-link" href={trailRegionUrl}>{isFinalRegion ? `Back to Grade ${region.grade}` : "Back to map"}</a></div>
+        <div className="boss-victory-actions"><EnterActionLink className="primary-button" href={victoryUrl}>{isFinalRegion ? "Open Daily Review" : `Start ${nextRegion.title}`} <span>→</span></EnterActionLink><a className="text-link" href={trailRegionUrl}>{isFinalRegion ? `Back to Grade ${region.grade}` : "Back to map"}</a></div>
       </section>
     </main>
   );
@@ -341,7 +346,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         <div className="repair-restored-path" aria-label="Both repairs complete and three hearts ready">
           <span><b>✓</b> Repair 1</span><i /><span><b>✓</b> Repair 2</span><i /><strong>♥♥♥ Ready</strong>
         </div>
-        <button className="primary-button" type="button" onClick={resetAfterRepair}>Retry boss with full hearts <span>→</span></button>
+        <EnterActionButton className="primary-button" onClick={resetAfterRepair}>Retry boss with full hearts <span>→</span></EnterActionButton>
       </section>
     </main>
   );
@@ -365,7 +370,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           {repairFeedback === "incorrect" && <div id="boss-repair-feedback" className="repair-answer-feedback" role="status"><span aria-hidden="true">↻</span><div><strong>Not yet—repair this step.</strong><p>{repairQuestion.hint}</p><small>Repair {repair + 1} stays open. No XP or completed repair is lost.</small></div></div>}
         </div>
         {errorMessage && <p id="boss-repair-error" className="form-error" role="alert">{errorMessage}</p>}
-        <button className="primary-button" type="button" onClick={checkRepair} disabled={!repairAnswer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : repair === 1 ? "Restore all hearts" : "Check repair"} <span>→</span></button>
+        <button className="primary-button" type="button" onClick={checkRepair} disabled={!repairResponseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter">{busy ? "Checking…" : repair === 1 ? "Restore all hearts" : "Check repair"} <span>→</span></button>
       </section>
     </main>
   );
@@ -376,9 +381,9 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       <LearnerHeader state={state} demo={demo} />
       <div className="boss-topbar"><a href={trailUrl}>← Leave</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
-        <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF 5</span><h1>{region.title}</h1><p>Five links. No timer. Every miss can be repaired.</p></div></div>
-        <div className="boss-connection-map" aria-label={`${connectedLinks} of 5 boss connections complete`}>
-          <header><div><span>SKILL MAP</span><strong>Four lesson moves + one mixed finish</strong></div><small>{connectedLinks}/5 linked</small></header>
+        <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF {questions.length}</span><h1>{region.title}</h1><p>{questions.length} links. No timer. Every miss can be repaired.</p></div></div>
+        <div className="boss-connection-map" aria-label={`${connectedLinks} of ${questions.length} boss connections complete`}>
+          <header><div><span>SKILL MAP</span><strong>{region.lessons.length} lesson moves + one mixed finish</strong></div><small>{connectedLinks}/{questions.length} linked</small></header>
           <div className="boss-connection-nodes" role="list">
             {questions.map((item, round) => {
               const linkLesson = region.lessons[Math.min(round, region.lessons.length - 1)];
@@ -386,7 +391,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
               return <div className={`${status} ${round === questions.length - 1 ? "mixed" : ""}`} role="listitem" aria-label={`${item.lesson}: ${status === "done" ? "connected" : status === "current" ? "current question" : "upcoming"}`} key={`${item.id}-connection`}><TopicIcon visual={linkLesson.visual} accent={linkLesson.accent} size="sm" label="" /><span aria-hidden="true">{status === "done" ? "✓" : round === questions.length - 1 ? "★" : round + 1}</span><small>{item.lesson}</small></div>;
             })}
           </div>
-          <p><span aria-hidden="true">◆</span>{connectedLinks === 5 ? "All five ideas are connected." : `${5 - connectedLinks} ${5 - connectedLinks === 1 ? "connection" : "connections"} left. A correction keeps the map moving.`}</p>
+          <p><span aria-hidden="true">◆</span>{connectedLinks === questions.length ? `All ${questions.length} ideas are connected.` : `${questions.length - connectedLinks} ${questions.length - connectedLinks === 1 ? "connection" : "connections"} left. A correction keeps the map moving.`}</p>
         </div>
         <div className="boss-question-card" aria-busy={busy}>
           <span className="boss-topic">{question.lesson}</span>
@@ -397,7 +402,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
           {syncMessage && <div id="boss-sync-message" className="boss-sync-message" role="status"><span aria-hidden="true">↻</span><div><strong>You are back in the right place.</strong><p>{syncMessage}</p></div></div>}
           {errorMessage && <p id="boss-answer-error" className="form-error" role="alert">{errorMessage}</p>}
-          <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`boss-${region.id}-${index}`} label={index === questions.length - 1 ? "Finish boss" : "Next question"} busy={busy} busyLabel="Saving boss…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
+          <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`boss-${region.id}-${index}`} label={index === questions.length - 1 ? "Finish boss" : "Next question"} busy={busy} busyLabel="Saving boss…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter">{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>
       </section>
     </main>

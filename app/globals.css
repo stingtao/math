@@ -3222,6 +3222,15 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .primary-button:disabled { opacity: .64; cursor: not-allowed; }
 [aria-busy="true"] .choice-grid button:disabled,
 [aria-busy="true"] .answer-field input:disabled { cursor: progress; }
+.ordering-response { margin: 25px 0; }
+.ordering-sequence { min-height: 84px; padding: 14px 17px; display: grid; gap: 6px; border: 1px solid #cddce6; border-radius: 14px; background: #f5f9fc; }
+.ordering-sequence span { color: var(--muted); font-size: 16px; font-weight: 850; text-transform: uppercase; letter-spacing: .07em; }
+.ordering-sequence strong { color: var(--navy); font-size: 18px; line-height: 1.5; }
+.ordering-choice-grid { margin: 12px 0 9px; grid-template-columns: 1fr; }
+.ordering-choice-grid button { display: flex; align-items: center; gap: 11px; }
+.ordering-choice-grid button.selected { color: #526b80; border-color: #cbd8e0; background: #edf2f5; box-shadow: none; }
+.ordering-position { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; color: white; background: var(--blue); font-size: 16px; }
+.ordering-reset { min-height: 42px; padding: 8px 13px; border: 1px solid #cbd8e0; border-radius: 10px; color: var(--navy); background: white; font-size: 16px; font-weight: 800; }
 .primary-button[aria-busy="true"] { opacity: 1; cursor: progress; }
 .primary-button[aria-busy="true"] span { display: none; }
 .primary-button[aria-busy="true"]::after { content: ""; width: 14px; height: 14px; margin-left: 12px; display: inline-block; border: 2px solid rgb(255 255 255 / 45%); border-top-color: white; border-radius: 50%; vertical-align: -2px; animation: answer-check-spin .7s linear infinite; }

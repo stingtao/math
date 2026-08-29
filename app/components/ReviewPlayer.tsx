@@ -15,7 +15,8 @@ import { AnswerImpact } from "./AnswerImpact";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
 import { TaskProgress } from "./TaskProgress";
 import { QuestionResponse } from "./QuestionResponse";
-import type { QuestionInteraction } from "@/lib/question-interactions";
+import { isResponseComplete, type QuestionInteraction } from "@/lib/question-interactions";
+import { EnterActionLink } from "./EnterActionLink";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; choices?: string[] };
 
@@ -43,6 +44,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const suggestedHref = suggestedLesson ? `/learn/${suggestedLesson.slug}?grade=${suggestedLesson.grade}${demo ? "&demo=1" : ""}` : trailHref;
   const questionKey = question ? `${question.lessonId}:${question.questionId}` : "";
   const answerLocked = busy || feedback === "correct";
+  const responseReady = question ? isResponseComplete(question, answer) : false;
   const recalledCount = index + (feedback === "correct" ? 1 : 0);
   const currentFirstTry = feedback === "correct" && attempts[questionKey] === 1;
 
@@ -89,7 +91,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   }
 
   async function check() {
-    if (!answer.trim() || busy) return;
+    if (!responseReady || busy) return;
     setBusy(true);
     setErrorMessage("");
     try {
@@ -158,7 +160,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <p>They will return again when another quick recall will help them stick.</p>
         <div className="review-finish-reward"><span><strong>+20</strong> XP</span></div>
         <p className="review-stop-note">You can stop here.</p>
-        <div className="review-finish-actions">{suggestedLesson && <a className="primary-button" href={suggestedHref}>Start {suggestedLesson.title} <span>→</span></a>}<a className="text-link" href={trailHref}>View learning map</a></div>
+        <div className="review-finish-actions">{suggestedLesson && <EnterActionLink className="primary-button" href={suggestedHref}>Start {suggestedLesson.title} <span>→</span></EnterActionLink>}<a className="text-link" href={trailHref}>View learning map</a></div>
       </section>
     </main>
   );
@@ -179,7 +181,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
           {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—use the clue and retry.</strong><p>{question.hint}</p><small>A corrected answer earns the same review credit.</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} label={currentFirstTry ? "RECALLED" : "CORRECTED"} chain={recallStreak} progress={recalledCount} total={questions.length} tone={questionLesson?.accent ?? "teal"} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `${recallStreak} correct in a row!` : "Recalled correctly!" : "Corrected!"}</strong><p>{index + 1} of {questions.length} complete.</p></div><span className="momentum-chip">{currentFirstTry && recallStreak > 1 ? `${recallStreak} in a row` : "Complete"}</span></div></>}
           {errorMessage && <p id="review-answer-error" className="form-error" role="alert">{errorMessage}</p>}
-          <div className="practice-actions review-actions">{feedback === "correct" ? <AutoAdvanceButton eventKey={`review-${question.lessonId}-${question.questionId}-${index}`} label={index === questions.length - 1 ? "Finish review" : "Next question"} busy={busy} busyLabel="Saving review…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!answer.trim() || busy} aria-busy={busy}>{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
+          <div className="practice-actions review-actions">{feedback === "correct" ? <AutoAdvanceButton eventKey={`review-${question.lessonId}-${question.questionId}-${index}`} label={index === questions.length - 1 ? "Finish review" : "Next question"} busy={busy} busyLabel="Saving review…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter">{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>
       </section>
     </main>
