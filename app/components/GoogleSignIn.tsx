@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 
 declare global {
   interface Window {
@@ -16,8 +16,7 @@ declare global {
 }
 
 export function GoogleSignIn({ clientId, compact = false }: { clientId: string; compact?: boolean }) {
-  const rawId = useId();
-  const buttonId = `google-button-${rawId.replace(/:/g, "")}`;
+  const buttonId = "google-sign-in-button";
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [status, setStatus] = useState("");
 

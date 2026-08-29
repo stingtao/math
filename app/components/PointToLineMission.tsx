@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useState, type PointerEvent as ReactPointerEvent } from "react";
 import { coordinateMissionProgress, coordinateReadTargets, pointToLineTargets, sameCoordinate, type CoordinatePoint } from "@/lib/coordinate-mission";
 import { SuccessBurst } from "./SuccessBurst";
 
@@ -28,7 +28,7 @@ function pointText(point: CoordinatePoint) {
 }
 
 export function PointToLineMission({ compact = false }: { compact?: boolean }) {
-  const missionId = useId();
+  const missionId = compact ? "lesson-point-line-mission" : "public-point-line-mission";
   const [phase, setPhase] = useState<"plot" | "connect" | "read" | "complete">("plot");
   const [plotted, setPlotted] = useState<CoordinatePoint[]>([]);
   const [readIndex, setReadIndex] = useState(0);

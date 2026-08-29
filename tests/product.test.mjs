@@ -198,6 +198,7 @@ test("adds one private live line grapher across Grade 7, 8, and 9 graph lessons"
   assert.match(lab, /toFixed\(1\)/);
   assert.match(lab, /onPointerMove=\{pointNearPointer\}/);
   assert.match(lab, /onFocus=\{startKeyboardExplore\}/);
+  assert.doesNotMatch(lab, /useId/);
   assert.match(lab, /not saved or linked to an account/);
   assert.match(page, /<LinearGraphLab initialEquation="y=2x"/);
   assert.match(page, /Predict first\. Check second/);
@@ -225,6 +226,7 @@ test("ships one accessible point-line mission and an active reasoning flow acros
   assert.match(mission, /point-line-marker-coordinate/);
   assert.match(mission, /connected \? "confirmed" : "progressive"/);
   assert.match(mission, /getScreenCTM/);
+  assert.doesNotMatch(mission, /useId/);
   assert.match(mission, /never saved or tied to an identity/);
   assert.match(flow, /Predict what the next mathematical move/);
   assert.match(flow, /REASONING CHAIN COMPLETE/);

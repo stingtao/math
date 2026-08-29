@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+import { useMemo, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { clippedLinePoints, nearestVisibleLinePoint, parseLinearFunction, valueAt, type GraphPoint } from "@/lib/linear-function";
 
 const graphBound = 5;
@@ -27,7 +27,7 @@ function coordinateNumber(value: number) {
 }
 
 export function LinearGraphLab({ initialEquation = "y=2x", examples = defaultExamples }: { initialEquation?: string; examples?: string[] }) {
-  const inputId = useId();
+  const inputId = "linear-graph-equation";
   const [equation, setEquation] = useState(initialEquation);
   const [hoverPoint, setHoverPoint] = useState<GraphPoint | null>(null);
   const line = useMemo(() => parseLinearFunction(equation), [equation]);
