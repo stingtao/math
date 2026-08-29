@@ -97,7 +97,7 @@ test("reports only achievement thresholds crossed by the latest saved result", (
   assert.equal(achievementUnlockedBetween({ ...empty, lessons: 19, stars: 11 }, { ...empty, lessons: 20, stars: 12 })?.id, "trail-builder");
 });
 
-test("uses one achievement evaluation for the profile shelf and learning map", () => {
+test("uses one achievement evaluation for profile milestones", () => {
   const totals = { lessons: 3, stars: 7, bosses: 0, streak: 2 };
   const evaluated = evaluateAchievements(totals);
   assert.equal(evaluated.find((item) => item.id === "first-step")?.unlocked, true);
@@ -494,12 +494,11 @@ test("keeps avatar frames permanently unlocked and makes the token goal visible"
   assert.match(profile, /NEXT FRAME/);
   assert.match(profile, /isOwned \? "Equip"/);
   assert.doesNotMatch(profile, /unlocked forever|NEXT COLLECTION GOAL|Owned · Equip|No tokens spent/);
-  assert.match(dashboard, /Use tokens for avatar frames/);
+  assert.doesNotMatch(dashboard, /Use tokens for avatar frames|reward-locker-link/);
   assert.match(css, /\.locker-goal/);
-  assert.match(css, /\.reward-locker-link/);
 });
 
-test("presents daily rewards as a fixed, forgiving seven-claim journey", async () => {
+test("presents the daily reward as a distinct action and retires its completed state", async () => {
   const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
   const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
@@ -507,28 +506,21 @@ test("presents daily rewards as a fixed, forgiving seven-claim journey", async (
   assert.match(store, /const rewardTokens = \[10, 12, 14, 16, 18, 20, 30\]/);
   assert.match(store, /INSERT OR IGNORE INTO daily_rewards/);
   assert.match(store, /if \(step === 7\) shields \+= 1/);
-  assert.doesNotMatch(dashboard, /Every reward is fixed/);
-  assert.match(dashboard, /Skip a day\? Nothing resets/);
-  assert.doesNotMatch(dashboard, /no mystery boxes or paid boosts|never purchased/);
+  assert.doesNotMatch(dashboard, /Every reward is fixed|Skip a day\? Nothing resets|no mystery boxes or paid boosts|never purchased/);
   assert.match(dashboard, /rewardPending \? "Collecting…"/);
-  assert.match(dashboard, /Today’s reward is collected/);
-  assert.match(dashboard, /Streak Shields available/);
-  assert.match(dashboard, /MISSION BOARD/);
+  assert.match(dashboard, /showClaimedReward/);
+  assert.match(dashboard, /window\.setTimeout\([\s\S]*5000/);
+  assert.match(dashboard, /Collected today/);
+  assert.match(dashboard, /reward-ready-button/);
+  assert.match(dashboard, /claim-settling/);
   assert.match(dashboard, /OPTIONAL DAILY CHECK-IN/);
-  assert.match(dashboard, /Move toward \$\{journey\.nextLocation\}/);
-  assert.match(dashboard, /className="daily-reward-details" open=\{!state\.dailyRewardClaimed\}/);
-  assert.match(dashboard, /Current streak/);
-  assert.match(dashboard, /Longest kept/);
-  assert.match(dashboard, /MAIN · \{mainMissionType\.toUpperCase\(\)\}/);
+  assert.match(dashboard, /aria-busy=\{rewardPending\}/);
+  assert.doesNotMatch(dashboard, /daily-reward-details|daily-rhythm|today-mission-header|today-mission-route/);
   assert.match(css, /\.reward-balance/);
-  assert.match(css, /\.reward-shield/);
-  assert.match(css, /\.reward-calendar \.today/);
-  assert.match(css, /\.today-mission-header/);
-  assert.match(css, /\.today-mission-route/);
-  assert.match(css, /\.daily-reward-details/);
-  assert.match(css, /\.daily-rhythm/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.today-mission-header/);
-  assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.daily-reward-details > \.reward-calendar \{ grid-template-columns: repeat\(4/);
+  assert.match(css, /\.reward-ready-button/);
+  assert.match(css, /@keyframes reward-ready-nudge/);
+  assert.match(css, /@keyframes claimed-reward-retire/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.reward-ready-button/);
 });
 
 test("keeps signed-in navigation and a clear self marker on the weekly league", async () => {
@@ -580,6 +572,19 @@ test("guards authenticated mutations and production responses", async () => {
   assert.match(worker, /frame-ancestors 'none'/);
   assert.match(worker, /X-Content-Type-Options/);
   assert.match(worker, /Strict-Transport-Security/);
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
+  const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const feedback = await readFile(new URL("../app/components/FeedbackBoard.tsx", import.meta.url), "utf8");
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
+  const google = await readFile(new URL("../app/components/GoogleSignIn.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(dashboard, /dailyRewardClaimed \|\| rewardPending/);
+  assert.match(profile, /if \(busyAction\) return/);
+  assert.match(feedback, /if \(busy \|\| message\.trim\(\)\.length < 3\) return/);
+  assert.match(header, /if \(loggingOut\) return/);
+  assert.match(google, /if \(authPending\.current\) return/);
+  assert.match(css, /button:not\(:disabled\)[\s\S]*:active/);
+  assert.match(css, /\[aria-busy="true"\][\s\S]*pointer-events: none/);
 });
 
 test("keeps progression and boss hearts server-authoritative", async () => {
@@ -778,10 +783,9 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /\.momentum-run-copy > strong \{ font-size: 16px; white-space: normal/);
   assert.match(css, /\.star-path-options small \{ font-size: 16px/);
   assert.match(css, /\.recovery-coach > header p,[\s\S]*font-size: 16px/);
-  assert.match(css, /\.today-mission-route > span > small \{ font-size: 16px/);
   assert.match(css, /\.daily-token-medallion small \{ font-size: 16px/);
-  assert.match(css, /\.daily-rhythm small \{ font-size: 16px/);
-  assert.match(css, /\.reward-calendar span em \{ font-size: 16px/);
+  assert.match(css, /\.reward-collected-status p \{[^}]*font-size: 16px/);
+  assert.match(css, /\.world-replay-link \{[\s\S]*font-size: 16px/);
   assert.match(css, /\.math-world-proof-stats small \{ font-size: 16px/);
   assert.match(css, /\.game-feedback-card small \{ font-size: 16px/);
   assert.match(css, /\.game-feedback-card h3 \{ font-size: 20px/);
@@ -1041,13 +1045,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /frontier-recovery-board/);
   assert.match(home, /3 \/ 4 online/);
   assert.match(home, /Correction earns the key/);
-  assert.match(dashboard, /CURRENT QUEST/);
-  assert.match(dashboard, /questMilestone/);
-  assert.match(dashboard, /getQuestMilestone/);
-  assert.match(dashboard, /quest-milestone milestone-\$\{questMilestone\.tone\}/);
-  assert.match(dashboard, /getNextAchievement/);
-  assert.match(dashboard, /NEXT ACHIEVEMENT/);
-  assert.match(dashboard, /quest-landmark-meter/);
+  assert.doesNotMatch(dashboard, /CURRENT QUEST|Continue quest|questMilestone|getQuestMilestone|getNextAchievement|quest-landmark-meter/);
   assert.match(dashboard, /welcomeReady/);
   assert.match(dashboard, /math-welcome-guide/);
   assert.match(dashboard, /Start at \{journey\.location\}/);
@@ -1061,18 +1059,22 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /Start this lesson/);
   assert.match(dashboard, /<Avatar avatar=\{state\.profile\.avatar\}/);
   assert.match(dashboard, /reviewBatchSize/);
-  assert.match(dashboard, /BEST NEXT MOVE · REVIEW READY/);
+  assert.match(dashboard, /YOUR NEXT MOVE · REVIEW READY/);
   assert.match(dashboard, /Start the recall/);
   assert.match(dashboard, /gradeComplete \? <section className="next-card trail-complete-card"/);
   assert.match(dashboard, /activeBossReady \? <section className="next-card boss-priority-card"/);
-  assert.match(dashboard, /BEST NEXT MOVE · BOSS READY/);
-  assert.match(dashboard, /Nothing due today/);
+  assert.match(dashboard, /YOUR NEXT MOVE · BOSS READY/);
+  assert.match(dashboard, /You finished what was due/);
   assert.match(dashboard, /featuredLesson/);
-  assert.match(dashboard, /rewardCellClass/);
-  assert.match(dashboard, /Claim \$\{nextRewardStep\} of 7/);
+  assert.match(dashboard, /mission-primary-cta/);
+  assert.match(dashboard, /dailyCardVisible/);
+  assert.match(dashboard, /showClaimedReward/);
   assert.match(dashboard, /visibleRegions\.map/);
+  assert.match(dashboard, /gradeComplete \|\| !activeRegion \? \[\] : \[activeRegion\]/);
   assert.match(dashboard, /aria-expanded=\{showFullMap\}/);
   assert.match(dashboard, /id=\{`region-\$\{region\.id\}`\}/);
+  assert.match(dashboard, /completed-summary/);
+  assert.match(dashboard, /world-lock-preview/);
   assert.match(dashboard, /world-landmark/);
   assert.match(dashboard, /getRegionLandmark/);
   assert.match(landmarks, /grade7RegionLandmarks/);
@@ -1085,11 +1087,10 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.topic-icon-xl/);
   assert.match(css, /\.learning-loop-grid/);
   assert.match(css, /\.feedback-celebration/);
-  assert.match(css, /\.quest-tracker/);
-  assert.match(css, /\.quest-milestone/);
-  assert.match(css, /\.quest-milestone\.milestone-near/);
-  assert.match(css, /\.quest-milestone\.milestone-memory/);
-  assert.match(css, /\.quest-landmark/);
+  assert.match(css, /\.mission-primary-cta/);
+  assert.match(css, /\.dashboard-grid\.mission-only/);
+  assert.match(css, /\.world-card\.completed-summary/);
+  assert.match(css, /\.world-lock-preview/);
   assert.match(css, /\.percent-context-grid/);
   assert.match(css, /\.scatter-model/);
   assert.match(css, /\.distribute-context-model/);
@@ -1248,8 +1249,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /\.achievement-grid/);
   assert.match(css, /\.achievement-badge/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.achievement-grid/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-tracker/);
-  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.quest-milestone strong \{ font-size: 16px/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.mission-primary-cta \{ width: 100%; min-height: 62px/);
+  assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.world-card\.completed-summary \{ grid-template-columns: 1fr/);
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.welcome-route/);
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.game-quest-path/);
   assert.match(css, /@media \(max-width: 380px\)[\s\S]*\.hero-float-practice/);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
@@ -19,6 +19,7 @@ export function GoogleSignIn({ clientId, compact = false }: { clientId: string; 
   const buttonId = "google-sign-in-button";
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [status, setStatus] = useState("");
+  const authPending = useRef(false);
 
   useEffect(() => {
     if (!clientId || !ageConfirmed) return;
@@ -30,15 +31,30 @@ export function GoogleSignIn({ clientId, compact = false }: { clientId: string; 
         client_id: clientId,
         use_fedcm_for_prompt: true,
         callback: async ({ credential }) => {
+          if (authPending.current) return;
+          authPending.current = true;
           setStatus("Creating your anonymous trail…");
-          const response = await fetch("/api/auth/google", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ credential, ageConfirmed: true, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
-          });
-          const body = await response.json() as { error?: string };
-          if (!response.ok) setStatus(body.error ?? "Sign-in did not work. Please try again.");
-          else window.location.assign("/learn");
+          element.setAttribute("aria-busy", "true");
+          element.style.pointerEvents = "none";
+          try {
+            const response = await fetch("/api/auth/google", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ credential, ageConfirmed: true, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+            });
+            const body = await response.json() as { error?: string };
+            if (!response.ok) {
+              setStatus(body.error ?? "Sign-in did not work. Please try again.");
+              authPending.current = false;
+              element.removeAttribute("aria-busy");
+              element.style.pointerEvents = "";
+            } else window.location.assign("/learn");
+          } catch {
+            setStatus("Sign-in did not work. Check your connection and try again.");
+            authPending.current = false;
+            element.removeAttribute("aria-busy");
+            element.style.pointerEvents = "";
+          }
         },
       });
       window.google.accounts.id.renderButton(element, {

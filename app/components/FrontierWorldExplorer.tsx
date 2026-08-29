@@ -40,7 +40,7 @@ export function FrontierWorldExplorer() {
       <div className="frontier-active-mission" key={activeWorld.id}>
         <div><small>{activeWorld.kicker}</small><strong>{activeWorld.worldName}</strong></div>
         <p><b>{activeWorld.missionLabel}:</b> {activeWorld.mission}</p>
-        <a href={activeWorld.href}>{activeWorld.cta} <span aria-hidden="true">↗</span></a>
+        <span className="frontier-mission-ready"><i aria-hidden="true">◆</i> Mission ready</span>
       </div>
 
       <div className="frontier-world-switcher" id="worlds" aria-label="Choose an expedition world">

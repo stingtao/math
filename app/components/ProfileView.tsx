@@ -19,6 +19,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const [busyFrame, setBusyFrame] = useState("");
   const [frameCelebrationKey, setFrameCelebrationKey] = useState("");
   const [busyTheme, setBusyTheme] = useState("");
+  const [busyAction, setBusyAction] = useState("");
   if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR PRIVATE BASE" title="Loading your base…" detail="Your codename, world, and milestones are almost ready." />;
   if (!state || error) return <LearningSignInGate glyph="✦" kicker="YOUR BASE IS PRIVATE" title="Sign in to open your base." detail="Only you can see your settings, rewards, and learning milestones." />;
   const activeState = state;
@@ -35,29 +36,46 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
 
   async function action(payload: Record<string, unknown>) {
     if (demo) return null;
-    const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify(payload) });
-    const body = await response.json() as { state?: LearnerState; error?: string };
-    if (body.state) setState(body.state);
-    setMessage(response.ok ? "Saved." : body.error ?? "That change could not be saved.");
-    return response.ok;
+    try {
+      const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify(payload) });
+      const body = await response.json() as { state?: LearnerState; error?: string };
+      if (body.state) setState(body.state);
+      setMessage(response.ok ? "Saved." : body.error ?? "That change could not be saved.");
+      return response.ok;
+    } catch {
+      setMessage("That change could not be saved. Check your connection and try again.");
+      return false;
+    }
   }
 
   async function reroll() {
-    if (demo) {
-      if (activeState.profile.rerollUsed) { setMessage("Your free identity reroll has already been used."); return; }
-      const next: LearnerState = { ...activeState, profile: { ...activeState.profile, nickname: "NimbleOrbit731", avatar: { ...activeState.profile.avatar, glyph: "orbit", tone: "violet" }, rerollUsed: true } };
-      saveDemoState(next); setState(next); setMessage("Your new anonymous identity is ready."); return;
+    if (busyAction) return;
+    setBusyAction("reroll");
+    try {
+      if (demo) {
+        if (activeState.profile.rerollUsed) { setMessage("Your free identity reroll has already been used."); return; }
+        const next: LearnerState = { ...activeState, profile: { ...activeState.profile, nickname: "NimbleOrbit731", avatar: { ...activeState.profile.avatar, glyph: "orbit", tone: "violet" }, rerollUsed: true } };
+        saveDemoState(next); setState(next); setMessage("Your new anonymous identity is ready."); return;
+      }
+      await action({ action: "reroll" });
+    } finally {
+      setBusyAction("");
     }
-    await action({ action: "reroll" });
   }
 
   async function toggleLeaderboard() {
+    if (busyAction) return;
+    setBusyAction("leaderboard");
     const enabled = !activeState.profile.leaderboardOptIn;
-    if (demo) {
-      const next: LearnerState = { ...activeState, profile: { ...activeState.profile, leaderboardOptIn: enabled } };
-      saveDemoState(next); setState(next); setMessage(enabled ? "You joined the anonymous weekly league." : "You left the public league."); return;
+    try {
+      if (demo) {
+        const next: LearnerState = { ...activeState, profile: { ...activeState.profile, leaderboardOptIn: enabled } };
+        saveDemoState(next); setState(next); setMessage(enabled ? "You joined the anonymous weekly league." : "You left the public league."); return;
+      }
+      await action({ action: "leaderboard", enabled });
+    } finally {
+      setBusyAction("");
     }
-    await action({ action: "leaderboard", enabled });
   }
 
   async function buyFrame(frameSpec: (typeof avatarFrameCatalog)[number]) {
@@ -118,7 +136,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         <div className={`profile-hero profile-command-deck theme-${world.id}`}>
           <div className="profile-world-art" style={{ backgroundPosition: world.atlasPosition }} aria-hidden="true"><span>{world.motif}</span><i /><i /><i /></div>
           <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()}</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p></div></div>
-          <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${demo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed} onClick={reroll}>{state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
+          <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${demo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed || Boolean(busyAction)} aria-busy={busyAction === "reroll"} onClick={reroll}>{busyAction === "reroll" ? "Rerolling…" : state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
         <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>{journey.stage}</strong><small>{world.levelLabel}</small></article><article><span>◆</span><strong>{state.totalXp}</strong><small>XP power</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article></div>
 
@@ -162,7 +180,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
           </section>
           <aside className="privacy-settings-card">
             <span className="section-kicker">PRIVACY CONTROLS</span><h2>Choose what leaves your base.</h2>
-            <div className="setting-row"><div><strong>Anonymous weekly league</strong><p>If you join, only your codename, avatar, rank, and weekly XP appear.</p></div><button className={`toggle ${state.profile.leaderboardOptIn ? "on" : ""}`} type="button" aria-pressed={state.profile.leaderboardOptIn} onClick={toggleLeaderboard}><span /></button></div>
+            <div className="setting-row"><div><strong>Anonymous weekly league</strong><p>If you join, only your codename, avatar, rank, and weekly XP appear.</p></div><button className={`toggle ${state.profile.leaderboardOptIn ? "on" : ""}`} type="button" aria-pressed={state.profile.leaderboardOptIn} aria-busy={busyAction === "leaderboard"} disabled={Boolean(busyAction)} onClick={toggleLeaderboard}><span /></button></div>
             <div className="setting-row static"><div><strong>Google profile data</strong><p>Name, email, and photo are never saved.</p></div><span className="safe-chip">Not stored</span></div>
             <div className="setting-row static"><div><strong>Public profile and search</strong><p>No profile page, searchable ID, or public history exists.</p></div><span className="safe-chip">Off</span></div>
             <a className="text-link" href="/privacy">Read the full privacy promise</a>

@@ -24,21 +24,26 @@ export function FeedbackBoard() {
     event.preventDefault();
     if (busy || message.trim().length < 3) return;
     setBusy(true); setStatus("");
-    const response = await fetch("/api/feedback", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ message, website: "" }) });
-    const body = await response.json() as { error?: string };
-    if (response.ok) { setMessage(""); setStatus("Posted with a new random name. Thanks for helping improve Math."); await load(); }
-    else setStatus(body.error ?? "That note did not post. Try again.");
-    setBusy(false);
+    try {
+      const response = await fetch("/api/feedback", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ message, website: "" }) });
+      const body = await response.json() as { error?: string };
+      if (response.ok) { setMessage(""); setStatus("Posted with a new random name. Thanks for helping improve Math."); await load(); }
+      else setStatus(body.error ?? "That note did not post. Try again.");
+    } catch {
+      setStatus("That note did not post. Check your connection and try again.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return <main className="site-shell feedback-page">
     <PublicHeader />
     <section className="feedback-wrap">
       <header><span className="eyebrow">FEEDBACK</span><h1>What should feel clearer?</h1><p>Tell us what felt confusing, wrong, or missing. Posts use a random name.</p></header>
-      <form className="feedback-form" onSubmit={submit}>
+      <form className="feedback-form" onSubmit={submit} aria-busy={busy}>
         <label><span>Your suggestion</span><textarea maxLength={600} rows={5} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Which step felt confusing? What example or change would help?" /></label>
         <input className="feedback-honeypot" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-        <div><small>{message.length}/600 · Do not include personal or contact details.</small><button className="primary-button" type="submit" disabled={busy || message.trim().length < 3}>{busy ? "Posting…" : "Post feedback"}</button></div>
+        <div><small>{message.length}/600 · Do not include personal or contact details.</small><button className="primary-button" type="submit" disabled={busy || message.trim().length < 3} aria-busy={busy}>{busy ? "Posting…" : "Post feedback"}</button></div>
         {status && <p className="signin-status" aria-live="polite">{status}</p>}
       </form>
       <section className="feedback-list" aria-live="polite">

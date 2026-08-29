@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Avatar } from "./Avatar";
 import type { LearnerState } from "@/lib/learner-state";
 import { getThemeJourney, getThemeSpec } from "@/lib/themes";
@@ -40,6 +40,7 @@ export function PublicHeader() {
 
 export function LearnerHeader({ state, demo }: { state: LearnerState; demo: boolean }) {
   const pathname = usePathname();
+  const [loggingOut, setLoggingOut] = useState(false);
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = state.profile.theme;
@@ -53,8 +54,14 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
   const world = getThemeSpec(state.profile.theme);
   const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
   async function logout() {
-    if (!demo) await fetch("/api/auth/logout", { method: "POST" });
-    window.location.assign("/");
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      if (!demo) await fetch("/api/auth/logout", { method: "POST" });
+      window.location.assign("/");
+    } catch {
+      setLoggingOut(false);
+    }
   }
   return (
     <>
@@ -73,7 +80,7 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
             <Avatar avatar={state.profile.avatar} size="sm" />
             <span>{state.profile.nickname}</span>
           </a>
-          <button className="icon-button logout-button" onClick={logout} type="button" aria-label="Sign out">↗</button>
+          <button className="icon-button logout-button" onClick={logout} type="button" disabled={loggingOut} aria-busy={loggingOut} aria-label={loggingOut ? "Signing out" : "Sign out"}>{loggingOut ? "…" : "↗"}</button>
         </div>
       </header>
       <aside className={`theme-world-hud theme-${world.id}`} aria-label={`Current learning world: ${world.worldName}`}>
