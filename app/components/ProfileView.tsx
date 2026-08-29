@@ -19,8 +19,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const [busyFrame, setBusyFrame] = useState("");
   const [frameCelebrationKey, setFrameCelebrationKey] = useState("");
   const [busyTheme, setBusyTheme] = useState("");
-  if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR PRIVATE BASE" title="Loading your anonymous profile…" detail="Your trail identity, frames, and private milestones are almost ready." />;
-  if (!state || error) return <LearningSignInGate glyph="✦" kicker="YOUR PROFILE IS PRIVATE" title="Sign in to view your profile." detail="Your anonymous identity and learning milestones are visible only to you." />;
+  if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR PRIVATE BASE" title="Loading your base…" detail="Your codename, world, and milestones are almost ready." />;
+  if (!state || error) return <LearningSignInGate glyph="✦" kicker="YOUR BASE IS PRIVATE" title="Sign in to open your base." detail="Only you can see your settings, rewards, and learning milestones." />;
   const activeState = state;
   const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
   const achievementValues = { lessons: state.completedLessons.length, stars: totalStars, bosses: state.clearedBosses.length, streak: state.profile.longestStreak };
@@ -118,15 +118,15 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
       <section className="profile-wrap">
         <div className={`profile-hero profile-command-deck theme-${world.id}`}>
           <div className="profile-world-art" style={{ backgroundPosition: world.atlasPosition }} aria-hidden="true"><span>{world.motif}</span><i /><i /><i /></div>
-          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()} · PRIVATE SAVE</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p><div className="profile-world-tags"><span>{world.worldName}</span><span>{journey.status}</span><span>Anonymous · no real name</span></div></div></div>
-          <div className="profile-current-mission"><small>CURRENT MISSION</small><strong>{journey.headline}</strong><p>Next: {world.missionFocus}.</p><div><a className="primary-button" href={`/learn${demo ? "?demo=1" : ""}`}>Resume adventure <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed} onClick={reroll}>{state.profile.rerollUsed ? "ID reroll used" : "Reroll private ID"}</button></div></div>
+          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()} · PRIVATE SAVE</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p><div className="profile-world-tags"><span>{world.worldName}</span><span>{journey.status}</span><span>Codename only</span></div></div></div>
+          <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${demo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed} onClick={reroll}>{state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
         <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>{journey.stage}</strong><small>{world.levelLabel}</small></article><article><span>◆</span><strong>{state.totalXp}</strong><small>XP power</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article></div>
 
-        <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">{world.motif}<i /></span><div><small>{world.badgeLabel.toUpperCase()}</small><strong>Open your private collection</strong><p>{state.badges.correctAnswers % 10}/10 answers toward the next trophy</p></div><b>{state.badges.earnedIds.length}<small> / 500</small></b><i aria-hidden="true">→</i></a>
+        <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">{world.motif}<i /></span><div><small>{world.badgeLabel.toUpperCase()}</small><strong>Open your badge vault</strong><p>Next trophy: {state.badges.correctAnswers % 10}/10 answer credits</p></div><b>{state.badges.earnedIds.length}<small> / 500</small></b><i aria-hidden="true">→</i></a>
 
         <section className="theme-studio" aria-labelledby="theme-studio-heading">
-          <header><div><span className="section-kicker">WORLD SELECT</span><h2 id="theme-studio-heading">Choose your next adventure.</h2><p>Story and scenery change. Math progress stays.</p></div><span className="safe-chip">Private setting</span></header>
+          <header><div><span className="section-kicker">WORLD SELECT</span><h2 id="theme-studio-heading">Change the world, not your progress.</h2><p>Pick a new story. Every cleared lesson stays cleared.</p></div><span className="safe-chip">Private setting</span></header>
           <div className="theme-grid" role="radiogroup" aria-label="Choose a visual theme">
             {themeCatalog.map((theme) => {
               const selected = state.profile.theme === theme.id;
@@ -149,7 +149,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         <div className="profile-grid">
           <section className="locker-card">
             <header><div><span className="section-kicker">{world.baseName.toUpperCase()} · COSMETICS</span><h2>Avatar loadout</h2></div><span className="token-balance">◆ {state.profile.trailTokens} tokens</span></header>
-            <p>Unlock once. Equip anytime.</p>
+            <p>Earn with tokens. Equip anytime. No skill boost attached.</p>
             {nextFrame ? <div className={`locker-goal ${nextFrameNeeded === 0 ? "ready" : ""}`}>
               <Avatar avatar={{ ...state.profile.avatar, frame: nextFrame.id }} size="md" label={`${nextFrame.label} preview`} />
               <div><small>{nextFrameNeeded === 0 ? "READY TO UNLOCK" : "NEXT COLLECTION GOAL"}</small><strong>{nextFrame.label}</strong><p>{nextFrameNeeded === 0 ? `You have enough tokens. Unlock it below.` : `${nextFrameNeeded} more ${nextFrameNeeded === 1 ? "token" : "tokens"} to make it yours forever.`}</p><span className="locker-goal-meter" role="progressbar" aria-label={`${nextFrame.label} token progress`} aria-valuemin={0} aria-valuemax={nextFrame.cost} aria-valuenow={Math.min(state.profile.trailTokens, nextFrame.cost)}><i style={{ width: `${nextFrameProgress}%` }} /></span></div>
@@ -165,8 +165,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
             <footer className="locker-promise"><span aria-hidden="true">◇</span><p><strong>{ownedFrames.size} of {avatarFrameCatalog.length} collected.</strong> Frames are private cosmetics; they never affect XP, lessons, or leaderboard rank.</p></footer>
           </section>
           <aside className="privacy-settings-card">
-            <span className="section-kicker">PRIVACY CONTROLS</span><h2>You decide what is public.</h2>
-            <div className="setting-row"><div><strong>Anonymous weekly league</strong><p>Show only this random avatar, nickname, rank, and weekly XP.</p></div><button className={`toggle ${state.profile.leaderboardOptIn ? "on" : ""}`} type="button" aria-pressed={state.profile.leaderboardOptIn} onClick={toggleLeaderboard}><span /></button></div>
+            <span className="section-kicker">PRIVACY CONTROLS</span><h2>Choose what leaves your base.</h2>
+            <div className="setting-row"><div><strong>Anonymous weekly league</strong><p>If you join, only your codename, avatar, rank, and weekly XP appear.</p></div><button className={`toggle ${state.profile.leaderboardOptIn ? "on" : ""}`} type="button" aria-pressed={state.profile.leaderboardOptIn} onClick={toggleLeaderboard}><span /></button></div>
             <div className="setting-row static"><div><strong>Google profile data</strong><p>Name, email, and photo are never saved.</p></div><span className="safe-chip">Not stored</span></div>
             <div className="setting-row static"><div><strong>Public profile and search</strong><p>No profile page, searchable ID, or public history exists.</p></div><span className="safe-chip">Off</span></div>
             <a className="text-link" href="/privacy">Read the full privacy promise</a>
@@ -174,7 +174,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         </div>
 
         <section className="account-settings">
-          <div><span className="section-kicker">ACCOUNT</span><h2>Keep control of your trail.</h2><p>Sign out on this device, or permanently remove lessons, attempts, rewards, league entries, and sessions.</p></div>
+          <div><span className="section-kicker">ACCOUNT</span><h2>Your data stays under your control.</h2><p>You can permanently remove progress, rewards, league entries, and active sessions.</p></div>
           <button className="danger-button" type="button" onClick={() => setDeleteOpen(true)}>Delete my account</button>
         </section>
         {message && <div className="toast-message" role="status">{message}</div>}

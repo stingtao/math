@@ -32,27 +32,27 @@ export default function LinearGraphsLabPage() {
     <main className="site-shell graph-lab-page">
       <PublicHeader />
       <section className="graph-lab-hero">
-        <div><span className="eyebrow">OPEN MATH LAB · GRADES 7–12</span><h1>Make a line.<br />See what every number does.</h1><p>Plot points, connect a line, then type an equation and watch every representation change together. No sign-in, timer, score, or saved input.</p><div className="graph-lab-hero-actions"><a className="primary-button" href="#point-mission">Build a line from points <span aria-hidden="true">↓</span></a><a className="text-link" href="#live-graph">Open equation lab</a></div></div>
+        <div><span className="eyebrow">OPEN MATH LAB · GRADES 7–12</span><h1>Draw the line.<br />Decode the rule.</h1><p>Plot points, connect the pattern, then change an equation and watch the graph respond. No sign-in, timer, score, or saved input.</p><div className="graph-lab-hero-actions"><a className="primary-button" href="#point-mission">Start with five points <span aria-hidden="true">↓</span></a><a className="text-link" href="#live-graph">Type an equation instead</a></div></div>
         <div className="graph-lab-formula" aria-label="In y equals m x plus b, m is the slope and b is the y-intercept"><span>y</span><i>=</i><span className="graph-formula-term"><strong>m</strong><small>slope</small></span><b>x</b><i>+</i><span className="graph-formula-term"><em>b</em><small>y-intercept</small></span></div>
       </section>
 
       <section className="public-point-mission" id="point-mission" aria-labelledby="point-mission-heading">
-        <header><span className="section-kicker">PLOT · CONNECT · DECODE</span><h2 id="point-mission-heading">Build y = 2x with your own points.</h2><p>Start with (0, 0), then place (1, 2), (2, 4), (3, 6), and (4, 8). Connect the pattern and read coordinates back from the finished line.</p></header>
+        <header><span className="section-kicker">PLOT · CONNECT · DECODE</span><h2 id="point-mission-heading">Turn five points into y = 2x.</h2><p>Place each ordered pair. Connect the pattern. Then read coordinates back from the line you built.</p></header>
         <PointToLineMission />
       </section>
 
       <section className="public-linear-lab" id="live-graph" aria-labelledby="live-graph-heading">
-        <header><span className="section-kicker">CHANGE · NOTICE · EXPLAIN</span><h2 id="live-graph-heading">Start with y = 2x.</h2><p>Then try a negative slope, a decimal slope, or a different y-intercept. The graph, explanation, and point table update together.</p></header>
+        <header><span className="section-kicker">CHANGE · NOTICE · EXPLAIN</span><h2 id="live-graph-heading">Type y = 2x. Then break the pattern.</h2><p>Try a negative slope, decimal slope, or new intercept. The line, point table, and explanation update together.</p></header>
         <LinearGraphLab initialEquation="y=2x" examples={guidedChallenges.map((challenge) => challenge.equation)} />
       </section>
 
       <section className="graph-lab-challenges" aria-labelledby="graph-challenges-heading">
-        <header><span className="section-kicker">GUIDED INVESTIGATIONS</span><h2 id="graph-challenges-heading">Six changes worth noticing.</h2><p>Enter each equation above, predict first, then open the check. Explaining the change matters more than finishing quickly.</p></header>
+        <header><span className="section-kicker">SIX QUICK TESTS</span><h2 id="graph-challenges-heading">Predict first. Check second.</h2><p>Try each equation above. Say what you expect the line to do, then open the reasoning.</p></header>
         <div>{guidedChallenges.map((challenge) => <article key={challenge.number}><span>{challenge.number}</span><code>{challenge.equation}</code><h3>{challenge.title}</h3><p>{challenge.prompt}</p><details><summary>Check my reasoning</summary><div>{challenge.check}</div></details></article>)}</div>
       </section>
 
       <section className="graph-lab-connections" aria-labelledby="grade-connections-heading">
-        <header><span className="section-kicker">ONE TOOL · SIX GRADE PATHS</span><h2 id="grade-connections-heading">The idea grows with you.</h2></header>
+        <header><span className="section-kicker">ONE TOOL · SIX GRADE PATHS</span><h2 id="grade-connections-heading">This line keeps showing up.</h2></header>
         <div>{gradeConnections.map((item) => <article className={`accent-${item.accent}`} key={item.grade}><TopicIcon visual={item.visual} accent={item.accent} size="md" label="" /><span>GRADE {item.grade}</span><h3>{item.title}</h3><p>{item.copy}</p><code>{item.equation}</code></article>)}</div>
         <footer><span aria-hidden="true">◇</span><p><strong>Private by default.</strong> Equations entered here remain in this browser tab and are never connected to an account, lesson history, or leaderboard.</p></footer>
       </section>

@@ -113,7 +113,7 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
     <section className={`point-line-mission ${compact ? "compact" : ""}`} aria-labelledby={`${missionId}-title`}>
       {phase === "complete" && <SuccessBurst eventKey={`${missionId}-point-line-complete`} />}
       <header className="point-line-heading">
-        <div><small>GRAPH TRAIL · 2-PART MISSION</small><strong id={`${missionId}-title`}>Turn points into a line. Then decode the line.</strong><p>Place coordinates in order, connect the pattern, and read coordinates back from the finished graph.</p></div>
+        <div><small>GRAPH MISSION · THREE MOVES</small><strong id={`${missionId}-title`}>Plot. Connect. Decode.</strong><p>Build one line from coordinates, then prove you can read it.</p></div>
         <div className="point-line-charge" aria-label={`Mission charge ${progress} percent`}><span><i style={{ width: `${progress}%` }} /></span><b>{progress}%</b><small>SKILL CHARGE</small></div>
       </header>
 
@@ -152,14 +152,14 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
               </g>;
             })}
           </svg>
-          <p>Each plotted point is numbered and labelled. From point 2 onward, the dashed trace grows one segment at a time. Keyboard users can enter the same coordinate beside the graph.</p>
+          <p>Each point gets a number and coordinate label. The dashed route grows after every correct plot.</p>
         </div>
 
         <aside className="point-line-task">
           {phase === "plot" && activePlot && <>
             <span className="point-line-kicker">POINT {plotted.length + 1} OF {pointToLineTargets.length}</span>
             <h3>Plot <code>{pointText(activePlot)}</code></h3>
-            <p>Move <strong>{activePlot.x}</strong> across on x, then <strong>{activePlot.y}</strong> up on y.</p>
+            <p>Move <strong>{activePlot.x}</strong> across the x-axis, then <strong>{activePlot.y}</strong> on the y-axis.</p>
             <div className="point-line-coordinate-inputs">
               <label><span>x</span><select value={xValue} onChange={(event) => setXValue(event.target.value)}>{xTicks.map((value) => <option key={value}>{value}</option>)}</select></label>
               <label><span>y</span><select value={yValue} onChange={(event) => setYValue(event.target.value)}>{yTicks.map((value) => <option key={value}>{value}</option>)}</select></label>
@@ -169,13 +169,13 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
           {phase === "connect" && <>
             <span className="point-line-kicker">PATTERN FOUND</span>
             <h3>Five points are ready.</h3>
-            <p>Each time x grows by 1, y grows by 2. Confirm the dashed point-to-point trace to reveal one straight relationship.</p>
+            <p>When x increases by 1, y increases by 2. Connect the route to reveal the line.</p>
             <button className="primary-button" type="button" onClick={connectPoints}>Connect my points <span aria-hidden="true">↗</span></button>
           </>}
           {phase === "read" && activeRead && <>
             <span className="point-line-kicker">DECODE {readIndex + 1} OF {coordinateReadTargets.length}</span>
             <h3>Read the gold point.</h3>
-            <p>Trace down for x and left for y. Enter the ordered pair.</p>
+            <p>Trace to each axis, then enter the ordered pair.</p>
             <div className="point-line-coordinate-inputs read-inputs">
               <label><span>x</span><input aria-label="x coordinate" value={xValue} inputMode="numeric" onChange={(event) => setXValue(event.target.value)} /></label>
               <label><span>y</span><input aria-label="y coordinate" value={yValue} inputMode="numeric" onChange={(event) => setYValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") checkReadPoint(); }} /></label>
@@ -184,8 +184,8 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
           </>}
           {phase === "complete" && <>
             <span className="point-line-kicker">MISSION COMPLETE · +1 SKILL</span>
-            <h3>Points, line, rule—connected.</h3>
-            <p>You built y = 2x from points and decoded three coordinates from the finished line.</p>
+            <h3>You built and decoded the line.</h3>
+            <p>Five points became y = 2x, and you read three coordinates back from it.</p>
             <button className="secondary-button" type="button" onClick={resetMission}>Play again <span aria-hidden="true">↻</span></button>
           </>}
           <div className={`point-line-feedback ${phase === "complete" ? "complete" : ""}`} role="status" aria-live="polite"><span aria-hidden="true">{phase === "complete" ? "✓" : "◇"}</span><p>{feedback}</p></div>

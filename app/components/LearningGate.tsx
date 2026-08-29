@@ -38,8 +38,8 @@ export function LearningSignInGate({ glyph, kicker, title, detail }: LearningSig
         <span className="section-kicker">{kicker}</span>
         <h1>{title}</h1>
         <p>{detail}</p>
-        <a className="primary-button" href="/#join">Continue with Google <span aria-hidden="true">→</span></a>
-        <small>Your Google name, email, and photo never appear on your learning trail.</small>
+        <a className="primary-button" href="/#join">Sign in and keep going <span aria-hidden="true">→</span></a>
+        <small>Your trail uses a random codename. Your Google name, email, and photo stay off the site.</small>
       </div>
     </main>
   );

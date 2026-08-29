@@ -39,31 +39,39 @@ Keep missions inside a 6–8 minute expectation. Corrections can recover points.
 - Put math into routes, structures, patterns, and decisions instead of floating decorative formulas.
 - Keep visible text in HTML. Generated art contains no words or UI.
 - Only the active hero is eager-loaded. World cards are lazy-loaded and use compressed WebP assets.
-- All visible CSS type remains within 14–34px; hierarchy comes from composition, density, contrast, and whitespace.
+- All visible CSS type remains within 16–34px; hierarchy comes from composition, density, contrast, and whitespace.
 - Motion uses opacity and transform, remains subtle, and stops under `prefers-reduced-motion`.
 - Public world selection stays in memory only; it adds no identity, cookie, local storage, or tracking.
 
 ## Generated art assets and final prompts
 
-Mode: built-in `image_gen`.
+Mode: built-in `image_gen`, using style transfer from the original world compositions.
+
+Shared visual contract: clean contemporary graphic-novel art for American high school students; confident dark-navy linework, flat color blocks, minimal cel shading, simplified backgrounds, and generous quiet space for HTML copy. Preserve the subject and composition of the reference image. Do not add words, logos, UI, equations, watermarks, photorealism, glossy 3D rendering, noisy gradients, or decorative clutter.
 
 ### Mars Command
 
-Asset: `public/visuals/frontier-mars-v1.webp`
+Asset: `public/visuals/frontier-mars-comic-v2.webp`
 
-Prompt: “Create a cinematic premium editorial illustration for a math learning adventure homepage, wide landscape 16:9. Scene: a teenage expedition crew viewed from behind on a high observation deck overlooking the first thriving human city on Mars at dawn. Elegant red-orange canyons, pressurized glass habitats, a rover route drawn through the terrain, solar arrays, distant launch tower, subtle geometric and coordinate-grid motifs integrated into architecture (not floating formulas). The mood is ambitious, intelligent, adventurous, credible, and cool for American high school students—not childish, not a school textbook. Visual language: stylized 3D concept art with crisp architectural silhouettes, sophisticated deep navy, rust orange, electric cyan highlights, soft cinematic atmosphere, premium game key art. Leave clean darker negative space at upper left for webpage copy. No text, no logos, no UI, no equations, no watermarks.”
+Prompt: “Apply the shared graphic-novel contract. Keep the teen explorers looking from the ridge toward the Mars settlement, its rover route, domes, and open sky. Use restrained terracotta, coral, sand, navy, and teal color blocks. Make the destination bold and readable at a glance.”
 
 ### Deepglass City
 
-Asset: `public/visuals/frontier-deepglass-v1.webp`
+Asset: `public/visuals/frontier-deepglass-comic-v2.webp`
 
-Prompt: “Create cinematic premium game key art for a math learning adventure homepage, wide landscape 16:9. Scene: a diverse teenage engineering crew inside a glass observation tunnel overlooking a vast luminous underwater city named Deepglass, built into a deep ocean trench. Huge curved pressure gates, modular towers, bioluminescent gardens, a manta ray gliding above, current-map paths and elegant geometric structure embedded naturally into the city. Feeling: daring, intelligent, mysterious, aspirational, and cool for American high school students; not childish, not cartoon school art. Visual language: polished stylized 3D concept art, deep indigo and teal, aqua light, small coral-orange highlights, cinematic depth, premium strategy adventure game. Leave clean darker negative space at upper left for webpage copy. No text, no logos, no UI, no equations, no watermarks.”
+Prompt: “Apply the shared graphic-novel contract. Keep the teen explorers in the observation tunnel facing the underwater city, manta ray, current routes, and geometric architecture. Use deep ocean navy, turquoise, aqua, and restrained coral accents.”
 
 ### Aurora Wilds
 
-Asset: `public/visuals/frontier-aurora-v1.webp`
+Asset: `public/visuals/frontier-aurora-comic-v2.webp`
 
-Prompt: “Create cinematic premium game key art for a math learning adventure homepage, wide landscape 16:9. Scene: a diverse teenage exploration crew on a black volcanic ridge at the edge of an unmapped alien wilderness under immense violet-green aurora ribbons. A mysterious geometric signal pulses from a distant crystalline observatory, with glowing path nodes and constellation-like patterns leading beyond the known map. The environment combines dark evergreen forms, obsidian terrain, mist, and otherworldly light. Feeling: bold, mysterious, intelligent, aspirational, cool for American high school students; not fantasy cliché, not childish, not school art. Visual language: polished stylized 3D concept art, charcoal black, deep forest, ultraviolet purple and aurora green, cinematic depth, premium sci-fi exploration game. Leave clean darker negative space at upper left for webpage copy. No text, no logos, no UI, no equations, no watermarks.”
+Prompt: “Apply the shared graphic-novel contract. Keep the explorers on the dark ridge approaching the crystal signal, route nodes, and aurora wilderness. Use ink navy, violet, mint, lavender, and small amber accents.”
+
+### World atlas
+
+Asset: `public/visuals/theme-worlds-atlas-comic-v2.webp`
+
+Prompt: “Apply the shared graphic-novel contract to exactly five equal vertical panels: abstract geometry, Mars exploration, a bright future city garden, an underwater city, and an aurora wilderness. Give each panel one clear focal point and a restrained matching palette; keep the full strip calm enough to sit behind interface copy.”
 
 ## Future iteration hooks
 

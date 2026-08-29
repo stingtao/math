@@ -6,7 +6,7 @@ export function LegalPage({ kind }: { kind: "privacy" | "terms" }) {
     <main className="site-shell legal-page">
       <PublicHeader />
       <article className="legal-wrap">
-        <header><span className="eyebrow">PLAIN ENGLISH · VERSION 1.3</span><h1>{privacy ? "Privacy should be easy to understand." : "Simple rules for a calm learning space."}</h1><p>{privacy ? "Math is designed so even its maker cannot connect a real Google profile with learning progress." : "These terms explain the boundaries of the Grades 7–12 learning service."}</p></header>
+        <header><span className="eyebrow">PLAIN ENGLISH · VERSION 1.3</span><h1>{privacy ? "Your progress should not reveal who you are." : "Clear rules. No legal maze."}</h1><p>{privacy ? "Math keeps Google profile details separate from your anonymous learning trail." : "Here is what you can expect from Math—and what the site expects from learners."}</p></header>
         {privacy ? <PrivacyCopy /> : <TermsCopy />}
         <footer><p>Last updated: August 29, 2026</p><a className="primary-button" href="/">Return home <span>→</span></a></footer>
       </article>

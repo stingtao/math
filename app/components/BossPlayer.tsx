@@ -107,7 +107,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const trailUrl = `/learn?grade=${region.grade}${demo ? "&demo=1" : ""}`;
   const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${demo ? "&demo=1" : ""}` : `/learn/${nextRegion.lessons[0].slug}?grade=${region.grade}${demo ? "&demo=1" : ""}`;
   const trailRegionUrl = nextRegion ? `${trailUrl}#region-${nextRegion.id}` : trailUrl;
-  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Four lessons come first.</h1><p>Finish this region, then return for the mixed check.</p><a className="primary-button" href={trailUrl}>Back to Grade {region.grade} <span>→</span></a></section></main>;
+  if (!unlocked) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">★</span><span className="section-kicker">BOSS LOCKED</span><h1>Clear all four lessons first.</h1><p>The five-question challenge opens after the last lesson.</p><a className="primary-button" href={trailUrl}>Show my next lesson <span>→</span></a></section></main>;
 
   function applyAttempt(attempt: Partial<BossAttempt>) {
     if (attempt.attemptId) setAttemptId(attempt.attemptId);
@@ -347,8 +347,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <span aria-hidden="true">♥</span>
         </div>
         <span className="section-kicker">REPAIR COMPLETE · 2 OF 2</span>
-        <h1>All three hearts restored.</h1>
-        <p>You corrected the idea. The boss restarts at question 1 with no XP lost.</p>
+        <h1>Hearts full. Method repaired.</h1>
+        <p>You fixed the skill. Restart at question 1 with no XP lost.</p>
         <div className="restored-hearts" aria-label="Three hearts restored">♥♥♥</div>
         <div className="repair-restored-path" aria-label="Both repairs complete and three hearts ready">
           <span><b>✓</b> Repair 1</span><i /><span><b>✓</b> Repair 2</span><i /><strong>♥♥♥ Ready</strong>
@@ -366,8 +366,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       <section className="repair-card" aria-busy={busy}>
         <div className="repair-emblem"><TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="lg" label={`${repairLesson.title} repair`} /><span aria-hidden="true">◇</span></div>
         <span className="section-kicker">2-QUESTION REPAIR</span>
-        <h1>Fix the idea. Try again.</h1>
-        <p>No XP lost. Answer two focused questions to refill all three hearts.</p>
+        <h1>Repair the skill. Refill your hearts.</h1>
+        <p>Answer two focused questions. Your XP and cleared work stay safe.</p>
         <div className="repair-progress" role="progressbar" aria-label={`${repair} of 2 repair questions complete`} aria-valuemin={0} aria-valuemax={2} aria-valuenow={repair}><span className={repair > 0 ? "done" : "active"}>{repair > 0 ? "✓" : "1"}</span><i /><span className={repair > 0 ? "active" : "locked"}>2</span><b>Complete both <em>→</em> ♥♥♥</b></div>
         {repairCheckpoint && <div className="repair-checkpoint" role="status"><span aria-hidden="true">✓</span><div><strong>First repair locked in.</strong><p>One more answer restores ♥♥♥.</p></div></div>}
         <div className="repair-question">
@@ -388,9 +388,9 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       <LearnerHeader state={state} demo={demo} />
       <div className="boss-topbar"><a href={trailUrl}>← Leave</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
-        <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF 5</span><h1>{region.title}</h1><p>No timer. Correct each answer to continue.</p></div></div>
+        <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF 5</span><h1>{region.title}</h1><p>Five links. No timer. Every miss can be repaired.</p></div></div>
         <div className="boss-connection-map" aria-label={`${connectedLinks} of 5 boss connections complete`}>
-          <header><div><span>CONNECTION MAP</span><strong>Four lesson skills + one mixed finish</strong></div><small>{connectedLinks}/5 linked</small></header>
+          <header><div><span>SKILL MAP</span><strong>Four lesson moves + one mixed finish</strong></div><small>{connectedLinks}/5 linked</small></header>
           <div className="boss-connection-nodes" role="list">
             {questions.map((item, round) => {
               const linkLesson = region.lessons[Math.min(round, region.lessons.length - 1)];
@@ -405,7 +405,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <h2>{question.prompt}</h2>
           {question.choices ? <div className="choice-grid">{question.choices.map((choice) => <button className={answer === choice ? "selected" : ""} type="button" aria-pressed={answer === choice} disabled={answerLocked} onClick={() => { setAnswer(choice); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} key={choice}>{choice}</button>)}</div> : <label className="answer-field"><span>Your answer</span><input value={answer} inputMode={mathInputMode(question.answer)} enterKeyHint="done" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={answerLocked} aria-invalid={feedback === "incorrect"} aria-describedby={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : syncMessage ? "boss-sync-message" : undefined} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} onKeyDown={(event) => { if (event.key === "Enter") void check(); }} placeholder="Type your answer" autoFocus /></label>}
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
-          {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—repair this connection.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. The same question stays open.` : "Two focused repairs will refill every heart."}</small></div></div>}
+          {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—fix this move.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. Retry this same question.` : "Two focused repairs refill every heart."}</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
           {syncMessage && <div id="boss-sync-message" className="boss-sync-message" role="status"><span aria-hidden="true">↻</span><div><strong>You are back in the right place.</strong><p>{syncMessage}</p></div></div>}
           {errorMessage && <p id="boss-answer-error" className="form-error" role="alert">{errorMessage}</p>}

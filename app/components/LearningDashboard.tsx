@@ -147,7 +147,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     <main className="learner-shell">
       <LearnerHeader state={state} demo={demo} />
       {rewardMessage.startsWith("Collected") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} />}
-      {demo && <div className="demo-banner"><span>Preview mode</span><p>Your progress stays in this browser session.</p><a href="/#join">Use Google to keep it for next time</a></div>}
+      {demo && <div className="demo-banner"><span>Preview mode</span><p>Try anything. This progress lasts only in this browser.</p><a href="/#join">Sign in to save it</a></div>}
       <section className="dashboard-wrap">
         <nav className="grade-switcher" aria-label="Choose a grade">
           {[7, 8, 9, 10, 11, 12].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${demo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
@@ -155,9 +155,9 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         <div className={`dashboard-heading dashboard-world-heading theme-${world.id}`}>
           <div><span className="section-kicker">{world.worldName.toUpperCase()} · {world.role.toUpperCase()}</span><h1>{journey.headline}</h1><p>{journey.story} {journey.status}</p></div>
           <div className="dashboard-summary">
-            <div><strong>{state.totalXp}</strong><span>XP power</span></div>
-            <div><strong>{gradeCompleted}<small>/{gradeLessons.length}</small></strong><span>Routes cleared</span></div>
-            <div><strong>{gradeBosses}<small>/{curriculum.regions.length}</small></strong><span>Boss gates</span></div>
+            <div><strong>{state.totalXp}</strong><span>Total XP</span></div>
+            <div><strong>{gradeCompleted}<small>/{gradeLessons.length}</small></strong><span>Lessons clear</span></div>
+            <div><strong>{gradeBosses}<small>/{curriculum.regions.length}</small></strong><span>Bosses clear</span></div>
           </div>
         </div>
 
@@ -165,26 +165,26 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           <button className="welcome-guide-close" type="button" onClick={dismissWelcomeGuide} aria-label="Dismiss welcome guide">×</button>
           <header className="welcome-guide-heading">
             <Avatar avatar={state.profile.avatar} size="lg" label="Your random abstract avatar" />
-            <div><span className="section-kicker">WELCOME, {world.role.toUpperCase()}</span><h2 id="welcome-trail-heading">Enter {world.worldName}.</h2><p>Your first mission begins at {journey.location}. Your avatar and callsign stay anonymous; your Google name, email, and photo are never shown here.</p></div>
+            <div><span className="section-kicker">WELCOME, {world.role.toUpperCase()}</span><h2 id="welcome-trail-heading">Start at {journey.location}.</h2><p>Learn one move, practice it, then clear a short check. Your random codename is the only identity shown here.</p></div>
           </header>
           <div className="welcome-route" aria-label="Complete short lessons, collect four region keys, then unlock the boss">
-            <div className="welcome-route-step"><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="md" label="First short lesson" /><div><small>STEP 1</small><strong>Short lesson</strong><span>6–8 minutes</span></div></div>
+            <div className="welcome-route-step"><TopicIcon visual={nextLesson.visual} accent={nextLesson.accent} size="md" label="First short lesson" /><div><small>STEP 1</small><strong>Learn one move</strong><span>6–8 minutes</span></div></div>
             <i className="welcome-route-connector" aria-hidden="true" />
-            <div className="welcome-route-step welcome-key-step"><span className="welcome-mini-keys" aria-hidden="true"><b>1</b><b>2</b><b>3</b><b>4</b></span><div><small>REGION</small><strong>Collect 4 keys</strong><span>One key per lesson</span></div></div>
+            <div className="welcome-route-step welcome-key-step"><span className="welcome-mini-keys" aria-hidden="true"><b>1</b><b>2</b><b>3</b><b>4</b></span><div><small>REGION</small><strong>Clear 4 lessons</strong><span>Fixes still count</span></div></div>
             <i className="welcome-route-connector" aria-hidden="true" />
-            <div className="welcome-route-step welcome-boss-step"><span aria-hidden="true">★</span><div><small>UNLOCK</small><strong>Boss quest</strong><span>5 mixed questions</span></div></div>
+            <div className="welcome-route-step welcome-boss-step"><span aria-hidden="true">★</span><div><small>UNLOCK</small><strong>Mixed challenge</strong><span>5 questions · no timer</span></div></div>
           </div>
           <footer className="welcome-guide-footer">
             <div className="welcome-first-win" aria-label="First lesson reward preview: one of four region keys, at least 40 XP, and the next lesson opens">
-              <header><span aria-hidden="true">✦</span><div><small>FIRST WIN PREVIEW</small><strong>Finish all five—even after corrections.</strong></div></header>
+              <header><span aria-hidden="true">✦</span><div><small>FIRST WIN</small><strong>Finish all five. Corrected answers count.</strong></div></header>
               <div className="welcome-first-win-rewards" role="list">
                 <span role="listitem"><b>1/4</b><strong>Region key</strong><small>Boss path begins</small></span>
                 <span role="listitem"><b>+40</b><strong>Base XP</strong><small>Star bonus possible</small></span>
                 <span role="listitem"><b>→</b><strong>Next lesson</strong><small>Opens right away</small></span>
               </div>
-              <p><span aria-hidden="true">✓</span><strong>Stars are feedback.</strong> First tries add sparkle; corrected work still unlocks everything.</p>
+              <p><span aria-hidden="true">✓</span><strong>Stars show fluency.</strong> A corrected answer still opens the next lesson.</p>
             </div>
-            <div className="welcome-guide-action"><small>YOUR FIRST QUEST</small><strong>{nextLesson.title}</strong><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start one small step <span aria-hidden="true">→</span></a></div>
+            <div className="welcome-guide-action"><small>YOUR FIRST MISSION</small><strong>{nextLesson.title}</strong><a className="primary-button" href={`/learn/${nextLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start this lesson <span aria-hidden="true">→</span></a></div>
           </footer>
         </section>}
 
@@ -201,16 +201,16 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           <div className="dashboard-grid">
           {reviewBatchSize > 0 ? <section className="next-card review-priority-card">
             <div className="next-visual review-priority-visual" role="img" aria-label={`${reviewBatchSize} ideas ready for Daily Review`}><span>{String(reviewBatchSize).padStart(2, "0")}</span><div className="review-priority-orbit"><b>◇</b>{Array.from({ length: reviewBatchSize }, (_, index) => <i key={index} />)}</div><small>MEMORY PATH</small></div>
-            <div className="next-copy"><span className="section-kicker">TODAY’S BEST STEP · REVIEW READY</span><h2>Recharge today’s ideas.</h2><p>{reviewBatchSize === 1 ? "One quick recall is due. Strengthen it before adding new material." : `${reviewBatchSize} quick recalls are due. Strengthen them before adding new material.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button" href={`/review?grade=${grade}${demo ? "&demo=1" : ""}`}>Start Daily Review <span aria-hidden="true">→</span></a></div>
+            <div className="next-copy"><span className="section-kicker">BEST NEXT MOVE · REVIEW READY</span><h2>Keep this skill ready.</h2><p>{reviewBatchSize === 1 ? "One idea is ready for a fast recall." : `${reviewBatchSize} ideas are ready for a fast recall.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button" href={`/review?grade=${grade}${demo ? "&demo=1" : ""}`}>Start the recall <span aria-hidden="true">→</span></a></div>
           </section> : gradeComplete ? <section className="next-card trail-complete-card">
             <div className={`next-visual trail-complete-visual accent-${activeRegion.accent}`}><span>{String(curriculum.regions.length).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[3].visual} accent={activeRegion.accent} size="xl" label={`Grade ${grade} trail complete`} /><b aria-hidden="true">✓</b><small>TRAIL CLEARED</small></div>
-            <div className="next-copy"><span className="section-kicker">GRADE {grade} · NOTHING DUE</span><h2>Today’s trail is complete.</h2><p>Every lesson and boss is saved, and no review is waiting. This is enough for today.</p><div className="next-meta"><span>✓ {gradeLessons.length} lessons</span><span>★ {curriculum.regions.length} bosses</span><span>◇ review will return</span></div><a className="secondary-button" href="#grade-map">Revisit the completed trail <span aria-hidden="true">↓</span></a></div>
+            <div className="next-copy"><span className="section-kicker">GRADE {grade} · ALL CLEAR</span><h2>You finished what was due.</h2><p>Your lessons, bosses, and review are saved. Stop here or replay any skill.</p><div className="next-meta"><span>✓ {gradeLessons.length} lessons</span><span>★ {curriculum.regions.length} bosses</span><span>◇ review returns later</span></div><a className="secondary-button" href="#grade-map">Choose a skill to replay <span aria-hidden="true">↓</span></a></div>
           </section> : activeBossReady ? <section className="next-card boss-priority-card">
             <div className={`next-visual boss-priority-visual accent-${activeRegion.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="xl" label={`${activeRegion.title} boss quest`} /><b aria-hidden="true">★</b><small>4 KEYS COLLECTED</small></div>
-            <div className="next-copy"><span className="section-kicker">TODAY’S BEST STEP · BOSS READY</span><h2>{activeRegion.title} Boss</h2><p>Connect the four ideas in five mixed questions. Take your time—there is no countdown, and corrections restore the path.</p><div className="next-meta"><span>♥ 3 hearts</span><span>◇ 5 mixed questions</span><span>◆ 100 XP</span></div><a className="primary-button" href={`/boss/${activeRegion.id}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start boss quest <span aria-hidden="true">→</span></a></div>
+            <div className="next-copy"><span className="section-kicker">BEST NEXT MOVE · BOSS READY</span><h2>{activeRegion.title} Boss</h2><p>Use all four lesson ideas in five questions. No timer. A miss opens a repair path.</p><div className="next-meta"><span>♥ 3 hearts</span><span>◇ 5 mixed questions</span><span>◆ 100 XP</span></div><a className="primary-button" href={`/boss/${activeRegion.id}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start the challenge <span aria-hidden="true">→</span></a></div>
           </section> : <section className="next-card">
             <div className={`next-visual accent-${featuredLesson.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={featuredLesson.visual} accent={featuredLesson.accent} size="xl" label={`${featuredLesson.title} topic icon`} /></div>
-            <div className="next-copy"><span className="section-kicker">GRADE {grade} · UP NEXT</span><h2>{featuredLesson.title}</h2><p>{featuredLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3 stars</span></div><a className="primary-button" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Continue lesson <span aria-hidden="true">→</span></a></div>
+            <div className="next-copy"><span className="section-kicker">GRADE {grade} · YOUR NEXT MOVE</span><h2>{featuredLesson.title}</h2><p>{featuredLesson.goal}</p><div className="next-meta"><span>◷ 6–8 min</span><span>◆ 40 XP + star bonus</span><span>☆ 3-star goal</span></div><a className="primary-button" href={`/learn/${featuredLesson.slug}?grade=${grade}${demo ? "&demo=1" : ""}`}>Start this mission <span aria-hidden="true">→</span></a></div>
           </section>}
 
           <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed" : "ready"}`} aria-labelledby="daily-reward-heading">
@@ -296,7 +296,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 
         <section className="trail-overview">
           <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade} · {world.worldName.toUpperCase()}</span><h2>{world.mapLabel}</h2></div><div className="map-controls"><p>{showFullMap ? `All ${curriculum.regions.length} regions visible.` : `Current position: ${journey.location}.`} Stars do not block progress.</p><button type="button" aria-expanded={showFullMap} aria-controls="grade-map" onClick={() => setShowFullMap((value) => !value)}>{showFullMap ? "Focus current mission" : `Open full ${world.mapLabel}`}</button></div></div>
-          {!showFullMap && <p className="map-window-note" role="status"><span aria-hidden="true">◎</span> A focused map keeps your next step close. You can open the full trail anytime.</p>}
+          {!showFullMap && <p className="map-window-note" role="status"><span aria-hidden="true">◎</span> Showing your current region. Open the full map whenever you want.</p>}
           <div className="world-list" id="grade-map">
             {visibleRegions.map((region) => {
               const regionIndex = curriculum.regions.findIndex((item) => item.id === region.id);

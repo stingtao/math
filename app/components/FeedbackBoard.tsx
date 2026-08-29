@@ -26,17 +26,17 @@ export function FeedbackBoard() {
     setBusy(true); setStatus("");
     const response = await fetch("/api/feedback", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ message, website: "" }) });
     const body = await response.json() as { error?: string };
-    if (response.ok) { setMessage(""); setStatus("Thanks. Your note is now on the board with a new random name."); await load(); }
-    else setStatus(body.error ?? "That note could not be posted.");
+    if (response.ok) { setMessage(""); setStatus("Posted with a new random name. Thanks for helping improve Math."); await load(); }
+    else setStatus(body.error ?? "That note did not post. Try again.");
     setBusy(false);
   }
 
   return <main className="site-shell feedback-page">
     <PublicHeader />
     <section className="feedback-wrap">
-      <header><span className="eyebrow">ANONYMOUS FEEDBACK BOARD</span><h1>Tell me what would help.</h1><p>I read these notes when deciding what to fix or explain next. Each post gets a new random name; it is not connected to a Google account, learner profile, progress, or leaderboard.</p></header>
+      <header><span className="eyebrow">ANONYMOUS FEEDBACK BOARD</span><h1>What should feel clearer?</h1><p>Point out a confusing step, missing example, or rough screen. Your post gets a new random name and never connects to your account or progress.</p></header>
       <form className="feedback-form" onSubmit={submit}>
-        <label><span>Your note</span><textarea maxLength={600} rows={5} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="What was confusing? What should I add or change?" /></label>
+        <label><span>Your suggestion</span><textarea maxLength={600} rows={5} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Which step felt confusing? What example or change would help?" /></label>
         <input className="feedback-honeypot" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
         <div><small>{message.length}/600 · Names, email addresses, phone numbers, social handles, school names, and links do not belong here. Contact details are blocked before posting.</small><button className="primary-button" type="submit" disabled={busy || message.trim().length < 3}>{busy ? "Posting…" : "Post anonymously"}</button></div>
         {status && <p className="signin-status" aria-live="polite">{status}</p>}

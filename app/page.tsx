@@ -9,10 +9,10 @@ import { featuredFrontierWorlds } from "@/lib/frontier-worlds";
 export const dynamic = "force-dynamic";
 
 const missionSteps = [
-  { number: "01", label: "SEE THE IDEA", title: "One example. One move to notice.", copy: "Start with a visual that makes the rule visible. No wall of text and no guessing what matters.", visual: "fraction-bars", accent: "gold" as const },
-  { number: "02", label: "TAKE THE CONTROLS", title: "Do the math, do not just watch it.", copy: "Plot the point, move the line, enter the equation, or choose the next step yourself.", visual: "coordinate-plane", accent: "blue" as const },
-  { number: "03", label: "REPAIR THE MISS", title: "Wrong answers open clues.", copy: "See what went off course, use a hint, try again, and recover points when you correct it.", visual: "equation-steps", accent: "teal" as const },
-  { number: "04", label: "CLEAR THE BOSS", title: "Finish with a short checkpoint.", copy: "Mix what you learned, beat it now, or let the idea return later until it finally sticks.", visual: "line-graph", accent: "violet" as const },
+  { number: "01", label: "SEE THE MOVE", title: "Watch one example.", copy: "A visual shows what changes and why. You know the target before you start.", visual: "fraction-bars", accent: "gold" as const },
+  { number: "02", label: "TRY IT", title: "Take control of the math.", copy: "Plot, drag, type, or choose the next step. You do the thinking—not just the watching.", visual: "coordinate-plane", accent: "blue" as const },
+  { number: "03", label: "FIX THE MISS", title: "Use the clue. Try again.", copy: "A miss points to one step to change. Correct it and keep your progress.", visual: "equation-steps", accent: "teal" as const },
+  { number: "04", label: "CLEAR THE CHECK", title: "Prove the idea can travel.", copy: "Mix the skill with earlier ideas. If it is not ready yet, it comes back later.", visual: "line-graph", accent: "violet" as const },
 ];
 
 const gradeVisuals = {
@@ -38,16 +38,16 @@ export default function Home() {
         <span className="frontier-section-index">01 · THE IDEA</span>
         <div>
           <p className="frontier-kicker">MATH PUSHES THE MAP FORWARD</p>
-          <h2 id="manifesto-title">The next frontier is not built by memorizing a worksheet.</h2>
+          <h2 id="manifesto-title">Math is how you build what does not exist yet.</h2>
         </div>
-        <p>It is built by noticing patterns, testing ideas, correcting misses, and trying again. Those are math skills—and explorer skills.</p>
+        <p>Notice a pattern. Test it. Fix the miss. Try again. That is how equations become routes, systems, and new worlds.</p>
       </section>
 
       <section className="frontier-world-gallery" aria-labelledby="world-gallery-title">
         <div className="frontier-section-heading">
           <span className="frontier-section-index">02 · CHOOSE A WORLD</span>
           <div><p className="frontier-kicker">THREE FRONTIERS · ONE SKILL TREE</p><h2 id="world-gallery-title">Your math changes what the crew can build.</h2></div>
-          <p>Every world turns Grade 7–9 ideas into a mission with a reason to finish it.</p>
+          <p>Each world gives Grade 7–9 math a job: route a rover, pressure-test a habitat, or decode a signal.</p>
         </div>
         <div className="frontier-world-cards">
           {featuredFrontierWorlds.map((world) => (
@@ -87,7 +87,7 @@ export default function Home() {
         <div className="frontier-loop-footer">
           <span><b>6–8</b><small>minutes per mission</small></span>
           <i aria-hidden="true" />
-          <p>No marathon session required. Finish one meaningful run, then come back when you want the next world.</p>
+          <p>One focused run is enough. Finish a useful step, then return when you want the next one.</p>
           <a href="/learn?grade=8&demo=1">Try the loop <span aria-hidden="true">→</span></a>
         </div>
       </section>
@@ -129,7 +129,7 @@ export default function Home() {
       <section className="frontier-curriculum" id="curriculum" aria-labelledby="curriculum-title">
         <div className="frontier-section-heading">
           <span className="frontier-section-index">06 · EXPEDITION MAP</span>
-          <div><p className="frontier-kicker">GRADES 7–12</p><h2 id="curriculum-title">Choose the math you want to master next.</h2></div>
+          <div><p className="frontier-kicker">GRADES 7–12</p><h2 id="curriculum-title">Choose the skill you need next.</h2></div>
           <p>Start anywhere. Each path is built from short lessons, mixed checkpoints, and review that returns before an idea fades.</p>
         </div>
         <div className="frontier-grade-grid">

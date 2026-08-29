@@ -16,8 +16,8 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
   const earned = useMemo(() => new Set(state?.badges.earnedIds ?? []), [state]);
   const filtered = useMemo(() => badgeCatalog.filter((badge) => filter === "all" ? true : filter === "earned" ? earned.has(badge.id) : badge.kind === filter), [earned, filter]);
 
-  if (loading) return <LearningLoading glyph="◆" tone="violet" kicker="OPENING THE BADGE VAULT" title="Arranging your collection…" detail="Five hundred private trophies are taking their places." />;
-  if (!state || error) return <LearningSignInGate glyph="◆" kicker="YOUR COLLECTION IS PRIVATE" title="Sign in to open Badge Vault." detail="Only your anonymous account can see which trophies you have earned." />;
+  if (loading) return <LearningLoading glyph="◆" tone="violet" kicker="OPENING THE BADGE VAULT" title="Loading your trophies…" detail="Your earned badges and next target are almost ready." />;
+  if (!state || error) return <LearningSignInGate glyph="◆" kicker="YOUR COLLECTION IS PRIVATE" title="Sign in to open your vault." detail="Only you can see which badges you earned and what unlocks next." />;
 
   const earnedCount = earned.size;
   const vaultLevel = Math.min(50, Math.floor(earnedCount / 10) + 1);
@@ -36,7 +36,7 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
       <LearnerHeader state={state} demo={demo} />
       <section className="badge-vault-wrap">
         <header className="badge-vault-hero">
-          <div className="badge-vault-heading"><span className="section-kicker">PRIVATE COLLECTION · 500 BADGES</span><h1>Badge Vault</h1><p>Every finished lesson leaves a crest. Every ten qualified correct answers powers the next Answer Quest trophy.</p></div>
+          <div className="badge-vault-heading"><span className="section-kicker">PRIVATE COLLECTION · 500 BADGES</span><h1>Badge Vault</h1><p>Clear a lesson for a crest. Every 10 answer credits unlocks another trophy.</p></div>
           <div className="vault-level-card" aria-label={`Badge Vault level ${vaultLevel} of 50`}>
             <div className="vault-level-emblem"><span>{String(vaultLevel).padStart(2, "0")}</span><i /></div>
             <div><small>VAULT LEVEL</small><strong>{earnedCount === BADGE_CATALOG_SIZE ? "Legend complete" : `${earnedCount - levelStart} of 10 trophies`}</strong><p>{earnedCount === BADGE_CATALOG_SIZE ? "All 500 designs are yours." : `${levelTarget - earnedCount} until Level ${Math.min(50, vaultLevel + 1)}.`}</p><i className="vault-level-meter"><b style={{ width: `${levelProgress}%` }} /></i></div>
@@ -56,7 +56,7 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
         {recent.length > 0 && <section className="badge-recent-section"><header><div><span className="section-kicker">RECENT HONORS</span><h2>Newest in your vault</h2></div><p>Badge ownership and dates stay private.</p></header><div className="badge-recent-grid">{recent.map(({ badge, unlockedAt }) => <article className={`accent-${badge!.tone}`} key={badge!.id}><BadgeMedallion badge={badge!} earned size="lg" /><div><small>{badge!.rankLabel}</small><h3>{badge!.title}</h3><p>{badge!.series}</p><time dateTime={unlockedAt}>Earned {new Date(unlockedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</time></div></article>)}</div></section>}
 
         <section className="badge-catalog-section" aria-labelledby="badge-catalog-heading">
-          <header><div><span className="section-kicker">THE COMPLETE VAULT</span><h2 id="badge-catalog-heading">500 designed trophies</h2><p>Locked badges show the exact path forward. No packs, purchases, or luck.</p></div><span className="badge-catalog-count"><b>{filtered.filter((item) => earned.has(item.id)).length}</b> / {filtered.length} in view</span></header>
+          <header><div><span className="section-kicker">CHOOSE A TARGET</span><h2 id="badge-catalog-heading">Every badge shows the next move.</h2><p>No loot boxes or purchases. Unlocks come from lessons and correct answers.</p></div><span className="badge-catalog-count"><b>{filtered.filter((item) => earned.has(item.id)).length}</b> / {filtered.length} in view</span></header>
           <div className="badge-filter-bar" role="group" aria-label="Filter badges">
             {([['all', 'All 500'], ['earned', 'Earned'], ['lesson', 'Lesson Crests'], ['answer', 'Answer Quest']] as Array<[BadgeFilter, string]>).map(([value, label]) => <button className={filter === value ? "active" : ""} type="button" aria-pressed={filter === value} onClick={() => chooseFilter(value)} key={value}>{label}</button>)}
           </div>

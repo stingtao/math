@@ -15,24 +15,24 @@ export function PublicHeader() {
     <header className="topbar">
       <Brand />
       <nav className="topnav" aria-label="Main navigation">
-        <a href="/#story">How it works</a>
+        <a href="/#story">Mission loop</a>
         <a href="/#curriculum">Grades 7–12</a>
         <a href="/labs/linear-graphs">Graph Lab</a>
-        <a href="/leaderboard">Leaderboard</a>
-        <a href="/feedback">Feedback</a>
+        <a href="/leaderboard">Weekly league</a>
+        <a href="/feedback">Suggest a fix</a>
       </nav>
       <div className="public-actions">
         <details className="mobile-public-menu">
           <summary aria-label="Open navigation"><span aria-hidden="true">☰</span></summary>
           <nav aria-label="Mobile navigation">
-            <a href="/#story">How it works</a>
+            <a href="/#story">Mission loop</a>
             <a href="/#curriculum">Grades 7–12</a>
             <a href="/labs/linear-graphs">Graph Lab</a>
-            <a href="/leaderboard">Leaderboard</a>
-            <a href="/feedback">Feedback</a>
+            <a href="/leaderboard">Weekly league</a>
+            <a href="/feedback">Suggest a fix</a>
           </nav>
         </details>
-        <a className="sign-in-button" href="/#join">Sign in</a>
+        <a className="sign-in-button" href="/#join">Save progress</a>
       </div>
     </header>
   );

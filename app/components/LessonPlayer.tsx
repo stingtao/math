@@ -118,7 +118,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [sheetOpen]);
 
-  if (loading) return <LearningLoading glyph="M" tone="blue" kicker="SETTING UP YOUR STEP" title="Opening your lesson…" detail="Your goal, example, and practice path are almost ready." />;
+  if (loading) return <LearningLoading glyph="M" tone="blue" kicker="SETTING UP YOUR MISSION" title="Opening the lesson…" detail="Goal, example, and practice are almost ready." />;
   if (!state || error) return <LessonGate />;
   const activeState = state;
   const gradeLessons = getGradeLessons(lesson.grade);
@@ -132,7 +132,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const practiceProgress = inMemoryCheck ? .9 + .1 * (masteryLockedCount / Math.max(1, masteryTotal)) : .9 * correctedCount / lesson.practice.length;
   const lessonProgressPercent = Math.round(((stage + (stage === 4 ? practiceProgress : 0)) / stageLabels.length) * 100);
   const currentStageLabel = stage === 4 ? inMemoryCheck ? `Memory Check ${masteryLockedCount + 1} of ${masteryTotal}` : `Practice ${questionIndex + 1} of ${lesson.practice.length}` : stageLabels[stage].label;
-  if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">FOLLOW THE TRAIL</span><h1>This lesson is just ahead.</h1><p>Complete your current step first. The trail will bring you here next.</p><a className="primary-button" href={trailUrl}>Back to your trail <span>→</span></a></section></main>;
+  if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={demo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">NEXT REGION LOCKED</span><h1>Clear the current lesson first.</h1><p>Your next route opens as soon as that step is complete.</p><a className="primary-button" href={trailUrl}>Show my next move <span>→</span></a></section></main>;
 
   function advanceStage() { setStage((value) => Math.min(4, value + 1)); }
 
@@ -285,25 +285,25 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       ? { title: "One clean pass from mastery", copy: "A future no-hint review can turn this into a three-star skill." }
       : { title: "The path stays open", copy: "Corrections finished the lesson. Daily Review will bring the useful steps back at the right time." };
     const outcome = reward.firstCompletion
-      ? { kicker: "LESSON COMPLETE · NEW", title: "That step is yours.", copy: <><strong>{lesson.title}</strong> is complete. Corrections count.</> }
+      ? { kicker: "LESSON CLEARED · NEW", title: "Skill unlocked.", copy: <><strong>{lesson.title}</strong> is complete. Corrected answers count.</> }
       : reward.starsImproved
-      ? { kicker: "MASTERY UPGRADED", title: "Your marker just leveled up.", copy: <><strong>{lesson.title}</strong> now has a {reward.bestStars}-star best.</> }
-      : { kicker: "PRACTICE COMPLETE", title: "Practice strengthened.", copy: <><strong>{lesson.title}</strong> is refreshed. Your {reward.bestStars}-star best stays saved.</> };
+      ? { kicker: "MASTERY UPGRADED", title: "New personal best.", copy: <><strong>{lesson.title}</strong> now has a {reward.bestStars}-star best.</> }
+      : { kicker: "PRACTICE COMPLETE", title: "Skill refreshed.", copy: <><strong>{lesson.title}</strong> is ready again. Your {reward.bestStars}-star best stays saved.</> };
     const regionKeyCount = region?.lessons.filter((item) => item.id === lesson.id || completeMap.has(item.id)).length ?? lesson.order;
     const keyStatus = reward.firstCompletion ? "New key" : reward.starsImproved ? "Key safe · marker upgraded" : "Key already safe";
     const primaryHref = reward.firstCompletion
       ? regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`
       : trailUrl;
-    const primaryLabel = reward.firstCompletion ? regionFinished ? "Enter the unlocked boss" : "Continue to the next lesson" : "Return to your trail";
+    const primaryLabel = reward.firstCompletion ? regionFinished ? "Start the unlocked boss" : "Start the next lesson" : "Return to the map";
     const secondaryHref = reward.firstCompletion
       ? trailUrl
       : regionFinished ? `/boss/${lesson.regionId}?grade=${lesson.grade}${demo ? "&demo=1" : ""}` : `/learn/${following?.slug}?grade=${lesson.grade}${demo ? "&demo=1" : ""}`;
-    const secondaryLabel = reward.firstCompletion ? "Finish for today" : regionFinished ? "Revisit the boss" : "Practice the next lesson";
+    const secondaryLabel = reward.firstCompletion ? "Stop here for today" : regionFinished ? "Replay the boss" : "Try the next lesson";
     const nextStep = reward.firstCompletion
       ? regionFinished
-        ? { kicker: "BOSS GATE OPEN", title: `${region?.title ?? "Region"} Boss`, copy: "Five mixed questions connect all four lesson ideas. No timer, unlimited retries." }
-        : { kicker: "NEXT QUEST UNLOCKED", title: following?.title ?? "Return to the trail", copy: "The next short lesson is ready whenever you are. Stopping here is also progress." }
-      : { kicker: "TRAIL STATUS", title: "Your progress is protected.", copy: "This practice strengthened memory without removing XP, stars, or quest keys you already earned." };
+        ? { kicker: "BOSS GATE OPEN", title: `${region?.title ?? "Region"} Boss`, copy: "Five mixed questions. No timer. Misses open a repair path." }
+        : { kicker: "NEXT MISSION OPEN", title: following?.title ?? "Return to the map", copy: "The next short lesson is ready. Stopping here also counts as progress." }
+      : { kicker: "SAVE STATUS", title: "Your best stays safe.", copy: "This replay strengthened memory without removing XP, stars, or keys." };
     const currentAchievementTotals = achievementTotalsForState(state);
     const previousAchievementTotals = {
       ...currentAchievementTotals,
@@ -367,7 +367,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       <div className="lesson-topline">
         <a href={trailUrl} className="back-link">← Trail</a>
         <div className="lesson-progress" role="progressbar" aria-label={`Lesson progress: ${currentStageLabel}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={lessonProgressPercent}><span style={{ width: `${lessonProgressPercent}%` }} /></div>
-        <button className="sheet-button" type="button" disabled={!lesson.quickSheet} onClick={() => setSheetOpen(true)}>{lesson.quickSheet ? "Quick Sheet" : "Lesson notes"}</button>
+        <button className="sheet-button" type="button" disabled={!lesson.quickSheet} onClick={() => setSheetOpen(true)}>{lesson.quickSheet ? "Visual recap" : "Lesson notes"}</button>
       </div>
       <div className={`lesson-mobile-status accent-${lesson.accent}`} aria-label={`Quest step ${stage + 1} of ${stageLabels.length}: ${currentStageLabel}`}>
         <div className="lesson-mobile-topic"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="sm" label="" /><span><small>QUEST STEP {stage + 1} OF {stageLabels.length}</small><strong>{currentStageLabel}</strong></span></div>
@@ -388,14 +388,14 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         </aside>
 
         <section className="lesson-stage" aria-live="polite">
-          {stage === 0 && <StageCard kicker="GOAL" title={lesson.goal} copy="Read the goal. Take your time." visual={<div className={`goal-concept accent-${lesson.accent}`}><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} concept`} /><span>Today’s focus</span><strong>{lesson.title}</strong></div>} onContinue={advanceStage} />}
-          {stage === 1 && <StageCard kicker="SEE IT" title="Picture it first." copy="Use the diagram. Notice what stays the same." visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} />}
-          {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} copy="One sentence to remember." visual={<div className={`key-idea-card accent-${lesson.accent}`}><span>KEY IDEA</span><strong>{lesson.keyIdea}</strong></div>} onContinue={advanceStage} />}
-          {stage === 3 && <StageCard kicker="EXAMPLE QUEST" title={lesson.example} copy="Predict the next move, then reveal one reasoning step at a time." visual={<WorkedExampleFlow steps={lesson.exampleSteps} accent={lesson.accent} onComplete={() => setExampleReady(true)} />} onContinue={advanceStage} continueDisabled={!exampleReady} continueLabel={exampleReady ? "Start practice" : "Complete the reasoning chain"} footerText={exampleReady ? "Reasoning chain complete. You’re ready to apply it." : "Reveal every step before practice. There is no countdown."} />}
+          {stage === 0 && <StageCard kicker="YOUR TARGET" title={lesson.goal} copy="Know the move before you start." visual={<div className={`goal-concept accent-${lesson.accent}`}><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} concept`} /><span>Today’s focus</span><strong>{lesson.title}</strong></div>} onContinue={advanceStage} continueLabel="Show me" />}
+          {stage === 1 && <StageCard kicker="SEE THE MOVE" title="Start with the picture." copy="Notice what changes—and what stays fixed." visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} continueLabel="I see it" />}
+          {stage === 2 && <StageCard kicker="KEEP THIS RULE" title={lesson.keyIdea} copy="Say it once in your own words." visual={<div className={`key-idea-card accent-${lesson.accent}`}><span>KEY IDEA</span><strong>{lesson.keyIdea}</strong></div>} onContinue={advanceStage} continueLabel="Try an example" />}
+          {stage === 3 && <StageCard kicker="WORKED EXAMPLE" title={lesson.example} copy="Predict each move, then reveal the reasoning." visual={<WorkedExampleFlow steps={lesson.exampleSteps} accent={lesson.accent} onComplete={() => setExampleReady(true)} />} onContinue={advanceStage} continueDisabled={!exampleReady} continueLabel={exampleReady ? "Start practice" : "Reveal every step"} footerText={exampleReady ? "Example complete. Now use the move yourself." : "Open each step before practice. No timer."} />}
           {stage === 4 && (
             <div className="practice-stage" aria-busy={busy}>
               <div className={`practice-method-loop accent-${lesson.accent}`} aria-label={`Learning loop: step ${methodStep} of 3`}><span className={methodStep >= 1 ? "active" : ""}><b>1</b><small>TRY</small><strong>Work it</strong></span><i aria-hidden="true">→</i><span className={methodStep >= 2 ? "active" : ""}><b>2</b><small>REPAIR</small><strong>Fix the method</strong></span><i aria-hidden="true">→</i><span className={methodStep >= 3 ? "active" : ""}><b>3</b><small>RECALL</small><strong>Lock it later</strong></span></div>
-              {inMemoryCheck && <div className={`memory-check-banner accent-${lesson.accent}`}><span aria-hidden="true">◆</span><div><small>MEMORY CHECK · NO RUSH</small><strong>Recall this repaired idea without help.</strong><p>The choices may move. Use the method, not the position. A clean first try locks mastery and restores the two-star path.</p></div></div>}
+              {inMemoryCheck && <div className={`memory-check-banner accent-${lesson.accent}`}><span aria-hidden="true">◆</span><div><small>MEMORY CHECK · NO RUSH</small><strong>Use the repaired method without help.</strong><p>Choices may move. Follow the math, not the button position. A clean recall locks mastery.</p></div></div>}
               <div className="practice-heading"><div><span className="section-kicker">{inMemoryCheck ? `MEMORY CHECK · ${masteryLockedCount + 1} OF ${masteryTotal}` : `PRACTICE · ${questionIndex + 1} OF ${lesson.practice.length}`}</span><h2>{question.prompt}</h2></div><div className="practice-dots">{inMemoryCheck ? Array.from({ length: masteryTotal }, (_, index) => <span className={index < masteryLockedCount ? "done" : index === masteryLockedCount ? "active" : ""} key={`memory-${index}`} />) : lesson.practice.map((item, index) => <span className={index < questionIndex ? "done" : index === questionIndex ? "active" : ""} key={item.id} />)}</div></div>
               <div className="practice-game-status"><div className={`practice-charge accent-${lesson.accent}`} aria-label={inMemoryCheck ? `Memory Locks: ${masteryLockedCount} of ${masteryTotal}` : `Focus charge: ${correctedCount} of ${lesson.practice.length} questions corrected`}><div><span>{inMemoryCheck ? "MEMORY LOCKS" : "FOCUS CHARGE"}</span><strong>{inMemoryCheck ? masteryLockedCount === masteryTotal ? "Mastered" : "Recall in progress" : focusChargeLabels[correctedCount]}</strong></div><div className="charge-cells" aria-hidden="true">{inMemoryCheck ? Array.from({ length: masteryTotal }, (_, index) => <i className={index < masteryLockedCount ? "done" : index === masteryLockedCount ? "current" : ""} key={`lock-${index}`}>{index < masteryLockedCount ? "◆" : index + 1}</i>) : lesson.practice.map((item, index) => <i className={index < correctedCount ? "done" : index === correctedCount ? "current" : ""} key={item.id}>{index < correctedCount ? "✓" : index + 1}</i>)}</div><small>{inMemoryCheck ? `${masteryLockedCount}/${masteryTotal}` : `${correctedCount}/${lesson.practice.length}`}</small></div><MomentumRun label={inMemoryCheck ? "RECALL CHAIN" : "FOCUS CHAIN"} current={focusStreak} best={bestFocusStreak} total={lesson.practice.length} tone="focus" justLinked={feedback === "correct" && currentFirstTry} /></div>
               <div className={`practice-star-path accent-${lesson.accent}`} aria-live="polite">
@@ -421,10 +421,10 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   );
 }
 
-function StageCard({ kicker, title, copy, visual, onContinue, continueDisabled = false, continueLabel = "I’m ready", footerText = "Take your time. There is no countdown." }: { kicker: string; title: string; copy: string; visual: React.ReactNode; onContinue: () => void; continueDisabled?: boolean; continueLabel?: string; footerText?: string }) {
+function StageCard({ kicker, title, copy, visual, onContinue, continueDisabled = false, continueLabel = "Continue", footerText = "Take your time. No timer." }: { kicker: string; title: string; copy: string; visual: React.ReactNode; onContinue: () => void; continueDisabled?: boolean; continueLabel?: string; footerText?: string }) {
   return <div className="stage-card"><div className="stage-copy"><span className="section-kicker">{kicker}</span><h2>{title}</h2><p>{copy}</p></div><div className="stage-visual">{visual}</div><div className="stage-footer"><span>{footerText}</span><button className="primary-button" type="button" disabled={continueDisabled} onClick={onContinue}>{continueLabel} <span>→</span></button></div></div>;
 }
 
 function LessonGate() {
-  return <LearningSignInGate glyph="✦" kicker="SAVE YOUR LEARNING" title="Sign in before the lesson." detail="This keeps progress connected to your anonymous trail." />;
+  return <LearningSignInGate glyph="✦" kicker="SAVE THIS MISSION" title="Sign in to start the lesson." detail="Your progress returns through an anonymous trail—not a public profile." />;
 }
