@@ -313,13 +313,12 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
             {region.lessons.map((lesson) => <div className="boss-victory-skill" role="listitem" key={lesson.id}><TopicIcon visual={lesson.visual} accent={lesson.accent} size="sm" label="" /><b aria-hidden="true">✓</b><small>{lesson.title}</small></div>)}
             <div className="boss-victory-seal" role="listitem"><span aria-hidden="true">★</span><b aria-hidden="true">✓</b><small>Region clear</small></div>
           </div>
-          <p><span aria-hidden="true">◆</span>Every skill remains open to revisit. The clear is permanent.</p>
         </div>
 
         <div className="boss-settlement-summary" aria-label="Boss result summary">
-          <div><span className="boss-result-icon xp" aria-hidden="true">XP</span><p><strong>{bossXpEarned > 0 ? `+${bossXpEarned} XP` : "0 XP"}</strong><small>{bossXpEarned > 0 ? "First-clear reward" : "Fair replay · no farmable XP"}</small></p></div>
-          <div><span className="boss-result-icon hearts" aria-hidden="true">♥</span><p><strong>{hearts}/3 hearts</strong><small>{hearts === 3 ? "Steady clear" : "Clear saved · no penalty"}</small></p></div>
-          <div><span className="boss-result-icon badge" aria-hidden="true">{String(region.order).padStart(2, "0")}</span><p><strong>Region clear</strong><small>{bossXpEarned > 0 ? "Permanent trail mark" : "Best hearts kept"}</small></p></div>
+          <div><span className="boss-result-icon xp" aria-hidden="true">XP</span><p><strong>{bossXpEarned > 0 ? `+${bossXpEarned} XP` : "0 XP"}</strong><small>{bossXpEarned > 0 ? "First clear" : "Replay"}</small></p></div>
+          <div><span className="boss-result-icon hearts" aria-hidden="true">♥</span><p><strong>{hearts}/3 hearts</strong><small>Best this run</small></p></div>
+          <div><span className="boss-result-icon badge" aria-hidden="true">{String(region.order).padStart(2, "0")}</span><p><strong>Region clear</strong><small>Map updated</small></p></div>
         </div>
 
         {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={demo} />}
@@ -330,7 +329,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <strong>{isFinalRegion ? "READY" : "OPEN"}</strong>
         </div>
 
-        <p className="boss-settlement-save"><span aria-hidden="true">✓</span><strong>Everything is saved.</strong> This is enough for today.</p>
+        <p className="boss-settlement-save"><span aria-hidden="true">✓</span><strong>This is enough for today.</strong></p>
         <div className="boss-victory-actions"><a className="secondary-button" href={trailRegionUrl}>{isFinalRegion ? `Back to Grade ${region.grade}` : "Finish for today"}</a><a className="primary-button" href={victoryUrl}>{isFinalRegion ? "Open Daily Review" : `Start ${nextRegion.title}`} <span>→</span></a></div>
       </section>
     </main>

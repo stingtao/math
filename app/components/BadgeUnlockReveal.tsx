@@ -66,17 +66,16 @@ export function BadgeUnlockReveal({ unlocks, demo, onDismiss }: { unlocks: Badge
       <span className="badge-vault-target" aria-hidden="true"><b>◆</b><small>VAULT</small><i /></span>
       {flying && <span className="badge-vault-flyer" aria-hidden="true"><BadgeMedallion badge={badge} earned size="xl" /></span>}
       <section className="badge-unlock-card">
-        <span className="badge-unlock-kicker">NEW BADGE · {badge.rankLabel.toUpperCase()}</span>
+        <span className="badge-unlock-kicker">NEW BADGE</span>
         <div className="badge-unlock-medal"><BadgeMedallion badge={badge} earned size="xl" /><span className="badge-unlock-check" aria-hidden="true">✓</span></div>
         <div className="badge-unlock-copy">
-          <small>{badge.series} · #{String(badge.catalogNumber).padStart(3, "0")} OF 500</small>
+          <small>{badge.series}</small>
           <h2 id="badge-unlock-title">{badge.title}</h2>
-          <p id="badge-unlock-copy">{badge.copy}</p>
-          <strong><span aria-hidden="true">◆</span>{badge.requirement}</strong>
+          <p id="badge-unlock-copy">Added to your badges.</p>
         </div>
         <div className="badge-unlock-actions">
-          <button className="primary-button" type="button" disabled={flying} onClick={continueReveal} autoFocus>{flying ? "Flying to vault…" : last ? "Add to my vault" : "Store & reveal next"} <span aria-hidden="true">→</span></button>
-          <a className="secondary-button" href={`/badges${demo ? "?demo=1" : ""}`} target="_blank" rel="noreferrer">View Badge Vault</a>
+          <button className="primary-button" type="button" disabled={flying} onClick={continueReveal} autoFocus>{flying ? "Adding…" : last ? "Continue" : "Next badge"} <span aria-hidden="true">→</span></button>
+          <a className="secondary-button" href={`/badges${demo ? "?demo=1" : ""}`} target="_blank" rel="noreferrer">View badges</a>
         </div>
         {unlocks.length > 1 && <span className="badge-unlock-page">{index + 1} / {unlocks.length} new badges</span>}
       </section>

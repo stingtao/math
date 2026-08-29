@@ -74,7 +74,7 @@ export function LinearGraphLab({ initialEquation = "y=2x", examples = defaultExa
     <section className="linear-graph-lab" aria-labelledby={`${inputId}-title`}>
       <header className="linear-graph-lab-heading">
         <div><small>LIVE GRAPH</small><strong id={`${inputId}-title`}>Type a rule. Watch the line react.</strong><p>Use y = mx + b. Try decimals and negative slopes too.</p></div>
-        <span>Private on this device</span>
+        <span>Not saved</span>
       </header>
       <div className="linear-graph-controls">
         <label htmlFor={inputId}>Equation</label>
@@ -120,7 +120,6 @@ export function LinearGraphLab({ initialEquation = "y=2x", examples = defaultExa
           {line && <table><caption>Three points on this line</caption><thead><tr><th>x</th><th>y</th></tr></thead><tbody>{visibleTable.map((point) => <tr key={point.x}><td>{point.x}</td><td>{shownNumber(point.y)}</td></tr>)}</tbody></table>}
         </aside>
       </div>
-      <footer><span aria-hidden="true">◇</span>Private scratch space: this equation is not saved or linked to an account.</footer>
     </section>
   );
 }

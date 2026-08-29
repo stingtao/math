@@ -25,7 +25,6 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
   const achievementValues = { lessons: state.completedLessons.length, stars: totalStars, bosses: state.clearedBosses.length, streak: state.profile.longestStreak };
   const achievements = evaluateAchievements(achievementValues);
-  const unlockedAchievements = achievements.filter((item) => item.unlocked).length;
   const nextAchievement = achievements.find((item) => !item.unlocked);
   const ownedFrames = new Set(["plain", ...state.profile.ownedFrames, state.profile.avatar.frame]);
   const nextFrame = avatarFrameCatalog.find((item) => item.cost > 0 && !ownedFrames.has(item.id));
@@ -86,7 +85,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         const ok = await action({ action: "purchaseFrame", frame: frameSpec.id });
         if (!ok) return;
       }
-      setMessage(wasOwned ? `${frameSpec.label} equipped. No tokens spent.` : `${frameSpec.label} unlocked forever and equipped.`);
+      setMessage(`${frameSpec.label} equipped.`);
       if (!wasOwned) setFrameCelebrationKey(`${frameSpec.id}-${Date.now()}`);
     } finally {
       setBusyFrame("");
@@ -118,15 +117,15 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
       <section className="profile-wrap">
         <div className={`profile-hero profile-command-deck theme-${world.id}`}>
           <div className="profile-world-art" style={{ backgroundPosition: world.atlasPosition }} aria-hidden="true"><span>{world.motif}</span><i /><i /><i /></div>
-          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()} · PRIVATE SAVE</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p><div className="profile-world-tags"><span>{world.worldName}</span><span>{journey.status}</span><span>Codename only</span></div></div></div>
+          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()}</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p></div></div>
           <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${demo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed} onClick={reroll}>{state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
         <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>{journey.stage}</strong><small>{world.levelLabel}</small></article><article><span>◆</span><strong>{state.totalXp}</strong><small>XP power</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article></div>
 
-        <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">{world.motif}<i /></span><div><small>{world.badgeLabel.toUpperCase()}</small><strong>Open your badge vault</strong><p>Next trophy: {state.badges.correctAnswers % 10}/10 answer credits</p></div><b>{state.badges.earnedIds.length}<small> / 500</small></b><i aria-hidden="true">→</i></a>
+        <a className="profile-badge-vault" href={`/badges${demo ? "?demo=1" : ""}`}><span className="profile-badge-emblem" aria-hidden="true">{world.motif}<i /></span><div><small>{world.badgeLabel.toUpperCase()}</small><strong>Badges</strong><p>Next badge · {state.badges.correctAnswers % 10}/10 correct answers</p></div><i aria-hidden="true">→</i></a>
 
         <section className="theme-studio" aria-labelledby="theme-studio-heading">
-          <header><div><span className="section-kicker">WORLD SELECT</span><h2 id="theme-studio-heading">Change the world, not your progress.</h2><p>Pick a new story. Every cleared lesson stays cleared.</p></div><span className="safe-chip">Private setting</span></header>
+          <header><div><span className="section-kicker">WORLD</span><h2 id="theme-studio-heading">Choose a world.</h2></div></header>
           <div className="theme-grid" role="radiogroup" aria-label="Choose a visual theme">
             {themeCatalog.map((theme) => {
               const selected = state.profile.theme === theme.id;
@@ -140,29 +139,26 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         </section>
 
         <section className="achievement-section" aria-labelledby="achievement-heading">
-          <header><div><span className="section-kicker">QUEST TROPHIES</span><h2 id="achievement-heading">{world.badgeLabel}</h2></div><span className="achievement-count"><strong>{unlockedAchievements}</strong> / {achievements.length} unlocked</span></header>
-          {nextAchievement ? <div className={`next-achievement accent-${nextAchievement.tone}`}><span className="achievement-badge" aria-hidden="true"><b>{nextAchievement.glyph}</b><i /></span><div><small>UP NEXT</small><strong>{nextAchievement.title}</strong><p>{nextAchievement.copy}</p></div><div className="next-achievement-progress"><span><b>{nextAchievement.value}</b> / {nextAchievement.target} {nextAchievement.unit}{nextAchievement.target === 1 ? "" : "s"}</span><i><b style={{ width: `${nextAchievement.progress}%` }} /></i></div></div> : <div className="next-achievement shelf-complete"><span className="achievement-badge" aria-hidden="true"><b>✓</b><i /></span><div><small>SHELF COMPLETE</small><strong>Every current landmark is yours.</strong><p>Keep exploring—the next trail landmark can arrive in a future update.</p></div></div>}
-          <div className="achievement-grid" role="list">{achievements.map((item) => <article className={`achievement-card accent-${item.tone} ${item.unlocked ? "unlocked" : "locked"}`} role="listitem" aria-label={`${item.title}: ${item.unlocked ? "unlocked" : `${item.value} of ${item.target}`}`} key={item.id}><span className="achievement-badge" aria-hidden="true"><b>{item.glyph}</b><i /></span><div><h3>{item.title}</h3><p>{item.copy}</p></div><div className="achievement-card-status"><span>{item.unlocked ? "UNLOCKED" : `${item.value}/${item.target}`}</span><i><b style={{ width: `${item.progress}%` }} /></i></div></article>)}</div>
-          <footer><span aria-hidden="true">◇</span><p><strong>Private collection.</strong> Only you can open it.</p></footer>
+          <header><h2 id="achievement-heading">Achievements</h2></header>
+          {nextAchievement ? <div className={`next-achievement accent-${nextAchievement.tone}`}><span className="achievement-badge" aria-hidden="true"><b>{nextAchievement.glyph}</b><i /></span><div><small>NEXT</small><strong>{nextAchievement.title}</strong><p>{nextAchievement.copy}</p></div><div className="next-achievement-progress"><span><b>{nextAchievement.value}</b> / {nextAchievement.target} {nextAchievement.unit}{nextAchievement.target === 1 ? "" : "s"}</span><i><b style={{ width: `${nextAchievement.progress}%` }} /></i></div></div> : <div className="next-achievement shelf-complete"><span className="achievement-badge" aria-hidden="true"><b>✓</b><i /></span><div><strong>All current achievements earned.</strong></div></div>}
+          <div className="achievement-grid" role="list">{achievements.map((item) => <article className={`achievement-card accent-${item.tone} ${item.unlocked ? "unlocked" : "locked"}`} role="listitem" aria-label={`${item.title}: ${item.unlocked ? "unlocked" : `${item.value} of ${item.target}`}`} key={item.id}><span className="achievement-badge" aria-hidden="true"><b>{item.glyph}</b><i /></span><div><h3>{item.title}</h3><p>{item.copy}</p></div>{!item.unlocked && <div className="achievement-card-status"><span>{item.value}/{item.target}</span><i><b style={{ width: `${item.progress}%` }} /></i></div>}</article>)}</div>
         </section>
 
         <div className="profile-grid">
           <section className="locker-card">
-            <header><div><span className="section-kicker">{world.baseName.toUpperCase()} · COSMETICS</span><h2>Avatar loadout</h2></div><span className="token-balance">◆ {state.profile.trailTokens} tokens</span></header>
-            <p>Earn with tokens. Equip anytime. No skill boost attached.</p>
+            <header><div><h2>Avatar frames</h2></div><span className="token-balance">◆ {state.profile.trailTokens} tokens</span></header>
             {nextFrame ? <div className={`locker-goal ${nextFrameNeeded === 0 ? "ready" : ""}`}>
               <Avatar avatar={{ ...state.profile.avatar, frame: nextFrame.id }} size="md" label={`${nextFrame.label} preview`} />
-              <div><small>{nextFrameNeeded === 0 ? "READY TO UNLOCK" : "NEXT COLLECTION GOAL"}</small><strong>{nextFrame.label}</strong><p>{nextFrameNeeded === 0 ? `You have enough tokens. Unlock it below.` : `${nextFrameNeeded} more ${nextFrameNeeded === 1 ? "token" : "tokens"} to make it yours forever.`}</p><span className="locker-goal-meter" role="progressbar" aria-label={`${nextFrame.label} token progress`} aria-valuemin={0} aria-valuemax={nextFrame.cost} aria-valuenow={Math.min(state.profile.trailTokens, nextFrame.cost)}><i style={{ width: `${nextFrameProgress}%` }} /></span></div>
+              <div><small>NEXT FRAME</small><strong>{nextFrame.label}</strong><p>{nextFrameNeeded === 0 ? "Ready to unlock." : `${nextFrameNeeded} more ${nextFrameNeeded === 1 ? "token" : "tokens"}.`}</p><span className="locker-goal-meter" role="progressbar" aria-label={`${nextFrame.label} token progress`} aria-valuemin={0} aria-valuemax={nextFrame.cost} aria-valuenow={Math.min(state.profile.trailTokens, nextFrame.cost)}><i style={{ width: `${nextFrameProgress}%` }} /></span></div>
               <b>{Math.min(state.profile.trailTokens, nextFrame.cost)}<small> / {nextFrame.cost}</small></b>
-            </div> : <div className="locker-goal collection-complete"><span className="locker-complete-mark" aria-hidden="true">✓</span><div><small>COLLECTION COMPLETE</small><strong>Every current frame is yours.</strong><p>Keep your tokens—new trail rewards can arrive in a future update.</p></div></div>}
+            </div> : <div className="locker-goal collection-complete"><span className="locker-complete-mark" aria-hidden="true">✓</span><div><strong>All current frames earned.</strong></div></div>}
             <div className="frame-grid">{avatarFrameCatalog.map((frame) => {
               const isEquipped = state.profile.avatar.frame === frame.id;
               const isOwned = ownedFrames.has(frame.id);
               const canUnlock = state.profile.trailTokens >= frame.cost;
-              const status = isEquipped ? "Equipped" : isOwned ? "Owned · Equip" : canUnlock ? `Unlock · ◆ ${frame.cost}` : `${frame.cost - state.profile.trailTokens} tokens to go`;
+              const status = isEquipped ? "Equipped" : isOwned ? "Equip" : canUnlock ? `Unlock · ◆ ${frame.cost}` : `${frame.cost - state.profile.trailTokens} tokens to go`;
               return <button className={`${isEquipped ? "equipped" : ""} ${isOwned ? "owned" : "locked"}`} type="button" disabled={isEquipped || Boolean(busyFrame) || (!isOwned && !canUnlock)} onClick={() => buyFrame(frame)} aria-label={`${frame.label}: ${status}`} key={frame.id}><Avatar avatar={{ ...state.profile.avatar, frame: frame.id }} size="md" /><strong>{frame.label}</strong><small>{frame.copy}</small><span>{busyFrame === frame.id ? "Saving…" : status}</span></button>;
             })}</div>
-            <footer className="locker-promise"><span aria-hidden="true">◇</span><p><strong>{ownedFrames.size} of {avatarFrameCatalog.length} collected.</strong> Frames are private cosmetics; they never affect XP, lessons, or leaderboard rank.</p></footer>
           </section>
           <aside className="privacy-settings-card">
             <span className="section-kicker">PRIVACY CONTROLS</span><h2>Choose what leaves your base.</h2>

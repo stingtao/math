@@ -53,11 +53,11 @@ export function getThemeJourney(theme: ThemeId, progress: { lessons: number; bos
     : `Route clear. Ready to ${spec.missionFocus}.`;
 
   const storyByTheme: Record<ThemeId, string> = {
-    classic: `You are charting ${spec.worldName}. Chapter ${stage} has reached ${location}.`,
-    space: `You are cruising ${spec.worldName}. Orbit ${stage} has reached ${location}.`,
-    blossom: `You are restoring ${spec.worldName}. Garden Bed ${stage} is growing at ${location}.`,
-    ocean: `You are building ${spec.worldName}. Labyrinth Gate ${stage} is open at ${location}.`,
-    aurora: `You are crossing ${spec.worldName}. Signal Camp ${stage} is lit at ${location}.`,
+    classic: `Charting a route through ${spec.worldName}.`,
+    space: `Cruising ${spec.worldName} toward new worlds.`,
+    blossom: `Restoring the floating gardens of ${spec.worldName}.`,
+    ocean: `Building the next passage through ${spec.worldName}.`,
+    aurora: `Following firefly signals across ${spec.worldName}.`,
   };
 
   return {

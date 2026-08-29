@@ -50,21 +50,8 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
   const profileUrl = demo ? "/profile?demo=1" : "/profile";
   const leagueUrl = demo ? "/leaderboard?demo=1" : "/leaderboard";
   const badgesUrl = demo ? "/badges?demo=1" : "/badges";
-  const badgeCount = state.badges.earnedIds.length;
-  const badgeCountLabel = badgeCount > 99 ? "99+" : badgeCount;
   const world = getThemeSpec(state.profile.theme);
   const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
-  const missionStatus = pathname.startsWith("/boss")
-    ? `Boss gate active at ${journey.location}. Connect five ideas to move on.`
-    : pathname.startsWith("/review")
-    ? `${world.reviewLabel} active. Recover each idea and keep every correction.`
-    : pathname.startsWith("/badges")
-    ? `${world.badgeLabel} open. Every trophy here came from real practice.`
-    : pathname.startsWith("/leaderboard")
-    ? `${world.leagueLabel} transmitting anonymous weekly XP only.`
-    : pathname.startsWith("/profile")
-    ? journey.story
-    : journey.status;
   async function logout() {
     if (!demo) await fetch("/api/auth/logout", { method: "POST" });
     window.location.assign("/");
@@ -76,7 +63,7 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
         <nav className="learner-nav" aria-label="Learning navigation">
           <a href={trailUrl}>{world.mapLabel}</a>
           <a href={reviewUrl}>{world.reviewLabel} <span className="nav-count">{state.dueReview}</span></a>
-          <a href={badgesUrl}>{world.badgeLabel} <span className="badge-nav-count">{badgeCountLabel}</span></a>
+          <a href={badgesUrl}>{world.badgeLabel}</a>
           <a href={leagueUrl}>{world.leagueLabel}</a>
         </nav>
         <div className="learner-stats">
@@ -91,15 +78,12 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
       </header>
       <aside className={`theme-world-hud theme-${world.id}`} aria-label={`Current learning world: ${world.worldName}`}>
         <span className="theme-world-hud-motif" aria-hidden="true">{world.motif}</span>
-        <div className="theme-world-hud-place"><small>{world.worldName} · {world.role}</small><strong>{journey.headline}</strong></div>
-        <i aria-hidden="true" />
-        <p>{missionStatus}</p>
-        <a href={profileUrl}>Open {world.profileLabel} <span aria-hidden="true">→</span></a>
+        <div className="theme-world-hud-place"><small>{world.worldName}</small><strong>{journey.headline}</strong></div>
       </aside>
       <nav className="mobile-learner-nav" aria-label="Mobile learning navigation">
         <a className={pathname.startsWith("/learn") || pathname.startsWith("/boss") ? "active" : ""} href={trailUrl}><span aria-hidden="true">◎</span><strong>Map</strong></a>
         <a className={pathname.startsWith("/review") ? "active" : ""} href={reviewUrl}><span aria-hidden="true">◇</span><strong>Recall</strong>{state.dueReview > 0 && <i>{state.dueReview}</i>}</a>
-        <a className={pathname.startsWith("/badges") ? "active" : ""} href={badgesUrl}><span aria-hidden="true">◆</span><strong>Vault</strong>{badgeCount > 0 && <i>{badgeCountLabel}</i>}</a>
+        <a className={pathname.startsWith("/badges") ? "active" : ""} href={badgesUrl}><span aria-hidden="true">◆</span><strong>Badges</strong></a>
         <a className={pathname.startsWith("/leaderboard") ? "active" : ""} href={leagueUrl}><span aria-hidden="true">★</span><strong>League</strong></a>
         <a className={pathname.startsWith("/profile") ? "active" : ""} href={profileUrl}><span aria-hidden="true">●</span><strong>Base</strong></a>
       </nav>

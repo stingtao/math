@@ -135,8 +135,7 @@ test("server-renders the Math Grades 7–12 landing page", async () => {
   assert.match(html, /Build the worlds no one has reached yet/);
   assert.match(html, /The next frontier is six minutes away/);
   assert.match(html, /GRADES 7–12/);
-  assert.match(html, /220/);
-  assert.match(html, /1100/);
+  assert.doesNotMatch(html, /220 lessons|1100 questions|full visual scenes/i);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Building your site/);
   assert.match(html, /og-frontier-v1\.webp/);
 });
@@ -147,7 +146,7 @@ test("server-renders a public, no-sign-in linear Graph Lab", async () => {
   const html = await response.text();
   assert.match(html, /Draw the line/);
   assert.match(html, /Type a rule\. Watch the line react/);
-  assert.match(html, /No sign-in, timer, score, or saved input/);
+  assert.match(html, /Nothing is saved/);
   assert.match(html, /ONE TOOL · SIX GRADE PATHS/);
   assert.match(html, /Plot\. Connect\. Decode/);
   assert.match(html, /Turn five points into y = 2x/);
@@ -200,7 +199,7 @@ test("ships all six curriculum files and all source sheets", async () => {
   assert.equal(sheets.filter((name) => name.endsWith(".png")).length, 20);
 });
 
-test("adds one private live line grapher across Grade 7, 8, and 9 graph lessons", async () => {
+test("adds one focused live line grapher across Grade 7, 8, and 9 graph lessons", async () => {
   const visual = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
   const lab = await readFile(new URL("../app/components/LinearGraphLab.tsx", import.meta.url), "utf8");
   const page = await readFile(new URL("../app/labs/linear-graphs/page.tsx", import.meta.url), "utf8");
@@ -218,12 +217,12 @@ test("adds one private live line grapher across Grade 7, 8, and 9 graph lessons"
   assert.match(lab, /onPointerMove=\{pointNearPointer\}/);
   assert.match(lab, /onFocus=\{startKeyboardExplore\}/);
   assert.doesNotMatch(lab, /useId/);
-  assert.match(lab, /not saved or linked to an account/);
+  assert.match(lab, /Not saved/);
   assert.match(page, /<LinearGraphLab initialEquation="y=2x"/);
   assert.match(page, /Predict first\. Check second/);
   assert.match(page, /guidedChallenges\.map/);
   assert.match(page, /Check my reasoning/);
-  assert.match(page, /Private by default/);
+  assert.doesNotMatch(page, /Private by default/);
   assert.match(header, /href="\/labs\/linear-graphs"/);
   assert.match(css, /\.linear-graph-workspace/);
   assert.match(css, /\.linear-example-buttons button \{ min-height: 44px/);
@@ -246,7 +245,7 @@ test("ships one accessible point-line mission and an active reasoning flow acros
   assert.match(mission, /connected \? "confirmed" : "progressive"/);
   assert.match(mission, /getScreenCTM/);
   assert.doesNotMatch(mission, /useId/);
-  assert.match(mission, /never saved or tied to an identity/);
+  assert.match(mission, /Points are not saved/);
   assert.match(flow, /Predict what the next mathematical move/);
   assert.match(flow, /REASONING CHAIN COMPLETE/);
   assert.match(lesson, /<WorkedExampleFlow steps=\{lesson\.exampleSteps\}/);
@@ -325,9 +324,10 @@ test("persists badge ownership and qualified answer credits without adding badge
   assert.doesNotMatch(badgeGrantSource, /awardXp/);
 });
 
-test("ships a private, progressive Badge Vault and accessible celebration controls", async () => {
+test("ships a focused, extensible badge collection and accessible celebration controls", async () => {
   const page = await readFile(new URL("../app/badges/page.tsx", import.meta.url), "utf8");
   const gallery = await readFile(new URL("../app/components/BadgeGallery.tsx", import.meta.url), "utf8");
+  const medallion = await readFile(new URL("../app/components/BadgeMedallion.tsx", import.meta.url), "utf8");
   const reveal = await readFile(new URL("../app/components/BadgeUnlockReveal.tsx", import.meta.url), "utf8");
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
@@ -336,20 +336,23 @@ test("ships a private, progressive Badge Vault and accessible celebration contro
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
   assert.match(page, /<BadgeGallery/);
-  assert.match(gallery, /PRIVATE COLLECTION · 500 BADGES/);
-  assert.match(gallery, /Math\.floor\(earnedCount \/ 10\)/);
+  assert.match(gallery, /NEXT BADGE/);
+  assert.match(gallery, /useState<BadgeFilter>\("earned"\)/);
   assert.match(gallery, /slice\(0, visibleCount\)/);
   assert.match(gallery, /setVisibleCount\(48\)/);
-  assert.match(gallery, /No loot boxes or purchases/);
+  assert.doesNotMatch(gallery, /500 BADGES|of 500|of 124|server-verified|CHOOSE A TARGET|No loot boxes|EARNED · PERMANENT|catalogNumber/i);
+  assert.match(medallion, /aria-label=\{`\$\{badge\.title\} badge`\}/);
+  assert.doesNotMatch(medallion, /catalog number|badge-medallion-rank|badge-medallion-number/);
   assert.match(header, /badgesUrl/);
-  assert.match(header, /99\+/);
+  assert.doesNotMatch(header, /badge-nav-count|99\+/);
   assert.match(reveal, /role="dialog"/);
   assert.match(reveal, /aria-modal="true"/);
   assert.match(reveal, /Skip animation/);
   assert.match(reveal, /event\.key === "Escape"/);
-  assert.match(reveal, /View Badge Vault/);
+  assert.match(reveal, /View badges/);
   assert.match(reveal, /badge-vault-flyer/);
-  assert.match(reveal, /Flying to vault/);
+  assert.match(reveal, /Adding…/);
+  assert.doesNotMatch(reveal, /OF 500|permanent/i);
   for (const source of [lesson, review, boss]) {
     assert.match(source, /<AnswerImpact/);
     assert.match(source, /<BadgeUnlockReveal/);
@@ -410,8 +413,8 @@ test("saves one private theme code and ships five visual learning worlds", async
   assert.match(store, /learner_preferences/);
   assert.match(store, /updateTheme/);
   assert.match(route, /action: "theme"/);
-  assert.match(profile, /WORLD SELECT/);
-  assert.match(profile, /Pick a new story\. Every cleared lesson stays cleared/);
+  assert.match(profile, /Choose a world/);
+  assert.doesNotMatch(profile, /Pick a new story\. Every cleared lesson stays cleared/);
   assert.match(profile, /profile-command-deck/);
   assert.match(header, /root\.dataset\.theme/);
   assert.match(header, /theme-world-hud/);
@@ -452,8 +455,8 @@ test("gives every Grade 10–12 lesson an appropriate interactive concept tool",
   assert.match(concept, /lesson\.grade >= 10/);
   assert.match(concept, /<AdvancedMathTool lesson=\{lesson\}/);
   for (const mode of ["calculus", "circle", "probability", "vector", "scale", "function"]) assert.match(tool, new RegExp(`"${mode}"`));
-  assert.match(tool, /Private scratch space/);
-  assert.match(tool, /Nothing here is saved/);
+  assert.match(tool, /Not saved/);
+  assert.doesNotMatch(tool, /Private scratch space|Nothing here is saved/);
   assert.match(tool, /Run another sample/);
   assert.match(tool, /UNIT CIRCLE/);
   assert.match(tool, /CALCULUS LENS/);
@@ -488,11 +491,10 @@ test("keeps avatar frames permanently unlocked and makes the token goal visible"
   assert.match(store, /SELECT 1 AS owned FROM avatar_frames/);
   assert.match(store, /NOT EXISTS \(SELECT 1 FROM avatar_frames/);
   assert.match(store, /return \{ unlocked: false, cost: 0 \}/);
-  assert.match(profile, /unlocked forever and equipped/);
-  assert.match(profile, /NEXT COLLECTION GOAL/);
-  assert.match(profile, /Owned · Equip/);
-  assert.match(profile, /No tokens spent/);
-  assert.match(dashboard, /Use tokens for permanent frames/);
+  assert.match(profile, /NEXT FRAME/);
+  assert.match(profile, /isOwned \? "Equip"/);
+  assert.doesNotMatch(profile, /unlocked forever|NEXT COLLECTION GOAL|Owned · Equip|No tokens spent/);
+  assert.match(dashboard, /Use tokens for avatar frames/);
   assert.match(css, /\.locker-goal/);
   assert.match(css, /\.reward-locker-link/);
 });
@@ -505,9 +507,9 @@ test("presents daily rewards as a fixed, forgiving seven-claim journey", async (
   assert.match(store, /const rewardTokens = \[10, 12, 14, 16, 18, 20, 30\]/);
   assert.match(store, /INSERT OR IGNORE INTO daily_rewards/);
   assert.match(store, /if \(step === 7\) shields \+= 1/);
-  assert.match(dashboard, /Every reward is fixed/);
+  assert.doesNotMatch(dashboard, /Every reward is fixed/);
   assert.match(dashboard, /Skip a day\? Nothing resets/);
-  assert.match(dashboard, /no mystery boxes or paid boosts/);
+  assert.doesNotMatch(dashboard, /no mystery boxes or paid boosts|never purchased/);
   assert.match(dashboard, /rewardPending \? "Collecting…"/);
   assert.match(dashboard, /Today’s reward is collected/);
   assert.match(dashboard, /Streak Shields available/);
@@ -529,7 +531,7 @@ test("presents daily rewards as a fixed, forgiving seven-claim journey", async (
   assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.daily-reward-details > \.reward-calendar \{ grid-template-columns: repeat\(4/);
 });
 
-test("keeps signed-in navigation and a private self marker on the weekly league", async () => {
+test("keeps signed-in navigation and a clear self marker on the weekly league", async () => {
   const page = await readFile(new URL("../app/leaderboard/page.tsx", import.meta.url), "utf8");
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
   const view = await readFile(new URL("../app/components/LeaderboardView.tsx", import.meta.url), "utf8");
@@ -539,8 +541,9 @@ test("keeps signed-in navigation and a private self marker on the weekly league"
   assert.match(page, /LeaderboardView demo=\{params\.demo === "1"\}/);
   assert.match(header, /leaderboard\?demo=1/);
   assert.match(view, /state \? <LearnerHeader/);
-  assert.match(view, /YOUR PRIVATE MARKER/);
-  assert.match(view, /Everyone else sees your random codename/);
+  assert.match(view, /Rank \{viewerEntry\.rank\}/);
+  assert.match(view, /entry\.isViewer && <small>YOU<\/small>/);
+  assert.doesNotMatch(view, /YOUR PRIVATE MARKER|Everyone else sees your random codename|30-person|Public top 30/);
   assert.match(view, /entry\.weeklyXp > 0/);
   assert.match(store, /isViewer: entry\.learner_id === learnerId/);
   assert.match(css, /\.current-rank-card/);
@@ -900,8 +903,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   for (const model of ["number-line", "symbol-meaning", "sign-pairs", "operation-order", "place-value", "repeating-decimal", "negative-distribute", "root-inverse", "solid-compare", "signed-sum", "subtract-opposite", "signed-rational-quotient", "signed-change", "proportion-table", "origin-proportion", "word-equation", "scale-area", "composite-area", "experimental-probability", "sample-space", "literal-equation", "line-forms", "system-substitution", "system-model", "radical-factor", "like-radicals", "gcf-factor", "factor-chain", "plus-minus-roots", "zero-product", "fit-prediction", "model-choice", "percent", "fraction-equivalence", "fraction-addition", "substitution", "power-steps", "term-structure", "slope", "triangle", "triangle-build", "angles", "scatter", "distribute", "function", "transform", "volume", "cone-volume", "sphere-volume", "cross-section", "coordinate-location", "coordinate-distance", "difference-squares", "balance", "root-bracket", "scientific-scale", "equation-steps", "ratio", "circle", "prism", "probability-scale", "systems-crossing", "solution-cases", "inequality-range", "area-product", "parabola", "exponential", "scale-drawing", "random-sample", "arithmetic-sequence", "quadratic-roots", "surface-area-net", "compound-event", "two-way-table", "exponential-decay", "number-kinds", "system-elimination", "distribution-compare", "rational-exponent", "growth-compare", "simple-interest", "graph-line", "dilation", "residuals"]) assert.match(concept, new RegExp(`model: "${model}"`));
   const contextSceneSource = concept.slice(concept.indexOf("const contextScenes"), concept.indexOf("function mathFor"));
   assert.equal((contextSceneSource.match(/^\s{2}(?:"[^"]+"|[\w-]+): \{/gm) ?? []).length, 124);
-  const expandedSceneCount = Number(home.match(/const expandedSceneCount = (\d+);/)?.[1]);
-  assert.equal(expandedSceneCount, 124);
+  assert.doesNotMatch(home, /expandedSceneCount/);
   for (const representative of ["math-symbols", "signed-numbers", "sign-rules", "order-of-operations", "decimals", "negative-distribution", "repeating-decimals", "square-cube-roots", "mixed-volume", "percent", "fractions", "adding-fractions", "substitution", "g9-evaluate-formulas", "algebra-language", "combining-like-terms", "g7-equivalent-expressions", "g7-proportional-tables", "g7-proportional-graphs", "g7-add-rational-numbers", "g7-subtract-rational-numbers", "g7-multiply-divide-rationals", "g7-rational-word-problems", "g7-equation-word-models", "g7-scale-area", "g7-composite-area", "g7-experimental-probability", "g7-sample-spaces", "g9-algebraic-structure", "g9-literal-equations", "g9-linear-equation-forms", "g9-systems-substitution-g9", "g9-systems-elimination-g9", "g9-system-models", "g9-simplify-radicals", "g9-radical-operations", "g9-greatest-common-factor", "g9-factoring-completely", "g9-solve-by-square-roots", "g9-solve-by-factoring", "g9-polynomial-vocabulary", "g9-add-subtract-polynomials", "g9-scatter-models-g9", "g9-modeling-decisions", "one-step-equations", "distributive-property", "approximating-irrationals", "scientific-notation", "multi-step-equations", "slope-rate", "function-representations", "coordinate-transformations", "pythagorean-theorem", "cylinder-volume", "cone-volume", "sphere-volume", "coordinate-distance", "scatter-plots", "two-way-tables", "rational-irrational", "systems-algebra", "graphing-lines", "function-rules", "dilations-similarity", "g7-unit-rates", "g7-circle-measures", "g7-prism-volume", "g7-probability-scale", "g7-scale-drawings", "g7-random-samples", "g7-surface-area", "g7-compound-events", "g7-discount-markup", "g7-angle-equations", "g7-constructing-triangles", "g7-cross-sections", "g7-compare-distributions", "g7-simple-interest", "g9-systems-by-graphing-g9", "g9-multiply-binomials", "g9-quadratic-graphs", "g9-exponential-growth", "g9-exponential-decay", "g9-arithmetic-sequences", "g9-geometric-sequences", "g9-absolute-value-equations", "g9-difference-squares", "g9-quadratic-formula", "g9-rational-exponents", "g9-linear-vs-exponential", "g9-correlation-residuals"]) {
     assert.match(contextSceneSource, new RegExp(`[" ]${representative}[":]`));
   }
@@ -943,8 +945,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(home, /frontier-world-cards/);
   assert.match(home, /frontier-world-card-image/);
   assert.match(home, /loading="lazy"/);
-  assert.match(home, /full visual scenes/);
-  assert.match(home, /curriculumStats\.lessons/);
+  assert.doesNotMatch(home, /full visual scenes|curriculumStats\.lessons/);
   assert.match(home, /Each world gives Grade 7–9 math a job/);
   assert.match(home, /world\.skills\.map/);
   assert.match(home, /frontier-mars-comic-v2\.webp|featuredFrontierWorlds/);
@@ -1045,7 +1046,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /getQuestMilestone/);
   assert.match(dashboard, /quest-milestone milestone-\$\{questMilestone\.tone\}/);
   assert.match(dashboard, /getNextAchievement/);
-  assert.match(dashboard, /NEXT PRIVATE LANDMARK/);
+  assert.match(dashboard, /NEXT ACHIEVEMENT/);
   assert.match(dashboard, /quest-landmark-meter/);
   assert.match(dashboard, /welcomeReady/);
   assert.match(dashboard, /math-welcome-guide/);
@@ -1158,7 +1159,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(lesson, /This is enough for today/);
   assert.match(lesson, /Start the next lesson/);
   assert.match(lesson, /Stars and XP details/);
-  assert.match(lesson, /Everything is saved/);
+  assert.doesNotMatch(lesson, /Everything is saved/);
   assert.match(lesson, /achievementUnlockedBetween/);
   assert.match(landmarkUnlock, /settlement-landmark/);
   assert.match(lesson, /<PrivateLandmarkUnlock/);
@@ -1168,8 +1169,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(dashboard, /achievementTotalsForState/);
   assert.match(dashboard, /landmark\?\.source === "streak"/);
   assert.match(dashboard, /<PrivateLandmarkUnlock achievement=\{rewardLandmark\}/);
-  assert.match(landmarkUnlock, /PRIVATE LANDMARK UNLOCKED/);
-  assert.match(landmarkUnlock, /View shelf/);
+  assert.match(landmarkUnlock, /NEW ACHIEVEMENT/);
+  assert.match(landmarkUnlock, /View achievements/);
   assert.match(landmarkUnlock, /#achievement-heading/);
   assert.doesNotMatch(lesson, /className="reward-strip"/);
   assert.doesNotMatch(lesson, /className="unlock-path"/);
@@ -1193,7 +1194,8 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(review, /Quick recall!/);
   assert.match(review, /Memory recovered!/);
   assert.match(review, /REVIEW · ALL CLEAR/);
-  assert.match(review, /SESSION WIN SAVED/);
+  assert.match(review, /review-stop-note/);
+  assert.doesNotMatch(review, /SESSION WIN SAVED|PROGRESS SAVED/);
   assert.match(review, /You can stop here/);
   assert.match(review, /suggestedLesson/);
   assert.match(boss, /isFinalRegion/);
@@ -1208,21 +1210,22 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(boss, /SKILL MAP/);
   assert.match(boss, /A correction keeps the map moving/);
   assert.match(boss, /bossXpEarned/);
-  assert.match(boss, /Fair replay · no farmable XP/);
+  assert.match(boss, /"Replay"/);
   assert.match(boss, /REGION CONNECTION/);
-  assert.match(boss, /Every skill remains open to revisit/);
+  assert.doesNotMatch(boss, /Every skill remains open to revisit/);
   assert.match(boss, /NEXT REGION UNLOCKED/);
   assert.match(boss, /WHOLE TRAIL COMPLETE/);
-  assert.match(boss, /Everything is saved/);
+  assert.doesNotMatch(boss, /Everything is saved/);
   assert.match(boss, /This is enough for today/);
   assert.match(boss, /region\.lessons\.map\(\(lesson\) => <div className="boss-victory-skill"/);
   assert.doesNotMatch(boss, /className="reward-strip"/);
   assert.doesNotMatch(boss, /className="unlock-path boss-unlock"/);
-  assert.match(css, /\.review-memory-path/);
+  assert.doesNotMatch(css, /\.review-memory-path/);
   assert.match(css, /\.review-memory-meter/);
   assert.match(css, /\.review-memory-nodes/);
   assert.match(css, /\.review-clear-state/);
-  assert.match(css, /\.session-save-card/);
+  assert.doesNotMatch(css, /\.session-save-card/);
+  assert.match(css, /\.review-stop-note/);
   assert.match(css, /\.review-finish-actions/);
   assert.match(css, /\.repair-progress/);
   assert.match(css, /\.repair-checkpoint/);
@@ -1238,10 +1241,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.match(css, /@media \(max-width: 760px\)[\s\S]*\.boss-settlement-summary \{ grid-template-columns: 1fr/);
   assert.match(profile, /evaluateAchievements/);
   assert.match(achievementsSource, /achievementSpecs/);
-  assert.match(profile, /QUEST TROPHIES/);
+  assert.match(profile, />Achievements</);
   for (const achievement of ["First Step", "Twelve Sparks", "Boss Link", "Steady Week", "Trail Builder", "Boss Pathfinder"]) assert.match(achievementsSource, new RegExp(achievement));
-  assert.match(profile, /Private collection/);
-  assert.match(profile, /Only you can open it/);
+  assert.doesNotMatch(profile, /QUEST TROPHIES|Private collection|Only you can open it|\/ 500/);
   assert.match(css, /\.achievement-section/);
   assert.match(css, /\.achievement-grid/);
   assert.match(css, /\.achievement-badge/);

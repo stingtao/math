@@ -68,9 +68,9 @@ function RangeControl({ label, display, value, min, max, step, onChange }: { lab
 export function AdvancedMathTool({ lesson }: { lesson: LessonDefinition }) {
   const mode = toolMode(lesson);
   return <section className={`advanced-math-tool tool-${mode} accent-${lesson.accent}`} aria-label={`${lesson.title} interactive concept tool`}>
-    <header><span><small>MOVE IT · NOTICE IT · EXPLAIN IT</small><strong>{lesson.title} Lab</strong></span><b>Private scratch space</b></header>
+    <header><span><small>MOVE IT · NOTICE IT · EXPLAIN IT</small><strong>{lesson.title} Lab</strong></span><b>Not saved</b></header>
     {mode === "calculus" ? <CalculusLens /> : mode === "circle" ? <UnitCircleLab /> : mode === "probability" ? <ProbabilityLab /> : mode === "vector" ? <VectorLab /> : mode === "scale" ? <ScaleLab lesson={lesson} /> : <FunctionLab lesson={lesson} />}
-    <footer><span aria-hidden="true">◇</span><p><strong>Move one control. Explain one change.</strong> The picture, value, and rule update together. Nothing here is saved.</p></footer>
+    <footer><span aria-hidden="true">◇</span><p><strong>Move one control. Explain one change.</strong> The picture, value, and rule update together.</p></footer>
   </section>;
 }
 

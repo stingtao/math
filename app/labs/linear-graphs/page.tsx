@@ -32,7 +32,7 @@ export default function LinearGraphsLabPage() {
     <main className="site-shell graph-lab-page">
       <PublicHeader />
       <section className="graph-lab-hero">
-        <div><span className="eyebrow">OPEN MATH LAB · GRADES 7–12</span><h1>Draw the line.<br />Decode the rule.</h1><p>Plot points, connect the pattern, then change an equation and watch the graph respond. No sign-in, timer, score, or saved input.</p><div className="graph-lab-hero-actions"><a className="primary-button" href="#point-mission">Start with five points <span aria-hidden="true">↓</span></a><a className="text-link" href="#live-graph">Type an equation instead</a></div></div>
+        <div><span className="eyebrow">OPEN MATH LAB · GRADES 7–12</span><h1>Draw the line.<br />Decode the rule.</h1><p>Plot points, connect the pattern, then change an equation and watch the graph respond. Nothing is saved.</p><div className="graph-lab-hero-actions"><a className="primary-button" href="#point-mission">Start with five points <span aria-hidden="true">↓</span></a><a className="text-link" href="#live-graph">Type an equation instead</a></div></div>
         <div className="graph-lab-formula" aria-label="In y equals m x plus b, m is the slope and b is the y-intercept"><span>y</span><i>=</i><span className="graph-formula-term"><strong>m</strong><small>slope</small></span><b>x</b><i>+</i><span className="graph-formula-term"><em>b</em><small>y-intercept</small></span></div>
       </section>
 
@@ -54,7 +54,6 @@ export default function LinearGraphsLabPage() {
       <section className="graph-lab-connections" aria-labelledby="grade-connections-heading">
         <header><span className="section-kicker">ONE TOOL · SIX GRADE PATHS</span><h2 id="grade-connections-heading">This line keeps showing up.</h2></header>
         <div>{gradeConnections.map((item) => <article className={`accent-${item.accent}`} key={item.grade}><TopicIcon visual={item.visual} accent={item.accent} size="md" label="" /><span>GRADE {item.grade}</span><h3>{item.title}</h3><p>{item.copy}</p><code>{item.equation}</code></article>)}</div>
-        <footer><span aria-hidden="true">◇</span><p><strong>Private by default.</strong> Equations entered here remain in this browser tab and are never connected to an account, lesson history, or leaderboard.</p></footer>
       </section>
     </main>
   );

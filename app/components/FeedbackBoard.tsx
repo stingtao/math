@@ -34,15 +34,15 @@ export function FeedbackBoard() {
   return <main className="site-shell feedback-page">
     <PublicHeader />
     <section className="feedback-wrap">
-      <header><span className="eyebrow">ANONYMOUS FEEDBACK BOARD</span><h1>What should feel clearer?</h1><p>Point out a confusing step, missing example, or rough screen. Your post gets a new random name and never connects to your account or progress.</p></header>
+      <header><span className="eyebrow">FEEDBACK</span><h1>What should feel clearer?</h1><p>Tell us what felt confusing, wrong, or missing. Posts use a random name.</p></header>
       <form className="feedback-form" onSubmit={submit}>
         <label><span>Your suggestion</span><textarea maxLength={600} rows={5} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Which step felt confusing? What example or change would help?" /></label>
         <input className="feedback-honeypot" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-        <div><small>{message.length}/600 · Names, email addresses, phone numbers, social handles, school names, and links do not belong here. Contact details are blocked before posting.</small><button className="primary-button" type="submit" disabled={busy || message.trim().length < 3}>{busy ? "Posting…" : "Post anonymously"}</button></div>
+        <div><small>{message.length}/600 · Do not include personal or contact details.</small><button className="primary-button" type="submit" disabled={busy || message.trim().length < 3}>{busy ? "Posting…" : "Post feedback"}</button></div>
         {status && <p className="signin-status" aria-live="polite">{status}</p>}
       </form>
       <section className="feedback-list" aria-live="polite">
-        <div className="section-heading"><span className="section-kicker">RECENT NOTES</span><h2>{messages.length ? "What learners are saying" : "The board is ready for its first note"}</h2></div>
+        <div className="section-heading"><h2>{messages.length ? "Recent feedback" : "No feedback yet"}</h2></div>
         {messages.map((item) => <article key={item.id}><div><span className="feedback-avatar" aria-hidden="true">◇</span><strong>{item.nickname}</strong><time dateTime={item.created_at}>{new Date(item.created_at).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</time></div><p>{item.body}</p></article>)}
       </section>
     </section>

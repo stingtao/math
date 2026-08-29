@@ -74,7 +74,6 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <span className="section-kicker">REVIEW · ALL CLEAR</span>
         <h1>No skill is due right now.</h1>
         <p>Your review is caught up. That is a complete study win—no extra work needed.</p>
-        <div className="session-save-card"><span aria-hidden="true">✓</span><div><small>PROGRESS SAVED</small><strong>You can stop here.</strong><p>When an idea is ready to revisit, up to five quick recalls will appear as Today’s best step.</p></div></div>
         <div className="review-finish-actions">
           <a className="secondary-button" href={trailHref}>View learning map</a>
           {suggestedLesson && <a className="primary-button" href={suggestedHref}>Optional: {suggestedLesson.title} <span>→</span></a>}
@@ -160,9 +159,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <span className="section-kicker">DAILY REVIEW COMPLETE</span>
         <h1>{questions.length} skills back online.</h1>
         <p>They will return again when another quick recall will help them stick.</p>
-        <div className="review-finish-reward"><span><strong>+20</strong> XP</span><span><strong>{questions.length}/{questions.length}</strong> recalled</span><span><strong>1–14</strong> day cycle</span></div>
-        <div className="review-memory-path" aria-label="Today complete and future reviews scheduled"><span className="done"><b>✓</b> Today complete</span><i /><span><b>◇</b> Next recall scheduled</span></div>
-        <div className="session-save-card"><span aria-hidden="true">✓</span><div><small>SESSION WIN SAVED</small><strong>You can stop here.</strong><p>When another idea is due, it will appear as Today’s best step on your trail.</p></div></div>
+        <div className="review-finish-reward"><span><strong>+20</strong> XP</span></div>
+        <p className="review-stop-note">You can stop here.</p>
         <div className="review-finish-actions"><a className="secondary-button" href={trailHref}>View learning map</a>{suggestedLesson && <a className="primary-button" href={suggestedHref}>Optional: {suggestedLesson.title} <span>→</span></a>}</div>
       </section>
     </main>

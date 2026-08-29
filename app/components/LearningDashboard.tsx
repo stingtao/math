@@ -219,10 +219,10 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               <span className="reward-balance" aria-label={`${state.profile.trailTokens} Trail Tokens available`}>◇ {state.profile.trailTokens}</span>
             </div>
             <div className="daily-reward-hero">
-              <span className="daily-token-medallion" aria-hidden="true"><b>{state.dailyRewardClaimed ? "✓" : `+${visibleRewardAmount}`}</b><small>{state.dailyRewardClaimed ? "SAVED" : "TOKENS"}</small></span>
+              <span className="daily-token-medallion" aria-hidden="true"><b>{state.dailyRewardClaimed ? "✓" : `+${visibleRewardAmount}`}</b>{!state.dailyRewardClaimed && <small>TOKENS</small>}</span>
               <div className="daily-reward-heading">
                 <h2 id="daily-reward-heading">{state.dailyRewardClaimed ? "Today’s reward is collected" : `Collect +${visibleRewardAmount} Trail Tokens`}</h2>
-                <p>{state.dailyRewardClaimed ? `Next claim: +${followingRewardAmount} tokens${followingRewardStep === 7 ? " and a Streak Shield" : ""}.` : `Claim ${nextRewardStep} of 7 is ready. Every reward is fixed.`}</p>
+                <p>{state.dailyRewardClaimed ? `Next claim: +${followingRewardAmount} tokens${followingRewardStep === 7 ? " and a Streak Shield" : ""}.` : `Claim ${nextRewardStep} of 7 is ready.`}</p>
               </div>
             </div>
             <button className="secondary-button full-button reward-claim-button" type="button" disabled={state.dailyRewardClaimed || rewardPending} aria-busy={rewardPending} onClick={claimReward}>{rewardPending ? "Collecting…" : state.dailyRewardClaimed ? "Collected today ✓" : `Collect +${visibleRewardAmount} tokens`}</button>
@@ -235,7 +235,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             </div>
 
             <details className="daily-reward-details" open={!state.dailyRewardClaimed}>
-              <summary><span>Fixed seven-claim path</span><strong>{state.dailyRewardClaimed ? `Claim ${visibleRewardStep} complete` : `Claim ${nextRewardStep} ready`}</strong></summary>
+              <summary><span>Seven-claim path</span><strong>{state.dailyRewardClaimed ? `Claim ${visibleRewardStep} complete` : `Claim ${nextRewardStep} ready`}</strong></summary>
               <div className="reward-calendar" aria-label="Seven-claim reward journey" role="list">
                 {dailyRewardAmounts.map((amount, index) => {
                   const claimNumber = index + 1;
@@ -250,12 +250,12 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
               </div>
               <div className="reward-note">
                 <strong>{state.dailyRewardClaimed ? `Claim ${followingRewardStep} of 7 comes next.` : "Skip a day? Nothing resets."}</strong>
-                <span>{state.dailyRewardClaimed ? "Return another day when it works for you." : "This seven-claim path waits for you—no mystery boxes or paid boosts."}</span>
+                <span>{state.dailyRewardClaimed ? "Return another day when it works for you." : "This path waits for you."}</span>
               </div>
-              <div className="reward-shield" aria-label={`${state.profile.streakShields} Streak Shields available`}><span aria-hidden="true">◇</span><div><strong>{state.profile.streakShields > 0 ? `${state.profile.streakShields} Streak ${state.profile.streakShields === 1 ? "Shield" : "Shields"} ready` : "A Streak Shield waits at claim 7"}</strong><small>{state.profile.streakShields > 0 ? "One shield protects your streak after one missed day." : "It is earned automatically—never purchased."}</small></div></div>
+              <div className="reward-shield" aria-label={`${state.profile.streakShields} Streak Shields available`}><span aria-hidden="true">◇</span><div><strong>{state.profile.streakShields > 0 ? `${state.profile.streakShields} Streak ${state.profile.streakShields === 1 ? "Shield" : "Shields"} ready` : "A Streak Shield waits at claim 7"}</strong><small>{state.profile.streakShields > 0 ? "One shield protects your streak after one missed day." : "Earned at claim 7."}</small></div></div>
             </details>
 
-            <a className="reward-locker-link" href={`/profile${demo ? "?demo=1" : ""}`}><span aria-hidden="true">◇</span><div><strong>Use tokens for permanent frames</strong><small>Open your private Avatar Locker</small></div><b aria-hidden="true">→</b></a>
+            <a className="reward-locker-link" href={`/profile${demo ? "?demo=1" : ""}`}><span aria-hidden="true">◇</span><div><strong>Use tokens for avatar frames</strong><small>Open Avatar frames</small></div><b aria-hidden="true">→</b></a>
           </aside>
           </div>
         </section>
@@ -286,11 +286,11 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <span>{gradeComplete ? reviewBatchSize > 0 ? "REVIEW READY" : "TRAIL CLEARED" : activeBossReady ? "BOSS READY" : `STEP ${activeDone + 1} OF ${activeRegion.lessons.length}`}</span>
             <strong>{gradeComplete ? reviewBatchSize > 0 ? `${reviewBatchSize} quick ${reviewBatchSize === 1 ? "recall" : "recalls"}` : "Nothing due today" : activeBossReady ? "5 mixed questions" : activeNextLesson?.title}</strong>
             <a className={gradeComplete && reviewBatchSize === 0 ? "secondary-button" : "primary-button"} href={questHref}>{gradeComplete ? reviewBatchSize > 0 ? "Open Daily Review" : "Browse completed lessons" : activeBossReady ? "Start boss quest" : "Continue quest"} <span aria-hidden="true">{gradeComplete && reviewBatchSize === 0 ? "↓" : "→"}</span></a>
-            {nextPrivateAchievement ? <a className={`quest-landmark accent-${nextPrivateAchievement.tone}`} href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`} aria-label={`Next private landmark: ${nextPrivateAchievement.title}, ${nextPrivateAchievement.value} of ${nextPrivateAchievement.target} ${nextPrivateAchievement.unit}${nextPrivateAchievement.target === 1 ? "" : "s"}`}>
+            {nextPrivateAchievement ? <a className={`quest-landmark accent-${nextPrivateAchievement.tone}`} href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`} aria-label={`Next achievement: ${nextPrivateAchievement.title}, ${nextPrivateAchievement.value} of ${nextPrivateAchievement.target} ${nextPrivateAchievement.unit}${nextPrivateAchievement.target === 1 ? "" : "s"}`}>
               <span className="quest-landmark-glyph" aria-hidden="true">{nextPrivateAchievement.glyph}</span>
-              <span className="quest-landmark-copy"><small>NEXT PRIVATE LANDMARK</small><strong>{nextPrivateAchievement.title}</strong><span>{nextPrivateAchievement.value}/{nextPrivateAchievement.target} {nextPrivateAchievement.unit}{nextPrivateAchievement.target === 1 ? "" : "s"}</span><span className="quest-landmark-meter" role="progressbar" aria-label={`${nextPrivateAchievement.title} progress`} aria-valuemin={0} aria-valuemax={nextPrivateAchievement.target} aria-valuenow={Math.min(nextPrivateAchievement.value, nextPrivateAchievement.target)}><i style={{ width: `${nextPrivateAchievement.progress}%` }} /></span></span>
+              <span className="quest-landmark-copy"><small>NEXT ACHIEVEMENT</small><strong>{nextPrivateAchievement.title}</strong><span>{nextPrivateAchievement.value}/{nextPrivateAchievement.target} {nextPrivateAchievement.unit}{nextPrivateAchievement.target === 1 ? "" : "s"}</span><span className="quest-landmark-meter" role="progressbar" aria-label={`${nextPrivateAchievement.title} progress`} aria-valuemin={0} aria-valuemax={nextPrivateAchievement.target} aria-valuenow={Math.min(nextPrivateAchievement.value, nextPrivateAchievement.target)}><i style={{ width: `${nextPrivateAchievement.progress}%` }} /></span></span>
               <b aria-hidden="true">→</b>
-            </a> : <a className="quest-landmark shelf-complete" href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`}><span className="quest-landmark-glyph" aria-hidden="true">✓</span><span className="quest-landmark-copy"><small>PRIVATE LANDMARKS</small><strong>Shelf complete</strong><span>Every current badge is yours.</span></span><b aria-hidden="true">→</b></a>}
+            </a> : <a className="quest-landmark shelf-complete" href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`}><span className="quest-landmark-glyph" aria-hidden="true">✓</span><span className="quest-landmark-copy"><small>ACHIEVEMENTS</small><strong>All current achievements earned.</strong></span><b aria-hidden="true">→</b></a>}
           </div>
         </section>
 

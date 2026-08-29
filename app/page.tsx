@@ -3,7 +3,7 @@ import { FrontierWorldExplorer } from "./components/FrontierWorldExplorer";
 import { GoogleSignIn } from "./components/GoogleSignIn";
 import { PublicHeader } from "./components/Header";
 import { TopicIcon } from "./components/TopicIcon";
-import { curriculumStats, gradeCurricula } from "@/lib/curriculum";
+import { gradeCurricula } from "@/lib/curriculum";
 import { featuredFrontierWorlds } from "@/lib/frontier-worlds";
 
 export const dynamic = "force-dynamic";
@@ -23,8 +23,6 @@ const gradeVisuals = {
   11: { visual: "growth", accent: "teal" as const },
   12: { visual: "curve-line", accent: "gold" as const },
 };
-
-const expandedSceneCount = 124;
 
 export default function Home() {
   const clientId = process.env.GOOGLE_CLIENT_ID ?? "";
@@ -46,7 +44,7 @@ export default function Home() {
       <section className="frontier-world-gallery" aria-labelledby="world-gallery-title">
         <div className="frontier-section-heading">
           <span className="frontier-section-index">02 · CHOOSE A WORLD</span>
-          <div><p className="frontier-kicker">THREE FRONTIERS · ONE SKILL TREE</p><h2 id="world-gallery-title">Your math changes what the crew can build.</h2></div>
+          <div><p className="frontier-kicker">CHOOSE A FRONTIER</p><h2 id="world-gallery-title">Your math changes what the crew can build.</h2></div>
           <p>Each world gives Grade 7–9 math a job: route a rover, pressure-test a habitat, or decode a signal.</p>
         </div>
         <div className="frontier-world-cards">
@@ -134,23 +132,15 @@ export default function Home() {
         </div>
         <div className="frontier-grade-grid">
           {gradeCurricula.map((curriculum) => {
-            const lessonCount = curriculum.regions.reduce((total, region) => total + region.lessons.length, 0);
             const gradeVisual = gradeVisuals[curriculum.grade];
             return (
               <a className={`frontier-grade-card accent-${gradeVisual.accent}`} href={`/learn?grade=${curriculum.grade}&demo=1`} key={curriculum.grade}>
                 <header><TopicIcon visual={gradeVisual.visual} accent={gradeVisual.accent} size="md" label="" /><span>GRADE <b>{curriculum.grade}</b></span></header>
                 <h3>{curriculum.subtitle}</h3>
-                <p>{lessonCount} missions · {curriculum.regions.length} bosses</p>
                 <strong>Open route <span aria-hidden="true">→</span></strong>
               </a>
             );
           })}
-        </div>
-        <div className="frontier-content-proof" aria-label="Course coverage">
-          <span><b>{curriculumStats.grades}</b> grade paths</span>
-          <span><b>{curriculumStats.lessons}</b> short missions</span>
-          <span><b>{curriculumStats.questions}</b> practice checks</span>
-          <span><b>{expandedSceneCount}</b> full visual scenes</span>
         </div>
       </section>
 

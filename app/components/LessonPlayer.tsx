@@ -302,7 +302,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     const nextStep = reward.firstCompletion
       ? regionFinished
         ? { kicker: "BOSS GATE OPEN", title: `${region?.title ?? "Region"} Boss`, copy: "Five mixed questions. No timer. Misses open a repair path." }
-        : { kicker: "NEXT MISSION OPEN", title: following?.title ?? "Return to the map", copy: "The next short lesson is ready. Stopping here also counts as progress." }
+        : { kicker: "NEXT MISSION OPEN", title: following?.title ?? "Return to the map", copy: "The next short lesson is ready." }
       : { kicker: "SAVE STATUS", title: "Your best stays safe.", copy: "This replay strengthened memory without removing XP, stars, or keys." };
     const currentAchievementTotals = achievementTotalsForState(state);
     const previousAchievementTotals = {
@@ -322,7 +322,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <h1>{outcome.title}</h1>
           <p>{outcome.copy}</p>
           <div className="settlement-summary" aria-label={`Lesson result: ${keyStatus}, ${stars} run stars, ${reward.xpEarned} XP earned`}>
-            <span className="settlement-key"><b aria-hidden="true">✓</b><strong>{keyStatus}</strong><small>{regionKeyCount} of 4 collected</small></span>
+            <span className="settlement-key"><b aria-hidden="true">✓</b><strong>{keyStatus}</strong><small>Route updated</small></span>
             <span className="settlement-stars"><b aria-hidden="true">{"★".repeat(stars)}{"☆".repeat(3 - stars)}</b><strong>{masteryMessage}</strong><small>{reward.bestStars}/3 saved best</small></span>
             <span className={`settlement-xp ${reward.xpEarned === 0 ? "quiet" : ""}`}><b>+{reward.xpEarned}</b><strong>XP this run</strong><small>{replayed ? "Fair replay" : "Saved to total"}</small></span>
           </div>
@@ -346,11 +346,11 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               <div className={`reward-receipt ${replayed ? "replay" : reward.starsImproved ? "upgrade" : "new"}`} aria-label={`${reward.xpEarned} XP earned on this run`}>
                 <header><div><small>REWARD RECEIPT</small><strong>{replayed ? "Fair replay · skill refreshed" : reward.starsImproved ? "New best · bonus unlocked" : "First finish · XP banked"}</strong></div><b>+{reward.xpEarned} XP</b></header>
                 <div className="reward-receipt-path" aria-hidden="true"><span className={reward.baseXp > 0 ? "earned" : "quiet"}><b>{reward.baseXp > 0 ? `+${reward.baseXp}` : "—"}</b><small>First finish</small></span><i /><span className={reward.starXp > 0 ? "earned" : "quiet"}><b>{reward.starXp > 0 ? `+${reward.starXp}` : "—"}</b><small>Star bonus</small></span><i /><span className="total"><b>+{reward.xpEarned}</b><small>This run</small></span></div>
-                <p>{replayed ? "Repeat XP stays at 0 so practice cannot be farmed for the weekly league. Your memory work still counts." : reward.starsImproved ? `Your ${reward.bestStars}-star marker and the new bonus are permanently saved.` : "This one-time lesson reward is now included in your XP total."}</p>
+                <p>{replayed ? "Repeat XP stays at 0. Your memory work still counts." : reward.starsImproved ? `Your ${reward.bestStars}-star best and bonus were added.` : "This lesson reward was added to your XP total."}</p>
               </div>
             </div>
           </details>
-          <p className="settlement-save-note"><span aria-hidden="true">✓</span><strong>Everything is saved.</strong> This is enough for today.</p>
+          <p className="settlement-save-note"><span aria-hidden="true">✓</span><strong>This is enough for today.</strong></p>
           <div className="celebration-actions settlement-actions">
             <a className="primary-button" href={primaryHref}>{primaryLabel} <span aria-hidden="true">→</span></a>
             <a className="secondary-button" href={secondaryHref}>{secondaryLabel}</a>
@@ -380,9 +380,9 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <h1>{lesson.title}</h1>
           <p>{lesson.goal}</p>
           <ol className="stage-list">{stageLabels.map((item, index) => <li className={index < stage ? "done" : index === stage ? "active" : ""} key={item.label}><span aria-hidden="true">{index < stage ? "✓" : item.icon}</span>{item.label}</li>)}</ol>
-          {lessonBadge && <div className={`lesson-badge-quest accent-${lesson.accent}`}>
+          {lessonBadge && <div className={`lesson-badge-quest accent-${lesson.accent}`} aria-label={`${lessonBadge.title}: ${completeMap.has(lesson.id) ? "earned" : `${lessonProgressPercent} percent complete`}`}>
             <BadgeMedallion badge={lessonBadge} earned={completeMap.has(lesson.id)} size="sm" />
-            <div><small>{completeMap.has(lesson.id) ? "CREST EARNED" : "LESSON CREST"}</small><strong>{lessonBadge.title}</strong><p>{completeMap.has(lesson.id) ? "Replay to strengthen your mastery marker." : `Complete all ${stageLabels.length} quest steps to add it to your private vault.`}</p><span aria-label={`${lessonProgressPercent} percent charged`}><i style={{ width: `${lessonProgressPercent}%` }} /></span></div>
+            <div>{!completeMap.has(lesson.id) && <small>NEXT BADGE</small>}<strong>{lessonBadge.title}</strong>{!completeMap.has(lesson.id) && <span role="progressbar" aria-label="Lesson badge progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={lessonProgressPercent}><i style={{ width: `${lessonProgressPercent}%` }} /></span>}</div>
           </div>}
           <span className="standard-chip">{lesson.standard}</span>
         </aside>

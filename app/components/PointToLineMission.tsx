@@ -192,7 +192,7 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
         </aside>
       </div>
 
-      <footer><span aria-hidden="true">◇</span><p><strong>Private practice.</strong> Your taps and coordinates stay in this browser tab and are never saved or tied to an identity.</p></footer>
+      <footer><span aria-hidden="true">◇</span><p>Points are not saved.</p></footer>
     </section>
   );
 }

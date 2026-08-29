@@ -12,8 +12,8 @@ export function PrivateLandmarkUnlock({
   return (
     <section className={`settlement-landmark accent-${achievement.tone} ${compact ? "compact-landmark" : ""}`} role="status" aria-label={`${achievement.title} achievement unlocked`}>
       <span className="achievement-badge" aria-hidden="true"><b>{achievement.glyph}</b><i /></span>
-      <div><small>PRIVATE LANDMARK UNLOCKED</small><strong>{achievement.title}</strong><p>{achievement.copy} It is now saved on your private achievement shelf.</p></div>
-      <a href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`}>View shelf <span aria-hidden="true">→</span></a>
+      <div><small>NEW ACHIEVEMENT</small><strong>{achievement.title}</strong><p>{achievement.copy}</p></div>
+      <a href={`/profile${demo ? "?demo=1" : ""}#achievement-heading`}>View achievements <span aria-hidden="true">→</span></a>
     </section>
   );
 }
