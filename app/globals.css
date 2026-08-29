@@ -579,7 +579,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
   .grade-switcher { margin-bottom: 12px; }
   .grade-switcher a { min-height: 44px; font-size: 17px; }
   .next-card { min-height: 0; padding: 17px; gap: 10px; border-radius: 20px; }
-  .next-visual { min-height: 120px; }
+  .next-visual { min-height: 100px; }
   .review-priority-orbit { transform: scale(.8); }
   .review-priority-visual > small { bottom: 12px; }
   .concept-mini { transform: scale(.82); }
@@ -3840,6 +3840,11 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
   .grade-switcher { display: flex; overflow-x: auto; gap: 6px; scroll-snap-type: x proximity; scrollbar-width: none; }
   .grade-switcher::-webkit-scrollbar { display: none; }
   .grade-switcher a { min-width: 74px; padding-inline: 8px; flex: 0 0 74px; scroll-snap-align: start; }
+}
+
+@media (max-width: 520px) {
+  .theme-world-hud { min-height: 48px; margin-top: 6px; padding: 5px 9px; grid-template-columns: 34px minmax(0, 1fr); gap: 7px; border-radius: 13px; }
+  .theme-world-hud-motif { width: 34px; height: 34px; border-radius: 10px; font-size: 19px; }
 }
 
 .answer-impact.combo-signal { --accent: #4c91e6; }
