@@ -84,6 +84,7 @@ const topicIconSpecs: Record<string, TopicIconSpec> = {
   trials: { kind: "chance", glyph: "n" },
   triangle: { kind: "shape", glyph: "△" },
   "two-way": { kind: "data", glyph: "2×2" },
+  venn: { kind: "chance", glyph: "∪" },
 };
 
 export const topicIconVisuals = Object.freeze(Object.keys(topicIconSpecs));

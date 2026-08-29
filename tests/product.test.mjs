@@ -10,7 +10,8 @@ import { coordinateMissionProgress, coordinateReadTargets, isOnRoverLine, pointT
 import { publicTextPrivacyIssue } from "../lib/privacy.ts";
 import { recoveryGuidance, remixedChoices } from "../lib/practice-recovery.ts";
 import { isAnswerCorrect, lessons } from "../lib/curriculum.ts";
-import { ANSWER_BADGE_STEP, BADGE_CATALOG_SIZE, BADGE_CATALOG_VERSION, answerBadgeForCorrectCount, answerBadges, badgeCatalog, lessonBadges, nextAnswerBadge } from "../lib/badges.ts";
+import { algebraCourseCoverage } from "../lib/curriculum-coverage.ts";
+import { ANSWER_BADGE_COUNT, ANSWER_BADGE_STEP, BADGE_CATALOG_SIZE, BADGE_CATALOG_VERSION, answerBadgeForCorrectCount, answerBadges, badgeCatalog, lessonBadges, nextAnswerBadge } from "../lib/badges.ts";
 import { completeDemoLesson, creditDemoCorrectAnswer, getDemoState } from "../lib/learner-state.ts";
 import { getComboSpec } from "../lib/combo.ts";
 import { isThemeId, themeCatalog } from "../lib/themes.ts";
@@ -78,15 +79,15 @@ test("turns common wrong answers into specific recovery guidance and a delayed r
   assert.deepEqual(remixedChoices(["A", "B", "C"], false), ["A", "B", "C"]);
 });
 
-test("models answer interactions before rendering all 1,100 questions", () => {
+test("models answer interactions before rendering all 1,140 questions", () => {
   const questions = lessons.flatMap((lesson) => lesson.practice);
   const yesNo = questions.filter((question) => question.interaction === "yes-no");
   const trueFalse = questions.filter((question) => question.interaction === "true-false");
   const factorQuestions = questions.filter((question) => /^Factor(?: completely)?\b/i.test(question.prompt));
   const proportionalDecision = lessons.find((lesson) => lesson.slug === "g7-proportional-tables")?.practice[1];
 
-  assert.equal(questions.length, 1100);
-  assert.equal(yesNo.length, 97);
+  assert.equal(questions.length, 1140);
+  assert.equal(yesNo.length, 99);
   assert.equal(trueFalse.length, 1);
   assert.ok(yesNo.every((question) => question.choices?.join("|") === "Yes|No"));
   assert.ok(trueFalse.every((question) => question.choices?.join("|") === "True|False"));
@@ -94,6 +95,25 @@ test("models answer interactions before rendering all 1,100 questions", () => {
   assert.deepEqual(proportionalDecision?.choices, ["Yes", "No"]);
   assert.equal(factorQuestions.length, 17);
   assert.ok(factorQuestions.every((question) => question.interaction === "four-choice" && question.choices?.length === 4));
+});
+
+test("keeps the audited Algebra I scope tied to dedicated lessons and teaching visuals", async () => {
+  const concept = await readFile(new URL("../app/components/ConceptVisual.tsx", import.meta.url), "utf8");
+  const advanced = await readFile(new URL("../app/components/AdvancedMathTool.tsx", import.meta.url), "utf8");
+  const icons = await readFile(new URL("../lib/topic-icons.ts", import.meta.url), "utf8");
+  const slugs = new Set(lessons.map((lesson) => lesson.slug));
+
+  assert.equal(algebraCourseCoverage.length, 16);
+  for (const strand of algebraCourseCoverage) for (const slug of strand.lessonSlugs) assert.ok(slugs.has(slug), `${strand.topic} lost ${slug}`);
+  for (const slug of ["g9-quantities-units-precision", "g9-absolute-value-functions", "g9-absolute-value-inequalities", "g9-graph-linear-inequalities", "g9-systems-linear-inequalities", "g9-build-quadratic-models"]) assert.match(concept, new RegExp(slug));
+  assert.match(concept, /inequality-shade/);
+  assert.match(concept, /system-shade/);
+  assert.match(concept, /quadratic-model-path/);
+  assert.match(advanced, /sets-and-venn[\s\S]*return "venn"/);
+  assert.match(advanced, /categorical-data[\s\S]*return "categorical"/);
+  assert.match(advanced, /function VennLab/);
+  assert.match(advanced, /function CategoricalDataLab/);
+  assert.match(icons, /venn: \{ kind: "chance", glyph: "∪" \}/);
 });
 
 test("uses one answer control, concise recovery, and a longer success beat everywhere", async () => {
@@ -306,17 +326,18 @@ test("ships one accessible point-line mission and an active reasoning flow acros
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.point-line-connection/);
 });
 
-test("builds exactly 500 deterministic badges around the full curriculum", () => {
-  assert.equal(BADGE_CATALOG_SIZE, 500);
-  assert.equal(BADGE_CATALOG_VERSION, "2026.2");
+test("extends the deterministic badge catalog without deleting answer milestones", () => {
+  assert.equal(BADGE_CATALOG_SIZE, 508);
+  assert.equal(BADGE_CATALOG_VERSION, "2026.3");
   assert.equal(ANSWER_BADGE_STEP, 10);
-  assert.equal(lessonBadges.length, 220);
+  assert.equal(ANSWER_BADGE_COUNT, 280);
+  assert.equal(lessonBadges.length, 228);
   assert.equal(answerBadges.length, 280);
-  assert.equal(badgeCatalog.length, 500);
-  assert.equal(new Set(badgeCatalog.map((badge) => badge.id)).size, 500);
-  assert.equal(new Set(badgeCatalog.map((badge) => badge.title)).size, 500);
-  assert.equal(new Set(badgeCatalog.map((badge) => badge.catalogNumber)).size, 500);
-  assert.equal(new Set(lessonBadges.map((badge) => badge.lessonId)).size, 220);
+  assert.equal(badgeCatalog.length, 508);
+  assert.equal(new Set(badgeCatalog.map((badge) => badge.id)).size, 508);
+  assert.equal(new Set(badgeCatalog.map((badge) => badge.title)).size, 508);
+  assert.equal(new Set(badgeCatalog.map((badge) => badge.catalogNumber)).size, 508);
+  assert.equal(new Set(lessonBadges.map((badge) => badge.lessonId)).size, 228);
   assert.equal(answerBadges.at(0)?.target, 10);
   assert.equal(answerBadges.at(-1)?.target, 2_800);
   for (const [index, badge] of answerBadges.entries()) assert.equal(badge.target, (index + 1) * 10);
@@ -502,7 +523,7 @@ test("gives every Grade 10–12 lesson an appropriate interactive concept tool",
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(concept, /lesson\.grade >= 10/);
   assert.match(concept, /<AdvancedMathTool lesson=\{lesson\}/);
-  for (const mode of ["logic", "calculus", "circle", "probability", "vector", "scale", "function"]) assert.match(tool, new RegExp(`"${mode}"`));
+  for (const mode of ["logic", "venn", "categorical", "calculus", "circle", "probability", "vector", "scale", "function"]) assert.match(tool, new RegExp(`"${mode}"`));
   assert.match(tool, /logic-and-conditionals[\s\S]*return "logic"/);
   assert.doesNotMatch(tool, /probability\|conditional\|independence/);
   assert.match(tool, /Not saved/);
@@ -1298,7 +1319,7 @@ test("gives every lesson an applied mission and a sourced history finish", async
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
   const experiences = lessons.map(getLessonExperience);
 
-  assert.equal(experiences.length, 220);
+  assert.equal(experiences.length, 228);
   assert.deepEqual(new Set(experiences.map((item) => item.scene)), new Set(["numbers", "resources", "systems", "navigation", "habitat", "risk", "growth", "motion"]));
   for (const experience of experiences) {
     assert.ok(experience.title.length > 20);

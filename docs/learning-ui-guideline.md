@@ -131,3 +131,16 @@ When the curriculum is large, use a shared experience system without making the 
 - Verify names, dates, publications, and priority claims with reliable sources. Distinguish documented history from classroom legend and avoid assigning sole credit when the historical record is shared or disputed.
 - Link to a concise source for learners who want to go deeper; do not turn the main lesson into a long biography.
 - Place the origin story after practice and before the saved reward when it serves as the lesson's transfer step. The learner should first use the mathematics, then see why people needed it, then complete the lesson.
+
+## 13. Prove curriculum coverage at the lesson-objective level
+
+A broad domain label or neighboring lesson is not proof that a topic is taught.
+
+- Establish the actual standards authority first. The United States has state and local curriculum authority; Common Core is an auditable standards baseline, not a single federally mandated course sequence.
+- Split each requested strand into concept, representation, procedure, modeling, and interpretation. One-variable inequalities do not cover two-variable half-planes; reading a quadratic graph does not cover building a quadratic model; and listing a sample space does not cover Venn unions, intersections, and complements.
+- Require a named lesson objective, a worked model, five reviewed questions, and a suitable answer interaction for each distinct outcome.
+- Store important scope in a machine-checked coverage contract so deleting or relabeling one required lesson fails validation.
+- Append new lessons inside an existing region when possible. Do not shift existing lesson IDs and silently redirect saved learner progress.
+- Record why a gap existed. Future audits should test the failed assumption, not merely search for the newly added title.
+
+The current Algebra I audit and topic evidence live in [curriculum-coverage.md](./curriculum-coverage.md) and `lib/curriculum-coverage.ts`.

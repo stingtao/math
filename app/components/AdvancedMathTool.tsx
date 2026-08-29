@@ -42,6 +42,8 @@ function pathFor(fn: FunctionModel["fn"]) {
 function toolMode(lesson: LessonDefinition) {
   const slug = lesson.slug;
   if (/logic-and-conditionals/.test(slug)) return "logic";
+  if (/sets-and-venn/.test(slug)) return "venn";
+  if (/categorical-data/.test(slug)) return "categorical";
   if (/limit|derivative|tangent|motion|increasing|optimization|antiderivative|integral|fundamental/.test(slug)) return "calculus";
   if (/trig|radian|unit-circle|polar|complex-plane/.test(slug)) return "circle";
   if (/probability|independence|sampling|distribution|expected|binomial|hypothesis|confidence|statistical|data|regression/.test(slug)) return "probability";
@@ -70,9 +72,39 @@ export function AdvancedMathTool({ lesson }: { lesson: LessonDefinition }) {
   const mode = toolMode(lesson);
   return <section className={`advanced-math-tool tool-${mode} accent-${lesson.accent}`} aria-label={`${lesson.title} interactive concept tool`}>
     <header><span><small>MOVE IT · NOTICE IT · EXPLAIN IT</small><strong>{lesson.title} Lab</strong></span><b>Not saved</b></header>
-    {mode === "logic" ? <LogicLab /> : mode === "calculus" ? <CalculusLens /> : mode === "circle" ? <UnitCircleLab /> : mode === "probability" ? <ProbabilityLab /> : mode === "vector" ? <VectorLab /> : mode === "scale" ? <ScaleLab lesson={lesson} /> : <FunctionLab lesson={lesson} />}
+    {mode === "logic" ? <LogicLab /> : mode === "venn" ? <VennLab /> : mode === "categorical" ? <CategoricalDataLab /> : mode === "calculus" ? <CalculusLens /> : mode === "circle" ? <UnitCircleLab /> : mode === "probability" ? <ProbabilityLab /> : mode === "vector" ? <VectorLab /> : mode === "scale" ? <ScaleLab lesson={lesson} /> : <FunctionLab lesson={lesson} />}
     <footer><span aria-hidden="true">◇</span><p><strong>Move one control. Explain one change.</strong> The picture, value, and rule update together.</p></footer>
   </section>;
+}
+
+function VennLab() {
+  const [selection, setSelection] = useState<"union" | "intersection" | "complement">("intersection");
+  const explanation = selection === "union" ? "Everything in A or B, including the overlap." : selection === "intersection" ? "Only outcomes that belong to both A and B." : "Everything in the universal set that is not in A.";
+  return <div className={`advanced-tool-workspace venn-workspace is-${selection}`}>
+    <div className="venn-stage" role="img" aria-label={explanation}>
+      <svg viewBox="0 0 420 280">
+        <defs><clipPath id="venn-a-clip"><circle cx="175" cy="140" r="84" /></clipPath></defs>
+        <rect className="venn-universe" x="28" y="24" width="364" height="232" rx="18" />
+        <circle className="venn-set venn-set-a" cx="175" cy="140" r="84" />
+        <circle className="venn-set venn-set-b" cx="245" cy="140" r="84" />
+        <circle className="venn-overlap" cx="245" cy="140" r="84" clipPath="url(#venn-a-clip)" />
+        <text x="130" y="142">A</text><text x="278" y="142">B</text><text className="venn-u-label" x="45" y="50">U</text>
+      </svg>
+    </div>
+    <div className="advanced-tool-panel"><span className="advanced-tool-tag">SET RELATION</span><h3>{selection === "union" ? "A ∪ B" : selection === "intersection" ? "A ∩ B" : "Aᶜ"}</h3><p>{explanation}</p><div className="venn-choice-grid" aria-label="Choose a set relationship">{(["union", "intersection", "complement"] as const).map((item) => <button className={selection === item ? "selected" : ""} type="button" aria-pressed={selection === item} onClick={() => setSelection(item)} key={item}>{item === "union" ? "A ∪ B" : item === "intersection" ? "A ∩ B" : "Aᶜ"}</button>)}</div><div className="advanced-live-value"><small>READ THE SHADE</small><strong>{selection === "union" ? "A or B" : selection === "intersection" ? "A and B" : "not A"}</strong></div></div>
+  </div>;
+}
+
+function CategoricalDataLab() {
+  const [group, setGroup] = useState<"A" | "B">("A");
+  const values = group === "A" ? { yes: 30, total: 50 } : { yes: 42, total: 70 };
+  const percent = Math.round(values.yes / values.total * 100);
+  return <div className="advanced-tool-workspace categorical-workspace">
+    <div className="categorical-stage">
+      <table aria-label="Preference counts by group"><thead><tr><th>Group</th><th>Yes</th><th>No</th><th>Total</th></tr></thead><tbody><tr className={group === "A" ? "selected" : ""}><th>A</th><td>30</td><td>20</td><td>50</td></tr><tr className={group === "B" ? "selected" : ""}><th>B</th><td>42</td><td>28</td><td>70</td></tr><tr><th>Total</th><td>72</td><td>48</td><td>120</td></tr></tbody></table>
+    </div>
+    <div className="advanced-tool-panel"><span className="advanced-tool-tag">CONDITIONAL RATE</span><h3>Compare within one group.</h3><p>Use that group&apos;s total as the denominator. Raw counts alone can make a larger group look stronger.</p><div className="categorical-choice-grid" aria-label="Choose a group">{(["A", "B"] as const).map((item) => <button className={group === item ? "selected" : ""} type="button" aria-pressed={group === item} onClick={() => setGroup(item)} key={item}>Group {item}</button>)}</div><div className="advanced-live-value"><small>YES WITHIN GROUP {group}</small><strong>{values.yes} ÷ {values.total} = {percent}%</strong></div></div>
+  </div>;
 }
 
 function LogicLab() {

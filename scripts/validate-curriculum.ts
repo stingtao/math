@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curriculum.ts";
+import { algebraCourseCoverage } from "../lib/curriculum-coverage.ts";
 import { inferQuestionInteraction, type QuestionInteraction } from "../lib/question-interactions.ts";
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
@@ -9,12 +10,12 @@ function writtenUnit(choice: string) {
 }
 
 assert.equal(regions.length, 55, "Grades 7–12 must contain 55 regions");
-assert.equal(lessons.length, 220, "Grades 7–12 must contain 220 lessons");
-assert.equal(curriculumStats.questions, 1100, "Every lesson must contain five reviewed questions");
+assert.equal(lessons.length, 228, "Grades 7–12 must contain 228 lessons");
+assert.equal(curriculumStats.questions, 1140, "Every lesson must contain five reviewed questions");
 assert.ok(lessons.every((lesson) => lesson.practice.length === 5), "Every lesson must contain exactly five questions");
 assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, lessons.length, "Lesson IDs must be unique");
 assert.equal(new Set(lessons.map((lesson) => lesson.slug)).size, lessons.length, "Lesson slugs must be unique");
-assert.deepEqual([7, 8, 9, 10, 11, 12].map((grade) => lessons.filter((lesson) => lesson.grade === grade).length), [32, 52, 40, 32, 32, 32]);
+assert.deepEqual([7, 8, 9, 10, 11, 12].map((grade) => lessons.filter((lesson) => lesson.grade === grade).length), [32, 52, 46, 34, 32, 32]);
 assert.ok(lessons.every((lesson) => hasSpecificTopicIcon(lesson.visual)), "Every lesson visual must have a specific topic icon");
 assert.equal(new Set(lessons.map((lesson) => lesson.visual)).size, topicIconVisuals.length, "Icon catalog must exactly cover curriculum visuals");
 assert.equal(Object.keys(regionLandmarks).length, regions.length, "Every current region must have one visual landmark");
@@ -23,7 +24,7 @@ assert.ok(regions.every((region) => getRegionLandmark(region.grade, region.id)),
 const requiredDomains = new Map<number, string[]>([
   [7, ["7.RP", "7.NS", "7.EE", "7.G", "7.SP"]],
   [8, ["8.NS", "8.EE", "8.F", "8.G", "8.SP"]],
-  [9, ["HSN.RN", "HSA.SSE", "HSA.APR", "HSA.CED", "HSA.REI", "HSF.IF", "HSF.BF", "HSF.LE", "HSS.ID"]],
+  [9, ["HSN.RN", "HSN.Q", "HSA.SSE", "HSA.APR", "HSA.CED", "HSA.REI", "HSF.IF", "HSF.BF", "HSF.LE", "HSS.ID"]],
   [10, ["HSG.CO", "HSG.SRT", "HSG.GPE", "HSG.C", "HSG.GMD", "HSG.MG", "HSS.CP", "HSF.IF", "HSS.ID"]],
   [11, ["HSA.APR", "HSA.REI", "HSF.LE", "HSF.BF", "HSF.TF", "HSG.GPE", "HSN.VM", "HSS.IC"]],
   [12, ["HSF.BF", "AP.CALC.LIM", "AP.CALC.DIF", "AP.CALC.INT", "HSN.VM", "HSS.MD", "HSS.IC", "HSF.LE"]],
@@ -31,6 +32,16 @@ const requiredDomains = new Map<number, string[]>([
 for (const [grade, domains] of requiredDomains) {
   const gradeStandards = lessons.filter((lesson) => lesson.grade === grade).map((lesson) => lesson.standard).join(" ");
   for (const domain of domains) assert.match(gradeStandards, new RegExp(domain.replace(".", "\\.")), `Grade ${grade} is missing ${domain} coverage`);
+}
+
+const lessonBySlug = new Map(lessons.map((lesson) => [lesson.slug, lesson]));
+for (const strand of algebraCourseCoverage) {
+  for (const slug of strand.lessonSlugs) assert.ok(lessonBySlug.has(slug), `${strand.topic} is missing required lesson ${slug}`);
+  const mappedStandards = strand.lessonSlugs.map((slug) => lessonBySlug.get(slug)?.standard ?? "").join(" ");
+  for (const standard of strand.standards) {
+    const family = standard.replace(/[.][A-Z0-9–-]+$/, "");
+    assert.ok(mappedStandards.includes(standard) || mappedStandards.includes(family), `${strand.topic} is missing standard evidence for ${standard}`);
+  }
 }
 
 let propertyChecks = 0;

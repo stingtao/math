@@ -130,6 +130,13 @@ export const grade10Regions: RegionDefinition[] = [
     { slug: "independence", title: "Independent Events", goal: "Determine whether one event changes the chance of another.", key: "A and B are independent when P(A|B)=P(A), equivalently P(A and B)=P(A)P(B).", example: "Coin result and die result are independent", standard: "HSS.CP.A.2–5", visual: "tree", drills: [
       ["Coin result and die result independent?", "yes"], ["Drawing two cards without replacement independent?", "no"], ["P(A)=0.5, P(B)=0.4, independent. P(A and B)?", "0.2|20%"], ["If P(A|B)=P(A), the events are?", "independent"], ["P(A and B)=0.12 and P(A)=0.3 for independent events. P(B)?", "0.4|40%"],
     ] },
+    { slug: "sets-and-venn-diagrams", title: "Sets and Venn Diagrams", goal: "Read unions, intersections, and complements directly from overlapping sets.", key: "Union means in A or B, intersection means in both, and complement means outside the named set.", example: "If |A|=18, |B|=15, and |A∩B|=6, then |A∪B|=27", standard: "HSS.CP.A.1", visual: "venn", drills: [
+      ["Which symbol means the outcomes in both A and B?", "A ∩ B", ["A ∩ B", "A ∪ B", "Aᶜ", "A ⊂ B"]],
+      ["Which symbol means the outcomes in A or B or both?", "A ∪ B", ["A ∪ B", "A ∩ B", "Aᶜ", "A = B"]],
+      ["If |A|=18, |B|=15, and |A∩B|=6, find |A∪B|.", "27", ["21", "27", "33", "39"]],
+      ["What region represents Aᶜ in a Venn diagram?", "everything outside A", ["everything outside A", "only the overlap", "everything inside A", "only the universal set border"]],
+      ["If every member of A is also in B, which relation is true?", "A is a subset of B", ["A is a subset of B", "A and B are disjoint", "A is the complement of B", "A and B have no universal set"]],
+    ] },
   ]),
   makeRegion(8, "Functions and Data", "Model change with functions and summarize variation.", "HSF.IF · HSS.ID", [
     { slug: "function-notation-review", title: "Function Notation", goal: "Evaluate and interpret function inputs and outputs.", key: "f(a) means the output of f when the input is a; it does not mean f times a.", example: "f(x)=2x²−1 gives f(3)=17", standard: "HSF.IF.A.2", visual: "mapping", drills: [
@@ -143,6 +150,13 @@ export const grade10Regions: RegionDefinition[] = [
     ] },
     { slug: "regression-and-residuals", title: "Regression and Residuals", goal: "Judge how well a model predicts data.", key: "Residual = actual − predicted; a useful model leaves small residuals with no clear pattern.", example: "Actual 18, predicted 15 → residual 3", standard: "HSS.ID.B.6", visual: "residual", drills: [
       ["Actual 20, predicted 17. Residual?", "3"], ["Actual 8, predicted 10. Residual?", "-2"], ["A random residual plot around zero supports the model?", "yes"], ["A curved residual pattern suggests the linear model is?", "not appropriate|poor|inadequate"], ["Correlation alone proves causation?", "no"],
+    ] },
+    { slug: "categorical-data", title: "Categorical Data", goal: "Use two-way tables and relative frequencies to compare groups fairly.", key: "A conditional relative frequency divides by the total of the group being conditioned on, not by the whole table.", example: "18 of 30 bus riders prefer later starts, so 60% of bus riders do", standard: "HSS.ID.B.5", visual: "two-way", drills: [
+      ["18 of 30 bus riders prefer a later start. What percent of bus riders is that?", "60%|0.6", ["40%", "50%", "60%", "75%"]],
+      ["To compare preferences within each grade, which totals should be the denominators?", "the grade totals", ["the grade totals", "the full-table total", "the preference totals", "the number of cells"]],
+      ["Which frequency counts observations that are both Grade 10 and bus riders?", "joint frequency", ["joint frequency", "marginal frequency", "mean", "standard deviation"]],
+      ["Which values appear at the edge of a two-way table after row or column totals?", "marginal frequencies", ["marginal frequencies", "joint frequencies", "residuals", "quartiles"]],
+      ["Group A has 30 of 50 yes; Group B has 42 of 70 yes. Which conclusion is supported?", "the yes rates are equal", ["the yes rates are equal", "Group A has the higher yes rate", "Group B has the higher yes rate", "the rates cannot be compared"]],
     ] },
   ]),
 ];

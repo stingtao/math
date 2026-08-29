@@ -45,6 +45,13 @@ export const grade9Regions: RegionDefinition[] = [
     { slug: "literal-equations", title: "Literal Equations", goal: "Rearrange a formula for a chosen variable.", key: "Treat other letters as known values and use inverse operations.", example: "A = lw → w = A/l", standard: "HSA.CED.A.4", visual: "formula", drills: [
       ["Solve A = lw for w.", "w=A/l|A/l"], ["Solve y = mx + b for b.", "b=y-mx|y-mx"], ["Solve d = rt for t.", "t=d/r|d/r"], ["Solve P = 2l + 2w for l.", "l=(P-2w)/2|(P-2w)/2"], ["Solve C = (5/9)(F − 32) for F.", "F=9C/5+32|9C/5+32"],
     ] },
+    { slug: "quantities-units-precision", title: "Quantities, Units, and Precision", goal: "Choose quantities, units, scales, and precision that keep a model meaningful.", key: "Define what each quantity measures, carry units through the model, and round only as far as the measurement supports.", example: "A sensor reading 18.37°C reported to the nearest tenth is 18.4°C", standard: "HSN.Q.A.1–3", visual: "formula", drills: [
+      ["Which unit best describes a rover's average speed?", "kilometers per hour", ["kilometers per hour", "kilometers", "hours", "square kilometers"]],
+      ["A sensor reads 18.37°C. Report it to the nearest tenth.", "18.4°C|18.4", ["18.0°C", "18.3°C", "18.4°C", "18.37°C"]],
+      ["A graph tracks battery charge over time. Which axis setup is meaningful?", "time on x; charge on y", ["time on x; charge on y", "charge on x; time on y", "time on both axes", "charge on both axes"]],
+      ["Which equation keeps units consistent for distance?", "distance = speed × time", ["distance = speed × time", "distance = speed ÷ time", "distance = time ÷ speed", "distance = speed + time"]],
+      ["A panel is measured as 2.4 m. Which report invents unsupported precision?", "2.4000 m", ["2.4 m", "2 m", "3 m", "2.4000 m"]],
+    ] },
   ]),
   makeRegion(2, "Linear Equations and Inequalities", "Solve, explain, and model one-variable relationships.", "HSA.REI.A–B", [
     { slug: "multi-step-linear-equations", title: "Multi-Step Linear Equations", goal: "Solve equations with variables and constants on both sides.", key: "Simplify, move variable terms to one side, then isolate the variable.", example: "5x − 3 = 2x + 12 → x = 5", standard: "HSA.REI.A.1", visual: "balance", drills: [
@@ -58,6 +65,20 @@ export const grade9Regions: RegionDefinition[] = [
     ] },
     { slug: "absolute-value-equations", title: "Absolute Value Equations", goal: "Solve equations that describe distance from zero.", key: "If |u| = a with a ≥ 0, then u = a or u = −a.", example: "|x − 2| = 5 → x = 7 or x = −3", standard: "HSA.REI.B.3", visual: "number-line", drills: [
       ["Solve |x| = 6. Give both values.", "-6,6|6,-6|-6 and 6"], ["Solve |x − 2| = 5. Give both values.", "-3,7|7,-3|-3 and 7"], ["Solve |2x| = 10. Give both values.", "-5,5|5,-5|-5 and 5"], ["Does |x + 1| = −4 have a solution?", "no|no solution"], ["Solve |x| = 0.", "0"],
+    ] },
+    { slug: "absolute-value-functions", title: "Absolute Value Functions", goal: "Read and graph the vertex, direction, and shift of a V-shaped function.", key: "In y = a|x − h| + k, the vertex is (h,k); the sign and size of a control direction and steepness.", example: "y = |x − 3| − 2 has vertex (3,−2)", standard: "HSF.IF.C.7b · HSF.BF.B.3", visual: "curve-line", drills: [
+      ["What is the vertex of y = |x − 3| − 2?", "(3, −2)|(3,-2)", ["(3, −2)", "(−3, −2)", "(3, 2)", "(−2, 3)"]],
+      ["How does y = −|x| open?", "down", ["up", "down", "left", "right"]],
+      ["Compared with y = |x|, what does y = |x| + 4 do?", "shifts up 4", ["shifts up 4", "shifts down 4", "shifts right 4", "gets 4 times steeper"]],
+      ["Which point lies on y = |x − 1| + 2?", "(3, 4)|(3,4)", ["(3, 4)", "(3, 2)", "(1, 0)", "(0, 0)"]],
+      ["What is the range of y = |x + 2| − 5?", "y ≥ −5|y>=-5", ["y ≥ −5", "y ≤ −5", "y ≥ 2", "all real y"]],
+    ] },
+    { slug: "absolute-value-inequalities", title: "Absolute Value Inequalities", goal: "Translate distance limits into intervals and number-line graphs.", key: "A distance less than a value stays between two boundaries; a distance greater than a value lies outside them.", example: "|x − 3| < 5 means −2 < x < 8", standard: "HSA.CED.A.1 · HSA.REI.B.3", visual: "inequality-line", drills: [
+      ["Solve |x| < 4.", "−4 < x < 4|-4<x<4", ["−4 < x < 4", "x < −4 or x > 4", "x < 4", "x > −4"]],
+      ["Solve |x − 3| < 5.", "−2 < x < 8|-2<x<8", ["−2 < x < 8", "x < −2 or x > 8", "−5 < x < 5", "3 < x < 8"]],
+      ["Solve |x + 1| ≥ 3.", "x ≤ −4 or x ≥ 2|x<=-4 or x>=2", ["x ≤ −4 or x ≥ 2", "−4 ≤ x ≤ 2", "x ≥ −2", "−3 ≤ x ≤ 3"]],
+      ["The rule |x − 10| ≤ 2 describes which interval?", "8 ≤ x ≤ 12|8<=x<=12", ["8 ≤ x ≤ 12", "x ≤ 8 or x ≥ 12", "−2 ≤ x ≤ 2", "10 ≤ x ≤ 12"]],
+      ["Which phrase matches |x − 6| > 4?", "more than 4 units from 6", ["more than 4 units from 6", "within 4 units of 6", "exactly 4 units from 6", "at most 6 units from 4"]],
     ] },
   ]),
   makeRegion(3, "Linear Functions", "Connect slope, intercepts, tables, equations, and graphs.", "HSF.IF.B–C · HSF.LE.A", [
@@ -86,6 +107,20 @@ export const grade9Regions: RegionDefinition[] = [
     ] },
     { slug: "system-models", title: "Model with Systems", goal: "Use two equations to model two unknown quantities.", key: "Define both unknowns and write one equation for each independent condition.", example: "Adults + students = 20 and 10a + 6s = 152 → a=8, s=12", standard: "HSA.CED.A.3", visual: "model", drills: [
       ["20 tickets: adult $10, student $6, total $152. Adults?", "8"], ["Two numbers sum to 18 and differ by 4. Larger number?", "11"], ["3 pens and 2 notebooks cost $13; pen $1. Notebook price?", "5|$5"], ["A farm has 12 heads and 34 legs (chickens/rabbits). Rabbits?", "5"], ["Why are two independent equations needed for two unknowns?", "to determine one solution|one equation is not enough|find both unknowns"],
+    ] },
+    { slug: "graph-linear-inequalities", title: "Graph Linear Inequalities", goal: "Turn a two-variable inequality into a boundary and a shaded half-plane.", key: "Graph the boundary line, use solid for ≤ or ≥ and dashed for < or >, then test which side satisfies the inequality.", example: "y > 2x − 1 uses a dashed boundary and shades above the line", standard: "HSA.REI.D.12", visual: "line-graph", drills: [
+      ["For y > 2x − 1, which boundary should be drawn?", "dashed y = 2x − 1", ["dashed y = 2x − 1", "solid y = 2x − 1", "dashed x = 2y − 1", "solid x = 2y − 1"]],
+      ["For y ≤ −x + 4, which side is shaded?", "below the line", ["below the line", "above the line", "left of the y-axis", "right of the y-axis"]],
+      ["Does (0, 0) satisfy y ≥ 3x − 2?", "yes"],
+      ["Which point satisfies y < x + 1?", "(2, 1)|(2,1)", ["(2, 1)", "(0, 2)", "(1, 3)", "(−1, 2)"]],
+      ["Why is the boundary solid for 2x + y ≥ 6?", "equality is included", ["equality is included", "the slope is positive", "the y-intercept is 6", "every point is a solution"]],
+    ] },
+    { slug: "systems-linear-inequalities", title: "Systems of Linear Inequalities", goal: "Find the region where several constraints are true at the same time.", key: "Graph each half-plane; the solution is their overlap, and a viable point must satisfy every inequality.", example: "x ≥ 0, y ≥ 0, and x + y ≤ 6 form a triangular feasible region", standard: "HSA.CED.A.3 · HSA.REI.D.12", visual: "systems", drills: [
+      ["What represents the solution to a system of inequalities?", "the overlapping shaded region", ["the overlapping shaded region", "either boundary line", "the x-intercept only", "every unshaded point"]],
+      ["Which point satisfies x ≥ 0, y ≥ 0, and x + y ≤ 6?", "(2, 3)|(2,3)", ["(2, 3)", "(−1, 2)", "(4, 4)", "(3, −1)"]],
+      ["A point lies in one shaded region but not the other. Is it a solution to the system?", "no"],
+      ["For x + y ≤ 10 and x ≥ 4, which point is viable?", "(6, 3)|(6,3)", ["(6, 3)", "(3, 6)", "(8, 5)", "(2, 2)"]],
+      ["If two required half-planes never overlap, the system has what result?", "no solution", ["no solution", "one solution", "all points", "one boundary line"]],
     ] },
   ]),
   makeRegion(5, "Exponents and Radicals", "Use exponent laws and connect powers with roots.", "HSN.RN.A · HSA.SSE.B", [
@@ -142,6 +177,13 @@ export const grade9Regions: RegionDefinition[] = [
     ] },
     { slug: "quadratic-graphs", title: "Graphs of Quadratics", goal: "Read vertices, intercepts, and direction from a parabola.", key: "The vertex is the turning point; the sign of a tells whether the parabola opens up or down.", example: "y=(x−3)²−4 has vertex (3,−4)", standard: "HSF.IF.C.7", visual: "parabola", drills: [
       ["Find the vertex of y = (x − 3)² − 4.", "(3,-4)|3,-4"], ["Does y = −2x² + 1 open up or down?", "down"], ["Find the y-intercept of y = x² − 5x + 6.", "6|(0,6)"], ["Find the x-intercepts of y = (x − 2)(x + 1).", "-1,2|2,-1"], ["What line divides a parabola symmetrically?", "axis of symmetry|symmetry axis"],
+    ] },
+    { slug: "build-quadratic-models", title: "Build Quadratic Models", goal: "Choose a quadratic form from the information a situation gives you.", key: "Use factored form for zeros, vertex form for a maximum or minimum, and a known point to determine the scale factor.", example: "Zeros 1 and 5 with point (3,8) give y = −2(x − 1)(x − 5)", standard: "HSF.BF.A.1 · HSF.IF.C.8a", visual: "parabola", drills: [
+      ["A parabola has zeros 2 and 7. Which form exposes them?", "y = a(x − 2)(x − 7)", ["y = a(x − 2)(x − 7)", "y = a(x + 2)(x + 7)", "y = a(x − 2) + 7", "y = ax + 9"]],
+      ["A projectile reaches its highest point at (4, 18). Which form starts with that vertex?", "y = a(x − 4)² + 18", ["y = a(x − 4)² + 18", "y = a(x + 4)² − 18", "y = a(x − 18)² + 4", "y = ax + 18"]],
+      ["Zeros 1 and 5 with point (3, 8) give which model?", "y = −2(x − 1)(x − 5)", ["y = −2(x − 1)(x − 5)", "y = 2(x − 1)(x − 5)", "y = −2(x + 1)(x + 5)", "y = (x − 3)² + 8"]],
+      ["In h(t) = −5(t − 2)² + 20, what does 20 represent?", "maximum height", ["maximum height", "launch time", "horizontal speed", "time on the ground"]],
+      ["Which feature is easiest to read from y = 3(x + 2)(x − 6)?", "the zeros", ["the zeros", "the vertex y-value", "the axis scale", "the average rate"]],
     ] },
   ]),
   makeRegion(9, "Exponential Functions", "Model repeated multiplication, growth, and decay.", "HSF.LE.A–B", [

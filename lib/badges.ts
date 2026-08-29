@@ -1,10 +1,10 @@
 import { lessons, regions, type Accent } from "./curriculum.ts";
 
-export const BADGE_CATALOG_SIZE = 500;
 export const ANSWER_BADGE_STEP = 10;
-export const BADGE_CATALOG_VERSION = "2026.2";
+export const ANSWER_BADGE_COUNT = 280;
+export const BADGE_CATALOG_VERSION = "2026.3";
 const LESSON_BADGE_COUNT = lessons.length;
-const ANSWER_BADGE_COUNT = BADGE_CATALOG_SIZE - LESSON_BADGE_COUNT;
+export const BADGE_CATALOG_SIZE = LESSON_BADGE_COUNT + ANSWER_BADGE_COUNT;
 
 export type BadgeKind = "lesson" | "answer";
 export type BadgeRank = "trail" | "bronze" | "silver" | "gold" | "platinum" | "diamond" | "stellar" | "cosmic" | "mythic";
@@ -45,8 +45,6 @@ const mathGlyphs = ["+", "−", "×", "÷", "=", "≠", "<", ">", "π", "√", "
 const constellationAdjectives = ["Bright", "Calm", "Bold", "Curious", "Nimble", "Steady", "Swift", "Wise"];
 const constellationNouns = ["Comet", "Vector", "Prism", "Orbit", "Summit", "Cipher"];
 const constellationNames = constellationAdjectives.flatMap((adjective) => constellationNouns.map((noun) => `${adjective} ${noun}`)).slice(0, 47);
-
-if (ANSWER_BADGE_COUNT < 1) throw new Error(`Badge catalog ${BADGE_CATALOG_VERSION} needs room for at least one Answer Quest badge.`);
 
 export const lessonBadges: BadgeSpec[] = lessons.map((lesson, index) => {
   const region = regionById.get(lesson.regionId);
