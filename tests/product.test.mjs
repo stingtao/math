@@ -747,10 +747,13 @@ test("places a teen-treated AdSense unit between every page and the shared foote
   assert.match(adUnit, /data-tag-for-age-treatment="2"/);
   assert.match(adUnit, /document\.createElement\("script"\)/);
   assert.match(adUnit, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js/);
+  assert.match(adUnit, /window\.setTimeout/);
+  assert.match(adUnit, /2500/);
   assert.doesNotMatch(layout, /<script/);
   assert.match(layout, /<html lang="en" suppressHydrationWarning>/);
   assert.match(layout, /suppressHydrationWarning/);
   assert.match(layout, /google-adsense-account/);
+  assert.match(layout, /page-content google-anno-skip/);
   assert.ok(layout.indexOf("{children}") < layout.indexOf("<AdUnit"));
   assert.ok(layout.indexOf("<AdUnit") < layout.indexOf("<SiteFooter"));
   assert.doesNotMatch(home, /<footer className="site-footer"/);

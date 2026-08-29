@@ -51,7 +51,7 @@ export default function RootLayout({
         className={`${manrope.variable} antialiased`}
         suppressHydrationWarning
       >
-        <div className="page-content">{children}</div>
+        <div className="page-content google-anno-skip">{children}</div>
         <AdUnit />
         <SiteFooter />
       </body>

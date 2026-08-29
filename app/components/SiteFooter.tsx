@@ -1,6 +1,6 @@
 export function SiteFooter() {
   return (
-    <footer className="site-footer">
+    <footer className="site-footer google-anno-skip">
       <div>
         <span className="brand"><span className="brand-mark" aria-hidden="true">M</span><span>Math</span></span>
         <p>Made by Sting, a parent who likes math.</p>
