@@ -6,7 +6,7 @@ import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievem
 import { mathInputMode } from "../lib/math-input.ts";
 import { getQuestMilestone } from "../lib/quest-milestone.ts";
 import { clippedLinePoints, nearestVisibleLinePoint, parseLinearFunction, valueAt } from "../lib/linear-function.ts";
-import { coordinateMissionProgress, coordinateReadTargets, isOnDoubleLine, pointToLineTargets, sameCoordinate } from "../lib/coordinate-mission.ts";
+import { coordinateMissionProgress, coordinateReadTargets, isOnRoverLine, pointToLineTargets, sameCoordinate } from "../lib/coordinate-mission.ts";
 import { publicTextPrivacyIssue } from "../lib/privacy.ts";
 import { recoveryGuidance, remixedChoices } from "../lib/practice-recovery.ts";
 import { isAnswerCorrect, lessons } from "../lib/curriculum.ts";
@@ -55,9 +55,9 @@ test("parses safe slope-intercept equations and clips them to the visible graph"
   assert.deepEqual(nearestVisibleLinePoint(line, { x: 4, y: 8 }), { x: 2.5, y: 5 });
 });
 
-test("builds a valid y = 2x point-to-line mission and reverses it into coordinate reading", () => {
-  assert.deepEqual(pointToLineTargets, [{ x: 0, y: 0 }, { x: 1, y: 2 }, { x: 2, y: 4 }, { x: 3, y: 6 }, { x: 4, y: 8 }]);
-  assert.ok(pointToLineTargets.every(isOnDoubleLine));
+test("builds a valid y = 2x + 1 rover mission and reverses it into coordinate reading", () => {
+  assert.deepEqual(pointToLineTargets, [{ x: 0, y: 1 }, { x: 1, y: 3 }, { x: 2, y: 5 }, { x: 3, y: 7 }, { x: 4, y: 9 }]);
+  assert.ok(pointToLineTargets.every(isOnRoverLine));
   assert.ok(coordinateReadTargets.every((point) => pointToLineTargets.some((candidate) => sameCoordinate(point, candidate))));
   assert.equal(coordinateMissionProgress(0, false, 0), 0);
   assert.equal(coordinateMissionProgress(5, true, 3), 100);
@@ -186,12 +186,12 @@ test("server-renders a public, no-sign-in linear Graph Lab", async () => {
   const response = await render("/labs/linear-graphs");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Draw the line/);
+  assert.match(html, /Plot a rover/);
   assert.match(html, /Type a rule\. Watch the line react/);
-  assert.match(html, /Nothing is saved/);
-  assert.match(html, /ONE TOOL · SIX GRADE PATHS/);
-  assert.match(html, /Plot\. Connect\. Decode/);
-  assert.match(html, /Turn five points into y = 2x/);
+  assert.match(html, /Track Nova with y = 2x \+ 1/);
+  assert.match(html, /When equations became pictures/);
+  assert.match(html, /La Géométrie/);
+  assert.doesNotMatch(html, /SIX QUICK TESTS|ONE TOOL · SIX GRADE PATHS|This line keeps showing up/);
 });
 
 test("publishes a plain-English AI collaboration and open reuse promise", async () => {
@@ -260,10 +260,11 @@ test("adds one focused live line grapher across Grade 7, 8, and 9 graph lessons"
   assert.match(lab, /onFocus=\{startKeyboardExplore\}/);
   assert.doesNotMatch(lab, /useId/);
   assert.match(lab, /Not saved/);
-  assert.match(page, /<LinearGraphLab initialEquation="y=2x"/);
-  assert.match(page, /Predict first\. Check second/);
-  assert.match(page, /guidedChallenges\.map/);
-  assert.match(page, /Check my reasoning/);
+  assert.match(page, /<LinearGraphLab initialEquation="y=2x\+1"/);
+  assert.match(page, /graphExamples/);
+  assert.match(page, /When equations became pictures/);
+  assert.match(page, /mathshistory\.st-andrews\.ac\.uk/);
+  assert.doesNotMatch(page, /Predict first\. Check second|guidedChallenges|Check my reasoning|gradeConnections/);
   assert.doesNotMatch(page, /Private by default/);
   assert.match(header, /href="\/labs\/linear-graphs"/);
   assert.match(css, /\.linear-graph-workspace/);
@@ -284,10 +285,14 @@ test("ships one accessible point-line mission and an active reasoning flow acros
   assert.match(mission, /coordinate controls beside the graph/);
   assert.match(mission, /hasTrace/);
   assert.match(mission, /point-line-marker-coordinate/);
+  assert.match(mission, /attemptedPoint/);
+  assert.match(mission, /point-line-attempt-dot/);
+  assert.match(mission, /point-line-target-ring/);
+  assert.match(mission, /You plotted/);
   assert.match(mission, /connected \? "confirmed" : "progressive"/);
   assert.match(mission, /getScreenCTM/);
   assert.doesNotMatch(mission, /useId/);
-  assert.match(mission, /Points are not saved/);
+  assert.doesNotMatch(mission, /Points are not saved/);
   assert.match(flow, /Predict what the next mathematical move/);
   assert.match(flow, /REASONING CHAIN COMPLETE/);
   assert.match(lesson, /<WorkedExampleFlow steps=\{lesson\.exampleSteps\}/);

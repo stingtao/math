@@ -96,3 +96,35 @@ Correct feedback should clearly close the action loop without making the learner
 - Do not turn a wrong answer into a lecture. Show one short diagnosis and one actionable clue.
 - Put supporting instruction behind a clearly named control such as `Review the key idea`; opening it should reveal the exact concept needed for the retry.
 - Preserve full credit where intended and say it once. Do not stack reassurance, a three-step workflow, and game-system terminology around the same mistake.
+
+## 10. Show the attempted state on the object being changed
+
+Every action must visibly affect the object the learner acted on, including an incorrect attempt.
+
+- If a button plots a point, every submitted coordinate must appear on the graph immediately. Do not reject a wrong point silently while updating only a paragraph elsewhere.
+- Distinguish the learner's attempt from the target with color, shape, labels, and accessible descriptions. Attach corrective guides to the same diagram so the learner can compare positions.
+- Promote a correct attempt into the saved task state. Keep an incorrect attempt available long enough to inspect and replace it on the next try.
+- When an invalid input truly cannot be rendered, show the reason beside the control and preserve the last valid visual. A missing visual response must never be mistaken for a broken control.
+- Test controls with correct, incorrect, boundary, and repeated inputs. Verify the primary visual changes, not only a status region.
+
+This is the visual equivalent of useful wrong-answer recovery: the learner should see what their answer means before being told how to fix it.
+
+## 11. Give each page one learning spine
+
+An instructional page should progress through a coherent experience rather than collect locally reasonable sections.
+
+1. Establish one concrete problem or question.
+2. Let the learner act on a representation.
+3. Explain the relationship revealed by that action.
+4. Offer one meaningful transfer, variation, or historical connection.
+
+For an applied equation, map every variable, coefficient, intercept, and unit to the situation. A `y = 2x + 1` mission should make `x`, `y`, `2`, and `+1` mean something observable; a fictional setting is useful only when its quantities remain mathematically coherent.
+
+Every section must have a unique teaching job: experience, explain, practice, transfer, motivate, or navigate. Remove generic test grids, grade catalogs, slogans, and repeated summaries that cannot name a distinct learner outcome.
+
+## 12. Use history as instruction, not decoration
+
+- Include a historical story only when it changes how the learner understands the current idea.
+- Connect the story to the concept with a diagram, original mathematical object, or direct comparison. For coordinate geometry, show how an equation and a curve can describe the same relationship.
+- Verify names, dates, publications, and priority claims with reliable sources. Distinguish documented history from classroom legend and avoid assigning sole credit when the historical record is shared or disputed.
+- Link to a concise source for learners who want to go deeper; do not turn the main lesson into a long biography.

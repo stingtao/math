@@ -31,10 +31,12 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
   const missionId = compact ? "lesson-point-line-mission" : "public-point-line-mission";
   const [phase, setPhase] = useState<"plot" | "connect" | "read" | "complete">("plot");
   const [plotted, setPlotted] = useState<CoordinatePoint[]>([]);
+  const [attemptedPoint, setAttemptedPoint] = useState<CoordinatePoint | null>(null);
+  const [attemptVersion, setAttemptVersion] = useState(0);
   const [readIndex, setReadIndex] = useState(0);
   const [xValue, setXValue] = useState("0");
   const [yValue, setYValue] = useState("0");
-  const [feedback, setFeedback] = useState("Start at the origin. Move across for x, then up for y.");
+  const [feedback, setFeedback] = useState("Nova starts 1 km from base. Plot the first signal at (0, 1).");
   const activePlot = pointToLineTargets[plotted.length];
   const activeRead = coordinateReadTargets[readIndex];
   const connected = phase === "read" || phase === "complete";
@@ -44,19 +46,22 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
 
   function tryPlot(point: CoordinatePoint) {
     if (phase !== "plot" || !activePlot) return;
+    setAttemptVersion((current) => current + 1);
     if (!sameCoordinate(point, activePlot)) {
-      setFeedback(`That spot is ${pointText(point)}. Remember: x moves across first, then y moves up.`);
+      setAttemptedPoint(point);
+      setFeedback(`You plotted ${pointText(point)}. The gold target is ${pointText(activePlot)}—compare the dashed x and y guides, then move your point.`);
       return;
     }
+    setAttemptedPoint(null);
     const next = [...plotted, point];
     setPlotted(next);
     if (next.length === pointToLineTargets.length) {
       setPhase("connect");
-      setFeedback("Every point is placed. The dashed trace shows the path from point to point. Confirm it to reveal the full relationship.");
+      setFeedback("Every rover signal is placed. The dashed route rises 2 km each hour and starts 1 km from base.");
     } else {
-      setFeedback(`${pointText(point)} is locked in.${next.length > 1 ? " It is now connected to the previous point." : " The point is highlighted on the graph."} Next, plot ${pointText(pointToLineTargets[next.length])}.`);
-      setXValue(String(pointToLineTargets[next.length].x));
-      setYValue(String(pointToLineTargets[next.length].y));
+      setFeedback(`${pointText(point)} is on the map.${next.length > 1 ? " The route now connects it to the previous signal." : " This is Nova’s starting distance."} Next: ${pointText(pointToLineTargets[next.length])}.`);
+      setXValue("0");
+      setYValue("0");
     }
   }
 
@@ -75,23 +80,24 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
 
   function connectPoints() {
     setPhase("read");
+    setAttemptedPoint(null);
     setXValue("");
     setYValue("");
-    setFeedback(`The points form y = 2x. Now read the highlighted point from the finished line.`);
+    setFeedback("The route is y = 2x + 1: 2 km farther each hour, with a 1 km head start. Now decode a signal.");
   }
 
   function checkReadPoint() {
     if (phase !== "read" || !activeRead) return;
     const response = { x: Number(xValue), y: Number(yValue) };
     if (!sameCoordinate(response, activeRead)) {
-      setFeedback("Look down to the x-axis first, then across to the y-axis. Write x before y.");
+      setFeedback(`That reads as ${pointText(response)}. Follow the gold point down for x (hours), then across for y (kilometers).`);
       return;
     }
     const nextIndex = readIndex + 1;
     if (nextIndex === coordinateReadTargets.length) {
       setReadIndex(nextIndex);
       setPhase("complete");
-      setFeedback("Mission complete: a table of matching points, a graph, and y = 2x all describe the same relationship.");
+      setFeedback("Mission complete: the rover story, point table, graph, and y = 2x + 1 all describe the same trip.");
       return;
     }
     setReadIndex(nextIndex);
@@ -103,17 +109,26 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
   function resetMission() {
     setPhase("plot");
     setPlotted([]);
+    setAttemptedPoint(null);
+    setAttemptVersion(0);
     setReadIndex(0);
     setXValue("0");
     setYValue("0");
-    setFeedback("Start at the origin. Move across for x, then up for y.");
+    setFeedback("Nova starts 1 km from base. Plot the first signal at (0, 1).");
   }
 
   return (
     <section className={`point-line-mission ${compact ? "compact" : ""}`} aria-labelledby={`${missionId}-title`}>
       {phase === "complete" && <SuccessBurst eventKey={`${missionId}-point-line-complete`} />}
       <header className="point-line-heading">
-        <div><small>GRAPH MISSION · THREE MOVES</small><strong id={`${missionId}-title`}>Plot. Connect. Decode.</strong><p>Build one line from coordinates, then prove you can read it.</p></div>
+        <div>
+          <small>MARS ROVER · LINE MISSION</small>
+          <strong id={`${missionId}-title`}>Track Nova with y = 2x + 1.</strong>
+          <p>Nova is already 1 km from base when tracking begins. It travels 2 km farther each hour. Plot five signals, connect the route, then read one back.</p>
+          <div className="point-line-model" aria-label="In y equals 2 x plus 1, x is hours and y is kilometers from base">
+            <code>y = 2x + 1</code><span><b>2</b> km each hour</span><span><b>+1</b> km at the start</span>
+          </div>
+        </div>
         <div className="point-line-charge" role="progressbar" aria-label={`Mission progress: ${progress} percent`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span><i style={{ width: `${progress}%` }} /></span><b>{progress}%</b><small>PROGRESS</small></div>
       </header>
 
@@ -128,8 +143,8 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
       <div className="point-line-workspace">
         <div className="point-line-graph">
           <svg viewBox={`0 0 ${viewWidth} ${viewHeight}`} onPointerDown={plotFromPointer} role="img" aria-labelledby={`${missionId}-graph-title ${missionId}-graph-description`}>
-            <title id={`${missionId}-graph-title`}>Interactive coordinate plane for the line y equals 2x</title>
-            <desc id={`${missionId}-graph-description`}>{phase === "plot" && activePlot ? `Plot ${pointText(activePlot)} by tapping the grid, or use the coordinate controls beside the graph.` : connected ? "The connected line y equals 2x with integer points from zero zero through four eight." : "All required points are plotted and ready to connect."}</desc>
+            <title id={`${missionId}-graph-title`}>Interactive rover coordinate plane for y equals 2x plus 1</title>
+            <desc id={`${missionId}-graph-description`}>{phase === "plot" && activePlot ? attemptedPoint ? `The attempted point ${pointText(attemptedPoint)} is shown in coral and the target ${pointText(activePlot)} is shown as a gold ring.` : `Plot ${pointText(activePlot)} by tapping the grid, or use the coordinate controls beside the graph.` : connected ? "The connected rover route y equals 2x plus 1 with five integer points." : "All required rover signals are plotted and ready to connect."}</desc>
             <rect className="point-line-paper" x={plotLeft} y={plotTop} width={plotWidth} height={plotHeight} rx="10" />
             {xTicks.map((tick) => <line className="point-line-grid" x1={graphX(tick)} y1={plotTop} x2={graphX(tick)} y2={plotTop + plotHeight} key={`x-${tick}`} />)}
             {yTicks.map((tick) => <line className="point-line-grid" x1={plotLeft} y1={graphY(tick)} x2={plotLeft + plotWidth} y2={graphY(tick)} key={`y-${tick}`} />)}
@@ -137,9 +152,18 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
             <line className="point-line-axis" x1={graphX(0)} y1={plotTop - 5} x2={graphX(0)} y2={plotTop + plotHeight} />
             {xTicks.map((tick) => <text className="point-line-label" x={graphX(tick)} y={plotTop + plotHeight + 22} textAnchor="middle" key={`xl-${tick}`}>{tick}</text>)}
             {yTicks.filter((tick) => tick > 0 && tick % 2 === 0).map((tick) => <text className="point-line-label" x={plotLeft - 12} y={graphY(tick) + 4} textAnchor="end" key={`yl-${tick}`}>{tick}</text>)}
-            <text className="point-line-axis-name" x={plotLeft + plotWidth - 4} y={plotTop + plotHeight - 10}>x</text>
-            <text className="point-line-axis-name" x={plotLeft + 10} y={plotTop + 15}>y</text>
+            <text className="point-line-axis-name" x={plotLeft + plotWidth - 6} y={plotTop + plotHeight - 10} textAnchor="end">hours · x</text>
+            <text className="point-line-axis-name" x={plotLeft + 9} y={plotTop + 15}>km · y</text>
             {hasTrace && <polyline className={`point-line-connection ${connected ? "confirmed" : "progressive"}`} points={visiblePoints.map((point) => `${graphX(point.x)},${graphY(point.y)}`).join(" ")} />}
+            {attemptedPoint && activePlot && <g key={`attempt-${attemptVersion}`} className="point-line-attempt">
+              <line className="point-line-attempt-guide" x1={graphX(attemptedPoint.x)} y1={graphY(0)} x2={graphX(attemptedPoint.x)} y2={graphY(attemptedPoint.y)} />
+              <line className="point-line-attempt-guide" x1={graphX(0)} y1={graphY(attemptedPoint.y)} x2={graphX(attemptedPoint.x)} y2={graphY(attemptedPoint.y)} />
+              <circle className="point-line-target-ring" cx={graphX(activePlot.x)} cy={graphY(activePlot.y)} r="13" />
+              <text className="point-line-target-label" x={graphX(activePlot.x) + 16} y={graphY(activePlot.y) - 12}>target {pointText(activePlot)}</text>
+              <circle className="point-line-attempt-dot" cx={graphX(attemptedPoint.x)} cy={graphY(attemptedPoint.y)} r="10" />
+              <path className="point-line-attempt-cross" d={`M ${graphX(attemptedPoint.x) - 4} ${graphY(attemptedPoint.y) - 4} L ${graphX(attemptedPoint.x) + 4} ${graphY(attemptedPoint.y) + 4} M ${graphX(attemptedPoint.x) + 4} ${graphY(attemptedPoint.y) - 4} L ${graphX(attemptedPoint.x) - 4} ${graphY(attemptedPoint.y) + 4}`} />
+              <text className="point-line-attempt-label" x={graphX(attemptedPoint.x)} y={graphY(attemptedPoint.y) - 16} textAnchor="middle">you {pointText(attemptedPoint)}</text>
+            </g>}
             {visiblePoints.map((point, index) => {
               const highlighted = phase === "read" && activeRead && sameCoordinate(point, activeRead);
               const showCoordinate = phase === "plot" || phase === "connect";
@@ -152,14 +176,14 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
               </g>;
             })}
           </svg>
-          <p>Each point gets a number and coordinate label. The dashed route grows after every correct plot.</p>
+          <p>{attemptedPoint ? "Coral is your point. Gold is the target. Dashed guides show its x and y." : "x is time in hours. y is Nova’s distance from base in kilometers."}</p>
         </div>
 
         <aside className="point-line-task">
           {phase === "plot" && activePlot && <>
             <span className="point-line-kicker">POINT {plotted.length + 1} OF {pointToLineTargets.length}</span>
             <h3>Plot <code>{pointText(activePlot)}</code></h3>
-            <p>Move <strong>{activePlot.x}</strong> across the x-axis, then <strong>{activePlot.y}</strong> on the y-axis.</p>
+            <p>At hour <strong>{activePlot.x}</strong>, Nova is <strong>{activePlot.y} km</strong> from base.</p>
             <div className="point-line-coordinate-inputs">
               <label><span>x</span><select value={xValue} onChange={(event) => setXValue(event.target.value)}>{xTicks.map((value) => <option key={value}>{value}</option>)}</select></label>
               <label><span>y</span><select value={yValue} onChange={(event) => setYValue(event.target.value)}>{yTicks.map((value) => <option key={value}>{value}</option>)}</select></label>
@@ -168,14 +192,14 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
           </>}
           {phase === "connect" && <>
             <span className="point-line-kicker">PATTERN FOUND</span>
-            <h3>Five points are ready.</h3>
-            <p>When x increases by 1, y increases by 2. Connect the route to reveal the line.</p>
+            <h3>Five signals are ready.</h3>
+            <p>Each hour adds 2 km. The trip began at 1 km. Connect the points to reveal the route.</p>
             <button className="primary-button" type="button" onClick={connectPoints}>Connect my points <span aria-hidden="true">↗</span></button>
           </>}
           {phase === "read" && activeRead && <>
             <span className="point-line-kicker">DECODE {readIndex + 1} OF {coordinateReadTargets.length}</span>
-            <h3>Read the gold point.</h3>
-            <p>Trace to each axis, then enter the ordered pair.</p>
+            <h3>Decode the gold signal.</h3>
+            <p>Read hours on x and kilometers from base on y.</p>
             <div className="point-line-coordinate-inputs read-inputs">
               <label><span>x</span><input aria-label="x coordinate" value={xValue} inputMode="numeric" onChange={(event) => setXValue(event.target.value)} /></label>
               <label><span>y</span><input aria-label="y coordinate" value={yValue} inputMode="numeric" onChange={(event) => setYValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") checkReadPoint(); }} /></label>
@@ -184,15 +208,13 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
           </>}
           {phase === "complete" && <>
             <span className="point-line-kicker">MISSION COMPLETE · +1 SKILL</span>
-            <h3>You built and decoded the line.</h3>
-            <p>Five points became y = 2x, and you read three coordinates back from it.</p>
+            <h3>Nova’s route is decoded.</h3>
+            <p>Five signals became y = 2x + 1, and you translated the graph back into the trip.</p>
             <button className="secondary-button" type="button" onClick={resetMission}>Play again <span aria-hidden="true">↻</span></button>
           </>}
-          <div className={`point-line-feedback ${phase === "complete" ? "complete" : ""}`} role="status" aria-live="polite"><span aria-hidden="true">{phase === "complete" ? "✓" : "◇"}</span><p>{feedback}</p></div>
+          <div className={`point-line-feedback ${phase === "complete" ? "complete" : attemptedPoint ? "incorrect" : ""}`} role="status" aria-live="polite"><span aria-hidden="true">{phase === "complete" ? "✓" : attemptedPoint ? "↙" : "◇"}</span><p>{feedback}</p></div>
         </aside>
       </div>
-
-      <footer><span aria-hidden="true">◇</span><p>Points are not saved.</p></footer>
     </section>
   );
 }
