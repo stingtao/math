@@ -91,6 +91,24 @@ The answer interaction is part of the learning design, not a formatting decision
 
 The curriculum validator must reject Yes/No or True/False questions that fall back to text input, and reject known high-friction symbolic families that lack an appropriate answer control. The same shared response component must render each type everywhere.
 
+### Representation coverage is a second coverage contract
+
+Topic coverage and representation coverage are different. A lesson title can exist while learners never read a graph, compare a table, place a point, interpret a boundary, select several valid claims, or assemble a reasoning chain. Audit the interaction distribution by grade and region before adding content so a larger bank does not become a larger collection of the same fill-in task.
+
+- Maintain a matrix from region to learning objective, interaction family, instructional visual, renderer, and mobile behavior.
+- Every Grade 10–12 region must include at least one visual-reasoning mission, and every Grade 10–12 grade must use at least nine interaction families.
+- `graph-choice` options are structured graph specifications, not screenshots or text labels pretending to test graph reading.
+- `table-choice` options preserve named columns and row relationships in their authored data so the same mathematics survives desktop and mobile layouts.
+- A representation counts only when the learner must inspect or manipulate it to answer; a decorative image beside a text-only question does not count.
+
+### Structured visual choices have a responsive contract
+
+- Make the full graph or table row the selectable target and show selection immediately.
+- Use a compact two-column graph grid on desktop and one column on narrow phones.
+- Transform wide tables into labeled row cards on mobile. Do not require horizontal scrolling to compare answer choices, and never detach a value from its column meaning.
+- Give each option one concise accessible name. Nested SVG titles must not produce duplicate announcements.
+- Preserve radio semantics, focus order, touch targets, and the shared select-then-submit Enter behavior at every breakpoint.
+
 ## 9. Make feedback strong, brief, and useful
 
 Correct feedback should clearly close the action loop without making the learner wait to continue.
@@ -127,6 +145,15 @@ For an applied equation, map every variable, coefficient, intercept, and unit to
 Every section must have a unique teaching job: experience, explain, practice, transfer, motivate, or navigate. Remove generic test grids, grade catalogs, slogans, and repeated summaries that cannot name a distinct learner outcome.
 
 When the curriculum is large, use a shared experience system without making the experience generic. Classify lessons by the kind of problem they solve—such as navigation, resource allocation, structural design, uncertain evidence, repeated growth, or changing motion—then bind the lesson's own worked model to that setting. Never paste the same Mars story or illustration onto every topic.
+
+### Story and diagram resolve from the same semantic key
+
+Story copy, variables, equations, diagram, and labels must model one situation. Do not pair correct prose with a generic or unrelated scene merely because both mention movement, change, or exploration.
+
+- Give semantically important lessons and regions an explicit scene key; broad keyword matching is only a fallback for genuinely generic content.
+- Trace `lesson or region -> story -> scene -> SVG -> visible and accessible labels` during review.
+- Make coefficients, intercepts, rates, domains, and units correspond to objects in the scene.
+- Judge the assembled page, not the copy and illustration in isolation. If a learner cannot point from the story quantity to the visual mark, the scene is decoration rather than teaching.
 
 ## 12. Use history as instruction, not decoration
 
