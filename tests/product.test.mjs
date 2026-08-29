@@ -6,7 +6,7 @@ import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
 import { mathInputMode } from "../lib/math-input.ts";
 import { getQuestMilestone } from "../lib/quest-milestone.ts";
-import { clippedLinePoints, parseLinearFunction, valueAt } from "../lib/linear-function.ts";
+import { clippedLinePoints, nearestVisibleLinePoint, parseLinearFunction, valueAt } from "../lib/linear-function.ts";
 import { coordinateMissionProgress, coordinateReadTargets, isOnDoubleLine, pointToLineTargets, sameCoordinate } from "../lib/coordinate-mission.ts";
 import { publicTextPrivacyIssue } from "../lib/privacy.ts";
 import { recoveryGuidance, remixedChoices } from "../lib/practice-recovery.ts";
@@ -43,6 +43,8 @@ test("parses safe slope-intercept equations and clips them to the visible graph"
   assert.ok(line);
   assert.equal(valueAt(line, 3), 6);
   assert.deepEqual(clippedLinePoints(line), [{ x: -2.5, y: -5 }, { x: 2.5, y: 5 }]);
+  assert.deepEqual(nearestVisibleLinePoint(line, { x: 1.16, y: 2.45 }), { x: 1.2, y: 2.4 });
+  assert.deepEqual(nearestVisibleLinePoint(line, { x: 4, y: 8 }), { x: 2.5, y: 5 });
 });
 
 test("builds a valid y = 2x point-to-line mission and reverses it into coordinate reading", () => {
@@ -177,6 +179,9 @@ test("adds one private live line grapher across Grade 7, 8, and 9 graph lessons"
   assert.match(lab, /slope-intercept form/);
   assert.match(lab, /role="img"/);
   assert.match(lab, /aria-live="polite"/);
+  assert.match(lab, /Explore nearby coordinates on this line/);
+  assert.match(lab, /getScreenCTM/);
+  assert.match(lab, /coordinateNumber\(hoverPoint\.x\)/);
   assert.match(lab, /not saved or sent anywhere/);
   assert.match(page, /<LinearGraphLab initialEquation="y=2x"/);
   assert.match(page, /Six changes worth noticing/);
@@ -200,6 +205,7 @@ test("ships one accessible point-line mission and an active reasoning flow acros
   assert.match(mission, /Connect my points/);
   assert.match(mission, /Check coordinate/);
   assert.match(mission, /Keyboard users can enter/);
+  assert.match(mission, /getScreenCTM/);
   assert.match(mission, /never saved or tied to an identity/);
   assert.match(flow, /Predict what the next mathematical move/);
   assert.match(flow, /REASONING CHAIN COMPLETE/);
@@ -675,7 +681,11 @@ test("places a teen-treated AdSense unit between every page and the shared foote
   assert.match(adUnit, /2899407297/);
   assert.match(adUnit, /data-ad-format="autorelaxed"/);
   assert.match(adUnit, /data-tag-for-age-treatment="2"/);
-  assert.match(layout, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js/);
+  assert.match(adUnit, /document\.createElement\("script"\)/);
+  assert.match(adUnit, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js/);
+  assert.doesNotMatch(layout, /<script/);
+  assert.match(layout, /<html lang="en" suppressHydrationWarning>/);
+  assert.match(layout, /suppressHydrationWarning/);
   assert.match(layout, /google-adsense-account/);
   assert.ok(layout.indexOf("{children}") < layout.indexOf("<AdUnit"));
   assert.ok(layout.indexOf("<AdUnit") < layout.indexOf("<SiteFooter"));
@@ -687,6 +697,7 @@ test("places a teen-treated AdSense unit between every page and the shared foote
   assert.match(worker, /HTMLRewriter/);
   assert.match(worker, /'strict-dynamic'/);
   assert.match(worker, /'unsafe-eval'/);
+  assert.match(worker, /frame-src 'self' https: data: blob:/);
   assert.equal(adsTxt.trim(), "google.com, pub-6452867962392355, DIRECT, f08c47fec0942fa0");
   assert.equal(packageJson.scripts.deploy, "npm run deploy:cloudflare");
 });

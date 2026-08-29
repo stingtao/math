@@ -19,6 +19,14 @@ export function AdUnit() {
     requested.current = true;
 
     try {
+      if (!document.getElementById("math-adsense-script")) {
+        const script = document.createElement("script");
+        script.id = "math-adsense-script";
+        script.async = true;
+        script.crossOrigin = "anonymous";
+        script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+        document.head.appendChild(script);
+      }
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       // Ad blockers and privacy tools may prevent AdSense from loading.

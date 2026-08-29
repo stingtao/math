@@ -94,3 +94,17 @@ export function clippedLinePoints(line: LinearFunction, bound = 5): [GraphPoint,
   }
   return pair;
 }
+
+export function nearestVisibleLinePoint(line: LinearFunction, pointer: GraphPoint, bound = 5): GraphPoint | null {
+  const segment = clippedLinePoints(line, bound);
+  if (!segment) return null;
+  const projectedX = (pointer.x + line.slope * (pointer.y - line.intercept)) / (1 + line.slope * line.slope);
+  const segmentMinX = Math.min(segment[0].x, segment[1].x);
+  const segmentMaxX = Math.max(segment[0].x, segment[1].x);
+  const minimumTenth = Math.ceil((segmentMinX - 1e-9) * 10) / 10;
+  const maximumTenth = Math.floor((segmentMaxX + 1e-9) * 10) / 10;
+  const roundedX = Math.round(projectedX * 10) / 10;
+  const x = Math.max(minimumTenth, Math.min(maximumTenth, roundedX));
+  const y = Math.round(valueAt(line, x) * 10) / 10;
+  return { x: Object.is(x, -0) ? 0 : x, y: Object.is(y, -0) ? 0 : y };
+}

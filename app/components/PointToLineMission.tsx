@@ -60,11 +60,14 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
 
   function plotFromPointer(event: ReactPointerEvent<SVGSVGElement>) {
     if (phase !== "plot") return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const localX = (event.clientX - bounds.left) * viewWidth / bounds.width;
-    const localY = (event.clientY - bounds.top) * viewHeight / bounds.height;
-    const x = Math.max(0, Math.min(xMax, Math.round((localX - plotLeft) / plotWidth * xMax)));
-    const y = Math.max(0, Math.min(yMax, Math.round((plotTop + plotHeight - localY) / plotHeight * yMax)));
+    const matrix = event.currentTarget.getScreenCTM();
+    if (!matrix) return;
+    const cursor = event.currentTarget.createSVGPoint();
+    cursor.x = event.clientX;
+    cursor.y = event.clientY;
+    const local = cursor.matrixTransform(matrix.inverse());
+    const x = Math.max(0, Math.min(xMax, Math.round((local.x - plotLeft) / plotWidth * xMax)));
+    const y = Math.max(0, Math.min(yMax, Math.round((plotTop + plotHeight - local.y) / plotHeight * yMax)));
     tryPlot({ x, y });
   }
 
