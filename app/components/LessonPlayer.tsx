@@ -28,6 +28,8 @@ import { QuestionResponse } from "./QuestionResponse";
 import { LessonHistory, LessonMissionStory } from "./LessonMissionStory";
 import { EnterActionLink } from "./EnterActionLink";
 import { XpProgress } from "./XpProgress";
+import { ExperienceScene } from "./ExperienceScene";
+import { crossedExperienceStage } from "@/lib/experience-progression";
 import { useEnterAction } from "./useEnterAction";
 import { isResponseComplete } from "@/lib/question-interactions";
 
@@ -299,22 +301,25 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       stars: Math.max(0, currentAchievementTotals.stars - Math.max(0, reward.bestStars - reward.previousStars)),
     };
     const unlockedLandmark = achievementUnlockedBetween(previousAchievementTotals, currentAchievementTotals);
+    const experienceLevel = state.completedLessons.length;
+    const experienceMilestone = reward.firstCompletion && crossedExperienceStage(Math.max(0, experienceLevel - 1), experienceLevel);
     return (
       <main className="learner-shell celebration-page">
-        <SuccessBurst eventKey={`${lesson.id}-complete-${stars}-${reward.firstCompletion ? "new" : reward.starsImproved ? "upgrade" : "replay"}`} large />
-        {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+        <SuccessBurst eventKey={`${lesson.id}-complete-${stars}-${reward.firstCompletion ? "new" : reward.starsImproved ? "upgrade" : "replay"}`} large experienceLevel={experienceLevel} />
+        {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={experienceLevel} onDismiss={() => setBadgeUnlocks([])} />}
         <LearnerHeader state={state} demo={isDemo} />
         <section className={`celebration-card accent-${lesson.accent}`}>
           <div className="celebration-emblem"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} completed`} /><span aria-hidden="true">✓</span></div>
           <span className="section-kicker">{outcome.kicker}</span>
           <h1>{outcome.title}</h1>
           <p>{outcome.copy}</p>
+          {reward.firstCompletion && <ExperienceScene completedLessons={experienceLevel} milestone={experienceMilestone} />}
           <div className="completion-earnings" aria-label={`${stars} of 3 stars and ${reward.xpEarned} XP earned`}>
             <span><b aria-hidden="true">{"★".repeat(stars)}{"☆".repeat(3 - stars)}</b><strong>{stars}/3 stars</strong></span>
             <span className={reward.xpEarned === 0 ? "quiet" : ""}><b>+{reward.xpEarned}</b><strong>XP</strong></span>
             {masteryLockedCount > 0 && <span><b aria-hidden="true">↻</b><strong>{masteryLockedCount} recalled</strong></span>}
           </div>
-          <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - reward.xpEarned} theme={state.profile.theme} variant="reward" />
+          <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - reward.xpEarned} theme={state.profile.theme} completedLessons={experienceLevel} variant="reward" />
           {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={isDemo} compact />}
           <section className="settlement-next" aria-labelledby="settlement-next-title">
             {reward.firstCompletion && regionFinished ? <span className="settlement-boss-icon" aria-hidden="true">★</span> : <TopicIcon visual={reward.firstCompletion && following ? following.visual : lesson.visual} accent={reward.firstCompletion && following ? following.accent : lesson.accent} size="md" label="" />}
@@ -331,7 +336,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
 
   return (
     <main className="learner-shell lesson-shell">
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
       <div className="lesson-topline">
         <a href={trailUrl} className="back-link">← Trail</a>
@@ -369,7 +374,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               <QuestionResponse question={question} choices={choiceOptions} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "lesson-answer-error" : feedback ? "lesson-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void submitAnswer()} />
               {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <RecoveryCoach question={question} response={answer} failedAttempts={failedAttempts} memoryCheck={inMemoryCheck} />}
-              {feedback === "correct" && <><AnswerImpact eventKey={`${lesson.id}-${attemptKey}-chain-${focusStreak}`} label={inMemoryCheck ? currentFirstTry ? "RECALLED" : "CORRECTED" : currentFirstTry ? "CORRECT" : "CORRECTED"} chain={focusStreak} progress={inMemoryCheck ? masteryLockedCount + (currentFirstTry ? 1 : 0) : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} tone={lesson.accent} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{inMemoryCheck ? currentFirstTry ? "Recalled correctly!" : "Correct—recall it once more later." : currentFirstTry ? focusStreak >= 3 ? `${focusStreak} correct in a row!` : "Correct!" : "Corrected!"}</strong><p>{inMemoryCheck ? currentFirstTry ? "You recalled the method on the first try. This idea is now secure for the lesson." : "This correct answer proves the repair worked. It will return after another idea so you can recall it cleanly." : `${practiceEncouragement[questionPosition]} Question ${questionPosition + 1} is corrected.${recoveryNeeded[question.id] ? " It will return in Memory Check." : ""}`}</p></div><span className="momentum-chip">{inMemoryCheck ? currentFirstTry ? "Recall complete" : "One more recall" : currentFirstTry && focusStreak > 1 ? `${focusStreak} in a row` : "Complete"}</span></div></>}
+              {feedback === "correct" && <><AnswerImpact eventKey={`${lesson.id}-${attemptKey}-chain-${focusStreak}`} label={inMemoryCheck ? currentFirstTry ? "RECALLED" : "CORRECTED" : currentFirstTry ? "CORRECT" : "CORRECTED"} chain={focusStreak} progress={inMemoryCheck ? masteryLockedCount + (currentFirstTry ? 1 : 0) : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} tone={lesson.accent} experienceLevel={state.completedLessons.length} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{inMemoryCheck ? currentFirstTry ? "Recalled correctly!" : "Correct—recall it once more later." : currentFirstTry ? focusStreak >= 3 ? `${focusStreak} correct in a row!` : "Correct!" : "Corrected!"}</strong><p>{inMemoryCheck ? currentFirstTry ? "You recalled the method on the first try. This idea is now secure for the lesson." : "This correct answer proves the repair worked. It will return after another idea so you can recall it cleanly." : `${practiceEncouragement[questionPosition]} Question ${questionPosition + 1} is corrected.${recoveryNeeded[question.id] ? " It will return in Memory Check." : ""}`}</p></div><span className="momentum-chip">{inMemoryCheck ? currentFirstTry ? "Recall complete" : "One more recall" : currentFirstTry && focusStreak > 1 ? `${focusStreak} in a row` : "Complete"}</span></div></>}
               {errorMessage && <p id="lesson-answer-error" className="form-error" role="alert">{errorMessage}</p>}
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : inMemoryCheck ? "Use a repair hint" : "Show a hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`${lesson.id}-${attemptKey}`} label={nextActionLabel} busy={busy} onAdvance={continuePractice} /> : <button className="primary-button" type="button" disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter" onClick={submitAnswer}>{busy ? "Checking…" : inMemoryCheck ? "Check recall" : "Check answer"} <span>→</span></button>}</div>
             </div>

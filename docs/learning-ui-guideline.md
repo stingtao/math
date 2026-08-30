@@ -241,3 +241,18 @@ Every same-tab navigation action must acknowledge the first click before the nex
 - Motion is optional. The disabled state, busy text, and live status must still communicate progress when reduced motion is enabled.
 
 This rule applies to header navigation, maps, completion CTAs, history replay, badge replay, legal/footer links, sign-in exits, and any future control that changes the current page.
+
+## 20. Progress spectacle through vocabulary, not volume
+
+A reward system should feel finished on the first day and still reveal new craft on the tenth. Do not replay one identical burst forever, and do not solve habituation by making every later event longer, brighter, or noisier.
+
+- Tie permanent visual evolution to durable learning milestones such as unique lesson clears. Replays and easy answer farming must not advance the experience tier.
+- Separate semantic outcome, motion, material, and story. `Correct`, `Level up`, `Badge earned`, and `Boss cleared` stay plain; their visual vocabulary may evolve.
+- Add one recognizable visual idea at a time: a particle shape, path geometry, medal material, halo, story location, or color layer. Preserve continuity so the learner recognizes the same system becoming richer.
+- Keep ordinary correct answers finite and non-blocking. Reserve full-screen ceremony for genuine unlocks, level changes, and Boss victories; keep every interruptible celebration skippable.
+- Use the current story chapter as a concise establishing image, not another explanatory card. The image must reinforce the journey and leave the mathematical task visually dominant.
+- Later rarity must come from craft and composition, not hidden labels or arbitrary scarcity. A more advanced badge should look more carefully made even before its name is read.
+- Make reduced motion a designed state. Keep the check, badge, result, color hierarchy, and next action while removing spins, pans, flashes, and particle travel.
+- Define the stage sequence as data. Components consume motif, motion family, material, intensity, and art position; adding stages 21–40 or 41–60 must not require new answer or Boss flow branches.
+
+The current twenty-stage, one-hundred-lesson route and its extension contract live in [experience-progression.md](./experience-progression.md).

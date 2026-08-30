@@ -214,14 +214,14 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   return (
     <main className="learner-shell profile-page">
       <LearnerHeader state={state} demo={isDemo} />
-      {frameCelebrationKey && <SuccessBurst eventKey={`frame-${frameCelebrationKey}`} />}
+      {frameCelebrationKey && <SuccessBurst eventKey={`frame-${frameCelebrationKey}`} experienceLevel={state.completedLessons.length} />}
       <section className="profile-wrap">
         <div className={`profile-hero profile-command-deck theme-${world.id}`}>
           <div className="profile-world-art" style={{ backgroundPosition: world.atlasPosition }} aria-hidden="true"><span>{world.motif}</span><i /><i /><i /></div>
           <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()}</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p></div></div>
           <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${isDemo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed || Boolean(busyAction)} aria-busy={busyAction === "reroll"} onClick={reroll}>{busyAction === "reroll" ? "Rerolling…" : state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
-        <XpProgress totalXp={state.totalXp} theme={state.profile.theme} onOpen={showXpDetail} />
+        <XpProgress totalXp={state.totalXp} theme={state.profile.theme} completedLessons={state.completedLessons.length} onOpen={showXpDetail} />
         <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>Mission {journey.stage}</strong><small>{journey.location}</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article><article><span>◆</span><strong>{state.weeklyXp}</strong><small>Weekly XP</small></article></div>
 
         <section className="profile-learning-history" aria-labelledby="learning-history-heading">

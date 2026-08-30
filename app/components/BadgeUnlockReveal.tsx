@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { badgeById, type BadgeUnlock } from "@/lib/badges";
 import { BadgeMedallion } from "./BadgeMedallion";
+import { getExperienceStage } from "@/lib/experience-progression";
 
-export function BadgeUnlockReveal({ unlocks, demo, onDismiss }: { unlocks: BadgeUnlock[]; demo: boolean; onDismiss: () => void }) {
+export function BadgeUnlockReveal({ unlocks, demo, onDismiss, experienceLevel = 0 }: { unlocks: BadgeUnlock[]; demo: boolean; onDismiss: () => void; experienceLevel?: number }) {
   const [index, setIndex] = useState(0);
   const [settled, setSettled] = useState(false);
   const [flying, setFlying] = useState(false);
@@ -39,6 +40,7 @@ export function BadgeUnlockReveal({ unlocks, demo, onDismiss }: { unlocks: Badge
   }, []);
 
   if (!badge) return null;
+  const experience = getExperienceStage(experienceLevel);
   const last = index === unlocks.length - 1;
   function continueReveal() {
     if (flying) return;
@@ -56,7 +58,8 @@ export function BadgeUnlockReveal({ unlocks, demo, onDismiss }: { unlocks: Badge
   }
 
   return (
-    <div ref={overlayRef} className={`badge-unlock-overlay accent-${badge.tone} ${settled ? "settled" : ""} ${flying ? "vault-flight" : ""}`} role="dialog" aria-modal="true" aria-labelledby="badge-unlock-title" aria-describedby="badge-unlock-copy">
+    <div ref={overlayRef} className={`badge-unlock-overlay accent-${badge.tone} experience-${experience.pattern} experience-intensity-${experience.intensity} material-${experience.material} ${settled ? "settled" : ""} ${flying ? "vault-flight" : ""}`} data-experience-stage={experience.id} style={{ "--experience-art-position": experience.artPosition, "--experience-intensity": experience.intensity } as CSSProperties} role="dialog" aria-modal="true" aria-labelledby="badge-unlock-title" aria-describedby="badge-unlock-copy">
+      <span className="badge-unlock-story-art" aria-hidden="true" />
       <span className="badge-unlock-flash" aria-hidden="true" />
       <span className="badge-unlock-beams" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /></span>
       <span className="badge-unlock-shockwaves" aria-hidden="true"><i /><i /><i /></span>

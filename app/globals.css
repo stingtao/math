@@ -4823,3 +4823,110 @@ a[data-navigation-pending="true"] { opacity: .58 !important; cursor: wait !impor
 @media (max-width: 980px) {
   .stage-card.history-stage-card { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
 }
+
+/* A twenty-stage celebration language grows every five lesson clears instead of replaying one day-one effect forever. */
+.experience-scene {
+  --experience-art-position: 0%;
+  width: 100%;
+  min-height: 176px;
+  margin: 24px 0 18px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(230px, 1.15fr) minmax(220px, .85fr);
+  border: 1px solid color-mix(in srgb, var(--accent, var(--blue)) 30%, #dbe5eb);
+  border-radius: 20px;
+  color: var(--navy);
+  background: white;
+  box-shadow: 0 14px 32px rgb(19 44 68 / 10%);
+  text-align: left;
+}
+.experience-scene-art { min-height: 176px; position: relative; overflow: hidden; background-image: linear-gradient(90deg, transparent 72%, rgb(255 255 255 / 42%)), url("/visuals/experience-frontier-atlas-v1.webp"); background-size: 100% 100%, 500% 100%; background-position: center, var(--experience-art-position) center; background-repeat: no-repeat; }
+.experience-scene-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 48%, color-mix(in srgb, var(--accent, var(--blue)) 20%, transparent)); }
+.experience-scene-art > i { width: 9px; height: 9px; position: absolute; right: 17%; top: 24%; border: 2px solid white; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 7px rgb(255 255 255 / 13%), 0 0 24px var(--gold); }
+.experience-scene-art > i:nth-child(2) { right: 30%; top: 58%; transform: scale(.72); }.experience-scene-art > i:nth-child(3) { right: 9%; top: 72%; transform: scale(.48); }
+.experience-scene figcaption { min-width: 0; padding: 22px; display: grid; align-content: center; gap: 9px; background: linear-gradient(135deg, white, color-mix(in srgb, var(--accent-soft, #edf4fe) 58%, white)); }
+.experience-scene figcaption > span { display: grid; gap: 4px; }
+.experience-scene figcaption small { color: var(--accent, var(--blue)); font-size: 16px; font-weight: 900; letter-spacing: .11em; }
+.experience-scene figcaption strong { font-size: 22px; line-height: 1.12; letter-spacing: -.035em; }
+.experience-scene figcaption p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.48; }
+.experience-scene figcaption em { color: color-mix(in srgb, var(--accent, var(--blue)) 75%, var(--navy)); font-size: 16px; font-style: normal; font-weight: 800; }
+.experience-scene.new-stage { border-width: 2px; box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent, var(--blue)) 9%, transparent), 0 20px 42px color-mix(in srgb, var(--accent, var(--blue)) 20%, transparent); animation: experience-scene-unlock 2.4s .35s cubic-bezier(.18, .9, .25, 1) both; }
+.experience-boss { margin: 0 0 24px; }
+.boss-victory .experience-boss { margin: 23px 0 18px; }
+@keyframes experience-scene-unlock { 0% { opacity: 0; transform: translateY(22px) scale(.95); filter: saturate(.55); } 32% { opacity: 1; transform: translateY(-4px) scale(1.02); filter: saturate(1.18); } 100% { transform: none; filter: none; } }
+
+/* Later stages add geometry, material, and energy; the success meaning stays a clear check. */
+.success-check > b { font: inherit; line-height: 1; }
+.success-check > i { width: 29px; height: 29px; position: absolute; right: -9px; top: -9px; display: grid; place-items: center; border: 3px solid white; border-radius: 10px; color: var(--navy); background: var(--gold); font-size: 16px; font-style: normal; line-height: 1; box-shadow: 0 6px 15px rgb(20 44 68 / 22%); }
+.success-burst.experience-intensity-2 .success-check { box-shadow: 0 18px 55px rgb(21 121 96 / 42%), 0 0 0 10px rgb(255 255 255 / 12%); }
+.success-burst.experience-intensity-3 .success-check { border-radius: 50%; box-shadow: 0 22px 70px rgb(80 91 205 / 46%), 0 0 0 13px rgb(255 255 255 / 14%); }
+.success-burst.experience-intensity-4 .success-check { background: conic-gradient(from var(--experience-turn), var(--teal), var(--blue), var(--violet), var(--teal)); box-shadow: 0 24px 90px rgb(93 76 205 / 52%), 0 0 0 17px rgb(255 255 255 / 13%); }
+.success-burst.experience-intensity-5 .success-check { border-radius: 18px; background: conic-gradient(from var(--experience-turn), #f2bd41, #8b67ef, #2fb7b0, #f07c69, #f2bd41); box-shadow: 0 0 48px rgb(255 224 133 / 68%), 0 28px 110px rgb(104 69 184 / 58%), 0 0 0 22px rgb(255 255 255 / 12%); }
+.success-burst.experience-intensity-4 .success-rings i, .success-burst.experience-intensity-5 .success-rings i { border-style: double; border-width: 7px; }
+.success-burst.experience-intensity-5 .success-particles i:nth-child(4n) { width: 19px; height: 19px; clip-path: polygon(50% 0, 61% 36%, 100% 50%, 61% 64%, 50% 100%, 39% 64%, 0 50%, 39% 36%); border-radius: 0; background: white; }
+.experience-compass-sparks .success-particles i, .experience-nova-shards .success-particles i { clip-path: polygon(50% 0, 64% 35%, 100% 50%, 64% 65%, 50% 100%, 36% 65%, 0 50%, 36% 35%); border-radius: 0; }
+.experience-prism-crossing .success-particles i, .experience-prism-crossing .answer-impact-lines i { background: linear-gradient(transparent, #a26eef, #4d91eb); }
+.experience-comet-tails .success-particles i, .experience-aurora-sweep .success-particles i { width: 6px; height: 38px; border-radius: 99px; }
+.experience-lattice-wake .success-rings i, .experience-constellation-stitch .success-rings i { border-radius: 18px; transform: translate(-50%, -50%) rotate(45deg); }
+.experience-deepglass-bloom .success-check, .experience-current-rings .success-check { backdrop-filter: blur(10px); background: rgb(22 159 171 / 76%); }
+.experience-eclipse-halo .success-flash { background: radial-gradient(circle at center, #12223d 0 6%, #f3c85e 7% 9%, rgb(117 83 202 / 42%) 14%, transparent 55%); }
+.experience-mythic-portal .success-rings { transform: rotate(22deg); }
+
+.answer-impact-evolution { width: min(520px, 78vw); height: min(520px, 78vw); position: absolute; left: 50%; top: 48%; display: grid; place-items: center; border: 2px solid rgb(255 255 255 / 23%); border-radius: 50%; color: rgb(255 255 255 / 14%); font-size: 34px; text-shadow: 0 0 28px currentColor; transform: translate(-50%, -50%); animation: answer-evolution-orbit 2.8s ease-out both; }
+.answer-impact.experience-intensity-1 .answer-impact-evolution { opacity: .35; }
+.answer-impact.experience-intensity-3 .answer-impact-core::before { box-shadow: 0 24px 90px color-mix(in srgb, var(--accent) 58%, transparent), inset 0 0 0 10px rgb(255 255 255 / 17%); }
+.answer-impact.experience-intensity-4 .answer-impact-core::before { background: conic-gradient(from 25deg, color-mix(in srgb, var(--accent) 70%, white), var(--accent), var(--violet), var(--accent)); }
+.answer-impact.experience-intensity-5 .answer-impact-core::before { outline: 10px double rgb(255 255 255 / 26%); outline-offset: 11px; background: conic-gradient(#e9b941, #8b67ef, #29ada8, #ed715f, #e9b941); }
+@keyframes answer-evolution-orbit { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.4) rotate(-28deg); } 34% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.28) rotate(24deg); } }
+
+/* Badge craft becomes visibly richer with later lesson and answer milestones. */
+.badge-medallion-crown { position: absolute; inset: 0 0 31px; z-index: -1; display: none; animation: badge-rays-turn 17s linear infinite reverse; }
+.badge-medallion-crown i { width: 7px; height: 18px; position: absolute; left: calc(50% - 3px); top: 0; border-radius: 99px; background: color-mix(in srgb, var(--accent) 68%, white); box-shadow: 0 0 11px color-mix(in srgb, var(--accent) 45%, transparent); transform-origin: 50% calc(var(--badge-size) / 2); }
+.badge-medallion-crown i:nth-child(2) { transform: rotate(72deg); }.badge-medallion-crown i:nth-child(3) { transform: rotate(144deg); }.badge-medallion-crown i:nth-child(4) { transform: rotate(216deg); }.badge-medallion-crown i:nth-child(5) { transform: rotate(288deg); }
+.badge-material-bronze .badge-medallion-crown, .badge-material-enamel .badge-medallion-crown, .badge-material-silver .badge-medallion-crown, .badge-material-prism .badge-medallion-crown, .badge-material-deepglass .badge-medallion-crown, .badge-material-gold .badge-medallion-crown, .badge-material-stellar .badge-medallion-crown, .badge-material-cosmic .badge-medallion-crown, .badge-material-mythic .badge-medallion-crown { display: block; }
+.badge-material-bronze::before { box-shadow: inset 0 0 0 6px rgb(255 255 255 / 67%), inset 0 0 0 10px #a9632f, 0 13px 27px color-mix(in srgb, var(--accent) 24%, transparent); }
+.badge-material-enamel .badge-medallion-plate { box-shadow: inset 0 0 0 3px rgb(255 255 255 / 28%), inset -8px -9px 16px rgb(12 31 52 / 21%), 0 7px 15px color-mix(in srgb, var(--accent) 32%, transparent); }
+.badge-material-prism .badge-medallion-plate, .badge-material-cosmic .badge-medallion-plate { background: conic-gradient(from var(--badge-turn), #4d91eb, #9870e7, #2dafaa, #ef826d, #4d91eb); }
+.badge-material-deepglass::before { background: radial-gradient(circle, #fff 0 30%, #d8fbff 31% 58%, #1c9eb0 59% 100%); box-shadow: inset 0 0 0 7px rgb(255 255 255 / 72%), 0 0 26px rgb(52 193 205 / 36%); }
+.badge-material-gold::before { background: radial-gradient(circle, #fff 0 30%, #fff1bc 31% 58%, #d79c22 59% 100%); box-shadow: inset 0 0 0 7px rgb(255 255 255 / 70%), 0 0 28px rgb(221 161 37 / 43%); }
+.badge-material-stellar::before, .badge-material-cosmic::before { background: conic-gradient(from var(--badge-turn), #e7c65b, #8065df, #53c1c2, #eef7ff, #e7c65b); box-shadow: inset 0 0 0 7px rgb(255 255 255 / 64%), 0 0 31px rgb(108 88 208 / 47%); }
+.badge-material-mythic::before { background: conic-gradient(from var(--badge-turn), #ffe08b, #a56af0, #52d2c5, #ff8978, #ffe08b); box-shadow: inset 0 0 0 7px rgb(255 255 255 / 70%), 0 0 0 5px rgb(255 219 117 / 24%), 0 0 42px rgb(135 87 219 / 58%); animation: mythic-medal-turn 7s linear infinite; }
+@keyframes mythic-medal-turn { to { filter: hue-rotate(360deg); } }
+
+.badge-unlock-story-art { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(180deg, rgb(7 13 25 / 32%), rgb(7 13 25 / 88%)), url("/visuals/experience-frontier-atlas-v1.webp"); background-size: 100% 100%, 500% 100%; background-position: center, var(--experience-art-position) center; background-repeat: no-repeat; opacity: calc(.12 + var(--experience-intensity) * .055); filter: saturate(1.12); transform: scale(1.04); animation: badge-story-pan 5.2s ease-out both; }
+.badge-unlock-overlay.experience-intensity-1 .badge-unlock-confetti i:nth-child(n + 17), .badge-unlock-overlay.experience-intensity-2 .badge-unlock-confetti i:nth-child(n + 23) { display: none; }
+.badge-unlock-overlay.experience-intensity-4 .badge-unlock-card, .badge-unlock-overlay.experience-intensity-5 .badge-unlock-card { border-width: 2px; box-shadow: 0 40px 125px rgb(0 0 0 / 52%), 0 0 65px color-mix(in srgb, var(--accent) 25%, transparent), inset 0 1px 0 rgb(255 255 255 / 40%); }
+.badge-unlock-overlay.experience-intensity-5 .badge-unlock-medal { filter: drop-shadow(0 0 28px rgb(255 222 125 / 55%)); }
+@keyframes badge-story-pan { from { opacity: 0; transform: scale(1.11) translateX(-1.5%); } to { transform: scale(1.04) translateX(1.5%); } }
+
+/* XP keeps the same readable meter while its frame and world texture evolve. */
+.xp-profile-progress::before, .xp-reward-progress::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(90deg, rgb(255 255 255 / 96%) 24%, rgb(255 255 255 / 68%) 66%, transparent), url("/visuals/experience-frontier-atlas-v1.webp"); background-size: 100% 100%, 500% 100%; background-position: center, var(--experience-art-position) center; background-repeat: no-repeat; opacity: calc(.04 + var(--experience-intensity) * .025); }
+.xp-profile-progress > :not(.progress-detail-hitarea, .xp-experience-motif), .xp-reward-progress > :not(.xp-experience-motif) { position: relative; z-index: 1; }
+.xp-experience-motif { width: 72px; height: 72px; position: absolute; z-index: 0; right: 18px; bottom: -14px; display: grid; place-items: center; border: 2px solid color-mix(in srgb, var(--xp-accent) 14%, transparent); border-radius: 50%; color: color-mix(in srgb, var(--xp-accent) 18%, transparent); font-size: 34px; line-height: 1; transform: rotate(-12deg); }
+.xp-reward-progress { position: relative; overflow: hidden; }
+.xp-reward-progress.level-up::after { content: ""; position: absolute; inset: -50%; pointer-events: none; background: conic-gradient(transparent 0 38%, color-mix(in srgb, var(--xp-accent) 28%, transparent) 43%, transparent 48% 100%); animation: level-up-sweep 2.5s ease-out both; }
+.xp-reward-progress.experience-intensity-4.level-up .xp-level-orb, .xp-reward-progress.experience-intensity-5.level-up .xp-level-orb { animation-name: xp-level-ascend; animation-duration: 2.4s; animation-iteration-count: 1; }
+@keyframes level-up-sweep { from { opacity: 0; transform: rotate(-45deg) scale(.65); } 35% { opacity: 1; } to { opacity: 0; transform: rotate(80deg) scale(1.15); } }
+@keyframes xp-level-ascend { 0% { transform: scale(.6) rotate(-12deg); } 35% { transform: scale(1.22) rotate(5deg); box-shadow: 0 0 0 15px color-mix(in srgb, var(--xp-accent) 15%, transparent), 0 15px 38px var(--xp-shadow); } 65% { transform: scale(.96); } 100% { transform: none; } }
+
+@media (max-width: 700px) {
+  .experience-scene { grid-template-columns: 1fr; }
+  .experience-scene-art { min-height: 165px; background-image: linear-gradient(0deg, rgb(255 255 255 / 12%), transparent 45%), url("/visuals/experience-frontier-atlas-v1.webp"); }
+  .experience-scene figcaption { padding: 17px; }
+  .experience-scene figcaption strong { font-size: 21px; }
+  .experience-scene figcaption em { display: none; }
+  .boss-arena .experience-scene { margin-inline: 0; }
+  .answer-impact-evolution { width: 92vw; height: 92vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .experience-scene,
+  .experience-scene-art > i,
+  .answer-impact-evolution,
+  .badge-medallion-crown,
+  .badge-material-mythic::before,
+  .badge-unlock-story-art,
+  .xp-reward-progress.level-up::after,
+  .xp-reward-progress.level-up .xp-level-orb { animation: none !important; }
+  .answer-impact-evolution { opacity: .12; transform: translate(-50%, -50%); }
+}

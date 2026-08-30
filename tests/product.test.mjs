@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, stat } from "node:fs/promises";
 import test from "node:test";
 import { calculateLessonReward } from "../lib/rewards.ts";
 import { achievementTotalsForState, achievementUnlockedBetween, evaluateAchievements, getNextAchievement } from "../lib/achievements.ts";
@@ -22,6 +22,15 @@ import { isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-inte
 import { chooseLearnerMode } from "../lib/learner-mode.ts";
 import { getXpGain, getXpProgress, XP_PER_LEVEL } from "../lib/xp-progression.ts";
 import { badgeReplayDestination, historyReplayDestination } from "../lib/progress-replay.ts";
+import {
+  EXPERIENCE_BASE_ROUTE_LESSONS,
+  EXPERIENCE_LESSONS_PER_STAGE,
+  crossedExperienceStage,
+  experienceStages,
+  getBadgeExperienceStage,
+  getExperienceProgress,
+  getExperienceStage,
+} from "../lib/experience-progression.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -1011,6 +1020,75 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(css, /\.answer-impact-core::before/);
   assert.match(css, /\.answer-impact\.combo-flame \.answer-impact-core::before \{ clip-path:/);
   assert.doesNotMatch(css, /\.answer-impact\.combo-flame \.answer-impact-core \{[^}]*clip-path:/);
+});
+
+test("evolves reward spectacle through 20 distinct stages across the first 100 lesson clears", async () => {
+  assert.equal(EXPERIENCE_LESSONS_PER_STAGE, 5);
+  assert.equal(EXPERIENCE_BASE_ROUTE_LESSONS, 100);
+  assert.equal(experienceStages.length, 20);
+  assert.equal(new Set(experienceStages.map((stage) => stage.id)).size, 20);
+  assert.equal(new Set(experienceStages.map((stage) => stage.name)).size, 20);
+  assert.equal(new Set(experienceStages.map((stage) => stage.pattern)).size, 20);
+  assert.ok(experienceStages.every((stage) => stage.intensity >= 1 && stage.intensity <= 5));
+  assert.deepEqual(new Set(experienceStages.map((stage) => stage.chapter)), new Set([1, 2, 3, 4, 5]));
+
+  assert.equal(getExperienceStage(0).id, 1);
+  assert.equal(getExperienceStage(4).id, 1);
+  assert.equal(getExperienceStage(5).id, 2);
+  assert.equal(getExperienceStage(94).id, 19);
+  assert.equal(getExperienceStage(95).id, 20);
+  assert.equal(getExperienceStage(1_000).id, 20);
+  assert.equal(getExperienceStage(Number.NaN).id, 1);
+  assert.equal(crossedExperienceStage(3, 4), false);
+  assert.equal(crossedExperienceStage(4, 5), true);
+  assert.deepEqual(getExperienceProgress(7), {
+    current: experienceStages[1],
+    next: experienceStages[2],
+    earnedInStage: 2,
+    lessonsToNext: 3,
+    percent: 40,
+  });
+  assert.equal(getBadgeExperienceStage("lesson", 1, 1).id, 1);
+  assert.equal(getBadgeExperienceStage("lesson", 96, 1).id, 20);
+  assert.equal(getBadgeExperienceStage("answer", 1, 10).id, 1);
+  assert.equal(getBadgeExperienceStage("answer", 100, 1_000).id, 20);
+
+  const scene = await readFile(new URL("../app/components/ExperienceScene.tsx", import.meta.url), "utf8");
+  const burst = await readFile(new URL("../app/components/SuccessBurst.tsx", import.meta.url), "utf8");
+  const answer = await readFile(new URL("../app/components/AnswerImpact.tsx", import.meta.url), "utf8");
+  const medallion = await readFile(new URL("../app/components/BadgeMedallion.tsx", import.meta.url), "utf8");
+  const reveal = await readFile(new URL("../app/components/BadgeUnlockReveal.tsx", import.meta.url), "utf8");
+  const xp = await readFile(new URL("../app/components/XpProgress.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const docs = await readFile(new URL("../docs/experience-progression.md", import.meta.url), "utf8");
+  const guideline = await readFile(new URL("../docs/learning-ui-guideline.md", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const atlasUrl = new URL("../public/visuals/experience-frontier-atlas-v1.webp", import.meta.url);
+  const atlas = await sharp(await readFile(atlasUrl)).metadata();
+  const atlasStat = await stat(atlasUrl);
+
+  assert.equal(atlas.width, 1600);
+  assert.equal(atlas.height, 683);
+  assert.ok(atlasStat.size < 350_000);
+  assert.match(scene, /next visual evolution/i);
+  assert.match(burst, /experienceLevel/);
+  assert.match(answer, /lineCount = 16 \+ experience\.intensity \* 4/);
+  assert.match(medallion, /getBadgeExperienceStage/);
+  assert.match(medallion, /badge-medallion-crown/);
+  assert.match(reveal, /badge-unlock-story-art/);
+  assert.match(xp, /completedLessons/);
+  assert.match(lesson, /<ExperienceScene/);
+  assert.match(boss, /<ExperienceScene/);
+  assert.match(css, /\.experience-scene/);
+  assert.match(css, /experience-frontier-atlas-v1\.webp/);
+  assert.match(css, /\.xp-profile-progress > :not\(\.progress-detail-hitarea, \.xp-experience-motif\)/);
+  assert.match(css, /\.experience-intensity-5/);
+  assert.match(css, /\.experience-mythic-portal/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(docs, /Twenty-stage route for the first hundred lesson clears/i);
+  assert.match(docs, /Extension to forty and sixty stages/i);
+  assert.match(guideline, /Progress spectacle through vocabulary, not volume/);
 });
 
 test("ships a readable, safe-area-aware mobile learning interface", async () => {

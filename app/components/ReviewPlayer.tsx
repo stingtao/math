@@ -151,8 +151,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
 
   if (finished) return (
     <main className="learner-shell">
-      <SuccessBurst eventKey="daily-review-complete" large />
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <SuccessBurst eventKey="daily-review-complete" large experienceLevel={state.completedLessons.length} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
       <section className="review-finish">
         {reviewAnchorLesson && <div className="review-finish-emblem"><TopicIcon visual={reviewAnchorLesson.visual} accent={reviewAnchorLesson.accent} size="xl" label="Daily Review completed" /><span aria-hidden="true">✓</span></div>}
@@ -160,7 +160,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         <h1>{questions.length} skills back online.</h1>
         <p>They will return again when another quick recall will help them stick.</p>
         <div className="review-finish-reward"><span><strong>+20</strong> XP</span></div>
-        <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - 20} theme={state.profile.theme} variant="reward" />
+        <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - 20} theme={state.profile.theme} completedLessons={state.completedLessons.length} variant="reward" />
         <p className="review-stop-note">You can stop here.</p>
         <div className="review-finish-actions">{suggestedLesson && <EnterActionLink className="primary-button" href={suggestedHref}>Start {suggestedLesson.title} <span>→</span></EnterActionLink>}<a className="text-link" href={trailHref}>View learning map</a></div>
       </section>
@@ -169,7 +169,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
 
   return (
     <main className="learner-shell review-shell">
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
       <div className={`review-mobile-status accent-${questionLesson?.accent ?? "teal"}`}>
         <header><div><small>5-MINUTE REVIEW</small><strong>{question.lessonTitle}</strong></div></header>
@@ -181,7 +181,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
           <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div></header>
           <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void check()} />
           {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—use the clue and retry.</strong><p>{question.hint}</p><small>A corrected answer earns the same review credit.</small></div></div>}
-          {feedback === "correct" && <><AnswerImpact eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} label={currentFirstTry ? "RECALLED" : "CORRECTED"} chain={recallStreak} progress={recalledCount} total={questions.length} tone={questionLesson?.accent ?? "teal"} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `${recallStreak} correct in a row!` : "Recalled correctly!" : "Corrected!"}</strong><p>{index + 1} of {questions.length} complete.</p></div><span className="momentum-chip">{currentFirstTry && recallStreak > 1 ? `${recallStreak} in a row` : "Complete"}</span></div></>}
+          {feedback === "correct" && <><AnswerImpact eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} label={currentFirstTry ? "RECALLED" : "CORRECTED"} chain={recallStreak} progress={recalledCount} total={questions.length} tone={questionLesson?.accent ?? "teal"} experienceLevel={state.completedLessons.length} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `${recallStreak} correct in a row!` : "Recalled correctly!" : "Corrected!"}</strong><p>{index + 1} of {questions.length} complete.</p></div><span className="momentum-chip">{currentFirstTry && recallStreak > 1 ? `${recallStreak} in a row` : "Complete"}</span></div></>}
           {errorMessage && <p id="review-answer-error" className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions review-actions">{feedback === "correct" ? <AutoAdvanceButton eventKey={`review-${question.lessonId}-${question.questionId}-${index}`} label={index === questions.length - 1 ? "Finish review" : "Next question"} busy={busy} busyLabel="Saving review…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter">{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
         </div>

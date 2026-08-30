@@ -21,6 +21,7 @@ import { EnterActionLink } from "./EnterActionLink";
 import { XpProgress } from "./XpProgress";
 import { isResponseComplete } from "@/lib/question-interactions";
 import { EnterActionButton } from "./EnterActionButton";
+import { ExperienceScene } from "./ExperienceScene";
 
 type BossAttempt = {
   attemptId: string;
@@ -307,20 +308,21 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   if (cleared) return (
     <main className={`boss-shell accent-${region.accent}`}>
-      <SuccessBurst eventKey={`boss-${region.id}-complete`} large />
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <SuccessBurst eventKey={`boss-${region.id}-complete`} large experienceLevel={state.completedLessons.length} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
       <section className="boss-victory boss-region-clear" aria-labelledby="boss-clear-title">
         <div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} region cleared`} /><span aria-hidden="true">★</span></div>
         <span className="section-kicker">REGION COMPLETE</span>
         <h1 id="boss-clear-title">{isFinalRegion ? `Grade ${region.grade} complete.` : `${region.title} complete.`}</h1>
         <p>{isFinalRegion ? "Daily Review is ready." : `${nextRegion.title} is unlocked.`}</p>
+        <ExperienceScene completedLessons={state.completedLessons.length} variant="boss" />
 
         <div className="completion-earnings" aria-label={`${hearts} of 3 hearts and ${bossXpEarned} XP earned`}>
           <span><b aria-hidden="true">{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</b><strong>{hearts}/3 hearts</strong></span>
           <span className={bossXpEarned === 0 ? "quiet" : ""}><b>+{bossXpEarned}</b><strong>XP</strong></span>
         </div>
-        <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - bossXpEarned} theme={state.profile.theme} variant="reward" />
+        <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - bossXpEarned} theme={state.profile.theme} completedLessons={state.completedLessons.length} variant="reward" />
 
         {unlockedLandmark && <PrivateLandmarkUnlock achievement={unlockedLandmark} demo={isDemo} compact />}
 
@@ -336,8 +338,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   if (repairRestored) return (
     <main className={`boss-shell accent-${region.accent}`}>
-      <SuccessBurst eventKey={`boss-${region.id}-hearts-restored`} large />
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      <SuccessBurst eventKey={`boss-${region.id}-hearts-restored`} large experienceLevel={state.completedLessons.length} />
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
       <section className="repair-restored-card" aria-live="polite">
         <div className="repair-restored-emblem">
@@ -358,8 +360,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   if (failed) return (
     <main className={`boss-shell accent-${region.accent}`}>
-      {repairCheckpoint && <AnswerImpact eventKey={`boss-repair-${region.id}-1`} label="REPAIR LOCKED" chain={1} progress={1} total={2} tone={repairLesson.accent} />}
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      {repairCheckpoint && <AnswerImpact eventKey={`boss-repair-${region.id}-1`} label="REPAIR LOCKED" chain={1} progress={1} total={2} tone={repairLesson.accent} experienceLevel={state.completedLessons.length} />}
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
       <section className="repair-card" aria-busy={busy}>
         <div className="repair-emblem"><TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="lg" label={`${repairLesson.title} repair`} /><span aria-hidden="true">◇</span></div>
@@ -382,11 +384,12 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
 
   return (
     <main className={`boss-shell accent-${region.accent}`}>
-      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} onDismiss={() => setBadgeUnlocks([])} />}
+      {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
       <div className="boss-topbar"><a href={trailUrl}>← Leave</a><div className="boss-rounds">{questions.map((item, round) => <span className={round < index ? "done" : round === index ? "active" : ""} key={`${item.id}-${round}`} />)}</div><div className="boss-hearts" aria-label={`${hearts} hearts remaining`}>{"♥".repeat(hearts)}{"♡".repeat(3 - hearts)}</div></div>
       <section className="boss-arena">
         <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF {questions.length}</span><h1>{region.title}</h1><p>{questions.length} links. No timer. Every miss can be repaired.</p></div></div>
+        <ExperienceScene completedLessons={state.completedLessons.length} variant="boss" />
         <div className="boss-connection-map" aria-label={`${connectedLinks} of ${questions.length} boss connections complete`}>
           <header><div><span>SKILL MAP</span><strong>{region.lessons.length} lesson moves + one mixed finish</strong></div><small>{connectedLinks}/{questions.length} linked</small></header>
           <div className="boss-connection-nodes" role="list">
@@ -404,7 +407,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : syncMessage ? "boss-sync-message" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} onSubmit={() => void check()} />
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
           {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—fix this move.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. Retry this same question.` : "Two focused repairs refill every heart."}</small></div></div>}
-          {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
+          {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} experienceLevel={state.completedLessons.length} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
           {syncMessage && <div id="boss-sync-message" className="boss-sync-message" role="status"><span aria-hidden="true">↻</span><div><strong>You are back in the right place.</strong><p>{syncMessage}</p></div></div>}
           {errorMessage && <p id="boss-answer-error" className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`boss-${region.id}-${index}`} label={index === questions.length - 1 ? "Finish boss" : "Next question"} busy={busy} busyLabel="Saving boss…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter">{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>

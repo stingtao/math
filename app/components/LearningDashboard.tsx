@@ -125,7 +125,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   return (
     <main className="learner-shell">
       <LearnerHeader state={state} demo={isDemo} />
-      {rewardMessage.startsWith("Collected") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} />}
+      {rewardMessage.startsWith("Collected") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} experienceLevel={state.completedLessons.length} />}
       {isDemo && <div className="demo-banner"><span>Preview mode</span><p>Try anything. This progress lasts only in this browser.</p><a href="/#join">Sign in to save it</a></div>}
       <section className="dashboard-wrap">
         <nav className="grade-switcher" aria-label="Choose a grade">
