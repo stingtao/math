@@ -207,7 +207,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       clearedBosses: already ? activeState.clearedBosses.map((item) => item.regionId === region.id ? { ...item, hearts: Math.max(item.hearts, hearts) } : item) : [...activeState.clearedBosses, { regionId: region.id, hearts }],
       learningHistory: already
         ? activeState.learningHistory.map((item) => item.key === `boss:${region.id}` ? { ...item, hearts: Math.max(item.hearts ?? 0, hearts) } : item)
-        : [{ key: `boss:${region.id}`, kind: "boss", title: `${region.title} Boss`, grade: region.grade, regionTitle: region.title, completedAt: new Date().toISOString(), hearts }, ...activeState.learningHistory],
+        : [{ key: `boss:${region.id}`, kind: "boss", regionId: region.id, title: `${region.title} Boss`, grade: region.grade, regionTitle: region.title, completedAt: new Date().toISOString(), hearts }, ...activeState.learningHistory],
       totalXp: activeState.totalXp + (already ? 0 : 100),
       weeklyXp: activeState.weeklyXp + (already ? 0 : 100),
     };

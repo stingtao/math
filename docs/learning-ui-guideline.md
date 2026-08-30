@@ -215,3 +215,29 @@ Coverage audits must compare several kinds of authority instead of treating one 
 - Use IB Mathematics AA/AI guides to test inquiry, modeling, technology, proof, and interpretation—not only topic names.
 - Record every confirmed gap in the machine-readable coverage contract with named lesson evidence and five reviewed questions.
 - A topic is not complete until it includes a suitable representation, a worked reasoning chain, practice across more than recall, and an interaction type that fits the response.
+
+## 18. Make saved progress inspectable and replayable
+
+A history row, earned badge, achievement, XP level, or other object-backed progress surface is not only decoration. It is a compact index into the learner's own evidence and should open on demand without expanding every card by default.
+
+- Keep the resting card concise. Clicking or pressing it opens one shared accessible detail dialog with status, the object that produced it, useful completion evidence, and one relevant next action.
+- A completed lesson opens its saved grade, region, date, best stars, and first-try result, then offers `Replay lesson` without deleting the original clear.
+- A cleared boss opens its saved hearts and completion date, then offers `Replay boss`.
+- A lesson badge points back to its lesson. A cross-lesson answer badge explains the answer threshold and points to recall or practice instead of inventing a lesson association.
+- Achievements and XP show their real source metric and current threshold. Their CTA returns to the closest activity that can reproduce or improve that outcome.
+- Use stable lesson and region identifiers in saved history and destination resolution. Preserve key-based fallback for older records so a UI upgrade does not strand existing progress.
+- The dialog must support Escape, backdrop close, focus containment, focus restoration, keyboard activation, and a phone layout without horizontal overflow.
+
+Do not make every completed card permanently verbose just to prove it is clickable. Use hover, focus, pressed treatment, a concise accessible name, and the shared dialog to reveal depth when requested.
+
+## 19. Acknowledge navigation once
+
+Every same-tab navigation action must acknowledge the first click before the next page appears.
+
+- Mark the chosen link busy immediately, expose `aria-busy`, prevent a second navigation activation, and show one global loading signal.
+- Keep same-page anchor jumps, downloads, modifier-assisted clicks, and new-tab links out of the blocking path; they serve different interaction intents.
+- Clear the pending state when a page is restored from browser history so Back never returns to a disabled interface.
+- Programmatic navigation after a mutation must use the same principle locally: disable the trigger, change to a busy label, and restore it only when retrying is safe.
+- Motion is optional. The disabled state, busy text, and live status must still communicate progress when reduced motion is enabled.
+
+This rule applies to header navigation, maps, completion CTAs, history replay, badge replay, legal/footer links, sign-in exits, and any future control that changes the current page.

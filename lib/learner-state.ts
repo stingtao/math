@@ -1,12 +1,14 @@
 import { calculateLessonReward } from "./rewards.ts";
 import { answerBadgeForCorrectCount, lessonBadgeByLessonId, type BadgeUnlock } from "./badges.ts";
 import { normalizeTheme, type ThemeId } from "./themes.ts";
-import { getGradeCurriculum, getGradeLessons, lessonById } from "./curriculum.ts";
+import { getGradeCurriculum, getGradeLessons, lessonById, regions } from "./curriculum.ts";
 
 export type AvatarSpec = { glyph: string; tone: string; frame: string };
 export type LearningHistoryEntry = {
   key: string;
   kind: "lesson" | "boss";
+  lessonId?: string;
+  regionId?: number;
   title: string;
   grade: number;
   regionTitle: string;
@@ -69,7 +71,9 @@ const fallback: LearnerState = {
   learningHistory: [{
     key: "lesson:g8-r1-l1",
     kind: "lesson",
-    title: "Integer Operations",
+    lessonId: "g8-r1-l1",
+    regionId: 1,
+    title: "Math Symbols",
     grade: 8,
     regionTitle: "Number Foundations",
     completedAt: "2026-08-20T08:00:00.000Z",
@@ -101,7 +105,20 @@ export function getDemoState(): LearnerState {
       earnedIds: Array.isArray(parsedBadges?.earnedIds) ? [...new Set(parsedBadges.earnedIds)] : fallback.badges.earnedIds,
       recent: Array.isArray(parsedBadges?.recent) ? parsedBadges.recent.slice(0, 8) : fallback.badges.recent,
     };
-    return { ...fallback, ...parsed, profile, badges } as LearnerState;
+    const sourceHistory = Array.isArray(parsed.learningHistory) ? parsed.learningHistory : fallback.learningHistory;
+    const regionById = new Map(regions.map((region) => [region.id, region]));
+    const learningHistory = sourceHistory.map((entry) => {
+      if (entry.kind === "lesson") {
+        const lessonId = entry.lessonId ?? entry.key.replace(/^lesson:/, "");
+        const lesson = lessonById.get(lessonId);
+        const region = lesson ? regionById.get(lesson.regionId) : undefined;
+        return lesson ? { ...entry, lessonId, regionId: lesson.regionId, title: lesson.title, grade: lesson.grade, regionTitle: region?.title ?? entry.regionTitle } : entry;
+      }
+      const regionId = entry.regionId ?? Number(entry.key.replace(/^boss:/, ""));
+      const region = regionById.get(regionId);
+      return region ? { ...entry, regionId, title: `${region.title} Boss`, grade: region.grade, regionTitle: region.title } : entry;
+    });
+    return { ...fallback, ...parsed, profile, badges, learningHistory } as LearnerState;
   } catch {
     return fallback;
   }
@@ -145,17 +162,31 @@ export function completeDemoLesson(state: LearnerState, lessonId: string, stars:
   const currentIndex = gradeLessons.findIndex((item) => item.id === lessonId);
   const followingLesson = gradeLessons[currentIndex + 1] ?? currentLesson;
   const region = currentLesson ? getGradeCurriculum(currentLesson.grade).regions.find((item) => item.id === currentLesson.regionId) : undefined;
-  const learningHistory = existing || !currentLesson ? state.learningHistory : [{
-    key: `lesson:${lessonId}`,
-    kind: "lesson" as const,
-    title: currentLesson.title,
-    grade: currentLesson.grade,
-    regionTitle: region?.title ?? "Math route",
-    completedAt: new Date().toISOString(),
-    stars,
-    firstCorrectCount: firstCorrectCount ?? (stars === 3 ? currentLesson.practice.length : 0),
-    questionCount: currentLesson.practice.length,
-  }, ...state.learningHistory];
+  const learningHistory = !currentLesson ? state.learningHistory : existing
+    ? state.learningHistory.map((entry) => entry.key === `lesson:${lessonId}` ? {
+        ...entry,
+        lessonId,
+        regionId: currentLesson.regionId,
+        title: currentLesson.title,
+        grade: currentLesson.grade,
+        regionTitle: region?.title ?? entry.regionTitle,
+        stars: Math.max(entry.stars ?? 0, stars),
+        firstCorrectCount: Math.max(entry.firstCorrectCount ?? 0, firstCorrectCount ?? (stars === 3 ? currentLesson.practice.length : 0)),
+        questionCount: currentLesson.practice.length,
+      } : entry)
+    : [{
+        key: `lesson:${lessonId}`,
+        kind: "lesson" as const,
+        lessonId,
+        regionId: currentLesson.regionId,
+        title: currentLesson.title,
+        grade: currentLesson.grade,
+        regionTitle: region?.title ?? "Math route",
+        completedAt: new Date().toISOString(),
+        stars,
+        firstCorrectCount: firstCorrectCount ?? (stars === 3 ? currentLesson.practice.length : 0),
+        questionCount: currentLesson.practice.length,
+      }, ...state.learningHistory];
   let next: LearnerState = {
     ...state,
     completedLessons,

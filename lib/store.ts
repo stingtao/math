@@ -182,6 +182,8 @@ export async function getLearnerState(learnerId: string) {
       return {
         key: `lesson:${item.lesson_id}`,
         kind: "lesson" as const,
+        lessonId: item.lesson_id,
+        regionId: lesson?.regionId,
         title: lesson?.title ?? "Completed lesson",
         grade: lesson?.grade ?? 0,
         regionTitle: region?.title ?? "Math route",
@@ -196,6 +198,7 @@ export async function getLearnerState(learnerId: string) {
       return {
         key: `boss:${item.region_id}`,
         kind: "boss" as const,
+        regionId: item.region_id,
         title: `${region?.title ?? "Region"} Boss`,
         grade: region?.grade ?? 0,
         regionTitle: region?.title ?? "Math route",

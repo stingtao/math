@@ -5,6 +5,7 @@ import "katex/dist/katex.min.css";
 import "./globals.css";
 import { AdUnit } from "./components/AdUnit";
 import { SiteFooter } from "./components/SiteFooter";
+import { NavigationFeedback } from "./components/NavigationFeedback";
 
 const ADSENSE_CLIENT = "ca-pub-6452867962392355";
 
@@ -52,6 +53,7 @@ export default function RootLayout({
         className={`${manrope.variable} antialiased`}
         suppressHydrationWarning
       >
+        <NavigationFeedback />
         <div className="page-content google-anno-skip">{children}</div>
         <AdUnit />
         <SiteFooter />

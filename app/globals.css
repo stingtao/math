@@ -4286,6 +4286,122 @@ html[data-theme] .boss-question-card { border-color: var(--theme-line, var(--lin
   .frontier-grade-card:hover { transform: none; }
 }
 
+/* Progress and achievement objects stay compact until the learner asks for evidence or replay. */
+.progress-detail-hitarea {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  outline-offset: -4px;
+  background: transparent;
+  cursor: pointer;
+}
+.progress-detail-hitarea:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent, var(--blue)) 75%, white); }
+.history-entry,
+.achievement-card,
+.next-achievement,
+.badge-catalog-card,
+.badge-next-quest { position: relative; }
+.history-entry:has(.progress-detail-hitarea:hover),
+.achievement-card:has(.progress-detail-hitarea:hover),
+.badge-catalog-card:has(.progress-detail-hitarea:hover) { transform: translateY(-3px); box-shadow: 0 12px 26px rgb(23 50 79 / 9%); }
+.history-entry { transition: transform .2s ease, box-shadow .2s ease; }
+.progress-detail-backdrop {
+  position: fixed;
+  z-index: 240;
+  inset: 0;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: rgb(10 28 44 / 76%);
+  backdrop-filter: blur(9px);
+  animation: progress-detail-backdrop-in .18s ease-out both;
+}
+.progress-detail-modal {
+  width: min(610px, 100%);
+  max-height: min(760px, calc(100dvh - 40px));
+  padding: 29px;
+  position: relative;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, #d8e3e9);
+  border-radius: 25px;
+  background: linear-gradient(150deg, white 58%, var(--accent-soft));
+  box-shadow: 0 30px 90px rgb(3 18 31 / 34%);
+  animation: progress-detail-modal-in .24s cubic-bezier(.2, .8, .2, 1) both;
+}
+.progress-detail-heading { padding-right: 42px; display: grid; grid-template-columns: 92px minmax(0, 1fr); align-items: center; gap: 18px; }
+.progress-detail-glyph { width: 88px; height: 88px; display: grid; place-items: center; border-radius: 28px; color: white; background: var(--accent); font-size: 32px; font-weight: 950; box-shadow: 0 11px 24px color-mix(in srgb, var(--accent) 24%, transparent); }
+.progress-detail-glyph:has(.badge-medallion) { background: transparent; box-shadow: none; }
+.progress-detail-glyph .badge-medallion { transform: scale(.75); }
+.progress-detail-heading h2 { margin: 6px 0 8px; font-size: 28px; line-height: 1.08; letter-spacing: -.04em; }
+.progress-detail-heading strong { padding: 6px 9px; display: inline-flex; border-radius: 99px; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, white); font-size: 16px; }
+.progress-detail-modal > p { margin: 22px 0 16px; color: var(--muted); font-size: 17px; line-height: 1.55; }
+.progress-detail-modal dl { margin: 0; overflow: hidden; display: grid; border: 1px solid color-mix(in srgb, var(--accent) 15%, #dce5ea); border-radius: 16px; background: rgb(255 255 255 / 78%); }
+.progress-detail-modal dl > div { min-height: 50px; padding: 11px 14px; display: grid; grid-template-columns: minmax(120px, .7fr) minmax(0, 1.3fr); align-items: center; gap: 14px; }
+.progress-detail-modal dl > div + div { border-top: 1px solid #e3eaee; }
+.progress-detail-modal dt { color: var(--muted); font-size: 16px; font-weight: 750; }
+.progress-detail-modal dd { margin: 0; overflow-wrap: anywhere; color: var(--navy); font-size: 16px; font-weight: 900; text-align: right; }
+.progress-detail-actions { margin-top: 20px; display: grid; grid-template-columns: 1.25fr .75fr; gap: 9px; }
+.progress-detail-actions > * { min-height: 50px; justify-content: center; }
+@keyframes progress-detail-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes progress-detail-modal-in { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+
+/* One global route transition signal disables repeat navigation and confirms the first click. */
+.navigation-feedback {
+  min-width: 132px;
+  min-height: 42px;
+  padding: 9px 14px;
+  position: fixed;
+  z-index: 300;
+  left: 50%;
+  top: max(12px, env(safe-area-inset-top));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 99px;
+  color: white;
+  background: rgb(18 43 68 / 94%);
+  box-shadow: 0 12px 35px rgb(6 24 41 / 25%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -14px);
+  transition: opacity .16s ease, transform .16s ease;
+}
+.navigation-feedback.active { opacity: 1; transform: translate(-50%, 0); }
+.navigation-feedback > span { width: 17px; height: 17px; border: 3px solid rgb(255 255 255 / 35%); border-top-color: white; border-radius: 50%; animation: navigation-spin .7s linear infinite; }
+.navigation-feedback strong { font-size: 16px; }
+html[data-navigation-pending="true"] a[href] { pointer-events: none !important; }
+a[data-navigation-pending="true"] { opacity: .58 !important; cursor: wait !important; }
+@keyframes navigation-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 560px) {
+  .progress-detail-backdrop { padding: 12px; align-items: end; }
+  .progress-detail-modal { width: 100%; max-height: calc(100dvh - 24px); padding: 24px 17px 18px; border-radius: 24px; }
+  .progress-detail-heading { padding-right: 35px; grid-template-columns: 72px minmax(0, 1fr); gap: 13px; }
+  .progress-detail-glyph { width: 70px; height: 70px; border-radius: 22px; font-size: 27px; }
+  .progress-detail-glyph .badge-medallion { transform: scale(.62); }
+  .progress-detail-heading h2 { font-size: 24px; }
+  .progress-detail-modal dl > div { grid-template-columns: 1fr; gap: 3px; }
+  .progress-detail-modal dd { text-align: left; }
+  .progress-detail-actions { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-detail-backdrop,
+  .progress-detail-modal,
+  .navigation-feedback,
+  .navigation-feedback > span { animation: none; transition: none; }
+  .history-entry:has(.progress-detail-hitarea:hover),
+  .achievement-card:has(.progress-detail-hitarea:hover),
+  .badge-catalog-card:has(.progress-detail-hitarea:hover) { transform: none; }
+}
+
 /* The public landing page stays bright even while its story travels through deep space and the ocean. */
 .frontier-home { --frontier-dark: #eef6f8; --frontier-panel: #fff; background: #f8fbfc; }
 .frontier-home > .topbar { color: #17364b; border-bottom: 1px solid #d7e4e9; background: rgb(255 255 255 / 96%); }

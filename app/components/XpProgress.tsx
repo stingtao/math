@@ -1,7 +1,8 @@
 import { getXpGain, getXpProgress } from "@/lib/xp-progression";
+import type { XpProgress as XpProgressState } from "@/lib/xp-progression";
 import type { ThemeId } from "@/lib/themes";
 
-export function XpProgress({ totalXp, theme, previousXp, variant = "profile" }: { totalXp: number; theme: ThemeId; previousXp?: number; variant?: "profile" | "reward" }) {
+export function XpProgress({ totalXp, theme, previousXp, variant = "profile", onOpen }: { totalXp: number; theme: ThemeId; previousXp?: number; variant?: "profile" | "reward"; onOpen?: (progress: XpProgressState) => void }) {
   const progress = getXpProgress(totalXp, theme);
   const gain = previousXp === undefined ? null : getXpGain(previousXp, totalXp, theme);
   const levelUp = Boolean(gain?.levelsGained);
@@ -20,6 +21,7 @@ export function XpProgress({ totalXp, theme, previousXp, variant = "profile" }: 
 
   return (
     <section className={`xp-profile-progress xp-tier-${progress.tier}`} id="xp-level" aria-labelledby="xp-level-heading">
+      {onOpen && <button className="progress-detail-hitarea" type="button" onClick={() => onOpen(progress)} aria-label={`Open Level ${progress.level} XP details`} />}
       <span className="xp-level-orb"><small>LEVEL</small><strong>{progress.level}</strong></span>
       <div className="xp-profile-copy">
         <span className="section-kicker">LIFETIME XP</span>

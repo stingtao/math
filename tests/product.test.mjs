@@ -21,6 +21,7 @@ import { grade89VisualInteractionLessonSlugs } from "../lib/curriculum-enrichmen
 import { isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-interactions.ts";
 import { chooseLearnerMode } from "../lib/learner-mode.ts";
 import { getXpGain, getXpProgress, XP_PER_LEVEL } from "../lib/xp-progression.ts";
+import { badgeReplayDestination, historyReplayDestination } from "../lib/progress-replay.ts";
 import sharp from "sharp";
 
 test("keeps the right math symbols available on mobile answer keyboards", () => {
@@ -438,6 +439,45 @@ test("grants demo badges once at the same milestones as the server", () => {
   const replayState = completeDemoLesson(lessonState, "g8-r1-l2", 3);
   assert.equal(replayState.badges.earnedIds.filter((id) => id === "lesson-g8-r1-l2").length, 1);
   assert.equal(replayState.learningHistory.filter((entry) => entry.key === "lesson:g8-r1-l2").length, 1);
+  assert.equal(replayState.learningHistory.find((entry) => entry.key === "lesson:g8-r1-l2")?.stars, 3);
+});
+
+test("turns saved progress and badges into stable replay destinations", () => {
+  const lessonHistory = { key: "lesson:g8-r1-l2", kind: "lesson", lessonId: "g8-r1-l2", regionId: 1, title: "Positive and Negative Numbers", grade: 8, regionTitle: "Number Foundations", completedAt: "2026-08-20T08:00:00.000Z" };
+  const legacyLessonHistory = { ...lessonHistory, lessonId: undefined, regionId: undefined };
+  const bossHistory = { key: "boss:1", kind: "boss", regionId: 1, title: "Number Foundations Boss", grade: 8, regionTitle: "Number Foundations", completedAt: "2026-08-21T08:00:00.000Z" };
+  assert.deepEqual(historyReplayDestination(lessonHistory, true), { href: "/learn/signed-numbers?grade=8&demo=1", label: "Replay lesson" });
+  assert.deepEqual(historyReplayDestination(legacyLessonHistory, false), { href: "/learn/signed-numbers?grade=8", label: "Replay lesson" });
+  assert.deepEqual(historyReplayDestination(bossHistory, true), { href: "/boss/1?grade=8&demo=1", label: "Replay boss" });
+  assert.deepEqual(badgeReplayDestination(lessonBadges.find((badge) => badge.lessonId === "g8-r1-l2"), true, true), { href: "/learn/signed-numbers?grade=8&demo=1", label: "Replay lesson" });
+  assert.deepEqual(badgeReplayDestination(answerBadges[0], false, true), { href: "/learn", label: "Practice again" });
+  assert.deepEqual(badgeReplayDestination(answerBadges[0], true, false, true), { href: "/review?demo=1", label: "Build progress" });
+});
+
+test("makes progress details accessible and navigation feedback global", async () => {
+  const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
+  const gallery = await readFile(new URL("../app/components/BadgeGallery.tsx", import.meta.url), "utf8");
+  const modal = await readFile(new URL("../app/components/ProgressDetailModal.tsx", import.meta.url), "utf8");
+  const navigation = await readFile(new URL("../app/components/NavigationFeedback.tsx", import.meta.url), "utf8");
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(profile, /showHistoryDetail/);
+  assert.match(profile, /showAchievementDetail/);
+  assert.match(profile, /showXpDetail/);
+  assert.match(gallery, /showBadgeDetail/);
+  assert.match(profile, /progress-detail-hitarea/);
+  assert.match(gallery, /progress-detail-hitarea/);
+  assert.match(modal, /role="dialog"/);
+  assert.match(modal, /aria-modal="true"/);
+  assert.match(modal, /event\.key === "Escape"/);
+  assert.match(modal, /querySelectorAll<HTMLElement>/);
+  assert.match(layout, /<NavigationFeedback/);
+  assert.match(navigation, /document\.addEventListener\("click", handleClick, true\)/);
+  assert.match(navigation, /aria-busy/);
+  assert.match(navigation, /navigationPending/);
+  assert.match(navigation, /flushSync\(\(\) => setPending\(true\)\)/);
+  assert.match(css, /html\[data-navigation-pending="true"\] a\[href\]/);
+  assert.match(css, /prefers-reduced-motion/);
 });
 
 test("always gives a signed-in account priority over a demo query", () => {

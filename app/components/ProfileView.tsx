@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { saveDemoState, type LearnerState } from "@/lib/learner-state";
 import { Avatar } from "./Avatar";
 import { LearnerHeader } from "./Header";
@@ -12,6 +12,10 @@ import { evaluateAchievements } from "@/lib/achievements";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { getThemeJourney, getThemeSpec, themeCatalog, type ThemeId } from "@/lib/themes";
 import { XpProgress } from "./XpProgress";
+import { ProgressDetailModal, type ProgressDetail } from "./ProgressDetailModal";
+import { historyReplayDestination, learningMapDestination } from "@/lib/progress-replay";
+import { lessonById } from "@/lib/curriculum";
+import type { XpProgress as XpProgressState } from "@/lib/xp-progression";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error, isDemo } = useLearner(demo);
@@ -21,6 +25,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const [frameCelebrationKey, setFrameCelebrationKey] = useState("");
   const [busyTheme, setBusyTheme] = useState("");
   const [busyAction, setBusyAction] = useState("");
+  const [detail, setDetail] = useState<ProgressDetail | null>(null);
   if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR PRIVATE BASE" title="Loading your base…" detail="Your codename, world, and milestones are almost ready." />;
   if (!state || error) return <LearningSignInGate glyph="✦" kicker="YOUR BASE IS PRIVATE" title="Sign in to open your base." detail="Only you can see your settings, rewards, and learning milestones." />;
   const activeState = state;
@@ -135,6 +140,77 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     }
   }
 
+  function showHistoryDetail(entry: LearnerState["learningHistory"][number]) {
+    const destination = historyReplayDestination(entry, isDemo);
+    const result = entry.kind === "boss"
+      ? `${entry.hearts ?? 0}/3 hearts`
+      : `${entry.stars ?? 0}/3 stars`;
+    const facts = [
+      { label: "Grade", value: `Grade ${entry.grade}` },
+      { label: "Region", value: entry.regionTitle },
+      { label: "Completed", value: formatHistoryDate(entry.completedAt) },
+      { label: "Best result", value: result },
+    ];
+    if (entry.kind === "lesson") facts.push({ label: "First try", value: `${entry.firstCorrectCount ?? 0}/${entry.questionCount ?? 0} questions` });
+    setDetail({
+      eyebrow: entry.kind === "boss" ? "BOSS HISTORY" : "LESSON HISTORY",
+      title: entry.title,
+      status: entry.kind === "boss" ? "Boss cleared" : "Lesson complete",
+      description: entry.kind === "boss" ? "This challenge is cleared. Replay it to practice the region as one connected set." : "This lesson is saved in your private history. Replaying can improve your best stars without removing the clear.",
+      glyph: entry.kind === "boss" ? "★" : "✓",
+      tone: entry.kind === "boss" ? "gold" : "teal",
+      facts,
+      actionHref: destination.href,
+      actionLabel: destination.label,
+    });
+  }
+
+  function showAchievementDetail(item: ReturnType<typeof evaluateAchievements>[number]) {
+    const latestLesson = state.learningHistory.find((entry) => entry.kind === "lesson");
+    const latestBoss = state.learningHistory.find((entry) => entry.kind === "boss");
+    const currentGrade = lessonById.get(state.nextLessonId)?.grade ?? latestLesson?.grade ?? 8;
+    const destination = item.source === "bosses" && latestBoss
+      ? historyReplayDestination(latestBoss, isDemo)
+      : (item.source === "lessons" || item.source === "stars") && latestLesson
+        ? historyReplayDestination(latestLesson, isDemo)
+        : item.source === "streak"
+          ? { href: isDemo ? "/review?demo=1" : "/review", label: item.unlocked ? "Practice again" : "Continue the streak" }
+          : { href: learningMapDestination(currentGrade, isDemo), label: item.unlocked ? "Open completed map" : "Build progress" };
+    setDetail({
+      eyebrow: "ACHIEVEMENT DETAILS",
+      title: item.title,
+      status: item.unlocked ? "Achievement earned" : "In progress",
+      description: item.copy,
+      glyph: item.glyph,
+      tone: item.tone,
+      facts: [
+        { label: "Progress", value: `${Math.min(item.value, item.target)}/${item.target} ${item.unit}${item.target === 1 ? "" : "s"}` },
+        { label: "Goal", value: item.copy },
+      ],
+      actionHref: destination.href,
+      actionLabel: destination.label,
+    });
+  }
+
+  function showXpDetail(progress: XpProgressState) {
+    const currentGrade = lessonById.get(state.nextLessonId)?.grade ?? 8;
+    setDetail({
+      eyebrow: "XP DETAILS",
+      title: `Level ${progress.level} · ${progress.rankTitle}`,
+      status: `${progress.totalXp} lifetime XP`,
+      description: "Lessons, recall, and boss challenges add XP. Replay any cleared activity when you want another practice run.",
+      glyph: String(progress.level),
+      tone: "blue",
+      facts: [
+        { label: "This level", value: `${progress.earnedInLevel}/${progress.nextLevelXp - progress.levelStartXp} XP` },
+        { label: "Next level", value: `${progress.xpToNextLevel} XP away` },
+        { label: "Next rank", value: progress.nextRank ? `${progress.nextRank.title} at Level ${progress.nextRank.level}` : "Top current rank" },
+      ],
+      actionHref: learningMapDestination(currentGrade, isDemo),
+      actionLabel: "Choose a mission",
+    });
+  }
+
   return (
     <main className="learner-shell profile-page">
       <LearnerHeader state={state} demo={isDemo} />
@@ -145,7 +221,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
           <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()}</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p></div></div>
           <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${isDemo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed || Boolean(busyAction)} aria-busy={busyAction === "reroll"} onClick={reroll}>{busyAction === "reroll" ? "Rerolling…" : state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
-        <XpProgress totalXp={state.totalXp} theme={state.profile.theme} />
+        <XpProgress totalXp={state.totalXp} theme={state.profile.theme} onOpen={showXpDetail} />
         <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>Mission {journey.stage}</strong><small>{journey.location}</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article><article><span>◆</span><strong>{state.weeklyXp}</strong><small>Weekly XP</small></article></div>
 
         <section className="profile-learning-history" aria-labelledby="learning-history-heading">
@@ -154,6 +230,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
             {historyByGrade.map(([historyGrade, entries], gradeIndex) => <details open={gradeIndex === 0} key={historyGrade}>
               <summary><span>Grade {historyGrade}</span><small>{entries.length} {entries.length === 1 ? "clear" : "clears"}</small></summary>
               <div className="history-entry-list">{entries.map((entry) => <article className={`history-entry ${entry.kind}`} key={entry.key}>
+                <button className="progress-detail-hitarea" type="button" onClick={() => showHistoryDetail(entry)} aria-label={`Open ${entry.title} completion details`} />
                 <span className="history-entry-icon" aria-hidden="true">{entry.kind === "boss" ? "★" : "✓"}</span>
                 <div><strong>{entry.title}</strong><p>{entry.regionTitle} · <time dateTime={entry.completedAt}>{formatHistoryDate(entry.completedAt)}</time></p></div>
                 <span className="history-result">{entry.kind === "boss" ? `${entry.hearts ?? 0}/3 ♥` : <>{"★".repeat(entry.stars ?? 0)}{"☆".repeat(3 - (entry.stars ?? 0))}<small>{entry.firstCorrectCount ?? 0}/{entry.questionCount ?? 0} first try</small></>}</span>
@@ -180,8 +257,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
 
         <section className="achievement-section" aria-labelledby="achievement-heading">
           <header><h2 id="achievement-heading">Achievements</h2></header>
-          {nextAchievement ? <div className={`next-achievement accent-${nextAchievement.tone}`}><span className="achievement-badge" aria-hidden="true"><b>{nextAchievement.glyph}</b><i /></span><div><small>NEXT</small><strong>{nextAchievement.title}</strong><p>{nextAchievement.copy}</p></div><div className="next-achievement-progress"><span><b>{nextAchievement.value}</b> / {nextAchievement.target} {nextAchievement.unit}{nextAchievement.target === 1 ? "" : "s"}</span><i><b style={{ width: `${nextAchievement.progress}%` }} /></i></div></div> : <div className="next-achievement shelf-complete"><span className="achievement-badge" aria-hidden="true"><b>✓</b><i /></span><div><strong>All current achievements earned.</strong></div></div>}
-          <div className="achievement-grid" role="list">{achievements.map((item) => <article className={`achievement-card accent-${item.tone} ${item.unlocked ? "unlocked" : "locked"}`} role="listitem" aria-label={`${item.title}: ${item.unlocked ? "unlocked" : `${item.value} of ${item.target}`}`} key={item.id}><span className="achievement-badge" aria-hidden="true"><b>{item.glyph}</b><i /></span><div><h3>{item.title}</h3><p>{item.copy}</p></div>{!item.unlocked && <div className="achievement-card-status"><span>{item.value}/{item.target}</span><i><b style={{ width: `${item.progress}%` }} /></i></div>}</article>)}</div>
+          {nextAchievement ? <div className={`next-achievement accent-${nextAchievement.tone}`}><button className="progress-detail-hitarea" type="button" onClick={() => showAchievementDetail(nextAchievement)} aria-label={`Open ${nextAchievement.title} progress details`} /><span className="achievement-badge" aria-hidden="true"><b>{nextAchievement.glyph}</b><i /></span><div><small>NEXT</small><strong>{nextAchievement.title}</strong><p>{nextAchievement.copy}</p></div><div className="next-achievement-progress"><span><b>{nextAchievement.value}</b> / {nextAchievement.target} {nextAchievement.unit}{nextAchievement.target === 1 ? "" : "s"}</span><i><b style={{ width: `${nextAchievement.progress}%` }} /></i></div></div> : <div className="next-achievement shelf-complete"><span className="achievement-badge" aria-hidden="true"><b>✓</b><i /></span><div><strong>All current achievements earned.</strong></div></div>}
+          <div className="achievement-grid" role="list">{achievements.map((item) => <article className={`achievement-card accent-${item.tone} ${item.unlocked ? "unlocked" : "locked"}`} role="listitem" aria-label={`${item.title}: ${item.unlocked ? "unlocked" : `${item.value} of ${item.target}`}`} key={item.id}><button className="progress-detail-hitarea" type="button" onClick={() => showAchievementDetail(item)} aria-label={`Open ${item.title} achievement details`} /><span className="achievement-badge" aria-hidden="true"><b>{item.glyph}</b><i /></span><div><h3>{item.title}</h3><p>{item.copy}</p></div>{!item.unlocked && <div className="achievement-card-status"><span>{item.value}/{item.target}</span><i><b style={{ width: `${item.progress}%` }} /></i></div>}</article>)}</div>
         </section>
 
         <div className="profile-grid">
@@ -216,6 +293,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         {message && <div className="toast-message" role="status">{message}</div>}
       </section>
       {deleteOpen && <DeleteAccount demo={isDemo} clientId={clientId} onClose={() => setDeleteOpen(false)} />}
+      {detail && <ProgressDetailModal detail={detail} onClose={() => setDetail(null)} />}
     </main>
   );
 }
@@ -229,6 +307,8 @@ function formatHistoryDate(value: string) {
 function DeleteAccount({ demo, clientId, onClose }: { demo: boolean; clientId: string; onClose: () => void }) {
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const deletingRef = useRef(false);
   useEffect(() => {
     if (!confirmed || demo || !clientId) return;
     const render = () => {
@@ -236,9 +316,18 @@ function DeleteAccount({ demo, clientId, onClose }: { demo: boolean; clientId: s
       if (!element || !window.google) return;
       element.replaceChildren();
       window.google.accounts.id.initialize({ client_id: clientId, callback: async ({ credential }) => {
+        if (deletingRef.current) return;
+        deletingRef.current = true;
+        setDeleting(true);
         setStatus("Deleting your trail…");
-        const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "deleteAccount", credential }) });
-        if (response.ok) window.location.assign("/"); else setStatus("Reauthentication did not match this account.");
+        try {
+          const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "deleteAccount", credential }) });
+          if (response.ok) window.location.assign("/"); else { deletingRef.current = false; setDeleting(false); setStatus("Reauthentication did not match this account."); }
+        } catch {
+          deletingRef.current = false;
+          setDeleting(false);
+          setStatus("Deletion could not finish. Check your connection and try again.");
+        }
       } });
       window.google.accounts.id.renderButton(element, { type: "standard", theme: "outline", size: "large", text: "continue_with", width: 300 });
     };
@@ -247,6 +336,13 @@ function DeleteAccount({ demo, clientId, onClose }: { demo: boolean; clientId: s
     }
   }, [clientId, confirmed, demo]);
 
-  function deleteDemo() { window.sessionStorage.removeItem("math-demo-state"); window.location.assign("/"); }
-  return <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Delete account"><div className="delete-modal"><button className="modal-close" onClick={onClose} type="button">×</button><span className="danger-icon">!</span><span className="section-kicker">PERMANENT ACTION</span><h2>Delete your complete Math trail?</h2><p>This removes progress, attempts, rewards, your anonymous identity, league entries, and every active session. It cannot be undone.</p><label className="age-check"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I understand that this permanently deletes my account.</span></label>{confirmed && (demo ? <button className="danger-button full-button" type="button" onClick={deleteDemo}>Delete demo data</button> : clientId ? <div id="delete-google-button" className="google-button-slot" /> : <p className="form-error">Google reauthentication will be available when the production Client ID is connected.</p>)}{status && <p className="signin-status">{status}</p>}</div></div>;
+  function deleteDemo() {
+    if (deletingRef.current) return;
+    deletingRef.current = true;
+    setDeleting(true);
+    setStatus("Deleting demo data…");
+    window.sessionStorage.removeItem("math-demo-state");
+    window.location.assign("/");
+  }
+  return <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Delete account"><div className="delete-modal"><button className="modal-close" onClick={onClose} type="button" disabled={deleting}>×</button><span className="danger-icon">!</span><span className="section-kicker">PERMANENT ACTION</span><h2>Delete your complete Math trail?</h2><p>This removes progress, attempts, rewards, your anonymous identity, league entries, and every active session. It cannot be undone.</p><label className="age-check"><input type="checkbox" checked={confirmed} disabled={deleting} onChange={(event) => setConfirmed(event.target.checked)} /><span>I understand that this permanently deletes my account.</span></label>{confirmed && (demo ? <button className="danger-button full-button" type="button" disabled={deleting} aria-busy={deleting} onClick={deleteDemo}>{deleting ? "Deleting…" : "Delete demo data"}</button> : clientId ? <div id="delete-google-button" className="google-button-slot" aria-busy={deleting} /> : <p className="form-error">Google reauthentication will be available when the production Client ID is connected.</p>)}{status && <p className="signin-status">{status}</p>}</div></div>;
 }
