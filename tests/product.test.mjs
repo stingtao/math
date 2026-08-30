@@ -530,6 +530,8 @@ test("keeps one private family record behind a newly confirmed parent session", 
   assert.match(security, /PARENT_SESSION_COOKIE/);
   assert.match(authRoute, /parentConfirmed/);
   assert.match(authRoute, /FAMILY_AGREEMENT_VERSION/);
+  assert.match(authRoute, /contentLength > 16_384/);
+  assert.match(authRoute, /body\.parentConfirmed !== true/);
   assert.match(googleSignIn, /I am 18 or older and the parent or legal guardian/);
   assert.match(googleSignIn, /Your child does not sign in/);
   assert.match(googleSignIn, /if \(!parentConfirmedRef\.current\)/);
