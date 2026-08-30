@@ -146,7 +146,6 @@ export function QuestionResponse({ question, value, disabled, invalid, described
           onSubmit();
         }}
         placeholder="Type your answer"
-        autoFocus
       />
     </label>
   );

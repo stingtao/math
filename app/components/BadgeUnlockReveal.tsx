@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { badgeById, type BadgeUnlock } from "@/lib/badges";
 import { BadgeMedallion } from "./BadgeMedallion";
 import { getExperienceStage } from "@/lib/experience-progression";
+import { useContentStart } from "./useContentStart";
 
 export function BadgeUnlockReveal({ unlocks, demo, onDismiss, experienceLevel = 0 }: { unlocks: BadgeUnlock[]; demo: boolean; onDismiss: () => void; experienceLevel?: number }) {
   const [index, setIndex] = useState(0);
@@ -11,6 +12,7 @@ export function BadgeUnlockReveal({ unlocks, demo, onDismiss, experienceLevel = 
   const [flying, setFlying] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const flightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const badgeStartRef = useContentStart<HTMLElement>(`badge-unlock-${index}`);
   const unlock = unlocks[index];
   const badge = unlock ? badgeById.get(unlock.id) : undefined;
 
@@ -68,7 +70,7 @@ export function BadgeUnlockReveal({ unlocks, demo, onDismiss, experienceLevel = 
       <button className="badge-unlock-skip" type="button" disabled={settled} onClick={() => setSettled(true)}>{settled ? "Animation skipped" : "Skip animation"}</button>
       <span className="badge-vault-target" aria-hidden="true"><b>◆</b><small>VAULT</small><i /></span>
       {flying && <span className="badge-vault-flyer" aria-hidden="true"><BadgeMedallion badge={badge} earned size="xl" /></span>}
-      <section className="badge-unlock-card">
+      <section ref={badgeStartRef} className="badge-unlock-card learning-content-start" tabIndex={-1}>
         <span className="badge-unlock-kicker">NEW BADGE</span>
         <div className="badge-unlock-medal"><BadgeMedallion badge={badge} earned size="xl" /><span className="badge-unlock-check" aria-hidden="true">✓</span></div>
         <div className="badge-unlock-copy">

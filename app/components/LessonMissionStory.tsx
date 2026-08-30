@@ -16,7 +16,7 @@ export function LessonMissionStory({ lesson }: { lesson: LessonDefinition }) {
   return <div className={`lesson-mission-story accent-${lesson.accent}`}>
     <div className="lesson-mission-copy">
       <span className="section-kicker">{experience.kicker}</span>
-      <h2>{experience.title}</h2>
+      <h2 data-learning-heading>{experience.title}</h2>
       <p>{experience.problem}</p>
       <div className="lesson-mission-model"><small>MISSION MODEL</small><strong>{experience.model}</strong></div>
     </div>
@@ -41,7 +41,7 @@ export function LessonHistory({ lesson, busy, errorMessage, onComplete }: { less
   return <div className={`stage-card history-stage-card accent-${lesson.accent}`}>
     <div className="history-stage-copy">
       <span className="section-kicker">WHY THIS IDEA EXISTS · {history.era}</span>
-      <h2>{history.title}</h2>
+      <h2 data-learning-heading>{history.title}</h2>
       <p>{history.story}</p>
       <strong>{history.connection}</strong>
       <a href={history.sourceUrl} target="_blank" rel="noreferrer">Read the history source <span aria-hidden="true">↗</span></a>

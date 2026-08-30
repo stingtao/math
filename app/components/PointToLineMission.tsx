@@ -3,6 +3,7 @@
 import { useState, type PointerEvent as ReactPointerEvent } from "react";
 import { coordinateMissionProgress, coordinateReadTargets, pointToLineTargets, sameCoordinate, type CoordinatePoint } from "@/lib/coordinate-mission";
 import { SuccessBurst } from "./SuccessBurst";
+import { useContentStart } from "./useContentStart";
 
 const viewWidth = 372;
 const viewHeight = 342;
@@ -43,6 +44,8 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
   const visiblePoints = connected ? pointToLineTargets : plotted;
   const hasTrace = visiblePoints.length >= 2;
   const progress = coordinateMissionProgress(plotted.length, connected, phase === "complete" ? coordinateReadTargets.length : readIndex);
+  const taskTransitionKey = phase === "read" ? `read-${readIndex}` : phase;
+  const taskStartRef = useContentStart<HTMLElement>(taskTransitionKey);
 
   function tryPlot(point: CoordinatePoint) {
     if (phase !== "plot" || !activePlot) return;
@@ -179,7 +182,7 @@ export function PointToLineMission({ compact = false }: { compact?: boolean }) {
           <p>{attemptedPoint ? "Coral is your point. Gold is the target. Dashed guides show its x and y." : "x is time in hours. y is Nova’s distance from base in kilometers."}</p>
         </div>
 
-        <aside className="point-line-task">
+        <aside ref={taskStartRef} className="point-line-task learning-content-start" tabIndex={-1} aria-label={`${phase} mission task`}>
           {phase === "plot" && activePlot && <>
             <span className="point-line-kicker">POINT {plotted.length + 1} OF {pointToLineTargets.length}</span>
             <h3>Plot <code>{pointText(activePlot)}</code></h3>

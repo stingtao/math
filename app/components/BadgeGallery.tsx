@@ -7,6 +7,7 @@ import { useLearner } from "./useLearner";
 import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { BadgeMedallion } from "./BadgeMedallion";
 import { ProgressDetailModal, type ProgressDetail } from "./ProgressDetailModal";
+import { useContentStart } from "./useContentStart";
 import { badgeReplayDestination } from "@/lib/progress-replay";
 import type { BadgeSpec } from "@/lib/badges";
 
@@ -16,6 +17,8 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
   const { state, loading, error, isDemo } = useLearner(demo);
   const [filter, setFilter] = useState<BadgeFilter>("earned");
   const [visibleCount, setVisibleCount] = useState(48);
+  const [revealedPage, setRevealedPage] = useState(0);
+  const firstNewBadgeRef = useContentStart<HTMLElement>(`badge-page-${revealedPage}`);
   const [detail, setDetail] = useState<ProgressDetail | null>(null);
   const earned = useMemo(() => new Set(state?.badges.earnedIds ?? []), [state]);
   const filtered = useMemo(() => badgeCatalog.filter((badge) => filter === "all" ? true : filter === "earned" ? earned.has(badge.id) : badge.kind === filter), [earned, filter]);
@@ -28,7 +31,12 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
   const answerRemainder = activeState.badges.correctAnswers % 10;
   const shown = filtered.slice(0, visibleCount);
 
-  function chooseFilter(next: BadgeFilter) { setFilter(next); setVisibleCount(48); }
+  function chooseFilter(next: BadgeFilter) { setFilter(next); setVisibleCount(48); setRevealedPage(0); }
+
+  function showMore() {
+    setVisibleCount((value) => value + 48);
+    setRevealedPage((value) => value + 1);
+  }
 
   function showBadgeDetail(badge: BadgeSpec, owned: boolean) {
     const destination = badgeReplayDestination(badge, isDemo, owned, activeState.dueReview > 0);
@@ -81,11 +89,12 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
           <div className="badge-filter-bar" role="group" aria-label="Filter badges">
             {([['earned', 'Earned'], ['all', 'All'], ['lesson', 'Lessons'], ['answer', 'Answers']] as Array<[BadgeFilter, string]>).map(([value, label]) => <button className={filter === value ? "active" : ""} type="button" aria-pressed={filter === value} onClick={() => chooseFilter(value)} key={value}>{label}</button>)}
           </div>
-          <div className="badge-catalog-grid">{shown.map((badge) => {
+          <div className="badge-catalog-grid">{shown.map((badge, badgeIndex) => {
             const owned = earned.has(badge.id);
-            return <article className={`badge-catalog-card accent-${badge.tone} ${owned ? "earned" : "locked"}`} aria-label={`${badge.title}: ${owned ? "earned" : badge.requirement}`} key={badge.id}><button className="progress-detail-hitarea" type="button" onClick={() => showBadgeDetail(badge, owned)} aria-label={`Open ${badge.title} badge details`} /><BadgeMedallion badge={badge} earned={owned} size="md" /><div className="badge-card-copy"><h3>{badge.title}</h3>{!owned && <p>{badge.requirement}</p>}</div></article>;
+            const firstNewBadge = revealedPage > 0 && badgeIndex === (revealedPage * 48);
+            return <article ref={firstNewBadge ? firstNewBadgeRef : undefined} className={`badge-catalog-card accent-${badge.tone} ${owned ? "earned" : "locked"} ${firstNewBadge ? "learning-content-start" : ""}`} tabIndex={firstNewBadge ? -1 : undefined} aria-label={`${badge.title}: ${owned ? "earned" : badge.requirement}`} key={badge.id}><button className="progress-detail-hitarea" type="button" onClick={() => showBadgeDetail(badge, owned)} aria-label={`Open ${badge.title} badge details`} /><BadgeMedallion badge={badge} earned={owned} size="md" /><div className="badge-card-copy"><h3>{badge.title}</h3>{!owned && <p>{badge.requirement}</p>}</div></article>;
           })}</div>
-          {visibleCount < filtered.length && <button className="secondary-button badge-show-more" type="button" onClick={() => setVisibleCount((value) => value + 48)}>Show more <span aria-hidden="true">↓</span></button>}
+          {visibleCount < filtered.length && <button className="secondary-button badge-show-more" type="button" onClick={showMore}>Show more <span aria-hidden="true">↓</span></button>}
           {!shown.length && <div className="badge-empty-filter"><span aria-hidden="true">◇</span><strong>No badges yet.</strong><p>Complete a lesson to earn your first.</p></div>}
         </section>
       </section>

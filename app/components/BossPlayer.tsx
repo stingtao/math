@@ -23,6 +23,7 @@ import { isResponseComplete } from "@/lib/question-interactions";
 import { EnterActionButton } from "./EnterActionButton";
 import { ExperienceScene } from "./ExperienceScene";
 import { FamilyLearningCue } from "./FamilyLearningCue";
+import { useContentStart } from "./useContentStart";
 
 type BossAttempt = {
   attemptId: string;
@@ -76,6 +77,8 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const regionIndex = gradeCurriculum.regions.findIndex((item) => item.id === region.id);
   const nextRegion = gradeCurriculum.regions[regionIndex + 1];
   const isFinalRegion = !nextRegion;
+  const contentTransitionKey = cleared ? "boss-cleared" : repairRestored ? "boss-repair-restored" : failed ? `boss-repair-${repair}` : `boss-question-${index}`;
+  const contentStartRef = useContentStart<HTMLElement>(contentTransitionKey);
 
   useEffect(() => {
     if (!learnerReady || !unlocked) return;
@@ -312,7 +315,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       <SuccessBurst eventKey={`boss-${region.id}-complete`} large experienceLevel={state.completedLessons.length} />
       {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
-      <section className="boss-victory boss-region-clear" aria-labelledby="boss-clear-title">
+      <section ref={contentStartRef} className="boss-victory boss-region-clear learning-content-start" tabIndex={-1} aria-labelledby="boss-clear-title">
         <div className="celebration-emblem boss-emblem"><TopicIcon visual={region.lessons[0].visual} accent={region.accent} size="xl" label={`${region.title} region cleared`} /><span aria-hidden="true">★</span></div>
         <span className="section-kicker">REGION COMPLETE</span>
         <h1 id="boss-clear-title">{isFinalRegion ? `Grade ${region.grade} complete.` : `${region.title} complete.`}</h1>
@@ -342,7 +345,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       <SuccessBurst eventKey={`boss-${region.id}-hearts-restored`} large experienceLevel={state.completedLessons.length} />
       {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
-      <section className="repair-restored-card" aria-live="polite">
+      <section ref={contentStartRef} className="repair-restored-card learning-content-start" tabIndex={-1} aria-live="polite">
         <div className="repair-restored-emblem">
           <TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="xl" label={`${repairLesson.title} repaired`} />
           <span aria-hidden="true">♥</span>
@@ -364,7 +367,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       {repairCheckpoint && <AnswerImpact eventKey={`boss-repair-${region.id}-1`} label="REPAIR LOCKED" chain={1} progress={1} total={2} tone={repairLesson.accent} experienceLevel={state.completedLessons.length} />}
       {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
-      <section className="repair-card" aria-busy={busy}>
+      <section ref={contentStartRef} className="repair-card learning-content-start" tabIndex={-1} aria-busy={busy}>
         <div className="repair-emblem"><TopicIcon visual={repairLesson.visual} accent={repairLesson.accent} size="lg" label={`${repairLesson.title} repair`} /><span aria-hidden="true">◇</span></div>
         <span className="section-kicker">2-QUESTION REPAIR</span>
         <h1>Repair the skill. Refill your hearts.</h1>
@@ -373,7 +376,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         {repairCheckpoint && <div className="repair-checkpoint" role="status"><span aria-hidden="true">✓</span><div><strong>First repair locked in.</strong><p>One more answer restores ♥♥♥.</p></div></div>}
         <div className="repair-question">
           <span>{repair + 1} OF 2 · {repairLesson.title}</span>
-          <strong>{repairQuestion.prompt}</strong>
+          <strong data-learning-heading role="heading" aria-level={2}>{repairQuestion.prompt}</strong>
           <QuestionResponse question={repairQuestion} value={repairAnswer} disabled={repairAnswerLocked} invalid={repairFeedback === "incorrect"} describedBy={errorMessage ? "boss-repair-error" : repairFeedback ? "boss-repair-feedback" : undefined} onChange={(value) => { setRepairAnswer(value); setRepairFeedback(""); setErrorMessage(""); }} onSubmit={() => void checkRepair()} />
           {repairFeedback === "incorrect" && <div id="boss-repair-feedback" className="repair-answer-feedback" role="status"><span aria-hidden="true">↻</span><div><strong>Not yet—repair this step.</strong><p>{repairQuestion.hint}</p><small>Repair {repair + 1} stays open. No XP or completed repair is lost.</small></div></div>}
         </div>
@@ -402,10 +405,10 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           </div>
           <p><span aria-hidden="true">◆</span>{connectedLinks === questions.length ? `All ${questions.length} ideas are connected.` : `${questions.length - connectedLinks} ${questions.length - connectedLinks === 1 ? "connection" : "connections"} left. A correction keeps the map moving.`}</p>
         </div>
-        <div className="boss-question-card" aria-busy={busy}>
+        <div ref={contentStartRef} className="boss-question-card learning-content-start" tabIndex={-1} aria-label={`Boss question ${index + 1} of ${questions.length}`} aria-busy={busy}>
           <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
           <span className="boss-topic">{question.lesson}</span>
-          <h2>{question.prompt}</h2>
+          <h2 data-learning-heading>{question.prompt}</h2>
           <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : syncMessage ? "boss-sync-message" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} onSubmit={() => void check()} />
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
           {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—fix this move.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. Retry this same question.` : "Two focused repairs refill every heart."}</small></div></div>}

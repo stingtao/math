@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { headers } from "next/headers";
+import { Suspense } from "react";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 import { SiteFooter } from "./components/SiteFooter";
@@ -49,8 +50,8 @@ export default function RootLayout({
         className={`${manrope.variable} antialiased`}
         suppressHydrationWarning
       >
-        <NavigationFeedback />
-        <div className="page-content">{children}</div>
+        <Suspense fallback={null}><NavigationFeedback /></Suspense>
+        <div className="page-content" tabIndex={-1}>{children}</div>
         <SiteFooter />
       </body>
     </html>

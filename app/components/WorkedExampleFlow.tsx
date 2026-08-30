@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import type { Accent } from "@/lib/curriculum";
+import { useContentStart } from "./useContentStart";
 
 export function WorkedExampleFlow({ steps, accent, onComplete }: { steps: string[]; accent: Accent; onComplete: () => void }) {
   const [revealed, setRevealed] = useState(Math.min(1, steps.length));
   const complete = revealed >= steps.length;
+  const revealedStepRef = useContentStart<HTMLDivElement>(`worked-example-${revealed}`);
 
   function revealNext() {
     const next = Math.min(steps.length, revealed + 1);
@@ -19,7 +21,7 @@ export function WorkedExampleFlow({ steps, accent, onComplete }: { steps: string
         {steps.map((step, index) => {
           const visible = index < revealed;
           return (
-            <div className={`worked-example-node ${visible ? "revealed" : "waiting"}`} key={`${index}-${step}`} aria-hidden={!visible}>
+            <div ref={visible && index === revealed - 1 ? revealedStepRef : undefined} className={`worked-example-node ${visible ? "revealed" : "waiting"} ${visible && index === revealed - 1 ? "learning-content-start" : ""}`} tabIndex={visible && index === revealed - 1 ? -1 : undefined} key={`${index}-${step}`} aria-hidden={!visible}>
               <span>{visible ? index + 1 : "?"}</span>
               <div><small>{index === 0 ? "START" : index === steps.length - 1 ? "CONCLUDE" : `THINK ${index + 1}`}</small><p>{visible ? step : "Predict what the next mathematical move should be."}</p></div>
               {index < steps.length - 1 && <i aria-hidden="true">↓</i>}

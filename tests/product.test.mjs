@@ -24,6 +24,7 @@ import { hasConstructibleMathAnswer, isResponseComplete, MULTI_SELECT_SEPARATOR 
 import { chooseLearnerMode } from "../lib/learner-mode.ts";
 import { getXpGain, getXpProgress, XP_PER_LEVEL } from "../lib/xp-progression.ts";
 import { badgeReplayDestination, historyReplayDestination } from "../lib/progress-replay.ts";
+import { navigationViewportIntent } from "../lib/navigation-viewport.ts";
 import {
   EXPERIENCE_BASE_ROUTE_LESSONS,
   EXPERIENCE_LESSONS_PER_STAGE,
@@ -497,6 +498,55 @@ test("makes progress details accessible and navigation feedback global", async (
   assert.match(navigation, /flushSync\(\(\) => setPending\(true\)\)/);
   assert.match(css, /html\[data-navigation-pending="true"\] a\[href\]/);
   assert.match(css, /prefers-reduced-motion/);
+});
+
+test("moves forward learning transitions to their new visible start without breaking hashes or Back", async () => {
+  assert.equal(navigationViewportIntent("https://math.test/learn/a?grade=7", "/learn/b?grade=7"), "forward-top");
+  assert.equal(navigationViewportIntent("https://math.test/learn?grade=7", "/learn?grade=8"), "forward-top");
+  assert.equal(navigationViewportIntent("https://math.test/learn?grade=7", "/learn?grade=7#region-2"), "same-document-hash");
+  assert.equal(navigationViewportIntent("https://math.test/learn/a", "/learn#region-2"), "forward-hash");
+  assert.equal(navigationViewportIntent("https://math.test/learn/a", "/learn/a"), "same-document-top");
+  assert.equal(navigationViewportIntent("https://math.test/learn/a", "https://example.com/elsewhere"), "external");
+
+  const transition = await readFile(new URL("../app/components/useContentStart.ts", import.meta.url), "utf8");
+  const navigation = await readFile(new URL("../app/components/NavigationFeedback.tsx", import.meta.url), "utf8");
+  const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
+  const boss = await readFile(new URL("../app/components/BossPlayer.tsx", import.meta.url), "utf8");
+  const review = await readFile(new URL("../app/components/ReviewPlayer.tsx", import.meta.url), "utf8");
+  const response = await readFile(new URL("../app/components/QuestionResponse.tsx", import.meta.url), "utf8");
+  const workedExample = await readFile(new URL("../app/components/WorkedExampleFlow.tsx", import.meta.url), "utf8");
+  const pointMission = await readFile(new URL("../app/components/PointToLineMission.tsx", import.meta.url), "utf8");
+  const badgeReveal = await readFile(new URL("../app/components/BadgeUnlockReveal.tsx", import.meta.url), "utf8");
+  const badgeGallery = await readFile(new URL("../app/components/BadgeGallery.tsx", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
+  const guideline = await readFile(new URL("../docs/learning-ui-guideline.md", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(transition, /requestAnimationFrame/);
+  assert.match(transition, /focus\(\{ preventScroll: true \}\)/);
+  assert.match(transition, /scrollIntoView/);
+  assert.match(transition, /prefers-reduced-motion: reduce/);
+  assert.match(transition, /MutationObserver/);
+  assert.match(transition, /aria-modal/);
+  assert.match(navigation, /usePathname/);
+  assert.match(navigation, /useSearchParams/);
+  assert.match(navigation, /viewportIntent\.current === "forward-top"/);
+  assert.match(navigation, /sessionStorage\.setItem\(forwardNavigationKey/);
+  assert.match(navigation, /addEventListener\("popstate"/);
+  for (const player of [lesson, boss, review]) {
+    assert.match(player, /useContentStart/);
+    assert.match(player, /learning-content-start/);
+  }
+  assert.doesNotMatch(response, /autoFocus/);
+  assert.match(workedExample, /revealedStepRef/);
+  assert.match(pointMission, /taskTransitionKey/);
+  assert.match(badgeReveal, /badgeStartRef/);
+  assert.match(badgeGallery, /firstNewBadgeRef/);
+  assert.match(dashboard, /openReplayMap/);
+  assert.match(guideline, /Return the viewport to the new learning object/);
+  assert.match(guideline, /Browser Back and Forward retain native scroll restoration/);
+  assert.match(css, /learning-content-start/);
+  assert.match(css, /scroll-margin-top: calc\(140px \+ env\(safe-area-inset-top\)\)/);
 });
 
 test("always gives a signed-in account priority over a demo query", () => {

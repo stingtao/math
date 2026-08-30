@@ -255,7 +255,21 @@ Every same-tab navigation action must acknowledge the first click before the nex
 
 This rule applies to header navigation, maps, completion CTAs, history replay, badge replay, legal/footer links, sign-in exits, and any future control that changes the current page.
 
-## 20. Progress spectacle through vocabulary, not volume
+## 20. Return the viewport to the new learning object
+
+An action is not complete when the data changes; the replacement must also become the visible and accessible reading position.
+
+- When `Next`, `Continue`, `Retry`, `Finish`, `Reveal`, or `Open` replaces the main lesson stage, question, recovery task, badge page, map section, or completion outcome on the same route, scroll to the beginning of the new object after React commits it.
+- Move programmatic focus to the new object's unique heading, or to a labelled boundary when the stage has no heading. Focus first with `preventScroll`, then position the content container. Do not autofocus an answer field and make the learner miss the new prompt or open the phone keyboard.
+- Keep one shared transition helper. Give every target a stable ref, `tabIndex={-1}`, and enough `scroll-margin-top` for the sticky learner header, the mobile lesson status bar, and the device safe area.
+- Use smooth motion only when `prefers-reduced-motion` allows it. Reduced motion changes the travel, not the destination or focus target.
+- Do not reposition for answer feedback, hints, selecting an option, filters, tabs, modal interactions, or a live graph update that remains inside the same learning object.
+- A forward internal route without a hash starts at the destination page heading after the route commits. A hash retains its exact destination. Browser Back and Forward retain native scroll restoration, and the source page must never jump to its top before navigation succeeds.
+- Test with the activating CTA below the fold at desktop and phone sizes. The new target must sit below the sticky stack, its heading must be `document.activeElement`, and one activation may produce at most one focus move and one scroll move.
+
+This contract applies to lesson stages and practice questions, Memory Check, Boss questions and repair, Daily Review, completion pages, staged worked examples, graph missions, multi-badge reveals, catalog expansion, and any future in-place learning flow.
+
+## 21. Progress spectacle through vocabulary, not volume
 
 A reward system should feel finished on the first day and still reveal new craft on the tenth. Do not replay one identical burst forever, and do not solve habituation by making every later event longer, brighter, or noisier.
 

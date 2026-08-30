@@ -19,6 +19,7 @@ import { isResponseComplete, type QuestionInteraction, type QuestionInteractionC
 import { EnterActionLink } from "./EnterActionLink";
 import { XpProgress } from "./XpProgress";
 import { FamilyLearningCue } from "./FamilyLearningCue";
+import { useContentStart } from "./useContentStart";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; interactionConfig?: QuestionInteractionConfig; choices?: string[] };
 
@@ -49,6 +50,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const responseReady = question ? isResponseComplete(question, answer) : false;
   const recalledCount = index + (feedback === "correct" ? 1 : 0);
   const currentFirstTry = feedback === "correct" && attempts[questionKey] === 1;
+  const contentTransitionKey = finished ? "review-finished" : `review-question-${index}`;
+  const contentStartRef = useContentStart<HTMLElement>(contentTransitionKey);
 
   const demoQuestions = useMemo(() => {
     if (!state) return [];
@@ -155,7 +158,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       <SuccessBurst eventKey="daily-review-complete" large experienceLevel={state.completedLessons.length} />
       {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={state.completedLessons.length} onDismiss={() => setBadgeUnlocks([])} />}
       <LearnerHeader state={state} demo={isDemo} />
-      <section className="review-finish">
+      <section ref={contentStartRef} className="review-finish learning-content-start" tabIndex={-1}>
         {reviewAnchorLesson && <div className="review-finish-emblem"><TopicIcon visual={reviewAnchorLesson.visual} accent={reviewAnchorLesson.accent} size="xl" label="Daily Review completed" /><span aria-hidden="true">✓</span></div>}
         <span className="section-kicker">DAILY REVIEW COMPLETE</span>
         <h1>{questions.length} skills back online.</h1>
@@ -178,9 +181,9 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       </div>
       <section className="review-layout">
         <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Keep it ready.</h1><p>Skills return after 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent="teal" /></aside>
-        <div className="review-card" aria-busy={busy}>
+        <div ref={contentStartRef} className="review-card learning-content-start" tabIndex={-1} aria-label={`Review question ${index + 1} of ${questions.length}`} aria-busy={busy}>
           <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
-          <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div></header>
+          <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2 data-learning-heading>{question.prompt}</h2></div></div></header>
           <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void check()} />
           {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—use the clue and retry.</strong><p>{question.hint}</p><small>A corrected answer earns the same review credit.</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} label={currentFirstTry ? "RECALLED" : "CORRECTED"} chain={recallStreak} progress={recalledCount} total={questions.length} tone={questionLesson?.accent ?? "teal"} experienceLevel={state.completedLessons.length} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `${recallStreak} correct in a row!` : "Recalled correctly!" : "Corrected!"}</strong><p>{index + 1} of {questions.length} complete.</p></div><span className="momentum-chip">{currentFirstTry && recallStreak > 1 ? `${recallStreak} in a row` : "Complete"}</span></div></>}

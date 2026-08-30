@@ -16,6 +16,7 @@ import { LearningLoading, LearningSignInGate } from "./LearningGate";
 import { getThemeSpec } from "@/lib/themes";
 import { getLessonExperience } from "@/lib/lesson-experience";
 import { LessonMissionThumbnail } from "./LessonMissionStory";
+import { useContentStart } from "./useContentStart";
 
 const dailyRewardAmounts = [10, 12, 14, 16, 18, 20, 30];
 
@@ -26,6 +27,8 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
   const [rewardPending, setRewardPending] = useState(false);
   const [showClaimedReward, setShowClaimedReward] = useState(false);
   const [showFullMap, setShowFullMap] = useState(true);
+  const [mapOpenVersion, setMapOpenVersion] = useState(0);
+  const mapStartRef = useContentStart<HTMLElement>(`dashboard-map-${mapOpenVersion}`);
   const [welcomeReady, setWelcomeReady] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
@@ -122,9 +125,15 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     setWelcomeDismissed(true);
   }
 
+  function openReplayMap() {
+    setShowFullMap(true);
+    setMapOpenVersion((value) => value + 1);
+  }
+
   return (
     <main className="learner-shell">
       <LearnerHeader state={state} demo={isDemo} />
+      <h1 className="sr-only">Grade {grade} family learning map</h1>
       {rewardMessage.startsWith("Collected") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} experienceLevel={state.completedLessons.length} />}
       {isDemo && <div className="demo-banner"><span>Family preview</span><p>Stay with your child. This shared progress lasts only in this browser.</p><a href="/#join">Parent sign in to save it</a></div>}
       <section className="dashboard-wrap">
@@ -151,7 +160,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
             <div className="next-copy"><span className="section-kicker">YOUR NEXT MOVE · REVIEW READY</span><h2>Keep this skill ready.</h2><p>{reviewBatchSize === 1 ? "One idea is ready for a fast recall." : `${reviewBatchSize} ideas are ready for a fast recall.`}</p><div className="next-meta"><span>◷ about 5 min</span><span>◇ {reviewBatchSize} {reviewBatchSize === 1 ? "recall" : "recalls"}</span><span>◆ 20 XP</span></div><a className="primary-button mission-primary-cta" href={`/review?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start the recall <span aria-hidden="true">→</span></a></div>
           </section> : gradeComplete ? <section className="next-card trail-complete-card">
             <div className={`next-visual trail-complete-visual accent-${activeRegion.accent}`}><span>{String(curriculum.regions.length).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[3].visual} accent={activeRegion.accent} size="xl" label={`Grade ${grade} trail complete`} /><b aria-hidden="true">✓</b><small>TRAIL CLEARED</small></div>
-            <div className="next-copy"><span className="section-kicker">GRADE {grade} · ALL CLEAR</span><h2>You finished what was due.</h2><p>Stop here, or open the map when you want to replay a skill.</p><div className="next-meta"><span>✓ Grade route complete</span><span>◇ review returns later</span></div><button className="secondary-button" type="button" onClick={() => setShowFullMap(true)}>Open replay map <span aria-hidden="true">↓</span></button></div>
+            <div className="next-copy"><span className="section-kicker">GRADE {grade} · ALL CLEAR</span><h2>You finished what was due.</h2><p>Stop here, or open the map when you want to replay a skill.</p><div className="next-meta"><span>✓ Grade route complete</span><span>◇ review returns later</span></div><button className="secondary-button" type="button" onClick={openReplayMap}>Open replay map <span aria-hidden="true">↓</span></button></div>
           </section> : activeBossReady ? <section className="next-card boss-priority-card">
             <div className={`next-visual boss-priority-visual accent-${activeRegion.accent}`}><span>{String(activeRegion.order).padStart(2, "0")}</span><TopicIcon visual={activeRegion.lessons[0].visual} accent={activeRegion.accent} size="xl" label={`${activeRegion.title} boss quest`} /><b aria-hidden="true">★</b><small>4 KEYS COLLECTED</small></div>
             <div className="next-copy"><span className="section-kicker">YOUR NEXT MOVE · BOSS READY</span><h2>{activeRegion.title} Boss</h2><p>Use all {activeRegion.lessons.length} lesson ideas in {activeRegion.lessons.length + 1} questions. No timer. A miss opens a repair path.</p><div className="next-meta"><span>♥ 3 hearts</span><span>◇ {activeRegion.lessons.length + 1} mixed questions</span><span>◆ 100 XP</span></div><a className="primary-button mission-primary-cta" href={`/boss/${activeRegion.id}?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start the challenge <span aria-hidden="true">→</span></a></div>
@@ -184,7 +193,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
           </div>
         </section>}
 
-        <section className={`trail-overview ${showFullMap ? "expanded-map" : "focused-map"}`}>
+        <section ref={mapStartRef} className={`trail-overview learning-content-start ${showFullMap ? "expanded-map" : "focused-map"}`} tabIndex={-1}>
           <div className="section-heading split-heading compact-heading"><div><span className="section-kicker">GRADE {grade} · {world.worldName.toUpperCase()}</span><h2>{world.mapLabel}</h2></div><div className="map-controls"><p>{showFullMap ? "Choose any open lesson to replay." : gradeComplete ? "This grade route is complete." : `${activeRegion.title} · ${activeDone}/${activeRegion.lessons.length} steps`}</p><button type="button" aria-expanded={showFullMap} aria-controls="grade-map" onClick={() => setShowFullMap((value) => !value)}>{showFullMap ? "Show current region" : gradeComplete ? "Explore completed map" : "View full map"}</button></div></div>
           {!visibleRegions.length && !showFullMap && <div className="map-complete-note"><span aria-hidden="true">✓</span><strong>No map action is waiting.</strong><p>Use the button above only when you want to replay a lesson.</p></div>}
           <div className="world-list" id="grade-map">

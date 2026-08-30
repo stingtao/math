@@ -33,6 +33,7 @@ import { crossedExperienceStage } from "@/lib/experience-progression";
 import { useEnterAction } from "./useEnterAction";
 import { isResponseComplete } from "@/lib/question-interactions";
 import { FamilyLearningCue } from "./FamilyLearningCue";
+import { useContentStart } from "./useContentStart";
 
 const stageLabels = [
   { label: "Mission", icon: "◎" },
@@ -110,6 +111,8 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const region = getRegion(lesson.regionId);
   const completeMap = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
   const lessonBadge = lessonBadgeByLessonId.get(lesson.id);
+  const contentTransitionKey = finished ? "lesson-finished" : stage === 4 ? `lesson-stage-4-${attemptKey}` : `lesson-stage-${stage}`;
+  const contentStartRef = useContentStart<HTMLElement>(contentTransitionKey);
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -310,7 +313,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={experienceLevel} onDismiss={() => setBadgeUnlocks([])} />}
         <LearnerHeader state={state} demo={isDemo} />
         <FamilyLearningCue moment="finish" />
-        <section className={`celebration-card accent-${lesson.accent}`}>
+        <section ref={contentStartRef} className={`celebration-card learning-content-start accent-${lesson.accent}`} tabIndex={-1}>
           <div className="celebration-emblem"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} completed`} /><span aria-hidden="true">✓</span></div>
           <span className="section-kicker">{outcome.kicker}</span>
           <h1>{outcome.title}</h1>
@@ -363,7 +366,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
           <span className="standard-chip">{lesson.standard}</span>
         </aside>
 
-        <section className="lesson-stage" aria-live="polite">
+        <section ref={contentStartRef} className="lesson-stage learning-content-start" tabIndex={-1} aria-label={currentStageLabel}>
           {stage === 0 && <><FamilyLearningCue moment="start" /><StageCard kicker="WHY THIS MATTERS" visual={<LessonMissionStory lesson={lesson} />} onContinue={advanceStage} continueLabel="See the math together" footerText="One short lesson, one useful family conversation." /></>}
           {stage === 1 && <StageCard kicker="SEE THE MATH" visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} continueLabel="Continue" footerText="" />}
           {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} onContinue={advanceStage} continueLabel="Try an example" footerText="" />}
@@ -372,7 +375,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
             <div className="practice-stage" aria-busy={busy}>
               <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
               {inMemoryCheck && <div className={`memory-check-banner accent-${lesson.accent}`}><span aria-hidden="true">◆</span><div><small>MEMORY CHECK · NO RUSH</small><strong>Use the repaired method without help.</strong><p>Choices may move. Follow the math, not the button position. A clean recall locks mastery.</p></div></div>}
-              <div className="practice-heading"><div><span className="section-kicker">{inMemoryCheck ? `MEMORY CHECK · ${masteryLockedCount + 1} OF ${masteryTotal}` : `PRACTICE · ${questionIndex + 1} OF ${lesson.practice.length}`}</span><h2>{question.prompt}</h2></div></div>
+              <div className="practice-heading"><div><span className="section-kicker">{inMemoryCheck ? `MEMORY CHECK · ${masteryLockedCount + 1} OF ${masteryTotal}` : `PRACTICE · ${questionIndex + 1} OF ${lesson.practice.length}`}</span><h2 data-learning-heading>{question.prompt}</h2></div></div>
               <TaskProgress label={inMemoryCheck ? "Memory check progress" : "Practice progress"} completed={inMemoryCheck ? masteryLockedCount : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} accent={lesson.accent} detail={feedback === "incorrect" ? "Use the hint, then retry." : !inMemoryCheck && recoveryCount > 0 ? <MemoryReturnCue count={recoveryCount} /> : undefined} />
               <QuestionResponse question={question} choices={choiceOptions} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "lesson-answer-error" : feedback ? "lesson-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void submitAnswer()} />
               {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
@@ -392,7 +395,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
 
 function StageCard({ kicker, title, copy, visual, onContinue, continueDisabled = false, continueLabel = "Continue", footerText = "Take your time. No timer." }: { kicker: string; title?: string; copy?: string; visual?: React.ReactNode; onContinue: () => void; continueDisabled?: boolean; continueLabel?: string; footerText?: string }) {
   useEnterAction(onContinue, !continueDisabled);
-  return <div className={`stage-card ${visual ? "" : "stage-card-compact"}`}><div className="stage-copy"><span className="section-kicker">{kicker}</span>{title && <h2>{title}</h2>}{copy && <p>{copy}</p>}</div>{visual && <div className="stage-visual">{visual}</div>}<div className="stage-footer">{footerText && <span>{footerText}</span>}<button className="primary-button" type="button" disabled={continueDisabled} aria-keyshortcuts="Enter" onClick={onContinue}>{continueLabel} <span>→</span></button></div></div>;
+  return <div className={`stage-card ${visual ? "" : "stage-card-compact"}`}><div className="stage-copy"><span className="section-kicker">{kicker}</span>{title && <h2 data-learning-heading>{title}</h2>}{copy && <p>{copy}</p>}</div>{visual && <div className="stage-visual">{visual}</div>}<div className="stage-footer">{footerText && <span>{footerText}</span>}<button className="primary-button" type="button" disabled={continueDisabled} aria-keyshortcuts="Enter" onClick={onContinue}>{continueLabel} <span>→</span></button></div></div>;
 }
 
 function LessonGate() {
