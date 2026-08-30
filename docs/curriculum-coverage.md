@@ -58,6 +58,20 @@ Cambridge International is recorded as a separate comparison authority because i
 
 These 16 additions contribute 80 reviewed questions. Each new lesson includes one five-step ordering task so a learner must reconstruct a method, not only recognize a result.
 
+## Grade 8–9 representation and story upgrade
+
+The middle-grade review found that topic coverage was strong but representation coverage was uneven. Grade 8 used nine interaction families and Grade 9 used eight, while several regions still relied almost entirely on fill-in calculation. The lesson story also reused one grade-level image even when the current region was about a different mathematical decision.
+
+The repair adds 23 authored visual-reasoning missions—one in every Grade 8–9 region—without changing lesson IDs:
+
+- Grade 8 now uses 11 interaction families and Grade 9 uses 10;
+- structured graph choices cover constant-rate motion, absolute-value functions, linear routes, quadratic models, and exponential growth;
+- structured table choices cover operation order, percent equivalence, equation balance, scientific notation, systems, transformations, geometry, volume, polynomial structure, and residual interpretation;
+- every wrong-answer hint names the specific mathematical move needed for the retry;
+- every Grade 8–9 story now renders a lesson-matched comic SVG instead of repeating one grade-wide hero image, so the visible structure, route, number line, growth curve, or evidence display matches the current model.
+
+The content validator now enforces all 23 lesson identities, regional coverage, at least ten interaction families per Grade 8–9 grade, structured plot/table integrity, and stable question IDs.
+
 ## Grade 10–12 representation upgrade
 
 The advanced-course audit found a second kind of gap: topic names and calculations were present, but 72–82% of questions in each advanced grade still used free-form fill-in. That over-tested symbolic entry while under-testing the representations students must interpret in Geometry, Algebra II, Precalculus, Calculus, and Statistics.

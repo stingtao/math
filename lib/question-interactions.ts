@@ -15,6 +15,7 @@ export type QuestionInteraction =
 export type GraphChoicePlot = {
   value: string;
   label: string;
+  optionLabel?: string;
   kind: "linear" | "quadratic" | "absolute" | "exponential" | "sine" | "cosine" | "circle" | "ellipse";
   a?: number;
   b?: number;

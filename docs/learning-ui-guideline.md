@@ -96,7 +96,7 @@ The curriculum validator must reject Yes/No or True/False questions that fall ba
 Topic coverage and representation coverage are different. A lesson title can exist while learners never read a graph, compare a table, place a point, interpret a boundary, select several valid claims, or assemble a reasoning chain. Audit the interaction distribution by grade and region before adding content so a larger bank does not become a larger collection of the same fill-in task.
 
 - Maintain a matrix from region to learning objective, interaction family, instructional visual, renderer, and mobile behavior.
-- Every Grade 10–12 region must include at least one visual-reasoning mission, and every Grade 10–12 grade must use at least nine interaction families.
+- Every Grade 8–9 region must include at least one visual-reasoning mission, and each of those grades must use at least ten interaction families. Every Grade 10–12 region follows the same region rule, with at least nine interaction families per grade.
 - `graph-choice` options are structured graph specifications, not screenshots or text labels pretending to test graph reading.
 - `table-choice` options preserve named columns and row relationships in their authored data so the same mathematics survives desktop and mobile layouts.
 - A representation counts only when the learner must inspect or manipulate it to answer; a decorative image beside a text-only question does not count.
@@ -154,6 +154,7 @@ Story copy, variables, equations, diagram, and labels must model one situation. 
 - Trace `lesson or region -> story -> scene -> SVG -> visible and accessible labels` during review.
 - Make coefficients, intercepts, rates, domains, and units correspond to objects in the scene.
 - Judge the assembled page, not the copy and illustration in isolation. If a learner cannot point from the story quantity to the visual mark, the scene is decoration rather than teaching.
+- Do not reuse one grade-level hero image across every lesson when the lesson already has a distinct mathematical setting. Prefer the lightweight lesson-matched scene whose marks, labels, and geometry can change with the story.
 
 ## 12. Use history as instruction, not decoration
 

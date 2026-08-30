@@ -36,7 +36,7 @@ const gradeStoryArcs: Record<number, GradeStoryArc> = {
   707: { kicker: "CREW SIGNALS", title: "Does this sample represent the whole colony?", problem: "Choose fair data, compare distributions, and decide what the evidence supports.", signalA: "sample", signalB: "infer" },
   708: { kicker: "DRONE FORECAST", title: "Which route gives the best chance of success?", problem: "Build a sample space, compare expected and observed results, then judge the risk.", signalA: "outcomes", signalB: "chance" },
 
-  1: { kicker: "DEEP-SEA CODE", title: "Can every control symbol be read without guessing?", problem: "Decode signs, operations, and number order before the dive station powers up.", signalA: "read", signalB: "decide" },
+  1: { kicker: "DEEP-SEA CONTROL", title: "Can every reading guide the right move?", problem: "Use symbols, signed levels, and operation order to turn each control reading into one safe action.", signalA: "read first", signalB: "move next" },
   2: { kicker: "OXYGEN MIX", title: "Will the same blend work in every habitat?", problem: "Connect fractions, decimals, and percents to divide a limited reserve accurately.", signalA: "part", signalB: "whole" },
   3: { kicker: "PRESSURE BALANCE", title: "What unknown setting returns the chamber to safe pressure?", problem: "Translate a control message into an equation and undo one operation at a time.", signalA: "unknown", signalB: "balance" },
   4: { kicker: "POWER MODULES", title: "Can one compact rule control a huge energy system?", problem: "Use powers and distribution to combine repeated modules without counting each one.", signalA: "repeat", signalB: "simplify" },
@@ -89,13 +89,12 @@ const gradeStoryArcs: Record<number, GradeStoryArc> = {
   1208: { kicker: "DECISION NETWORK", title: "Which conclusion or route survives the evidence?", problem: "Combine inference, finance, and algorithms to choose a defensible action without overstating what the data can prove.", signalA: "evidence", signalB: "decision" },
 };
 
-const gradeJourneyMedia: Record<7 | 8 | 9, { image: string; imageAlt: string }> = {
+const gradeJourneyMedia: Partial<Record<7 | 8 | 9, { image: string; imageAlt: string }>> = {
   7: { image: "/visuals/g7-frontier-mission.webp", imageAlt: "Students at a Mars greenhouse compare supplies, scaled plans, geometric panels, and chance models." },
-  8: { image: "/visuals/g8-frontier-mission.webp", imageAlt: "Students in an underwater city use a coordinate table, data models, solids, and a geometric bridge." },
-  9: { image: "/visuals/g9-frontier-mission.webp", imageAlt: "Students in an orbital lab compare straight and curved flight paths with energy and data models." },
 };
 
-const advancedRegionScenes: Record<number, LessonScene> = {
+const regionScenes: Record<number, LessonScene> = {
+  8: "navigation", 904: "navigation",
   1001: "proof", 1002: "proof", 1003: "orbit", 1004: "navigation", 1005: "orbit", 1006: "habitat", 1007: "risk", 1008: "risk",
   1101: "signal", 1102: "systems", 1103: "signal", 1104: "growth", 1105: "signal", 1106: "orbit", 1107: "network", 1108: "risk",
   1201: "network", 1202: "motion", 1203: "motion", 1204: "motion", 1205: "accumulation", 1206: "orbit", 1207: "risk", 1208: "network",
@@ -224,10 +223,10 @@ function classifyLesson(lesson: Pick<LessonDefinition, "title" | "standard" | "v
   if (/conic|ellipse|hyperbola|parabola|vector|polar|parametric|complex number|complex plane/.test(text)) return "orbit";
   if (/trigonometric|sine|cosine|radian|unit circle|logarithm|exponential model/.test(text)) return "signal";
   if (/statistics|probability|sample|distribution|regression|correlation|residual|confidence|survey|random|data/.test(text) || riskVisuals.has(lesson.visual)) return "risk";
-  if (/exponential|logarithm|growth|decay|geometric sequence|power|radical|root/.test(text) || growthVisuals.has(lesson.visual)) return "growth";
+  if (/exponential|logarithm|growth|decay|geometric sequence|power|radical|root|scientific notation/.test(text) || growthVisuals.has(lesson.visual)) return "growth";
   if (/geometry|triangle|circle|angle|volume|surface area|congruen|similar|transform|trigon|sine|cosine|radian/.test(text) || habitatVisuals.has(lesson.visual)) return "habitat";
   if (/coordinate|graph|function|slope|linear|quadratic|parabola|domain|range|mapping/.test(text) || navigationVisuals.has(lesson.visual)) return "navigation";
-  if (/fraction|percent|ratio|proportion|decimal|unit rate|scale factor/.test(text) || resourceVisuals.has(lesson.visual)) return "resources";
+  if (/\b(?:fraction|percent|ratio|proportion|decimal|unit rate|scale factor)s?\b/.test(text) || resourceVisuals.has(lesson.visual)) return "resources";
   if (/negative|positive|integer|absolute value|inequal|compare|number/.test(text) || numberVisuals.has(lesson.visual)) return "numbers";
   return "systems";
 }
@@ -327,7 +326,7 @@ const sceneCopy: Record<LessonScene, Omit<LessonExperience, "scene" | "model" | 
 };
 
 export function getLessonExperience(lesson: Pick<LessonDefinition, "title" | "goal" | "example" | "standard" | "visual" | "grade" | "regionId">): LessonExperience {
-  const scene = advancedRegionScenes[lesson.regionId] ?? classifyLesson(lesson);
+  const scene = regionScenes[lesson.regionId] ?? classifyLesson(lesson);
   if (/symbol/i.test(lesson.title)) {
     return {
       scene: "systems",

@@ -309,7 +309,7 @@ function GraphChoiceResponse({ config, value, disabled, invalid, describedBy, on
           onSubmit();
         }}>
           <GraphPreview plot={plot} xMin={config.xMin} xMax={config.xMax} yMin={config.yMin} yMax={config.yMax} />
-          <span>{plot.label}</span>
+          <span>{plot.optionLabel ?? plot.label}</span>
         </button>;
       })}
     </div>

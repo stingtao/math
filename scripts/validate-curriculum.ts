@@ -3,6 +3,7 @@ import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curri
 import { algebraCourseCoverage, extendedProgramCoverage, grade7To12CoreCoverage } from "../lib/curriculum-coverage.ts";
 import { expandedCoverageLessonSlugs } from "../lib/curriculum-extensions.ts";
 import { advancedInteractionLessonSlugs } from "../lib/curriculum-advanced-enrichment.ts";
+import { grade89VisualInteractionLessonSlugs } from "../lib/curriculum-enrichment.ts";
 import { inferQuestionInteraction, MULTI_SELECT_SEPARATOR, type QuestionInteraction } from "../lib/question-interactions.ts";
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
@@ -13,9 +14,9 @@ function writtenUnit(choice: string) {
 
 assert.equal(regions.length, 55, "Grades 7–12 must contain 55 regions");
 assert.equal(lessons.length, 253, "Grades 7–12 must contain 253 lessons");
-assert.equal(curriculumStats.questions, 1323, "The reviewed curriculum and Grade 7–12 interaction missions must remain complete");
+assert.equal(curriculumStats.questions, 1346, "The reviewed curriculum and Grade 7–12 interaction missions must remain complete");
 assert.ok(lessons.every((lesson) => lesson.practice.length >= 5), "Every lesson must contain at least five reviewed questions");
-assert.equal(lessons.filter((lesson) => lesson.grade >= 7 && lesson.grade <= 9 && lesson.practice.length > 5).length, 32, "Grade 7–9 must keep all 32 enriched interaction missions");
+assert.equal(lessons.filter((lesson) => lesson.grade >= 7 && lesson.grade <= 9 && lesson.practice.length > 5).length, 53, "Grade 7–9 must keep all 53 enriched interaction missions");
 assert.equal(lessons.filter((lesson) => lesson.grade >= 10 && lesson.practice.length > 5).length, 26, "Grade 10–12 must keep all 26 advanced visual-reasoning missions");
 assert.ok(lessons.every((lesson) => lesson.exampleSteps.length >= 3 && lesson.exampleSteps.every((step) => step.trim().length >= 12)), "Every lesson needs a usable worked reasoning sequence");
 assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, lessons.length, "Lesson IDs must be unique");
@@ -65,6 +66,11 @@ assert.equal(advancedInteractionLessonSlugs.length, 26, "Every authored Grade 10
 for (const slug of advancedInteractionLessonSlugs) assert.ok(lessonBySlug.has(slug), `Advanced interaction mission lost ${slug}`);
 for (const region of regions.filter((region) => region.grade >= 10)) {
   assert.ok(region.lessons.some((lesson) => advancedInteractionLessonSlugs.includes(lesson.slug)), `Grade ${region.grade} region ${region.id} needs a visual-reasoning mission`);
+}
+assert.equal(grade89VisualInteractionLessonSlugs.length, 23, "Every Grade 8–9 region must keep one authored visual-reasoning mission");
+for (const slug of grade89VisualInteractionLessonSlugs) assert.ok(lessonBySlug.has(slug), `Grade 8–9 visual interaction mission lost ${slug}`);
+for (const region of regions.filter((region) => region.grade === 8 || region.grade === 9)) {
+  assert.ok(region.lessons.some((lesson) => grade89VisualInteractionLessonSlugs.includes(lesson.slug)), `Grade ${region.grade} region ${region.id} needs a visual-reasoning mission`);
 }
 
 let propertyChecks = 0;
@@ -121,6 +127,7 @@ for (const lesson of lessons) {
       if (question.interactionConfig?.kind === "graph-choice") {
         assert.deepEqual(question.choices, question.interactionConfig.plots.map((plot) => plot.value), `${lesson.id}/${question.id} graph choices must match plot values`);
         assert.ok(question.interactionConfig.plots.every((plot) => plot.label.length >= 3), `${lesson.id}/${question.id} graph choices need accessible labels`);
+        if (lesson.grade === 8 || lesson.grade === 9) assert.ok(question.interactionConfig.plots.every((plot) => plot.optionLabel && /^\w+\s+[A-D]$/.test(plot.optionLabel)), `${lesson.id}/${question.id} must show neutral option labels while accessibility describes the graph`);
       }
     }
     if (question.interaction === "table-choice") {
@@ -169,8 +176,12 @@ for (const lesson of lessons) {
 assert.ok((interactionCounts.get("coordinate-grid") ?? 0) >= 8, "Grade 7–9 needs coordinate plotting questions");
 assert.ok((interactionCounts.get("number-line") ?? 0) >= 7, "Grade 7–9 needs number-line questions");
 assert.ok((interactionCounts.get("multi-select") ?? 0) >= 14, "Grade 7–9 needs multi-select reasoning questions");
-assert.ok((interactionCounts.get("graph-choice") ?? 0) >= 11, "Grade 10–12 needs graph-reading questions");
-assert.ok((interactionCounts.get("table-choice") ?? 0) >= 7, "Grade 10–12 needs table-reading questions");
+assert.ok((interactionCounts.get("graph-choice") ?? 0) >= 16, "Grades 8–12 need graph-reading questions");
+assert.ok((interactionCounts.get("table-choice") ?? 0) >= 24, "Grades 8–12 need table-reading questions");
+for (const grade of [8, 9]) {
+  const interactionFamilies = new Set(lessons.filter((lesson) => lesson.grade === grade).flatMap((lesson) => lesson.practice.map((question) => question.interaction)));
+  assert.ok(interactionFamilies.size >= 10, `Grade ${grade} needs at least ten question interaction families`);
+}
 for (const grade of [10, 11, 12]) {
   const interactionFamilies = new Set(lessons.filter((lesson) => lesson.grade === grade).flatMap((lesson) => lesson.practice.map((question) => question.interaction)));
   assert.ok(interactionFamilies.size >= 9, `Grade ${grade} needs at least nine question interaction families`);

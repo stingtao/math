@@ -17,6 +17,7 @@ import { getComboSpec } from "../lib/combo.ts";
 import { isThemeId, themeCatalog } from "../lib/themes.ts";
 import { frontierWorlds } from "../lib/frontier-worlds.ts";
 import { getLessonExperience } from "../lib/lesson-experience.ts";
+import { grade89VisualInteractionLessonSlugs } from "../lib/curriculum-enrichment.ts";
 import { isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-interactions.ts";
 import { chooseLearnerMode } from "../lib/learner-mode.ts";
 import { getXpGain, getXpProgress, XP_PER_LEVEL } from "../lib/xp-progression.ts";
@@ -87,7 +88,7 @@ test("turns common wrong answers into specific recovery guidance and a delayed r
   assert.deepEqual(remixedChoices(["A", "B", "C"], false), ["A", "B", "C"]);
 });
 
-test("models answer interactions before rendering all 1,323 questions", () => {
+test("models answer interactions before rendering all 1,346 questions", () => {
   const questions = lessons.flatMap((lesson) => lesson.practice);
   const yesNo = questions.filter((question) => question.interaction === "yes-no");
   const trueFalse = questions.filter((question) => question.interaction === "true-false");
@@ -100,15 +101,15 @@ test("models answer interactions before rendering all 1,323 questions", () => {
   const factorQuestions = questions.filter((question) => /^Factor(?: completely)?\b/i.test(question.prompt));
   const proportionalDecision = lessons.find((lesson) => lesson.slug === "g7-proportional-tables")?.practice[1];
 
-  assert.equal(questions.length, 1323);
+  assert.equal(questions.length, 1346);
   assert.equal(yesNo.length, 110);
   assert.equal(trueFalse.length, 1);
   assert.equal(ordering.length, 16);
   assert.equal(multiSelect.length, 18);
   assert.equal(coordinateGrid.length, 14);
-  assert.equal(numberLine.length, 8);
-  assert.equal(graphChoice.length, 11);
-  assert.equal(tableChoice.length, 7);
+  assert.equal(numberLine.length, 9);
+  assert.equal(graphChoice.length, 16);
+  assert.equal(tableChoice.length, 24);
   assert.ok(yesNo.every((question) => question.choices?.join("|") === "Yes|No"));
   assert.ok(trueFalse.every((question) => question.choices?.join("|") === "True|False"));
   assert.equal(proportionalDecision?.interaction, "yes-no");
@@ -121,6 +122,14 @@ test("models answer interactions before rendering all 1,323 questions", () => {
   assert.ok(numberLine.every((question) => question.interactionConfig?.kind === "number-line" && isResponseComplete(question, question.answer)));
   assert.ok(graphChoice.every((question) => question.interactionConfig?.kind === "graph-choice" && question.interactionConfig.plots.length === question.choices?.length));
   assert.ok(tableChoice.every((question) => question.interactionConfig?.kind === "table-choice" && question.interactionConfig.rows.every((row) => row.cells.length === question.interactionConfig.columns.length)));
+  assert.equal(grade89VisualInteractionLessonSlugs.length, 23);
+  for (const grade of [8, 9]) {
+    const gradeLessons = lessons.filter((lesson) => lesson.grade === grade);
+    const regionIds = new Set(gradeLessons.map((lesson) => lesson.regionId));
+    for (const regionId of regionIds) assert.ok(gradeLessons.some((lesson) => lesson.regionId === regionId && grade89VisualInteractionLessonSlugs.includes(lesson.slug)));
+  }
+  assert.ok(lessons.filter((lesson) => lesson.grade === 8 || lesson.grade === 9).flatMap((lesson) => lesson.practice).filter((question) => question.interactionConfig?.kind === "graph-choice").every((question) => question.interactionConfig.plots.every((plot) => plot.optionLabel)));
+  for (const grade of [8, 9]) assert.ok(new Set(lessons.filter((lesson) => lesson.grade === grade).flatMap((lesson) => lesson.practice.map((question) => question.interaction))).size >= 10);
   for (const grade of [10, 11, 12]) assert.ok(new Set(lessons.filter((lesson) => lesson.grade === grade).flatMap((lesson) => lesson.practice.map((question) => question.interaction))).size >= 9);
 });
 
@@ -1498,6 +1507,12 @@ test("gives every lesson an applied mission and a sourced history finish", async
   assert.match(lessonMission, /scene === "network"/);
   const advancedExperiences = lessons.filter((lesson) => lesson.grade >= 10).map(getLessonExperience);
   assert.equal(new Set(advancedExperiences.map((item) => item.kicker)).size, 24);
+  const grade89Experiences = lessons.filter((lesson) => lesson.grade === 8 || lesson.grade === 9).map(getLessonExperience);
+  assert.equal(new Set(grade89Experiences.map((item) => item.kicker)).size, 24);
+  assert.ok(grade89Experiences.every((item) => !item.image), "Grade 8–9 lessons should render their lesson-matched comic scene instead of one repeated grade image");
+  assert.equal(getLessonExperience(lessons.find((lesson) => lesson.slug === "order-of-operations")).scene, "systems", "operation must not be misclassified as ratio");
+  assert.equal(getLessonExperience(lessons.find((lesson) => lesson.slug === "scientific-notation")).scene, "growth");
+  assert.equal(getLessonExperience(lessons.find((lesson) => lesson.slug === "g9-system-models")).scene, "navigation");
   assert.match(dashboard, /Start first mission/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{nextLesson\}/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{featuredLesson\}/);
