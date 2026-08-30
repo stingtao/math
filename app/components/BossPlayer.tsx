@@ -22,6 +22,7 @@ import { XpProgress } from "./XpProgress";
 import { isResponseComplete } from "@/lib/question-interactions";
 import { EnterActionButton } from "./EnterActionButton";
 import { ExperienceScene } from "./ExperienceScene";
+import { FamilyLearningCue } from "./FamilyLearningCue";
 
 type BossAttempt = {
   attemptId: string;
@@ -109,7 +110,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   }, [isDemo, questions.length, region.id, learnerReady, unlocked]);
 
   if (loading || unlocked && !attemptReady) return <LearningLoading glyph="★" tone="gold" kicker="OPENING THE BOSS GATE" title="Preparing the check…" detail={`${questions.length} mixed challenges and three hearts are being set in place.`} />;
-  if (!state || error) return <LearningSignInGate glyph="★" kicker="PRIVATE BOSS PROGRESS" title="Sign in to open this check." detail="Your attempts and recovery practice stay connected to your anonymous trail." />;
+  if (!state || error) return <LearningSignInGate glyph="★" kicker="PRIVATE FAMILY CHALLENGE" title="A parent signs in to open this check." detail="Attempts and recovery practice stay inside one shared family learning record." />;
   const activeState = state;
   const trailUrl = `/learn?grade=${region.grade}${isDemo ? "&demo=1" : ""}`;
   const victoryUrl = isFinalRegion ? `/review?grade=${region.grade}${isDemo ? "&demo=1" : ""}` : `/learn/${nextRegion.lessons[0].slug}?grade=${region.grade}${isDemo ? "&demo=1" : ""}`;
@@ -402,6 +403,7 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           <p><span aria-hidden="true">◆</span>{connectedLinks === questions.length ? `All ${questions.length} ideas are connected.` : `${questions.length - connectedLinks} ${questions.length - connectedLinks === 1 ? "connection" : "connections"} left. A correction keeps the map moving.`}</p>
         </div>
         <div className="boss-question-card" aria-busy={busy}>
+          <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
           <span className="boss-topic">{question.lesson}</span>
           <h2>{question.prompt}</h2>
           <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "boss-answer-error" : feedback ? "boss-answer-feedback" : syncMessage ? "boss-sync-message" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); setSyncMessage(""); }} onSubmit={() => void check()} />

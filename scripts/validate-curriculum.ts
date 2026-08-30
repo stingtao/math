@@ -42,7 +42,7 @@ for (const [grade, domains] of requiredDomains) {
 }
 
 const lessonBySlug = new Map(lessons.map((lesson) => [lesson.slug, lesson]));
-const questionByKey = new Map(lessons.flatMap((lesson) => lesson.practice.map((question) => [`${lesson.slug}:${question.id}`, question] as const)));
+const questionByKey = new Map<string, (typeof lessons)[number]["practice"][number]>(lessons.flatMap((lesson) => lesson.practice.map((question) => [`${lesson.slug}:${question.id}`, question] as const)));
 assert.equal(textChoiceUpgradeKeys.length, 218, "The reviewed phrase-sensitive response audit must remain complete");
 for (const key of textChoiceUpgradeKeys) {
   const question = questionByKey.get(key);
@@ -142,8 +142,9 @@ for (const lesson of lessons) {
     if (question.interaction === "table-choice") {
       assert.equal(question.interactionConfig?.kind, "table-choice", `${lesson.id}/${question.id} needs table data`);
       if (question.interactionConfig?.kind === "table-choice") {
-        assert.deepEqual(question.choices, question.interactionConfig.rows.map((row) => row.value), `${lesson.id}/${question.id} table choices must match row values`);
-        assert.ok(question.interactionConfig.rows.every((row) => row.cells.length === question.interactionConfig.columns.length), `${lesson.id}/${question.id} every table row must match its headers`);
+        const tableConfig = question.interactionConfig;
+        assert.deepEqual(question.choices, tableConfig.rows.map((row) => row.value), `${lesson.id}/${question.id} table choices must match row values`);
+        assert.ok(tableConfig.rows.every((row) => row.cells.length === tableConfig.columns.length), `${lesson.id}/${question.id} every table row must match its headers`);
       }
     }
     if (/^Factor(?: completely)?\b/i.test(question.prompt)) {

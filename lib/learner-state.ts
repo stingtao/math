@@ -2,6 +2,8 @@ import { calculateLessonReward } from "./rewards.ts";
 import { answerBadgeForCorrectCount, lessonBadgeByLessonId, type BadgeUnlock } from "./badges.ts";
 import { normalizeTheme, type ThemeId } from "./themes.ts";
 import { getGradeCurriculum, getGradeLessons, lessonById, regions } from "./curriculum.ts";
+import { retentionDeadline } from "./data-retention.ts";
+import { FAMILY_ACCOUNT_RETENTION_MONTHS, FAMILY_DATA_RETENTION_MONTHS } from "./family-policy.ts";
 
 export type AvatarSpec = { glyph: string; tone: string; frame: string };
 export type LearningHistoryEntry = {
@@ -45,14 +47,20 @@ export type LearnerState = {
     recent: BadgeUnlock[];
     correctAnswers: number;
   };
+  retention: {
+    consentedAt: string;
+    learningDataExpiresAt: string;
+    accountExpiresAt: string;
+  };
 };
 
+const previewStartedAt = new Date();
 const fallback: LearnerState = {
   profile: {
     nickname: "CalmComet482",
     avatar: { glyph: "compass", tone: "blue", frame: "plain" },
     rerollUsed: false,
-    leaderboardOptIn: true,
+    leaderboardOptIn: false,
     trailTokens: 35,
     currentStreak: 3,
     longestStreak: 7,
@@ -86,6 +94,11 @@ const fallback: LearnerState = {
     recent: [{ id: "lesson-g8-r1-l1", unlockedAt: "2026-08-20T08:00:00.000Z" }],
     correctAnswers: 7,
   },
+  retention: {
+    consentedAt: previewStartedAt.toISOString(),
+    learningDataExpiresAt: retentionDeadline(previewStartedAt, FAMILY_DATA_RETENTION_MONTHS),
+    accountExpiresAt: retentionDeadline(previewStartedAt, FAMILY_ACCOUNT_RETENTION_MONTHS),
+  },
 };
 
 export function getDemoState(): LearnerState {
@@ -95,6 +108,7 @@ export function getDemoState(): LearnerState {
     if (!saved) return fallback;
     const parsed = JSON.parse(saved) as Partial<LearnerState>;
     const profile = { ...fallback.profile, ...parsed.profile };
+    profile.leaderboardOptIn = false;
     profile.theme = normalizeTheme(parsed.profile?.theme);
     const savedFrames = Array.isArray(parsed.profile?.ownedFrames) ? parsed.profile.ownedFrames : ["plain"];
     profile.ownedFrames = [...new Set(["plain", ...savedFrames, profile.avatar.frame])];

@@ -16,6 +16,7 @@ import { ProgressDetailModal, type ProgressDetail } from "./ProgressDetailModal"
 import { historyReplayDestination, learningMapDestination } from "@/lib/progress-replay";
 import { lessonById } from "@/lib/curriculum";
 import type { XpProgress as XpProgressState } from "@/lib/xp-progression";
+import type { DataDeletionCategory } from "@/lib/data-retention";
 
 export function ProfileView({ demo, clientId }: { demo: boolean; clientId: string }) {
   const { state, setState, loading, error, isDemo } = useLearner(demo);
@@ -26,8 +27,8 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   const [busyTheme, setBusyTheme] = useState("");
   const [busyAction, setBusyAction] = useState("");
   const [detail, setDetail] = useState<ProgressDetail | null>(null);
-  if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR PRIVATE BASE" title="Loading your base…" detail="Your codename, world, and milestones are almost ready." />;
-  if (!state || error) return <LearningSignInGate glyph="✦" kicker="YOUR BASE IS PRIVATE" title="Sign in to open your base." detail="Only you can see your settings, rewards, and learning milestones." />;
+  if (loading) return <LearningLoading glyph="✦" tone="violet" kicker="OPENING YOUR FAMILY SPACE" title="Loading your shared progress…" detail="Your family path, world, and learning history are almost ready." />;
+  if (!state || error) return <LearningSignInGate glyph="✦" kicker="FAMILY PROGRESS IS PRIVATE" title="A parent signs in to open this space." detail="Only the adult account holder can see the family’s settings and saved learning history." />;
   const activeState = state;
   const totalStars = state.completedLessons.reduce((sum, item) => sum + item.stars, 0);
   const achievementValues = { lessons: state.completedLessons.length, stars: totalStars, bosses: state.clearedBosses.length, streak: state.profile.longestStreak };
@@ -70,21 +71,6 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
         saveDemoState(next); setState(next); setMessage("Your new anonymous identity is ready."); return;
       }
       await action({ action: "reroll" });
-    } finally {
-      setBusyAction("");
-    }
-  }
-
-  async function toggleLeaderboard() {
-    if (busyAction) return;
-    setBusyAction("leaderboard");
-    const enabled = !activeState.profile.leaderboardOptIn;
-    try {
-      if (isDemo) {
-        const next: LearnerState = { ...activeState, profile: { ...activeState.profile, leaderboardOptIn: enabled } };
-        saveDemoState(next); setState(next); setMessage(enabled ? "You joined the anonymous weekly league." : "You left the public league."); return;
-      }
-      await action({ action: "leaderboard", enabled });
     } finally {
       setBusyAction("");
     }
@@ -140,6 +126,19 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
     }
   }
 
+  async function deleteDataCategory(category: DataDeletionCategory, label: string) {
+    if (isDemo || busyAction) return;
+    const confirmed = window.confirm(`Delete ${label}? This saved data cannot be restored from your family space.`);
+    if (!confirmed) return;
+    setBusyAction(`delete:${category}`);
+    try {
+      const ok = await action({ action: "deleteDataCategory", category });
+      if (ok) setMessage(`${label} deleted.`);
+    } finally {
+      setBusyAction("");
+    }
+  }
+
   function showHistoryDetail(entry: LearnerState["learningHistory"][number]) {
     const destination = historyReplayDestination(entry, isDemo);
     const result = entry.kind === "boss"
@@ -166,9 +165,9 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   }
 
   function showAchievementDetail(item: ReturnType<typeof evaluateAchievements>[number]) {
-    const latestLesson = state.learningHistory.find((entry) => entry.kind === "lesson");
-    const latestBoss = state.learningHistory.find((entry) => entry.kind === "boss");
-    const currentGrade = lessonById.get(state.nextLessonId)?.grade ?? latestLesson?.grade ?? 8;
+    const latestLesson = activeState.learningHistory.find((entry) => entry.kind === "lesson");
+    const latestBoss = activeState.learningHistory.find((entry) => entry.kind === "boss");
+    const currentGrade = lessonById.get(activeState.nextLessonId)?.grade ?? latestLesson?.grade ?? 8;
     const destination = item.source === "bosses" && latestBoss
       ? historyReplayDestination(latestBoss, isDemo)
       : (item.source === "lessons" || item.source === "stars") && latestLesson
@@ -193,7 +192,7 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
   }
 
   function showXpDetail(progress: XpProgressState) {
-    const currentGrade = lessonById.get(state.nextLessonId)?.grade ?? 8;
+    const currentGrade = lessonById.get(activeState.nextLessonId)?.grade ?? 8;
     setDetail({
       eyebrow: "XP DETAILS",
       title: `Level ${progress.level} · ${progress.rankTitle}`,
@@ -218,14 +217,14 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
       <section className="profile-wrap">
         <div className={`profile-hero profile-command-deck theme-${world.id}`}>
           <div className="profile-world-art" style={{ backgroundPosition: world.atlasPosition }} aria-hidden="true"><span>{world.motif}</span><i /><i /><i /></div>
-          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your anonymous game avatar" /><div><span className="section-kicker">{world.role.toUpperCase()}</span><h1>{state.profile.nickname}</h1><p>{journey.story}</p></div></div>
+          <div className="profile-identity"><Avatar avatar={state.profile.avatar} size="lg" label="Your private family learning symbol" /><div><span className="section-kicker">FAMILY LEARNING SPACE</span><h1>{state.profile.nickname}</h1><p>One private record for the math you explore together. {journey.story}</p></div></div>
           <div className="profile-current-mission"><small>YOUR NEXT MOVE</small><strong>{journey.headline}</strong><p>{world.missionFocus.charAt(0).toUpperCase() + world.missionFocus.slice(1)}.</p><div><a className="primary-button" href={`/learn${isDemo ? "?demo=1" : ""}`}>Resume mission <span aria-hidden="true">→</span></a><button className="profile-reroll-button" type="button" disabled={state.profile.rerollUsed || Boolean(busyAction)} aria-busy={busyAction === "reroll"} onClick={reroll}>{busyAction === "reroll" ? "Rerolling…" : state.profile.rerollUsed ? "Codename reroll used" : "Reroll codename"}</button></div></div>
         </div>
         <XpProgress totalXp={state.totalXp} theme={state.profile.theme} completedLessons={state.completedLessons.length} onOpen={showXpDetail} />
-        <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>Mission {journey.stage}</strong><small>{journey.location}</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article><article><span>◆</span><strong>{state.weeklyXp}</strong><small>Weekly XP</small></article></div>
+        <div className="profile-stats profile-game-stats"><article><span>{world.motif}</span><strong>Mission {journey.stage}</strong><small>{journey.location}</small></article><article><span>✓</span><strong>{state.completedLessons.length}</strong><small>Routes cleared</small></article><article><span>★</span><strong>{state.clearedBosses.length}</strong><small>Boss gates</small></article><article><span>◆</span><strong>{state.weeklyXp}</strong><small>This week together</small></article></div>
 
         <section className="profile-learning-history" aria-labelledby="learning-history-heading">
-          <header><div><span className="section-kicker">PRIVATE RECORD</span><h2 id="learning-history-heading">Learning history</h2></div><strong>{state.learningHistory.length} cleared</strong></header>
+          <header><div><span className="section-kicker">PRIVATE FAMILY RECORD</span><h2 id="learning-history-heading">Learning history</h2></div><strong>{state.learningHistory.length} cleared</strong></header>
           {historyByGrade.length === 0 ? <div className="history-empty"><span aria-hidden="true">◇</span><div><strong>Your first completed lesson will appear here.</strong><p>Only you can open this record.</p></div></div> : <div className="history-grade-list">
             {historyByGrade.map(([historyGrade, entries], gradeIndex) => <details open={gradeIndex === 0} key={historyGrade}>
               <summary><span>Grade {historyGrade}</span><small>{entries.length} {entries.length === 1 ? "clear" : "clears"}</small></summary>
@@ -278,17 +277,32 @@ export function ProfileView({ demo, clientId }: { demo: boolean; clientId: strin
             })}</div>
           </section>
           <aside className="privacy-settings-card">
-            <span className="section-kicker">PRIVACY CONTROLS</span><h2>Choose what leaves your base.</h2>
-            <div className="setting-row"><div><strong>Anonymous weekly league</strong><p>Joining creates a separate weekly alias. Your private profile codename never appears.</p></div><button className={`toggle ${state.profile.leaderboardOptIn ? "on" : ""}`} type="button" aria-pressed={state.profile.leaderboardOptIn} aria-busy={busyAction === "leaderboard"} disabled={Boolean(busyAction)} onClick={toggleLeaderboard}><span /></button></div>
-            <div className="setting-row static"><div><strong>Google profile data</strong><p>Name, email, and photo are never saved.</p></div><span className="safe-chip">Not stored</span></div>
-            <div className="setting-row static"><div><strong>Public profile and search</strong><p>No profile page, searchable ID, or public history exists.</p></div><span className="safe-chip">Off</span></div>
-            <a className="text-link" href="/privacy">Read the full privacy promise</a>
+            <span className="section-kicker">FAMILY PRIVACY</span><h2>Nothing here is public.</h2>
+            <div className="setting-row static"><div><strong>Child account and identity</strong><p>No child login, name, email, birth date, school, photo, or voice is requested.</p></div><span className="safe-chip">Not collected</span></div>
+            <div className="setting-row static"><div><strong>Advertising and public rankings</strong><p>No advertising code, public league, searchable profile, or public learning history is active.</p></div><span className="safe-chip">Off</span></div>
+            <div className="setting-row static"><div><strong>Parent visibility</strong><p>The adult account holder can see this shared family learning record.</p></div><span className="safe-chip">Visible</span></div>
+            {!isDemo && <div className="retention-deadlines">
+              <div><small>Saved family data</small><strong>Deletes after {formatRetentionDate(state.retention.learningDataExpiresAt)}</strong></div>
+              <div><small>Parent account</small><strong>Deletes after {formatRetentionDate(state.retention.accountExpiresAt)}</strong></div>
+              <p>Each successful parent sign-in restarts these periods from that sign-in date. The daily cleanup normally completes within 24 hours after a deadline.</p>
+            </div>}
+            <a className="text-link" href="/privacy">Read the family privacy notice</a>
           </aside>
         </div>
 
+        {!isDemo && <section className="data-controls" aria-labelledby="data-controls-heading">
+          <header><div><span className="section-kicker">DELETE BY CATEGORY</span><h2 id="data-controls-heading">Choose what to remove.</h2><p>Your parent login stays active unless you use complete account deletion below.</p></div></header>
+          <div className="data-control-grid">
+            <article><div><strong>Learning records and rewards</strong><p>Lessons, answers, hints, review timing, challenges, XP, badges, rewards, and streaks.</p></div><button type="button" disabled={Boolean(busyAction)} onClick={() => void deleteDataCategory("learning", "learning records and rewards")}>{busyAction === "delete:learning" ? "Deleting…" : "Delete learning data"}</button></article>
+            <article><div><strong>Family appearance</strong><p>Random family codename, avatar, theme, unlocked frames, and appearance settings reset to new defaults.</p></div><button type="button" disabled={Boolean(busyAction)} onClick={() => void deleteDataCategory("appearance", "family appearance data")}>{busyAction === "delete:appearance" ? "Deleting…" : "Reset appearance"}</button></article>
+            <article><div><strong>Feedback discussions</strong><p>Topics you created and site-owner replies attached to them. Owner replies authored from this account are also removed.</p></div><button type="button" disabled={Boolean(busyAction)} onClick={() => void deleteDataCategory("feedback", "feedback discussion data")}>{busyAction === "delete:feedback" ? "Deleting…" : "Delete feedback"}</button></article>
+            <article className="all-data-control"><div><strong>All saved family data</strong><p>Deletes all three categories and starts the family space again with a fresh private symbol. The parent account remains.</p></div><button type="button" disabled={Boolean(busyAction)} onClick={() => void deleteDataCategory("all", "all saved family data")}>{busyAction === "delete:all" ? "Deleting…" : "Delete all saved data"}</button></article>
+          </div>
+        </section>}
+
         <section className="account-settings">
-          <div><span className="section-kicker">ACCOUNT</span><h2>Your data stays under your control.</h2><p>You can permanently remove progress, rewards, league entries, and active sessions.</p></div>
-          <button className="danger-button" type="button" onClick={() => setDeleteOpen(true)}>Delete my account</button>
+          <div><span className="section-kicker">PARENT ACCOUNT</span><h2>Your family data stays under your control.</h2><p>Complete deletion removes the account key, consent record, shared learning data, feedback, and every active session.</p></div>
+          <button className="danger-button" type="button" onClick={() => setDeleteOpen(true)}>Delete family account</button>
         </section>
         {message && <div className="toast-message" role="status">{message}</div>}
       </section>
@@ -302,6 +316,12 @@ function formatHistoryDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Date unavailable";
   return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(date);
+}
+
+function formatRetentionDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "the next successful sign-in";
+  return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(date);
 }
 
 function DeleteAccount({ demo, clientId, onClose }: { demo: boolean; clientId: string; onClose: () => void }) {
@@ -319,7 +339,7 @@ function DeleteAccount({ demo, clientId, onClose }: { demo: boolean; clientId: s
         if (deletingRef.current) return;
         deletingRef.current = true;
         setDeleting(true);
-        setStatus("Deleting your trail…");
+        setStatus("Deleting your family learning record…");
         try {
           const response = await fetch("/api/state", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "deleteAccount", credential }) });
           if (response.ok) window.location.assign("/"); else { deletingRef.current = false; setDeleting(false); setStatus("Reauthentication did not match this account."); }
@@ -344,5 +364,5 @@ function DeleteAccount({ demo, clientId, onClose }: { demo: boolean; clientId: s
     window.sessionStorage.removeItem("math-demo-state");
     window.location.assign("/");
   }
-  return <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Delete account"><div className="delete-modal"><button className="modal-close" onClick={onClose} type="button" disabled={deleting}>×</button><span className="danger-icon">!</span><span className="section-kicker">PERMANENT ACTION</span><h2>Delete your complete Math trail?</h2><p>This removes progress, attempts, rewards, your anonymous identity, league entries, and every active session. It cannot be undone.</p><label className="age-check"><input type="checkbox" checked={confirmed} disabled={deleting} onChange={(event) => setConfirmed(event.target.checked)} /><span>I understand that this permanently deletes my account.</span></label>{confirmed && (demo ? <button className="danger-button full-button" type="button" disabled={deleting} aria-busy={deleting} onClick={deleteDemo}>{deleting ? "Deleting…" : "Delete demo data"}</button> : clientId ? <div id="delete-google-button" className="google-button-slot" aria-busy={deleting} /> : <p className="form-error">Google reauthentication will be available when the production Client ID is connected.</p>)}{status && <p className="signin-status">{status}</p>}</div></div>;
+  return <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Delete family account"><div className="delete-modal"><button className="modal-close" onClick={onClose} type="button" disabled={deleting} aria-label="Close delete account dialog">×</button><span className="danger-icon">!</span><span className="section-kicker">PERMANENT ACTION</span><h2>Delete the complete parent account?</h2><p>This removes the protected sign-in key, consent record, shared learning data, feedback, private family symbol, and every active session. It cannot be undone.</p><label className="age-check"><input type="checkbox" checked={confirmed} disabled={deleting} onChange={(event) => setConfirmed(event.target.checked)} /><span>I understand that this permanently deletes the parent account and all data linked to it.</span></label>{confirmed && (demo ? <button className="danger-button full-button" type="button" disabled={deleting} aria-busy={deleting} onClick={deleteDemo}>{deleting ? "Deleting…" : "Delete preview data"}</button> : clientId ? <div id="delete-google-button" className="google-button-slot" aria-busy={deleting} /> : <p className="form-error">Google reauthentication will be available when the production Client ID is connected.</p>)}{status && <p className="signin-status">{status}</p>}</div></div>;
 }

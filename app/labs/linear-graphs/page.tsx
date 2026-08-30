@@ -64,6 +64,7 @@ export default function LinearGraphsLabPage() {
   return (
     <main className="site-shell graph-lab-page">
       <PublicHeader />
+      <aside className="family-presence-notice" aria-label="Parent-guided activity notice"><span aria-hidden="true">♡</span><p><strong>Explore this together.</strong> A parent or guardian should stay beside the learner. Entries in this public lab are not saved.</p></aside>
       <section className="graph-lab-hero">
         <div><span className="eyebrow">OPEN MATH LAB · LINEAR GRAPHS</span><h1>Plot a rover.<br />Reveal the rule.</h1><p>Nova starts 1 km from base and travels 2 km farther each hour. Turn its signals into points, connect the line, and discover why the route is y = 2x + 1.</p><div className="graph-lab-hero-actions"><a className="primary-button" href="#point-mission">Start the rover mission <span aria-hidden="true">↓</span></a><a className="text-link" href="#live-graph">Open the graph tool</a></div></div>
         <RoverRouteVisual />

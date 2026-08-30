@@ -5,9 +5,18 @@ export const learners = sqliteTable("learners", {
   authKey: text("auth_key").notNull(),
   timezone: text("timezone").notNull().default("UTC"),
   ageConfirmedAt: text("age_confirmed_at"),
+  familyAgreementVersion: text("family_agreement_version"),
+  familyAgreementAt: text("family_agreement_at"),
+  learningDataExpiresAt: text("learning_data_expires_at"),
+  accountExpiresAt: text("account_expires_at"),
+  familyDataDeletedAt: text("family_data_deleted_at"),
   createdAt: text("created_at").notNull(),
   lastSeenAt: text("last_seen_at").notNull(),
-}, (table) => [uniqueIndex("idx_learners_auth_key").on(table.authKey)]);
+}, (table) => [
+  uniqueIndex("idx_learners_auth_key").on(table.authKey),
+  index("idx_learners_learning_expiry").on(table.learningDataExpiresAt, table.familyDataDeletedAt),
+  index("idx_learners_account_expiry").on(table.accountExpiresAt),
+]);
 
 export const authIdentities = sqliteTable("auth_identities", {
   provider: text("provider").notNull(),
@@ -204,6 +213,37 @@ export const feedbackMessages = sqliteTable("feedback_messages", {
   body: text("body").notNull(),
   createdAt: text("created_at").notNull(),
 }, (table) => [uniqueIndex("idx_feedback_request_key").on(table.requestKeyHash), index("idx_feedback_created").on(table.createdAt)]);
+
+export const feedbackThreads = sqliteTable("feedback_threads", {
+  id: text("id").primaryKey(),
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  category: text("category").notNull(),
+  body: text("body").notNull(),
+  status: text("status").notNull().default("pending"),
+  requestKeyHash: text("request_key_hash").notNull(),
+  noticeVersion: text("notice_version").notNull(),
+  publicationConsentAt: text("publication_consent_at").notNull(),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+}, (table) => [
+  uniqueIndex("idx_feedback_threads_request").on(table.learnerId, table.requestKeyHash),
+  index("idx_feedback_threads_recent").on(table.updatedAt),
+  index("idx_feedback_threads_learner").on(table.learnerId),
+]);
+
+export const feedbackReplies = sqliteTable("feedback_replies", {
+  id: text("id").primaryKey(),
+  threadId: text("thread_id").notNull().references(() => feedbackThreads.id, { onDelete: "cascade" }),
+  operatorLearnerId: text("operator_learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  createdAt: text("created_at").notNull(),
+}, (table) => [index("idx_feedback_replies_thread").on(table.threadId, table.createdAt), index("idx_feedback_replies_operator").on(table.operatorLearnerId)]);
+
+export const siteRoles = sqliteTable("site_roles", {
+  learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+  role: text("role").notNull(),
+  grantedAt: text("granted_at").notNull(),
+}, (table) => [primaryKey({ columns: [table.learnerId, table.role] }), index("idx_site_roles_role").on(table.role)]);
 
 export const leagueMembers = sqliteTable("league_members", {
   weekKey: text("week_key").notNull(),

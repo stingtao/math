@@ -126,7 +126,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
     <main className="learner-shell">
       <LearnerHeader state={state} demo={isDemo} />
       {rewardMessage.startsWith("Collected") && <SuccessBurst eventKey={`daily-${state.profile.rewardStep}`} experienceLevel={state.completedLessons.length} />}
-      {isDemo && <div className="demo-banner"><span>Preview mode</span><p>Try anything. This progress lasts only in this browser.</p><a href="/#join">Sign in to save it</a></div>}
+      {isDemo && <div className="demo-banner"><span>Family preview</span><p>Stay with your child. This shared progress lasts only in this browser.</p><a href="/#join">Parent sign in to save it</a></div>}
       <section className="dashboard-wrap">
         <nav className="grade-switcher" aria-label="Choose a grade">
           {[7, 8, 9, 10, 11, 12].map((item) => <a className={item === grade ? "active" : ""} href={`/learn?grade=${item}${isDemo ? "&demo=1" : ""}`} key={item}>Grade {item}</a>)}
@@ -135,11 +135,11 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
         {showWelcomeGuide && <section className={`welcome-trail-guide welcome-first-mission accent-${nextLesson.accent}`} aria-labelledby="welcome-trail-heading">
           <button className="welcome-guide-close" type="button" onClick={dismissWelcomeGuide} aria-label="Dismiss welcome guide">×</button>
           <div className="welcome-first-mission-copy">
-            <span className="section-kicker">WELCOME, {world.role.toUpperCase()}</span>
-            <h2 id="welcome-trail-heading">Start with {nextLesson.title}.</h2>
+            <span className="section-kicker">WELCOME, GROWN-UP GUIDE</span>
+            <h2 id="welcome-trail-heading">Learn {nextLesson.title} together.</h2>
             <p>{getLessonExperience(nextLesson).title}</p>
-            <div className="next-meta"><span>◷ 6–8 min</span><span>↻ Hints + retries</span></div>
-            <a className="primary-button mission-primary-cta" href={`/learn/${nextLesson.slug}?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start first mission <span aria-hidden="true">→</span></a>
+            <div className="next-meta"><span>◷ 8–12 min together</span><span>♡ Parent prompts included</span></div>
+            <a className="primary-button mission-primary-cta" href={`/learn/${nextLesson.slug}?grade=${grade}${isDemo ? "&demo=1" : ""}`}>Start the family lesson <span aria-hidden="true">→</span></a>
           </div>
           <div className="welcome-first-mission-visual"><LessonMissionThumbnail lesson={nextLesson} /></div>
         </section>}
@@ -162,7 +162,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 
           {dailyCardVisible && <aside className={`daily-card ${state.dailyRewardClaimed ? "claimed claim-settling" : "ready"}`} aria-labelledby="daily-reward-heading">
             <div className="daily-card-top">
-              <div><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">OPTIONAL DAILY CHECK-IN</span></div>
+              <div><span className="daily-icon" aria-hidden="true">◆</span><span className="section-kicker">OPTIONAL FAMILY CHECK-IN</span></div>
               <span className="reward-balance" aria-label={`${state.profile.trailTokens} Trail Tokens available`}>◇ {state.profile.trailTokens}</span>
             </div>
             {state.dailyRewardClaimed ? <div className="reward-collected-status" role="status" aria-live="polite">
@@ -173,7 +173,7 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
                 <span className="daily-token-medallion" aria-hidden="true"><b>+{visibleRewardAmount}</b></span>
                 <div className="daily-reward-heading">
                   <h2 id="daily-reward-heading">Tokens ready</h2>
-                  <p>Claim now · ▲ {state.profile.currentStreak} day streak</p>
+                  <p>Claim now · ▲ {state.profile.currentStreak} shared learning days</p>
                 </div>
               </div>
               <button className="full-button reward-claim-button reward-ready-button" type="button" disabled={rewardPending} aria-busy={rewardPending} onClick={claimReward}>{rewardPending ? "Collecting…" : `Collect +${visibleRewardAmount} tokens`} <span aria-hidden="true">◆</span></button>
@@ -220,9 +220,9 @@ export function LearningDashboard({ demo, grade }: { demo: boolean; grade: numbe
 }
 
 function LoadingTrail() {
-  return <LearningLoading glyph="M" tone="blue" kicker="SCOUTING YOUR TRAIL" title="Finding your next small step…" detail="Your progress, rewards, and closest milestone are being lined up." />;
+  return <LearningLoading glyph="M" tone="blue" kicker="OPENING YOUR FAMILY PATH" title="Finding your next shared step…" detail="Your family progress and next useful practice are being lined up." />;
 }
 
 function SignInGate() {
-  return <LearningSignInGate glyph="✦" kicker="YOUR TRAIL IS PRIVATE" title="Sign in to keep learning." detail="Your lessons and progress stay behind your anonymous profile." />;
+  return <LearningSignInGate glyph="✦" kicker="FAMILY PROGRESS IS PRIVATE" title="A parent signs in to save progress." detail="Your child never needs an account. The adult account holds one shared family learning record." />;
 }

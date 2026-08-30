@@ -32,6 +32,7 @@ import { ExperienceScene } from "./ExperienceScene";
 import { crossedExperienceStage } from "@/lib/experience-progression";
 import { useEnterAction } from "./useEnterAction";
 import { isResponseComplete } from "@/lib/question-interactions";
+import { FamilyLearningCue } from "./FamilyLearningCue";
 
 const stageLabels = [
   { label: "Mission", icon: "◎" },
@@ -308,6 +309,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         <SuccessBurst eventKey={`${lesson.id}-complete-${stars}-${reward.firstCompletion ? "new" : reward.starsImproved ? "upgrade" : "replay"}`} large experienceLevel={experienceLevel} />
         {badgeUnlocks.length > 0 && <BadgeUnlockReveal unlocks={badgeUnlocks} demo={isDemo} experienceLevel={experienceLevel} onDismiss={() => setBadgeUnlocks([])} />}
         <LearnerHeader state={state} demo={isDemo} />
+        <FamilyLearningCue moment="finish" />
         <section className={`celebration-card accent-${lesson.accent}`}>
           <div className="celebration-emblem"><TopicIcon visual={lesson.visual} accent={lesson.accent} size="xl" label={`${lesson.title} completed`} /><span aria-hidden="true">✓</span></div>
           <span className="section-kicker">{outcome.kicker}</span>
@@ -362,12 +364,13 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
         </aside>
 
         <section className="lesson-stage" aria-live="polite">
-          {stage === 0 && <StageCard kicker="WHY THIS MATTERS" visual={<LessonMissionStory lesson={lesson} />} onContinue={advanceStage} continueLabel="See the math" footerText="One mission, one mathematical decision." />}
+          {stage === 0 && <><FamilyLearningCue moment="start" /><StageCard kicker="WHY THIS MATTERS" visual={<LessonMissionStory lesson={lesson} />} onContinue={advanceStage} continueLabel="See the math together" footerText="One short lesson, one useful family conversation." /></>}
           {stage === 1 && <StageCard kicker="SEE THE MATH" visual={<ConceptVisual lesson={lesson} />} onContinue={advanceStage} continueLabel="Continue" footerText="" />}
           {stage === 2 && <StageCard kicker="KEY IDEA" title={lesson.keyIdea} onContinue={advanceStage} continueLabel="Try an example" footerText="" />}
           {stage === 3 && <StageCard kicker="WORKED EXAMPLE" title={lesson.example} copy="Predict each move, then reveal the reasoning." visual={<WorkedExampleFlow steps={lesson.exampleSteps} accent={lesson.accent} onComplete={() => setExampleReady(true)} />} onContinue={advanceStage} continueDisabled={!exampleReady} continueLabel={exampleReady ? "Start practice" : "Reveal every step"} footerText={exampleReady ? "Example complete. Now use the move yourself." : "Open each step before practice. No timer."} />}
           {stage === 4 && (
             <div className="practice-stage" aria-busy={busy}>
+              <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
               {inMemoryCheck && <div className={`memory-check-banner accent-${lesson.accent}`}><span aria-hidden="true">◆</span><div><small>MEMORY CHECK · NO RUSH</small><strong>Use the repaired method without help.</strong><p>Choices may move. Follow the math, not the button position. A clean recall locks mastery.</p></div></div>}
               <div className="practice-heading"><div><span className="section-kicker">{inMemoryCheck ? `MEMORY CHECK · ${masteryLockedCount + 1} OF ${masteryTotal}` : `PRACTICE · ${questionIndex + 1} OF ${lesson.practice.length}`}</span><h2>{question.prompt}</h2></div></div>
               <TaskProgress label={inMemoryCheck ? "Memory check progress" : "Practice progress"} completed={inMemoryCheck ? masteryLockedCount : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} accent={lesson.accent} detail={feedback === "incorrect" ? "Use the hint, then retry." : !inMemoryCheck && recoveryCount > 0 ? <MemoryReturnCue count={recoveryCount} /> : undefined} />
@@ -393,5 +396,5 @@ function StageCard({ kicker, title, copy, visual, onContinue, continueDisabled =
 }
 
 function LessonGate() {
-  return <LearningSignInGate glyph="✦" kicker="SAVE THIS MISSION" title="Sign in to start the lesson." detail="Your progress returns through an anonymous trail—not a public profile." />;
+  return <LearningSignInGate glyph="✦" kicker="SAVE FAMILY PROGRESS" title="A parent signs in to start this lesson." detail="Children do not need an account. The adult account keeps one private family learning record." />;
 }

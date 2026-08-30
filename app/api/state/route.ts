@@ -2,7 +2,8 @@ import { getRuntimeEnv } from "@/db/bootstrap";
 import { verifyGoogleCredential } from "@/lib/google-auth";
 import { privateJson, rejectCrossOriginMutation } from "@/lib/http";
 import { clearSessionCookie, hmacIdentity } from "@/lib/security";
-import { claimDailyReward, claimMutation, completeLesson, deleteLearner, getLearnerState, learnerFromRequest, purchaseFrame, updateProfile, updateTheme } from "@/lib/store";
+import { claimDailyReward, claimMutation, completeLesson, deleteLearner, deleteLearnerDataCategory, getLearnerState, learnerFromRequest, purchaseFrame, updateProfile, updateTheme } from "@/lib/store";
+import type { DataDeletionCategory } from "@/lib/data-retention";
 import { type ThemeId } from "@/lib/themes";
 
 type StateAction =
@@ -12,6 +13,7 @@ type StateAction =
   | { action: "leaderboard"; enabled: boolean }
   | { action: "purchaseFrame"; frame: string }
   | { action: "theme"; theme: ThemeId }
+  | { action: "deleteDataCategory"; category: DataDeletionCategory }
   | { action: "deleteAccount"; credential: string };
 
 export async function POST(request: Request) {
@@ -36,8 +38,7 @@ export async function POST(request: Request) {
       return privateJson({ state: await getLearnerState(learner.id) });
     }
     if (body.action === "leaderboard") {
-      await updateProfile(learner.id, "leaderboard", body.enabled);
-      return privateJson({ state: await getLearnerState(learner.id) });
+      return privateJson({ error: "Public rankings have been retired for family learning." }, { status: 410 });
     }
     if (body.action === "purchaseFrame") {
       await purchaseFrame(learner.id, body.frame);
@@ -45,6 +46,12 @@ export async function POST(request: Request) {
     }
     if (body.action === "theme") {
       await updateTheme(learner.id, body.theme);
+      return privateJson({ state: await getLearnerState(learner.id) });
+    }
+    if (body.action === "deleteDataCategory") {
+      const categories: DataDeletionCategory[] = ["learning", "appearance", "feedback", "all"];
+      if (!categories.includes(body.category)) throw new Error("Choose a valid data category.");
+      await deleteLearnerDataCategory(learner.id, body.category);
       return privateJson({ state: await getLearnerState(learner.id) });
     }
     if (body.action === "deleteAccount") {

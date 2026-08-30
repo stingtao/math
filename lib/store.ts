@@ -4,8 +4,9 @@ import { getCookie, randomToken, sha256 } from "@/lib/security";
 import { getAvatarFrame } from "@/lib/avatar-frames";
 import { calculateLessonReward } from "@/lib/rewards";
 import { BADGE_CATALOG_SIZE, ANSWER_BADGE_STEP, answerBadges, badgeById, lessonBadgeByLessonId, type BadgeUnlock } from "@/lib/badges";
-import { publicTextPrivacyIssue } from "@/lib/privacy";
+import { deleteSavedDataCategory, retentionDeadline, type DataDeletionCategory } from "@/lib/data-retention";
 import { isThemeId, normalizeTheme, type ThemeId } from "@/lib/themes";
+import { FAMILY_ACCOUNT_RETENTION_MONTHS, FAMILY_AGREEMENT_VERSION, FAMILY_DATA_RETENTION_MONTHS, FAMILY_SESSION_PREFIX, PARENT_SESSION_COOKIE } from "@/lib/family-policy";
 
 const adjectives = ["Calm", "Bright", "Brave", "Clever", "Curious", "Gentle", "Kind", "Nimble", "Quiet", "Swift", "Wise", "Bold"];
 const nouns = ["Comet", "Compass", "Cedar", "Falcon", "Harbor", "Lantern", "Orbit", "Panda", "Pebble", "River", "Sparrow", "Summit"];
@@ -15,7 +16,16 @@ const rewardTokens = [10, 12, 14, 16, 18, 20, 30];
 const lessonLookup = new Map(lessons.map((lesson) => [lesson.id, lesson]));
 const regionLookup = new Map(regions.map((region) => [region.id, region]));
 
-export type LearnerRow = { id: string; timezone: string; age_confirmed_at: string | null };
+export type LearnerRow = {
+  id: string;
+  timezone: string;
+  age_confirmed_at: string | null;
+  family_agreement_version: string | null;
+  family_agreement_at: string | null;
+  learning_data_expires_at: string | null;
+  account_expires_at: string | null;
+  family_data_deleted_at: string | null;
+};
 export type ProfileRow = {
   nickname: string;
   avatar_glyph: string;
@@ -30,14 +40,6 @@ export type ProfileRow = {
   reward_step: number;
   last_active_date: string | null;
 };
-type PublicAliasRow = {
-  public_id: string;
-  nickname: string;
-  avatar_glyph: string;
-  avatar_tone: string;
-  frame: string;
-};
-
 function pick<T>(items: T[]) {
   const bytes = new Uint32Array(1);
   crypto.getRandomValues(bytes);
@@ -48,28 +50,6 @@ function randomNickname() {
   const bytes = new Uint16Array(1);
   crypto.getRandomValues(bytes);
   return `${pick(adjectives)}${pick(nouns)}${String(bytes[0] % 1000).padStart(3, "0")}`;
-}
-
-export async function listFeedback(limit = 50) {
-  await ensureSchema();
-  const result = await getStore().prepare("SELECT id, nickname, body, created_at FROM feedback_messages ORDER BY created_at DESC LIMIT ?")
-    .bind(Math.min(50, Math.max(1, limit))).all<{ id: string; nickname: string; body: string; created_at: string }>();
-  return result.results;
-}
-
-export async function createFeedback(requestKey: string | null, body: string) {
-  if (!requestKey || requestKey.length < 12 || requestKey.length > 120) throw new Error("A valid idempotency key is required.");
-  const message = body.trim().replace(/\s+/g, " ");
-  if (message.length < 3 || message.length > 600) throw new Error("Feedback must be between 3 and 600 characters.");
-  if (/https?:\/\/|www\./i.test(message)) throw new Error("Please leave links out of public feedback.");
-  const privacyIssue = publicTextPrivacyIssue(message);
-  if (privacyIssue) throw new Error(`For privacy, remove the ${privacyIssue} before posting.`);
-  await ensureSchema();
-  const id = crypto.randomUUID();
-  const requestKeyHash = await sha256(requestKey);
-  await getStore().prepare("INSERT OR IGNORE INTO feedback_messages (id, request_key_hash, nickname, body, created_at) VALUES (?, ?, ?, ?, ?)")
-    .bind(id, requestKeyHash, randomNickname(), message, new Date().toISOString()).run();
-  return id;
 }
 
 export function weekKey(date = new Date()) {
@@ -91,42 +71,76 @@ function dayDifference(previous: string, current: string) {
   return Math.round((Date.parse(`${current}T00:00:00Z`) - Date.parse(`${previous}T00:00:00Z`)) / 86_400_000);
 }
 
-export async function getOrCreateLearner(authKey: string, timezone = "UTC", ageConfirmed = false, provider = "google") {
+export async function getOrCreateLearner(
+  authKey: string,
+  timezone = "UTC",
+  parentConfirmed = false,
+  agreementVersion = FAMILY_AGREEMENT_VERSION,
+  isFeedbackOperator = false,
+  provider = "google",
+) {
   await ensureSchema();
   const db = getStore();
-  const now = new Date().toISOString();
-  let learner = await db.prepare(`SELECT l.id, l.timezone, l.age_confirmed_at
+  const loginDate = new Date();
+  const now = loginDate.toISOString();
+  const learningDataExpiresAt = retentionDeadline(loginDate, FAMILY_DATA_RETENTION_MONTHS);
+  const accountExpiresAt = retentionDeadline(loginDate, FAMILY_ACCOUNT_RETENTION_MONTHS);
+  let learner = await db.prepare(`SELECT l.id, l.timezone, l.age_confirmed_at, l.family_agreement_version, l.family_agreement_at, l.learning_data_expires_at, l.account_expires_at, l.family_data_deleted_at
     FROM auth_identities i JOIN learners l ON l.id = i.learner_id
     WHERE i.provider = ? AND i.subject_key = ?`).bind(provider, authKey).first<LearnerRow>();
   if (!learner) {
-    learner = await db.prepare("SELECT id, timezone, age_confirmed_at FROM learners WHERE auth_key = ?").bind(authKey).first<LearnerRow>();
+    learner = await db.prepare("SELECT id, timezone, age_confirmed_at, family_agreement_version, family_agreement_at, learning_data_expires_at, account_expires_at, family_data_deleted_at FROM learners WHERE auth_key = ?").bind(authKey).first<LearnerRow>();
     if (learner) {
       await db.prepare("INSERT OR IGNORE INTO auth_identities (provider, subject_key, learner_id, created_at, last_used_at) VALUES (?, ?, ?, ?, ?)")
         .bind(provider, authKey, learner.id, now, now).run();
     }
   }
+  if (learner?.account_expires_at && learner.account_expires_at <= now) {
+    await db.prepare("DELETE FROM learners WHERE id = ?").bind(learner.id).run();
+    learner = null;
+  } else if (learner?.learning_data_expires_at && learner.learning_data_expires_at <= now && !learner.family_data_deleted_at) {
+    await deleteSavedDataCategory(db, learner.id, "all");
+    await db.prepare("UPDATE learners SET family_data_deleted_at = ? WHERE id = ?").bind(now, learner.id).run();
+    learner.family_data_deleted_at = now;
+  }
   if (!learner) {
     const id = crypto.randomUUID();
     await db.batch([
-      db.prepare("INSERT INTO learners (id, auth_key, timezone, age_confirmed_at, created_at, last_seen_at) VALUES (?, ?, ?, ?, ?, ?)").bind(id, authKey, timezone, ageConfirmed ? now : null, now, now),
+      db.prepare(`INSERT INTO learners
+        (id, auth_key, timezone, age_confirmed_at, family_agreement_version, family_agreement_at, learning_data_expires_at, account_expires_at, family_data_deleted_at, created_at, last_seen_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)`)
+        .bind(id, authKey, timezone, parentConfirmed ? now : null, parentConfirmed ? agreementVersion : null, parentConfirmed ? now : null, learningDataExpiresAt, accountExpiresAt, now, now),
       db.prepare("INSERT INTO auth_identities (provider, subject_key, learner_id, created_at, last_used_at) VALUES (?, ?, ?, ?, ?)").bind(provider, authKey, id, now, now),
       db.prepare("INSERT INTO public_profiles (learner_id, nickname, avatar_glyph, avatar_tone) VALUES (?, ?, ?, ?)").bind(id, randomNickname(), pick(glyphs), pick(tones)),
+      ...(isFeedbackOperator ? [db.prepare("INSERT OR IGNORE INTO site_roles (learner_id, role, granted_at) VALUES (?, 'feedback_admin', ?)").bind(id, now)] : []),
     ]);
-    learner = { id, timezone, age_confirmed_at: ageConfirmed ? now : null };
+    learner = { id, timezone, age_confirmed_at: parentConfirmed ? now : null, family_agreement_version: parentConfirmed ? agreementVersion : null, family_agreement_at: parentConfirmed ? now : null, learning_data_expires_at: learningDataExpiresAt, account_expires_at: accountExpiresAt, family_data_deleted_at: null };
   } else {
     await db.batch([
-      db.prepare("UPDATE learners SET last_seen_at = ?, timezone = CASE WHEN timezone = 'UTC' THEN ? ELSE timezone END, age_confirmed_at = COALESCE(age_confirmed_at, ?) WHERE id = ?")
-        .bind(now, timezone, ageConfirmed ? now : null, learner.id),
+      db.prepare(`UPDATE learners SET last_seen_at = ?, timezone = CASE WHEN timezone = 'UTC' THEN ? ELSE timezone END,
+        age_confirmed_at = CASE WHEN ? IS NOT NULL THEN ? ELSE age_confirmed_at END,
+        family_agreement_version = CASE WHEN ? IS NOT NULL THEN ? ELSE family_agreement_version END,
+        family_agreement_at = CASE WHEN ? IS NOT NULL THEN ? ELSE family_agreement_at END,
+        learning_data_expires_at = ?, account_expires_at = ?, family_data_deleted_at = NULL WHERE id = ?`)
+        .bind(now, timezone, parentConfirmed ? now : null, parentConfirmed ? now : null, parentConfirmed ? agreementVersion : null, parentConfirmed ? agreementVersion : null, parentConfirmed ? now : null, parentConfirmed ? now : null, learningDataExpiresAt, accountExpiresAt, learner.id),
       db.prepare("UPDATE auth_identities SET last_used_at = ? WHERE provider = ? AND subject_key = ?")
         .bind(now, provider, authKey),
+      ...(isFeedbackOperator ? [db.prepare("INSERT OR IGNORE INTO site_roles (learner_id, role, granted_at) VALUES (?, 'feedback_admin', ?)").bind(learner.id, now)] : []),
     ]);
+    await ensurePrivateProfile(learner.id);
+    learner = { ...learner, age_confirmed_at: parentConfirmed ? now : learner.age_confirmed_at, family_agreement_version: parentConfirmed ? agreementVersion : learner.family_agreement_version, family_agreement_at: parentConfirmed ? now : learner.family_agreement_at, learning_data_expires_at: learningDataExpiresAt, account_expires_at: accountExpiresAt, family_data_deleted_at: null };
   }
   return learner;
 }
 
+export async function ensurePrivateProfile(learnerId: string) {
+  await getStore().prepare("INSERT OR IGNORE INTO public_profiles (learner_id, nickname, avatar_glyph, avatar_tone) VALUES (?, ?, ?, ?)")
+    .bind(learnerId, randomNickname(), pick(glyphs), pick(tones)).run();
+}
+
 export async function createSession(learnerId: string) {
   await ensureSchema();
-  const token = randomToken();
+  const token = `${FAMILY_SESSION_PREFIX}${randomToken()}`;
   const tokenHash = await sha256(token);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 30 * 86_400_000).toISOString();
@@ -136,19 +150,21 @@ export async function createSession(learnerId: string) {
 }
 
 export async function learnerFromRequest(request: Request) {
-  const token = getCookie(request, "math_session");
-  if (!token) return null;
+  const token = getCookie(request, PARENT_SESSION_COOKIE);
+  if (!token?.startsWith(FAMILY_SESSION_PREFIX)) return null;
   await ensureSchema();
   const tokenHash = await sha256(token);
-  const learner = await getStore().prepare(`SELECT l.id, l.timezone, l.age_confirmed_at
+  const now = new Date().toISOString();
+  const learner = await getStore().prepare(`SELECT l.id, l.timezone, l.age_confirmed_at, l.family_agreement_version, l.family_agreement_at, l.learning_data_expires_at, l.account_expires_at, l.family_data_deleted_at
     FROM sessions s JOIN learners l ON l.id = s.learner_id
-    WHERE s.token_hash = ? AND s.expires_at > ?`).bind(tokenHash, new Date().toISOString()).first<LearnerRow>();
+    WHERE s.token_hash = ? AND s.expires_at > ? AND l.age_confirmed_at IS NOT NULL
+      AND l.family_agreement_version = ? AND l.account_expires_at > ?`).bind(tokenHash, now, FAMILY_AGREEMENT_VERSION, now).first<LearnerRow>();
   return learner ?? null;
 }
 
 export async function deleteSessionFromRequest(request: Request) {
-  const token = getCookie(request, "math_session");
-  if (!token) return;
+  const token = getCookie(request, PARENT_SESSION_COOKIE);
+  if (!token?.startsWith(FAMILY_SESSION_PREFIX)) return;
   await ensureSchema();
   await getStore().prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await sha256(token)).run();
 }
@@ -169,8 +185,7 @@ export async function getLearnerState(learnerId: string) {
     db.prepare("SELECT COUNT(*) AS total FROM answer_credits WHERE learner_id = ?").bind(learnerId).first<{ total: number }>(),
   ]);
   if (!profile) throw new Error("Anonymous profile is missing.");
-  if (profile.leaderboard_opt_in) await ensureLeagueMembership(learnerId);
-  const learner = await db.prepare("SELECT timezone FROM learners WHERE id = ?").bind(learnerId).first<{ timezone: string }>();
+  const learner = await db.prepare("SELECT timezone, family_agreement_at, learning_data_expires_at, account_expires_at FROM learners WHERE id = ?").bind(learnerId).first<{ timezone: string; family_agreement_at: string | null; learning_data_expires_at: string | null; account_expires_at: string | null }>();
   const todayReward = await db.prepare("SELECT 1 AS claimed FROM daily_rewards WHERE learner_id = ? AND local_date = ?")
     .bind(learnerId, localDate(learner?.timezone ?? "UTC")).first<{ claimed: number }>();
   const completed = new Map(progressResult.results.map((item) => [item.lesson_id, item]));
@@ -212,7 +227,7 @@ export async function getLearnerState(learnerId: string) {
       nickname: profile.nickname,
       avatar: { glyph: profile.avatar_glyph, tone: profile.avatar_tone, frame: profile.frame },
       rerollUsed: Boolean(profile.reroll_used),
-      leaderboardOptIn: Boolean(profile.leaderboard_opt_in),
+      leaderboardOptIn: false,
       trailTokens: profile.trail_tokens,
       currentStreak: profile.current_streak,
       longestStreak: profile.longest_streak,
@@ -233,6 +248,11 @@ export async function getLearnerState(learnerId: string) {
       earnedIds: badgeResult.results.map((item) => item.badge_id),
       recent: badgeResult.results.slice(0, 8).map((item) => ({ id: item.badge_id, unlockedAt: item.unlocked_at })),
       correctAnswers: Number(answerCreditCount?.total ?? 0),
+    },
+    retention: {
+      consentedAt: learner?.family_agreement_at ?? "",
+      learningDataExpiresAt: learner?.learning_data_expires_at ?? "",
+      accountExpiresAt: learner?.account_expires_at ?? "",
     },
   };
 }
@@ -636,16 +656,12 @@ export async function claimDailyReward(learnerId: string, timezone: string) {
   return { claimed: true, tokens, step, shield: step === 7 };
 }
 
-export async function updateProfile(learnerId: string, action: "reroll" | "leaderboard", enabled?: boolean) {
+export async function updateProfile(learnerId: string, action: "reroll") {
   await ensureSchema();
-  const db = getStore();
   if (action === "reroll") {
-    const result = await db.prepare("UPDATE public_profiles SET nickname = ?, avatar_glyph = ?, avatar_tone = ?, reroll_used = 1 WHERE learner_id = ? AND reroll_used = 0")
+    const result = await getStore().prepare("UPDATE public_profiles SET nickname = ?, avatar_glyph = ?, avatar_tone = ?, reroll_used = 1 WHERE learner_id = ? AND reroll_used = 0")
       .bind(randomNickname(), pick(glyphs), pick(tones), learnerId).run();
     if (!result.meta.changes) throw new Error("Your free identity reroll has already been used.");
-  } else {
-    await db.prepare("UPDATE public_profiles SET leaderboard_opt_in = ? WHERE learner_id = ?").bind(enabled ? 1 : 0, learnerId).run();
-    if (enabled) await ensureLeagueMembership(learnerId);
   }
 }
 
@@ -656,46 +672,6 @@ export async function updateTheme(learnerId: string, theme: ThemeId) {
   await getStore().prepare(`INSERT INTO learner_preferences (learner_id, theme, updated_at) VALUES (?, ?, ?)
     ON CONFLICT(learner_id) DO UPDATE SET theme = excluded.theme, updated_at = excluded.updated_at`)
     .bind(learnerId, theme, now).run();
-}
-
-async function ensureLeagueMembership(learnerId: string) {
-  const db = getStore();
-  const week = weekKey();
-  await ensurePublicAlias(learnerId, "leaderboard", week);
-  const existing = await db.prepare("SELECT league_id FROM league_members WHERE week_key = ? AND learner_id = ?").bind(week, learnerId).first<{ league_id: string }>();
-  if (existing) return existing.league_id;
-  const open = await db.prepare(`SELECT league_id, COUNT(*) AS members FROM league_members WHERE week_key = ? GROUP BY league_id HAVING COUNT(*) < 30 ORDER BY league_id LIMIT 1`)
-    .bind(week).first<{ league_id: string; members: number }>();
-  let leagueId = open?.league_id;
-  if (!leagueId) {
-    const total = await db.prepare("SELECT COUNT(*) AS total FROM league_members WHERE week_key = ?").bind(week).first<{ total: number }>();
-    leagueId = `league-${Math.floor(Number(total?.total ?? 0) / 30) + 1}`;
-  }
-  await db.prepare("INSERT OR IGNORE INTO league_members (week_key, league_id, learner_id, joined_at) VALUES (?, ?, ?, ?)")
-    .bind(week, leagueId, learnerId, new Date().toISOString()).run();
-  return leagueId;
-}
-
-async function ensurePublicAlias(learnerId: string, scope: "leaderboard", scopeKey: string) {
-  const db = getStore();
-  const existing = await db.prepare(`SELECT public_id, nickname, avatar_glyph, avatar_tone, frame
-    FROM public_aliases WHERE learner_id = ? AND scope = ? AND scope_key = ?`)
-    .bind(learnerId, scope, scopeKey).first<PublicAliasRow>();
-  if (existing) return existing;
-  const createdAt = new Date().toISOString();
-  await db.prepare(`INSERT OR IGNORE INTO public_aliases
-    (learner_id, scope, scope_key, public_id, nickname, avatar_glyph, avatar_tone, frame, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 'plain', ?)`)
-    .bind(learnerId, scope, scopeKey, crypto.randomUUID(), randomNickname(), pick(glyphs), pick(tones), createdAt).run();
-  const alias = await db.prepare(`SELECT public_id, nickname, avatar_glyph, avatar_tone, frame
-    FROM public_aliases WHERE learner_id = ? AND scope = ? AND scope_key = ?`)
-    .bind(learnerId, scope, scopeKey).first<PublicAliasRow>();
-  if (!alias) throw new Error("A public alias could not be created.");
-  return alias;
-}
-
-async function ensureLeaderboardAliases(learnerIds: string[], week: string) {
-  for (const learnerId of [...new Set(learnerIds)]) await ensurePublicAlias(learnerId, "leaderboard", week);
 }
 
 export async function purchaseFrame(learnerId: string, frame: string) {
@@ -738,58 +714,13 @@ export async function deleteLearner(learnerId: string) {
   await getStore().prepare("DELETE FROM learners WHERE id = ?").bind(learnerId).run();
 }
 
-export async function getLeaderboard(limit = 30) {
+export async function deleteLearnerDataCategory(learnerId: string, category: DataDeletionCategory) {
   await ensureSchema();
-  const currentWeek = weekKey();
-  const db = getStore();
-  const candidates = await db.prepare(`SELECT x.learner_id
-    FROM xp_events x JOIN public_profiles p ON p.learner_id = x.learner_id
-    WHERE x.week_key = ? AND p.leaderboard_opt_in = 1
-    GROUP BY x.learner_id ORDER BY SUM(x.xp) DESC LIMIT ?`)
-    .bind(currentWeek, Math.min(limit, 30)).all<{ learner_id: string }>();
-  await ensureLeaderboardAliases(candidates.results.map((entry) => entry.learner_id), currentWeek);
-  const result = await db.prepare(`SELECT a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame, SUM(x.xp) AS weekly_xp,
-      SUM(CASE WHEN x.kind = 'boss' THEN 1 ELSE 0 END) AS bosses
-    FROM xp_events x
-    JOIN public_profiles p ON p.learner_id = x.learner_id
-    JOIN public_aliases a ON a.learner_id = x.learner_id AND a.scope = 'leaderboard' AND a.scope_key = x.week_key
-    WHERE x.week_key = ? AND p.leaderboard_opt_in = 1
-    GROUP BY x.learner_id, a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame
-    ORDER BY weekly_xp DESC, bosses DESC, a.nickname ASC LIMIT ?`).bind(currentWeek, Math.min(limit, 30)).all<PublicAliasRow & { weekly_xp: number }>();
-  return result.results.map((entry, index) => ({
-    id: entry.public_id,
-    rank: index + 1,
-    nickname: entry.nickname,
-    avatar: { glyph: entry.avatar_glyph, tone: entry.avatar_tone, frame: entry.frame },
-    weeklyXp: Number(entry.weekly_xp),
-  }));
-}
-
-export async function getLearnerLeaderboard(learnerId: string) {
-  await ensureSchema();
-  const db = getStore();
-  const week = weekKey();
-  const leagueId = await ensureLeagueMembership(learnerId);
-  const candidates = await db.prepare(`SELECT m.learner_id FROM league_members m
-    JOIN public_profiles p ON p.learner_id = m.learner_id
-    WHERE m.week_key = ? AND m.league_id = ? AND p.leaderboard_opt_in = 1 LIMIT 30`)
-    .bind(week, leagueId).all<{ learner_id: string }>();
-  await ensureLeaderboardAliases(candidates.results.map((entry) => entry.learner_id), week);
-  const result = await db.prepare(`SELECT m.learner_id, a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame, COALESCE(SUM(x.xp), 0) AS weekly_xp,
-      SUM(CASE WHEN x.kind = 'boss' THEN 1 ELSE 0 END) AS bosses
-    FROM league_members m
-    JOIN public_profiles p ON p.learner_id = m.learner_id
-    JOIN public_aliases a ON a.learner_id = m.learner_id AND a.scope = 'leaderboard' AND a.scope_key = m.week_key
-    LEFT JOIN xp_events x ON x.learner_id = m.learner_id AND x.week_key = m.week_key
-    WHERE m.week_key = ? AND m.league_id = ? AND p.leaderboard_opt_in = 1
-    GROUP BY m.learner_id, a.public_id, a.nickname, a.avatar_glyph, a.avatar_tone, a.frame
-    ORDER BY weekly_xp DESC, bosses DESC, a.nickname ASC LIMIT 30`).bind(week, leagueId).all<PublicAliasRow & { learner_id: string; weekly_xp: number }>();
-  return result.results.map((entry, index) => ({ id: entry.public_id, rank: index + 1, nickname: entry.nickname, avatar: { glyph: entry.avatar_glyph, tone: entry.avatar_tone, frame: entry.frame }, weeklyXp: Number(entry.weekly_xp), isViewer: entry.learner_id === learnerId }));
-}
-
-export async function isLeaderboardParticipant(learnerId: string) {
-  await ensureSchema();
-  const profile = await getStore().prepare("SELECT leaderboard_opt_in FROM public_profiles WHERE learner_id = ?")
-    .bind(learnerId).first<{ leaderboard_opt_in: number }>();
-  return Boolean(profile?.leaderboard_opt_in);
+  await deleteSavedDataCategory(getStore(), learnerId, category);
+  if (category === "appearance") {
+    await getStore().prepare(`UPDATE public_profiles SET nickname = ?, avatar_glyph = ?, avatar_tone = ?, frame = 'plain',
+      reroll_used = 0, leaderboard_opt_in = 0 WHERE learner_id = ?`)
+      .bind(randomNickname(), pick(glyphs), pick(tones), learnerId).run();
+  }
+  if (category === "all") await ensurePrivateProfile(learnerId);
 }

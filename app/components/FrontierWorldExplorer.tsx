@@ -23,16 +23,16 @@ export function FrontierWorldExplorer() {
       </div>
       <div className="frontier-hero-shade" aria-hidden="true" />
       <div className="frontier-hero-content">
-        <span className="frontier-eyebrow">THE FRONTIER RUNS ON MATH</span>
-        <h1 id="frontier-title">Build the worlds no one has reached yet.</h1>
-        <p>Choose a world. Solve one short mission. Learn the math that keeps it moving.</p>
+        <span className="frontier-eyebrow">PARENT + CHILD · SIDE BY SIDE</span>
+        <h1 id="frontier-title">Learn math together.</h1>
+        <p>You stay beside your child. Math brings the example, the practice, and a useful prompt for the next conversation.</p>
         <div className="frontier-hero-actions">
-          <a className="frontier-primary" href={activeWorld.href}>{activeWorld.cta} <span aria-hidden="true">→</span></a>
-          <a className="frontier-secondary" href="#curriculum">Choose your grade</a>
+          <a className="frontier-primary" href={activeWorld.href}>Start a family session <span aria-hidden="true">→</span></a>
+          <a className="frontier-secondary" href="#story">See how co-learning works</a>
         </div>
-        <div className="frontier-promises" aria-label="Mission promises">
-          <span><b>6–8 min</b> per mission</span>
-          <span><b>Hints + retries</b> included</span>
+        <div className="frontier-promises" aria-label="Family learning promises">
+          <span><b>8–12 min</b> together</span>
+          <span><b>Parent prompts</b> included</span>
         </div>
       </div>
 
@@ -41,7 +41,7 @@ export function FrontierWorldExplorer() {
         <strong>{activeWorld.mission}</strong>
       </div>
 
-      <div className="frontier-world-switcher" id="worlds" aria-label="Choose an expedition world">
+      <div className="frontier-world-switcher" id="worlds" aria-label="Choose a family learning world">
         {frontierWorlds.map((world) => (
           <button
             className={world.id === activeWorld.id ? "active" : ""}

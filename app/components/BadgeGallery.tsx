@@ -22,17 +22,18 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
 
   if (loading) return <LearningLoading glyph="◆" tone="violet" kicker="OPENING THE BADGE VAULT" title="Loading your trophies…" detail="Your earned badges and next target are almost ready." />;
   if (!state || error) return <LearningSignInGate glyph="◆" kicker="YOUR COLLECTION IS PRIVATE" title="Sign in to open your vault." detail="Only you can see which badges you earned and what unlocks next." />;
+  const activeState = state;
 
-  const nextAnswer = nextAnswerBadge(state.badges.correctAnswers);
-  const answerRemainder = state.badges.correctAnswers % 10;
+  const nextAnswer = nextAnswerBadge(activeState.badges.correctAnswers);
+  const answerRemainder = activeState.badges.correctAnswers % 10;
   const shown = filtered.slice(0, visibleCount);
 
   function chooseFilter(next: BadgeFilter) { setFilter(next); setVisibleCount(48); }
 
   function showBadgeDetail(badge: BadgeSpec, owned: boolean) {
-    const destination = badgeReplayDestination(badge, isDemo, owned, state.dueReview > 0);
-    const lessonHistory = badge.lessonId ? state.learningHistory.find((entry) => entry.lessonId === badge.lessonId || entry.key === `lesson:${badge.lessonId}`) : undefined;
-    const recentUnlock = state.badges.recent.find((item) => item.id === badge.id);
+    const destination = badgeReplayDestination(badge, isDemo, owned, activeState.dueReview > 0);
+    const lessonHistory = badge.lessonId ? activeState.learningHistory.find((entry) => entry.lessonId === badge.lessonId || entry.key === `lesson:${badge.lessonId}`) : undefined;
+    const recentUnlock = activeState.badges.recent.find((item) => item.id === badge.id);
     const facts = badge.kind === "lesson"
       ? [
           { label: "Type", value: "Lesson badge" },
@@ -45,7 +46,7 @@ export function BadgeGallery({ demo }: { demo: boolean }) {
       : [
           { label: "Type", value: "Answer badge" },
           { label: "Goal", value: `${badge.target.toLocaleString("en-US")} correct answers` },
-          { label: "Current progress", value: `${Math.min(state.badges.correctAnswers, badge.target).toLocaleString("en-US")}/${badge.target.toLocaleString("en-US")}` },
+          { label: "Current progress", value: `${Math.min(activeState.badges.correctAnswers, badge.target).toLocaleString("en-US")}/${badge.target.toLocaleString("en-US")}` },
           ...(recentUnlock ? [{ label: "Earned", value: formatBadgeDate(recentUnlock.unlockedAt) }] : []),
         ];
     setDetail({

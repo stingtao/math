@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { LeaderboardView } from "../components/LeaderboardView";
+import { FamilySafetyPage } from "../components/FamilySafetyPage";
 
 export const metadata: Metadata = {
-  title: "Anonymous Weekly League · Math",
-  description: "An anonymous weekly Grades 7–12 learning league using random nicknames and abstract avatars.",
+  title: "Private Family Progress · Math",
+  description: "Math uses private family progress instead of public rankings.",
 };
 
-export const dynamic = "force-dynamic";
-
-export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ demo?: string }> }) {
-  const params = await searchParams;
-  return <LeaderboardView demo={params.demo === "1"} />;
-}
+export default function LeaderboardPage() { return <FamilySafetyPage kind="league" />; }

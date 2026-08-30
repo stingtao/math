@@ -1,3 +1,5 @@
+import { PARENT_SESSION_COOKIE } from "@/lib/family-policy";
+
 const encoder = new TextEncoder();
 
 function toBase64Url(bytes: Uint8Array) {
@@ -39,9 +41,9 @@ export function getCookie(request: Request, name: string) {
 }
 
 export function sessionCookie(token: string, maxAge = 60 * 60 * 24 * 30) {
-  return `math_session=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+  return `${PARENT_SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 }
 
 export function clearSessionCookie() {
-  return "math_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0";
+  return `${PARENT_SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 }

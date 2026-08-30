@@ -38,8 +38,8 @@ export function LearningSignInGate({ glyph, kicker, title, detail }: LearningSig
         <span className="section-kicker">{kicker}</span>
         <h1>{title}</h1>
         <p>{detail}</p>
-        <a className="primary-button" href="/#join">Sign in and keep going <span aria-hidden="true">→</span></a>
-        <small>Your trail uses a random codename. Your Google name, email, and photo stay off the site.</small>
+        <a className="primary-button" href="/#join">Parent sign in <span aria-hidden="true">→</span></a>
+        <small>Only an adult parent or legal guardian signs in. Children do not need an account, email address, or profile.</small>
       </div>
     </main>
   );

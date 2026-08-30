@@ -1,9 +1,11 @@
 /** Cloudflare Worker entry point for Math. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { runRetentionCleanup } from "../lib/data-retention";
 
 interface WorkerEnv extends Cloudflare.Env {
   AUTH_HMAC_SECRET: string;
+  DB: D1Database;
 }
 
 function withSecurityHeaders(response: Response): Response {
@@ -22,8 +24,8 @@ function withSecurityHeaders(response: Response): Response {
   }
 
   const scriptPolicy = canRewriteHtml
-    ? `'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https://accounts.google.com/gsi/client https://pagead2.googlesyndication.com https: http:`
-    : `'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com/gsi/client https://pagead2.googlesyndication.com`;
+    ? `'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https://accounts.google.com/gsi/client https: http:`
+    : `'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com/gsi/client`;
   secured.headers.set("Content-Security-Policy", `default-src 'self'; object-src 'none'; script-src ${scriptPolicy}; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https:; frame-src 'self' https: data: blob:; worker-src 'self' blob: https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
   secured.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   secured.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
@@ -58,6 +60,11 @@ const worker = {
 
     const response = await handler.fetch(request, env, ctx);
     return withSecurityHeaders(response);
+  },
+  scheduled(controller: ScheduledController, env: WorkerEnv, ctx: ExecutionContext) {
+    ctx.waitUntil(runRetentionCleanup(env.DB, new Date(controller.scheduledTime)).then(({ familyDataDeleted, accountsDeleted }) => {
+      console.log("Daily family retention cleanup completed.", { familyDataDeleted, accountsDeleted });
+    }));
   },
 };
 

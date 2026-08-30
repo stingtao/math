@@ -3,11 +3,8 @@ import { Manrope } from "next/font/google";
 import { headers } from "next/headers";
 import "katex/dist/katex.min.css";
 import "./globals.css";
-import { AdUnit } from "./components/AdUnit";
 import { SiteFooter } from "./components/SiteFooter";
 import { NavigationFeedback } from "./components/NavigationFeedback";
-
-const ADSENSE_CLIENT = "ca-pub-6452867962392355";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -26,8 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
-  const title = "Math — Build the worlds no one has reached yet.";
-  const description = "Launch a 6–8 minute math mission. Settle Mars, engineer an ocean city, and explore the unknown through examples, practice, corrections, and bosses.";
+  const title = "Math — Learn together, one conversation at a time.";
+  const description = "Short Grades 7–12 math sessions for a parent and child to explore side by side, with prompts that help adults ask, listen, and teach.";
   return {
     metadataBase: new URL(origin),
     title,
@@ -47,15 +44,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
       </head>
       <body
         className={`${manrope.variable} antialiased`}
         suppressHydrationWarning
       >
         <NavigationFeedback />
-        <div className="page-content google-anno-skip">{children}</div>
-        <AdUnit />
+        <div className="page-content">{children}</div>
         <SiteFooter />
       </body>
     </html>

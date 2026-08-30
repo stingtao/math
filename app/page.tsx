@@ -8,10 +8,10 @@ import { gradeCurricula } from "@/lib/curriculum";
 export const dynamic = "force-dynamic";
 
 const missionSteps = [
-  { number: "01", title: "See one example", visual: "fraction-bars", accent: "gold" as const },
-  { number: "02", title: "Try it yourself", visual: "coordinate-plane", accent: "blue" as const },
-  { number: "03", title: "Use a clue and retry", visual: "equation-steps", accent: "teal" as const },
-  { number: "04", title: "Clear a mixed check", visual: "line-graph", accent: "violet" as const },
+  { number: "01", title: "Look at one example together", visual: "fraction-bars", accent: "gold" as const },
+  { number: "02", title: "Let your child try", visual: "coordinate-plane", accent: "blue" as const },
+  { number: "03", title: "Use a parent prompt", visual: "equation-steps", accent: "teal" as const },
+  { number: "04", title: "Talk through what changed", visual: "line-graph", accent: "violet" as const },
 ];
 
 const gradeVisuals = {
@@ -34,8 +34,8 @@ export default function Home() {
       <section className="frontier-mission-loop" id="story" aria-labelledby="mission-loop-title">
         <div className="frontier-section-heading frontier-heading-light">
           <span className="frontier-section-index">HOW IT WORKS</span>
-          <div><p className="frontier-kicker">6–8 MINUTES</p><h2 id="mission-loop-title">One mission. Four moves.</h2></div>
-          <p>See it, try it, fix it, prove it.</p>
+          <div><p className="frontier-kicker">8–12 MINUTES TOGETHER</p><h2 id="mission-loop-title">One lesson. Four shared moves.</h2></div>
+          <p>The screen guides the activity. You guide the conversation.</p>
         </div>
         <div className="frontier-loop-grid">
           {missionSteps.map((step) => (
@@ -47,7 +47,7 @@ export default function Home() {
         </div>
         <div className="frontier-loop-footer">
           <span aria-hidden="true">↻</span>
-          <p><b>Hints and retries are built in.</b> A miss reveals one useful clue, then you try again.</p>
+          <p><b>No teaching script required.</b> Each step gives you one useful question to ask before explaining.</p>
         </div>
       </section>
 
@@ -57,19 +57,19 @@ export default function Home() {
           <div className="frontier-coordinate-hud" aria-hidden="true"><span>(1, 2)</span><span>(2, 4)</span><span>(3, 6)</span><strong>y = 2x</strong></div>
         </div>
         <div className="frontier-field-copy">
-          <span className="frontier-section-index">TRY IT NOW</span>
-          <p className="frontier-kicker">LIVE GRAPH LAB</p>
-          <h2 id="field-test-title">Plot it. Connect it. Read the line back.</h2>
-          <p>Plot <b>(1, 2)</b>, <b>(2, 4)</b>, and <b>(3, 6)</b>. Connect the points—or type <b>y = 2x</b> and watch the line respond.</p>
-          <a className="frontier-dark-button" href="/labs/linear-graphs#point-mission">Open the live Graph Lab <span aria-hidden="true">→</span></a>
+          <span className="frontier-section-index">TRY ONE TOGETHER</span>
+          <p className="frontier-kicker">FAMILY GRAPH LAB</p>
+          <h2 id="field-test-title">Ask. Plot. Explain the pattern.</h2>
+          <p>Invite your child to plot <b>(1, 2)</b>, <b>(2, 4)</b>, and <b>(3, 6)</b>. Then ask: “What stays the same each time?”</p>
+          <a className="frontier-dark-button" href="/labs/linear-graphs#point-mission">Explore the Graph Lab together <span aria-hidden="true">→</span></a>
         </div>
       </section>
 
       <section className="frontier-curriculum" id="curriculum" aria-labelledby="curriculum-title">
         <div className="frontier-section-heading">
           <span className="frontier-section-index">START HERE</span>
-          <div><p className="frontier-kicker">GRADES 7–12</p><h2 id="curriculum-title">Choose your grade.</h2></div>
-          <p>You can switch paths anytime.</p>
+          <div><p className="frontier-kicker">GRADES 7–12</p><h2 id="curriculum-title">Choose what your child is learning.</h2></div>
+          <p>A parent or guardian should stay present during the session.</p>
         </div>
         <div className="frontier-grade-grid">
           {gradeCurricula.map((curriculum) => {
@@ -87,16 +87,16 @@ export default function Home() {
 
       <section className="frontier-launch" id="join">
         <div className="frontier-launch-copy">
-          <span className="frontier-kicker">START NOW</span>
-          <h2>Play one short mission.</h2>
-          <p>No sign-in required.</p>
-          <a href="/learn?grade=8&demo=1">Start Grade 8 <span aria-hidden="true">→</span></a>
+          <span className="frontier-kicker">PREVIEW TOGETHER</span>
+          <h2>Try one short family lesson.</h2>
+          <p>No child account. No advertising. Preview progress stays in this browser.</p>
+          <a href="/learn?grade=8&demo=1">Start a Grade 8 preview <span aria-hidden="true">→</span></a>
         </div>
         <div className="frontier-launch-card">
-          <small>SAVE PROGRESS</small>
-          <h3>Return with a codename.</h3>
+          <small>PARENT ACCOUNT</small>
+          <h3>Save your family’s learning progress.</h3>
           <GoogleSignIn clientId={clientId} />
-          <span><a href="/privacy">Privacy details</a> · For learners age 13+</span>
+          <span><a href="/privacy">Family privacy details</a> · Adult account holders only</span>
         </div>
       </section>
     </main>

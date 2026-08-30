@@ -8,6 +8,7 @@ import { getQuestMilestone } from "../lib/quest-milestone.ts";
 import { clippedLinePoints, nearestVisibleLinePoint, parseLinearFunction, valueAt } from "../lib/linear-function.ts";
 import { coordinateMissionProgress, coordinateReadTargets, isOnRoverLine, pointToLineTargets, sameCoordinate } from "../lib/coordinate-mission.ts";
 import { publicTextPrivacyIssue } from "../lib/privacy.ts";
+import { retentionDeadline } from "../lib/data-retention.ts";
 import { recoveryGuidance, remixedChoices } from "../lib/practice-recovery.ts";
 import { isAnswerCorrect, lessons } from "../lib/curriculum.ts";
 import { algebraCourseCoverage, extendedProgramCoverage, grade7To12CoreCoverage } from "../lib/curriculum-coverage.ts";
@@ -223,7 +224,7 @@ test("uses one answer control, concise recovery, and a longer success beat every
   assert.match(css, /scale\(1\.45\)/);
 });
 
-test("blocks common contact details before anonymous public feedback is stored", () => {
+test("keeps a contact-detail detector available for any future adult feedback review", () => {
   assert.equal(publicTextPrivacyIssue("Please reply to student@example.com"), "email address");
   assert.equal(publicTextPrivacyIssue("Call me at +886 912 345 678"), "phone number");
   assert.equal(publicTextPrivacyIssue("My handle is @mathstudent"), "social handle");
@@ -279,12 +280,13 @@ async function render(path = "/") {
   }, { waitUntil() {}, passThroughOnException() {} });
 }
 
-test("server-renders the Math Grades 7–12 landing page", async () => {
+test("server-renders the parent-guided Grades 7–12 landing page", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Build the worlds no one has reached yet/);
-  assert.match(html, /Play one short mission/);
+  assert.match(html, /Learn math together/);
+  assert.match(html, /Try one short family lesson/);
+  assert.match(html, /PARENT \+ CHILD · SIDE BY SIDE/);
   assert.match(html, /GRADES 7–12/);
   assert.doesNotMatch(html, /220 lessons|1100 questions|full visual scenes/i);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Building your site/);
@@ -309,17 +311,17 @@ test("publishes a plain-English AI collaboration and open reuse promise", async 
   const html = await response.text();
   const legal = await readFile(new URL("../app/components/LegalPage.tsx", import.meta.url), "utf8");
   const footer = await readFile(new URL("../app/components/SiteFooter.tsx", import.meta.url), "utf8");
-  assert.match(html, /A dad built it for his daughter/);
+  assert.match(html, /A dad built it to sit beside his daughter/);
   assert.match(html, /Sting’s daughter had math to review/);
   assert.match(html, /Sting and AI build together/);
-  assert.match(html, /Use it\. Remix it\. Make it better/);
+  assert.match(html, /Use it\. Remix it\. Learn together/);
   assert.match(html, /original learning text and original image assets/);
   assert.match(legal, /AI-assisted creation and accuracy/);
   assert.match(legal, /Open reuse of original material/);
   assert.match(legal, /freely copy, share, and adapt/);
   assert.match(legal, /responsible for checking its accuracy/);
   assert.match(footer, /href="\/about"/);
-  assert.match(footer, /Built with AI and human review/);
+  assert.match(footer, /Built by a parent, with AI and human review/);
 });
 
 test("ships all six curriculum files and all source sheets", async () => {
@@ -504,35 +506,43 @@ test("always gives a signed-in account priority over a demo query", () => {
   assert.equal(chooseLearnerMode(false, false), "signed-out");
 });
 
-test("separates account identity, weekly public aliases, and private learning history", async () => {
-  const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
-  const bootstrap = await readFile(new URL("../db/bootstrap.ts", import.meta.url), "utf8");
-  const migration = await readFile(new URL("../drizzle/0009_breezy_the_captain.sql", import.meta.url), "utf8");
+test("keeps one private family record behind a newly confirmed parent session", async () => {
   const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
+  const familyPolicy = await readFile(new URL("../lib/family-policy.ts", import.meta.url), "utf8");
+  const security = await readFile(new URL("../lib/security.ts", import.meta.url), "utf8");
+  const authRoute = await readFile(new URL("../app/api/auth/google/route.ts", import.meta.url), "utf8");
+  const googleSignIn = await readFile(new URL("../app/components/GoogleSignIn.tsx", import.meta.url), "utf8");
+  const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
   const hook = await readFile(new URL("../app/components/useLearner.ts", import.meta.url), "utf8");
   const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
   const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
 
-  for (const source of [schema, bootstrap, migration]) {
-    assert.match(source, /auth_identities/);
-    assert.match(source, /public_aliases/);
-    assert.match(source, /question_count/);
-  }
-  assert.match(migration, /SELECT 'google', `auth_key`, `id`, `created_at`, `last_seen_at` FROM `learners`/);
   assert.match(store, /FROM auth_identities i JOIN learners l/);
-  assert.match(store, /ensurePublicAlias\(learnerId, "leaderboard", week\)/);
-  assert.match(store, /JOIN public_aliases a/);
-  assert.match(store, /id: entry\.public_id/);
+  assert.match(store, /FAMILY_SESSION_PREFIX/);
+  assert.match(store, /token\?\.startsWith\(FAMILY_SESSION_PREFIX\)/);
+  assert.match(store, /l\.age_confirmed_at IS NOT NULL/);
+  assert.match(store, /age_confirmed_at = CASE WHEN \? IS NOT NULL THEN \? ELSE age_confirmed_at END/);
+  assert.doesNotMatch(store, /ensurePublicAlias|JOIN public_aliases|feedback_messages/);
+  assert.match(familyPolicy, /family-colearning-v2/);
+  assert.match(familyPolicy, /family-v2\./);
+  assert.match(familyPolicy, /math_parent_session/);
+  assert.match(security, /PARENT_SESSION_COOKIE/);
+  assert.match(authRoute, /parentConfirmed/);
+  assert.match(authRoute, /FAMILY_AGREEMENT_VERSION/);
+  assert.match(googleSignIn, /I am 18 or older and the parent or legal guardian/);
+  assert.match(googleSignIn, /Your child does not sign in/);
+  assert.match(googleSignIn, /if \(!parentConfirmedRef\.current\)/);
+  assert.match(header, /parent or guardian account can see and save this shared family progress/);
   assert.match(store, /learningHistory/);
   assert.match(hook, /fetch\("\/api\/me"/);
   assert.match(hook, /chooseLearnerMode\(response\.ok, demoRequested\)/);
   assert.match(hook, /isDemo: mode === "demo"/);
   assert.match(dashboard, /demo=\{isDemo\}/);
   assert.match(lesson, /if \(isDemo\)/);
-  assert.match(profile, /PRIVATE RECORD/);
+  assert.match(profile, /PRIVATE FAMILY RECORD/);
   assert.match(profile, /Learning history/);
-  assert.match(profile, /separate weekly alias/);
+  assert.match(profile, /Nothing here is public/);
 });
 
 test("persists badge ownership and qualified answer credits without adding badge XP", async () => {
@@ -598,7 +608,7 @@ test("ships a focused, extensible badge collection and accessible celebration co
   assert.match(css, /@keyframes answer-impact-core/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /@media \(max-width: 430px\)[\s\S]*\.badge-catalog-grid \{ grid-template-columns: 1fr/);
-  assert.match(css, /\.mobile-learner-nav \{[^}]*grid-template-columns: repeat\(5, 1fr\)/s);
+  assert.match(css, /\.mobile-learner-nav \{[^}]*grid-template-columns: repeat\(4, 1fr\)/s);
 });
 
 test("makes Quick Sheets readable and actionable on small screens", async () => {
@@ -619,7 +629,8 @@ test("uses one visual loading and private sign-in language across learning flows
   const flowFiles = await Promise.all(["LessonPlayer", "BossPlayer", "ReviewPlayer", "ProfileView", "LearningDashboard"].map((name) => readFile(new URL(`../app/components/${name}.tsx`, import.meta.url), "utf8")));
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(stateComponent, /aria-live="polite"/);
-  assert.match(stateComponent, /Your Google name, email, and photo stay off the site/);
+  assert.match(stateComponent, /Only an adult parent or legal guardian signs in/);
+  assert.match(stateComponent, /Children do not need an account/);
   for (const source of flowFiles) assert.match(source, /LearningLoading|LearningSignInGate/);
   assert.match(css, /\.learning-loading-card/);
   assert.match(css, /\.learning-loading-route i/);
@@ -753,7 +764,7 @@ test("presents the daily reward as a distinct action and retires its completed s
   assert.match(dashboard, /Collected today/);
   assert.match(dashboard, /reward-ready-button/);
   assert.match(dashboard, /claim-settling/);
-  assert.match(dashboard, /OPTIONAL DAILY CHECK-IN/);
+  assert.match(dashboard, /OPTIONAL FAMILY CHECK-IN/);
   assert.match(dashboard, /aria-busy=\{rewardPending\}/);
   assert.doesNotMatch(dashboard, /daily-reward-details|daily-rhythm|today-mission-header|today-mission-route/);
   assert.match(css, /\.reward-balance/);
@@ -763,38 +774,75 @@ test("presents the daily reward as a distinct action and retires its completed s
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.reward-ready-button/);
 });
 
-test("keeps signed-in navigation and a clear self marker on the weekly league", async () => {
+test("retires public rankings across navigation, page, API, and storage logic", async () => {
   const page = await readFile(new URL("../app/leaderboard/page.tsx", import.meta.url), "utf8");
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
-  const view = await readFile(new URL("../app/components/LeaderboardView.tsx", import.meta.url), "utf8");
+  const route = await readFile(new URL("../app/api/leaderboard/route.ts", import.meta.url), "utf8");
+  const stateRoute = await readFile(new URL("../app/api/state/route.ts", import.meta.url), "utf8");
   const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
-  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(page, /LeaderboardView demo=\{params\.demo === "1"\}/);
-  assert.match(header, /leaderboard\?demo=1/);
-  assert.match(view, /state \? <LearnerHeader/);
-  assert.match(view, /Rank \{viewerEntry\.rank\}/);
-  assert.match(view, /entry\.isViewer && <small>YOU<\/small>/);
-  assert.doesNotMatch(view, /YOUR PRIVATE MARKER|Everyone else sees your random codename|30-person|Public top 30/);
-  assert.match(view, /entry\.weeklyXp > 0/);
-  assert.match(store, /isViewer: entry\.learner_id === learnerId/);
-  assert.match(css, /\.current-rank-card/);
-  assert.match(css, /li\.current-learner/);
+  assert.match(page, /FamilySafetyPage kind="league"/);
+  assert.doesNotMatch(header, /leaderboard/);
+  assert.match(route, /status: 410/);
+  assert.match(route, /retired for private family learning/);
+  assert.match(stateRoute, /Public rankings have been retired/);
+  assert.doesNotMatch(store, /ensureLeagueMembership|ensurePublicAlias|getLeaderboard|getLearnerLeaderboard/);
 });
 
-test("keeps feedback rows unlinkable from learner progress", async () => {
+test("offers a reviewed feedback channel only to signed-in adult account holders", async () => {
   const schema = await readFile(new URL("../db/schema.ts", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/feedback/page.tsx", import.meta.url), "utf8");
+  const route = await readFile(new URL("../app/api/feedback/route.ts", import.meta.url), "utf8");
+  const board = await readFile(new URL("../app/components/FeedbackBoard.tsx", import.meta.url), "utf8");
+  const feedback = await readFile(new URL("../lib/feedback.ts", import.meta.url), "utf8");
+  assert.match(schema, /feedbackThreads/);
+  assert.match(schema, /feedbackReplies/);
+  assert.match(schema, /siteRoles/);
+  assert.match(schema, /onDelete: "cascade"/);
+  assert.match(page, /<FeedbackBoard/);
+  assert.match(route, /learnerFromRequest/);
+  assert.match(route, /status: 401/);
+  assert.match(route, /rejectCrossOriginMutation/);
+  assert.match(feedback, /status = 'published' OR learner_id = \?/);
+  assert.match(feedback, /Only the site owner can reply/);
+  assert.match(feedback, /COUNT\(\*\) AS total FROM mutation_keys WHERE learner_id = \? AND route = 'feedback:create'/);
+  assert.match(board, /Send for review/);
+  assert.match(board, /contains no child or contact information/);
+});
+
+test("enforces calendar-month retention, category deletion, and a daily cleanup", async () => {
+  assert.equal(retentionDeadline(new Date("2026-10-31T03:17:00.000Z"), 4), "2027-02-28T03:17:00.000Z");
+  assert.equal(retentionDeadline(new Date("2027-10-31T03:17:00.000Z"), 4), "2028-02-29T03:17:00.000Z");
+  assert.equal(retentionDeadline(new Date("2026-08-30T03:17:00.000Z"), 6), "2027-02-28T03:17:00.000Z");
+  const retention = await readFile(new URL("../lib/data-retention.ts", import.meta.url), "utf8");
   const store = await readFile(new URL("../lib/store.ts", import.meta.url), "utf8");
-  const feedback = schema.slice(schema.indexOf("feedbackMessages"), schema.indexOf("leagueMembers"));
-  assert.doesNotMatch(feedback, /learnerId|learner_id|authKey|auth_key/);
-  assert.match(feedback, /requestKeyHash/);
-  assert.match(store, /publicTextPrivacyIssue/);
-  assert.match(store, /For privacy, remove the/);
+  const stateRoute = await readFile(new URL("../app/api/state/route.ts", import.meta.url), "utf8");
+  const worker = await readFile(new URL("../worker/index.ts", import.meta.url), "utf8");
+  const config = await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8");
+  const privacy = await readFile(new URL("../app/components/LegalPage.tsx", import.meta.url), "utf8");
+  const migration = await readFile(new URL("../drizzle/0010_melodic_nick_fury.sql", import.meta.url), "utf8");
+  assert.match(retention, /DataDeletionCategory = "learning" \| "appearance" \| "feedback" \| "all"/);
+  assert.match(retention, /learning_data_expires_at <= \?/);
+  assert.match(retention, /account_expires_at <= \?/);
+  assert.match(retention, /if \(category === "all"\) statements\.push\(db\.prepare\("DELETE FROM public_profiles/);
+  assert.match(store, /FAMILY_DATA_RETENTION_MONTHS/);
+  assert.match(store, /FAMILY_ACCOUNT_RETENTION_MONTHS/);
+  assert.match(store, /learner\.account_expires_at <= now/);
+  assert.match(store, /learner\.learning_data_expires_at <= now/);
+  assert.match(store, /if \(category === "appearance"\)[\s\S]*UPDATE public_profiles SET nickname/);
+  assert.match(stateRoute, /action: "deleteDataCategory"/);
+  assert.match(worker, /scheduled\(controller: ScheduledController/);
+  assert.match(config, /"17 3 \* \* \*"/);
+  assert.match(migration, /CREATE TRIGGER `learners_retention_after_insert`/);
+  assert.match(migration, /CREATE TRIGGER `learners_retention_after_login`/);
+  assert.match(privacy, /four calendar months/);
+  assert.match(privacy, /six calendar months/);
+  assert.match(privacy, /normally completes deletion within 24 hours/);
 });
 
 test("guards authenticated mutations and production responses", async () => {
   const routes = await Promise.all([
-    "answer", "state", "review", "feedback", "boss",
+    "answer", "state", "review", "boss",
   ].map((name) => readFile(new URL(`../app/api/${name}/route.ts`, import.meta.url), "utf8")));
   for (const route of routes) {
     assert.match(route, /rejectCrossOriginMutation/);
@@ -814,13 +862,15 @@ test("guards authenticated mutations and production responses", async () => {
   assert.match(worker, /Strict-Transport-Security/);
   const dashboard = await readFile(new URL("../app/components/LearningDashboard.tsx", import.meta.url), "utf8");
   const profile = await readFile(new URL("../app/components/ProfileView.tsx", import.meta.url), "utf8");
-  const feedback = await readFile(new URL("../app/components/FeedbackBoard.tsx", import.meta.url), "utf8");
+  const feedbackRoute = await readFile(new URL("../app/api/feedback/route.ts", import.meta.url), "utf8");
   const header = await readFile(new URL("../app/components/Header.tsx", import.meta.url), "utf8");
   const google = await readFile(new URL("../app/components/GoogleSignIn.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(dashboard, /dailyRewardClaimed \|\| rewardPending/);
   assert.match(profile, /if \(busyAction\) return/);
-  assert.match(feedback, /if \(busy \|\| message\.trim\(\)\.length < 3\) return/);
+  assert.match(feedbackRoute, /rejectCrossOriginMutation/);
+  assert.match(feedbackRoute, /learnerFromRequest/);
+  assert.match(feedbackRoute, /status: 401/);
   assert.match(header, /if \(loggingOut\) return/);
   assert.match(google, /if \(authPending\.current\) return/);
   assert.match(css, /button:not\(:disabled\)[\s\S]*:active/);
@@ -992,6 +1042,7 @@ test("does not send review answers to authenticated clients", async () => {
 
 test("ships five extensible success patterns and reduced-motion handling", async () => {
   const component = await readFile(new URL("../app/components/SuccessBurst.tsx", import.meta.url), "utf8");
+  const familyCue = await readFile(new URL("../app/components/FamilyLearningCue.tsx", import.meta.url), "utf8");
   const autoAdvance = await readFile(new URL("../app/components/AutoAdvanceButton.tsx", import.meta.url), "utf8");
   const taskProgress = await readFile(new URL("../app/components/TaskProgress.tsx", import.meta.url), "utf8");
   const lesson = await readFile(new URL("../app/components/LessonPlayer.tsx", import.meta.url), "utf8");
@@ -1017,9 +1068,17 @@ test("ships five extensible success patterns and reduced-motion handling", async
   assert.match(taskProgress, /role="tooltip"/);
   assert.doesNotMatch(lesson, /FOCUS CHARGE|FOCUS CHAIN|STAR PATH/);
   assert.doesNotMatch(review, /RECALL CHAIN|Pulse \+1/);
-  assert.match(autoAdvance, /AUTO_ADVANCE_SECONDS = 6/);
-  assert.match(autoAdvance, /Automatically continuing in/);
-  for (const player of [lesson, boss, review]) assert.match(player, /<AutoAdvanceButton/);
+  assert.doesNotMatch(autoAdvance, /AUTO_ADVANCE_SECONDS|setInterval|Automatically continuing in/);
+  assert.match(autoAdvance, /Talk through the answer/);
+  assert.match(autoAdvance, /useEnterAction/);
+  assert.match(familyCue, /Begin with curiosity, not an explanation/);
+  assert.match(familyCue, /Let your child make the first move/);
+  assert.match(familyCue, /Treat the miss as useful information/);
+  assert.match(familyCue, /End with one small reflection/);
+  for (const player of [lesson, boss, review]) {
+    assert.match(player, /<AutoAdvanceButton/);
+    assert.match(player, /<FamilyLearningCue/);
+  }
   assert.match(css, /\.auto-advance-timer/);
   assert.match(css, /\.task-progress-track/);
   assert.deepEqual([1, 2, 3, 5, 8].map((chain) => getComboSpec(chain).tier), ["signal", "spark", "flame", "prism", "cosmic"]);
@@ -1164,8 +1223,7 @@ test("ships a readable, safe-area-aware mobile learning interface", async () => 
   assert.match(css, /@keyframes answer-check-spin/);
 });
 
-test("places a teen-treated AdSense unit between every page and the shared footer", async () => {
-  const adUnit = await readFile(new URL("../app/components/AdUnit.tsx", import.meta.url), "utf8");
+test("removes advertising from every family learning surface", async () => {
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
   const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const legal = await readFile(new URL("../app/components/LegalPage.tsx", import.meta.url), "utf8");
@@ -1173,31 +1231,20 @@ test("places a teen-treated AdSense unit between every page and the shared foote
   const adsTxt = await readFile(new URL("../public/ads.txt", import.meta.url), "utf8");
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
-  assert.match(adUnit, /ca-pub-6452867962392355/);
-  assert.match(adUnit, /2899407297/);
-  assert.match(adUnit, /data-ad-format="autorelaxed"/);
-  assert.match(adUnit, /data-tag-for-age-treatment="2"/);
-  assert.match(adUnit, /document\.createElement\("script"\)/);
-  assert.match(adUnit, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js/);
-  assert.match(adUnit, /window\.setTimeout/);
-  assert.match(adUnit, /2500/);
+  await assert.rejects(readFile(new URL("../app/components/AdUnit.tsx", import.meta.url), "utf8"));
   assert.doesNotMatch(layout, /<script/);
   assert.match(layout, /<html lang="en" suppressHydrationWarning>/);
   assert.match(layout, /suppressHydrationWarning/);
-  assert.match(layout, /google-adsense-account/);
-  assert.match(layout, /page-content google-anno-skip/);
-  assert.ok(layout.indexOf("{children}") < layout.indexOf("<AdUnit"));
-  assert.ok(layout.indexOf("<AdUnit") < layout.indexOf("<SiteFooter"));
+  assert.doesNotMatch(layout, /google-adsense-account|AdUnit|google-anno-skip/);
   assert.doesNotMatch(home, /<footer className="site-footer"/);
-  assert.doesNotMatch(home, /No ads or behavior tracking/);
-  assert.match(legal, /Google AdSense/);
-  assert.match(legal, /policies\.google\.com\/technologies\/partner-sites/);
-  assert.match(worker, /pagead2\.googlesyndication\.com/);
+  assert.match(home, /No child account\. No advertising/);
+  assert.match(legal, /does not load AdSense or other advertising code/);
+  assert.doesNotMatch(worker, /pagead2\.googlesyndication\.com/);
   assert.match(worker, /HTMLRewriter/);
   assert.match(worker, /'strict-dynamic'/);
   assert.match(worker, /'unsafe-eval'/);
   assert.match(worker, /frame-src 'self' https: data: blob:/);
-  assert.equal(adsTxt.trim(), "google.com, pub-6452867962392355, DIRECT, f08c47fec0942fa0");
+  assert.match(adsTxt, /No advertising systems are authorized/);
   assert.equal(packageJson.scripts.deploy, "npm run deploy:cloudflare");
 });
 
@@ -1319,9 +1366,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.doesNotMatch(home, /frontier-manifesto|frontier-world-gallery|frontier-recovery|frontier-privacy|frontier-content-proof/);
   assert.doesNotMatch(home, /curriculum\.subtitle|world\.skills\.map/);
   assert.match(home, /graphing-line-city-context\.webp/);
-  assert.match(home, /Plot it\. Connect it\. Read the line back/);
-  assert.match(home, /Hints and retries are built in/);
-  assert.match(home, /No sign-in required/);
+  assert.match(home, /Ask\. Plot\. Explain the pattern/);
+  assert.match(home, /What stays the same each time/);
+  assert.match(home, /Explore the Graph Lab together/);
   assert.match(concept, /solution-cases-context-model/);
   assert.match(concept, /inequality-range-context-model/);
   assert.match(concept, /fraction-equivalence-context-model/);
@@ -1409,9 +1456,9 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.doesNotMatch(dashboard, /CURRENT QUEST|Continue quest|questMilestone|getQuestMilestone|getNextAchievement|quest-landmark-meter/);
   assert.match(dashboard, /welcomeReady/);
   assert.match(dashboard, /math-welcome-guide/);
-  assert.match(dashboard, /Start with \{nextLesson\.title\}/);
-  assert.match(dashboard, /Hints \+ retries/);
-  assert.match(dashboard, /Start first mission/);
+  assert.match(dashboard, /Learn \{nextLesson\.title\} together/);
+  assert.match(dashboard, /Parent prompts included/);
+  assert.match(dashboard, /Start the family lesson/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{nextLesson\}/);
   assert.doesNotMatch(dashboard, /random codename is the only identity shown|Clear 4 lessons|Stars show fluency|FIRST WIN|First lesson reward preview|Base XP|Start this lesson|<Avatar avatar=/i);
   assert.match(dashboard, /reviewBatchSize/);
@@ -1639,7 +1686,7 @@ test("gives every lesson an applied mission and a sourced history finish", async
   assert.equal(getLessonExperience(lessons.find((lesson) => lesson.slug === "order-of-operations")).scene, "systems", "operation must not be misclassified as ratio");
   assert.equal(getLessonExperience(lessons.find((lesson) => lesson.slug === "scientific-notation")).scene, "growth");
   assert.equal(getLessonExperience(lessons.find((lesson) => lesson.slug === "g9-system-models")).scene, "navigation");
-  assert.match(dashboard, /Start first mission/);
+  assert.match(dashboard, /Start the family lesson/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{nextLesson\}/);
   assert.match(dashboard, /<LessonMissionThumbnail lesson=\{featuredLesson\}/);
   assert.doesNotMatch(dashboard, /GradeMissionOverview|dashboard-summary|dashboard-world-heading|Move across Mars/);

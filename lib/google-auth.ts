@@ -3,7 +3,7 @@ import { getRuntimeEnv } from "@/db/bootstrap";
 
 const googleKeys = createRemoteJWKSet(new URL("https://www.googleapis.com/oauth2/v3/certs"));
 
-export async function verifyGoogleCredential(credential: string) {
+export async function verifyGoogleIdentity(credential: string) {
   const clientId = getRuntimeEnv().GOOGLE_CLIENT_ID;
   if (!clientId) throw new Error("Google sign-in is not configured yet.");
   const { payload } = await jwtVerify(credential, googleKeys, {
@@ -11,7 +11,15 @@ export async function verifyGoogleCredential(credential: string) {
     issuer: ["https://accounts.google.com", "accounts.google.com"],
   });
   if (!payload.sub) throw new Error("Google did not return a stable account subject.");
-  return payload.sub;
+  return {
+    subject: payload.sub,
+    email: typeof payload.email === "string" ? payload.email : undefined,
+    emailVerified: payload.email_verified === true,
+  };
+}
+
+export async function verifyGoogleCredential(credential: string) {
+  return (await verifyGoogleIdentity(credential)).subject;
 }
 
 export function googleClientId() {

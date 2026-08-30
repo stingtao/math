@@ -4,6 +4,7 @@ type RuntimeEnv = {
   DB?: D1Database;
   GOOGLE_CLIENT_ID?: string;
   AUTH_HMAC_SECRET?: string;
+  FEEDBACK_ADMIN_EMAIL?: string;
 };
 
 export function getRuntimeEnv() {
@@ -17,7 +18,7 @@ export function getStore() {
 }
 
 const schemaStatements = [
-  `CREATE TABLE IF NOT EXISTS learners (id TEXT PRIMARY KEY, auth_key TEXT NOT NULL UNIQUE, timezone TEXT NOT NULL DEFAULT 'UTC', age_confirmed_at TEXT, created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS learners (id TEXT PRIMARY KEY, auth_key TEXT NOT NULL UNIQUE, timezone TEXT NOT NULL DEFAULT 'UTC', age_confirmed_at TEXT, family_agreement_version TEXT, family_agreement_at TEXT, learning_data_expires_at TEXT, account_expires_at TEXT, family_data_deleted_at TEXT, created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS auth_identities (provider TEXT NOT NULL, subject_key TEXT NOT NULL, learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, created_at TEXT NOT NULL, last_used_at TEXT NOT NULL, PRIMARY KEY (provider, subject_key))`,
   `INSERT OR IGNORE INTO auth_identities (provider, subject_key, learner_id, created_at, last_used_at) SELECT 'google', auth_key, id, created_at, last_seen_at FROM learners`,
   `CREATE TABLE IF NOT EXISTS public_profiles (learner_id TEXT PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE, nickname TEXT NOT NULL, avatar_glyph TEXT NOT NULL, avatar_tone TEXT NOT NULL, frame TEXT NOT NULL DEFAULT 'plain', reroll_used INTEGER NOT NULL DEFAULT 0, leaderboard_opt_in INTEGER NOT NULL DEFAULT 0, trail_tokens INTEGER NOT NULL DEFAULT 0, current_streak INTEGER NOT NULL DEFAULT 0, longest_streak INTEGER NOT NULL DEFAULT 0, streak_shields INTEGER NOT NULL DEFAULT 0, reward_step INTEGER NOT NULL DEFAULT 0, last_active_date TEXT)`,
@@ -39,8 +40,13 @@ const schemaStatements = [
   `CREATE TABLE IF NOT EXISTS daily_rewards (learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, local_date TEXT NOT NULL, reward_step INTEGER NOT NULL, tokens INTEGER NOT NULL, claimed_at TEXT NOT NULL, PRIMARY KEY (learner_id, local_date))`,
   `CREATE TABLE IF NOT EXISTS mutation_keys (learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, key TEXT NOT NULL, route TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (learner_id, key))`,
   `CREATE TABLE IF NOT EXISTS feedback_messages (id TEXT PRIMARY KEY, request_key_hash TEXT NOT NULL UNIQUE, nickname TEXT NOT NULL, body TEXT NOT NULL, created_at TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS feedback_threads (id TEXT PRIMARY KEY, learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, category TEXT NOT NULL, body TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', request_key_hash TEXT NOT NULL, notice_version TEXT NOT NULL, publication_consent_at TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS feedback_replies (id TEXT PRIMARY KEY, thread_id TEXT NOT NULL REFERENCES feedback_threads(id) ON DELETE CASCADE, operator_learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, body TEXT NOT NULL, created_at TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS site_roles (learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, role TEXT NOT NULL, granted_at TEXT NOT NULL, PRIMARY KEY (learner_id, role))`,
   `CREATE TABLE IF NOT EXISTS league_members (week_key TEXT NOT NULL, league_id TEXT NOT NULL, learner_id TEXT NOT NULL REFERENCES learners(id) ON DELETE CASCADE, joined_at TEXT NOT NULL, PRIMARY KEY (week_key, learner_id))`,
   `CREATE UNIQUE INDEX IF NOT EXISTS idx_learners_auth_key ON learners(auth_key)`,
+  `CREATE INDEX IF NOT EXISTS idx_learners_learning_expiry ON learners(learning_data_expires_at, family_data_deleted_at)`,
+  `CREATE INDEX IF NOT EXISTS idx_learners_account_expiry ON learners(account_expires_at)`,
   `CREATE INDEX IF NOT EXISTS idx_auth_identities_learner ON auth_identities(learner_id)`,
   `CREATE UNIQUE INDEX IF NOT EXISTS idx_public_aliases_public_id ON public_aliases(scope, scope_key, public_id)`,
   `CREATE INDEX IF NOT EXISTS idx_public_aliases_scope ON public_aliases(scope, scope_key)`,
@@ -57,6 +63,12 @@ const schemaStatements = [
   `CREATE INDEX IF NOT EXISTS idx_xp_week ON xp_events(week_key, learner_id)`,
   `CREATE INDEX IF NOT EXISTS idx_league_members_group ON league_members(week_key, league_id)`,
   `CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback_messages(created_at)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS idx_feedback_threads_request ON feedback_threads(learner_id, request_key_hash)`,
+  `CREATE INDEX IF NOT EXISTS idx_feedback_threads_recent ON feedback_threads(updated_at)`,
+  `CREATE INDEX IF NOT EXISTS idx_feedback_threads_learner ON feedback_threads(learner_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_feedback_replies_thread ON feedback_replies(thread_id, created_at)`,
+  `CREATE INDEX IF NOT EXISTS idx_feedback_replies_operator ON feedback_replies(operator_learner_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_site_roles_role ON site_roles(role)`,
 ];
 
 let ready: Promise<void> | null = null;

@@ -16,24 +16,22 @@ export function PublicHeader() {
     <header className="topbar">
       <Brand />
       <nav className="topnav" aria-label="Main navigation">
-        <a href="/#story">Mission loop</a>
+        <a href="/#story">How families learn</a>
         <a href="/#curriculum">Grades 7–12</a>
         <a href="/labs/linear-graphs">Graph Lab</a>
-        <a href="/leaderboard">Weekly league</a>
-        <a href="/feedback">Suggest a fix</a>
+        <a href="/about">Why this exists</a>
       </nav>
       <div className="public-actions">
         <details className="mobile-public-menu">
           <summary aria-label="Open navigation"><span aria-hidden="true">☰</span></summary>
           <nav aria-label="Mobile navigation">
-            <a href="/#story">Mission loop</a>
+            <a href="/#story">How families learn</a>
             <a href="/#curriculum">Grades 7–12</a>
             <a href="/labs/linear-graphs">Graph Lab</a>
-            <a href="/leaderboard">Weekly league</a>
-            <a href="/feedback">Suggest a fix</a>
+            <a href="/about">Why this exists</a>
           </nav>
         </details>
-        <a className="sign-in-button" href="/#join">Save progress</a>
+        <a className="sign-in-button" href="/#join">Parent sign in</a>
       </div>
     </header>
   );
@@ -50,7 +48,6 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
   const trailUrl = demo ? "/learn?demo=1" : "/learn";
   const reviewUrl = demo ? "/review?demo=1" : "/review";
   const profileUrl = demo ? "/profile?demo=1" : "/profile";
-  const leagueUrl = demo ? "/leaderboard?demo=1" : "/leaderboard";
   const badgesUrl = demo ? "/badges?demo=1" : "/badges";
   const world = getThemeSpec(state.profile.theme);
   const journey = getThemeJourney(state.profile.theme, { lessons: state.completedLessons.length, bosses: state.clearedBosses.length, dueReview: state.dueReview });
@@ -70,17 +67,15 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
       <header className="learner-topbar">
         <Brand />
         <nav className="learner-nav" aria-label="Learning navigation">
-          <a href={trailUrl}>{world.mapLabel}</a>
-          <a href={reviewUrl}>{world.reviewLabel} <span className="nav-count">{state.dueReview}</span></a>
-          <a href={badgesUrl}>{world.badgeLabel}</a>
-          <a href={leagueUrl}>{world.leagueLabel}</a>
+          <a href={trailUrl}>Family path</a>
+          <a href={reviewUrl}>Review together <span className="nav-count">{state.dueReview}</span></a>
+          <a href={badgesUrl}>Keepsakes</a>
         </nav>
         <div className="learner-stats">
-          <a className="stat-chip level-chip" href={`${profileUrl}#xp-level`} title={`${xpProgress.rankTitle} · ${state.totalXp} lifetime XP`}>LV {xpProgress.level}</a>
-          <span className="stat-chip streak-chip" title="Current streak">▲ {state.profile.currentStreak}</span>
+          <a className="stat-chip level-chip" href={`${profileUrl}#xp-level`} title={`${xpProgress.rankTitle} · ${state.totalXp} saved family XP`}>LV {xpProgress.level}</a>
           <a className="profile-link" href={profileUrl}>
             <Avatar avatar={state.profile.avatar} size="sm" />
-            <span>{state.profile.nickname}</span>
+            <span>Family space</span>
           </a>
           <button className="icon-button logout-button" onClick={logout} type="button" disabled={loggingOut} aria-busy={loggingOut} aria-label={loggingOut ? "Signing out" : "Sign out"}>{loggingOut ? "…" : "↗"}</button>
         </div>
@@ -89,12 +84,15 @@ export function LearnerHeader({ state, demo }: { state: LearnerState; demo: bool
         <span className="theme-world-hud-motif" aria-hidden="true">{world.motif}</span>
         <div className="theme-world-hud-place"><small>{world.worldName}</small><strong>{journey.headline}</strong></div>
       </aside>
+      <aside className="family-presence-notice" aria-label="Family progress notice">
+        <span aria-hidden="true">♡</span>
+        <p><strong>You are learning together.</strong> {demo ? "A parent or guardian should stay with the learner. This preview remains only in this browser." : "The parent or guardian account can see and save this shared family progress."}</p>
+      </aside>
       <nav className="mobile-learner-nav" aria-label="Mobile learning navigation">
-        <a className={pathname.startsWith("/learn") || pathname.startsWith("/boss") ? "active" : ""} href={trailUrl}><span aria-hidden="true">◎</span><strong>Map</strong></a>
-        <a className={pathname.startsWith("/review") ? "active" : ""} href={reviewUrl}><span aria-hidden="true">◇</span><strong>Recall</strong>{state.dueReview > 0 && <i>{state.dueReview}</i>}</a>
-        <a className={pathname.startsWith("/badges") ? "active" : ""} href={badgesUrl}><span aria-hidden="true">◆</span><strong>Badges</strong></a>
-        <a className={pathname.startsWith("/leaderboard") ? "active" : ""} href={leagueUrl}><span aria-hidden="true">★</span><strong>League</strong></a>
-        <a className={pathname.startsWith("/profile") ? "active" : ""} href={profileUrl}><span aria-hidden="true">●</span><strong>Base</strong></a>
+        <a className={pathname.startsWith("/learn") || pathname.startsWith("/boss") ? "active" : ""} href={trailUrl}><span aria-hidden="true">◎</span><strong>Learn</strong></a>
+        <a className={pathname.startsWith("/review") ? "active" : ""} href={reviewUrl}><span aria-hidden="true">◇</span><strong>Review</strong>{state.dueReview > 0 && <i>{state.dueReview}</i>}</a>
+        <a className={pathname.startsWith("/badges") ? "active" : ""} href={badgesUrl}><span aria-hidden="true">◆</span><strong>Keepsakes</strong></a>
+        <a className={pathname.startsWith("/profile") ? "active" : ""} href={profileUrl}><span aria-hidden="true">●</span><strong>Family</strong></a>
       </nav>
     </>
   );

@@ -18,6 +18,7 @@ import { QuestionResponse } from "./QuestionResponse";
 import { isResponseComplete, type QuestionInteraction, type QuestionInteractionConfig } from "@/lib/question-interactions";
 import { EnterActionLink } from "./EnterActionLink";
 import { XpProgress } from "./XpProgress";
+import { FamilyLearningCue } from "./FamilyLearningCue";
 
 type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; interactionConfig?: QuestionInteractionConfig; choices?: string[] };
 
@@ -178,6 +179,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       <section className="review-layout">
         <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Keep it ready.</h1><p>Skills return after 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent="teal" /></aside>
         <div className="review-card" aria-busy={busy}>
+          <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
           <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2>{question.prompt}</h2></div></div></header>
           <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void check()} />
           {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—use the clue and retry.</strong><p>{question.hint}</p><small>A corrected answer earns the same review credit.</small></div></div>}
