@@ -61,6 +61,30 @@ function answerVariants(answer: string) {
   return answer.split("|").map((value) => value.trim().toLowerCase());
 }
 
+const mathematicalWords = new Set([
+  "pi", "sqrt", "sin", "cos", "tan", "log", "ln", "theta", "infinity",
+  ..."abcdefghijklmnopqrstuvwxyz",
+  "an", "dr", "dt", "dx", "dy", "mx", "np", "uv", "xy",
+  "aa", "ef", "hl",
+]);
+
+/**
+ * Free response is appropriate only when at least one accepted form can be
+ * constructed as a compact number or mathematical expression. Concept names,
+ * classifications, directions, and explanatory phrases need authored choices
+ * so spelling and exact wording never become accidental assessment criteria.
+ */
+export function hasConstructibleMathAnswer(answer: string) {
+  return answerVariants(answer).some((variant) => {
+    const normalized = variant
+      .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉]/g, "")
+      .replace(/[−–—×·π√∞∫∘′]/g, "")
+      .replace(/\b(pi|sqrt|sin|cos|tan|log|ln|theta|infinity)\b/g, "");
+    const words = normalized.match(/[a-z]+/g) ?? [];
+    return words.every((word) => mathematicalWords.has(word));
+  });
+}
+
 export function inferQuestionInteraction(answer: string, choices?: string[]): QuestionInteraction {
   const accepted = answerVariants(answer);
   const options = normalizedValues(choices);

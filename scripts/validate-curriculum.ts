@@ -4,7 +4,8 @@ import { algebraCourseCoverage, extendedProgramCoverage, grade7To12CoreCoverage 
 import { expandedCoverageLessonSlugs } from "../lib/curriculum-extensions.ts";
 import { advancedInteractionLessonSlugs } from "../lib/curriculum-advanced-enrichment.ts";
 import { grade89VisualInteractionLessonSlugs } from "../lib/curriculum-enrichment.ts";
-import { inferQuestionInteraction, MULTI_SELECT_SEPARATOR, type QuestionInteraction } from "../lib/question-interactions.ts";
+import { textChoiceUpgradeKeys } from "../lib/curriculum-response-upgrades.ts";
+import { hasConstructibleMathAnswer, inferQuestionInteraction, MULTI_SELECT_SEPARATOR, type QuestionInteraction } from "../lib/question-interactions.ts";
 import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
 
@@ -41,6 +42,13 @@ for (const [grade, domains] of requiredDomains) {
 }
 
 const lessonBySlug = new Map(lessons.map((lesson) => [lesson.slug, lesson]));
+const questionByKey = new Map(lessons.flatMap((lesson) => lesson.practice.map((question) => [`${lesson.slug}:${question.id}`, question] as const)));
+assert.equal(textChoiceUpgradeKeys.length, 218, "The reviewed phrase-sensitive response audit must remain complete");
+for (const key of textChoiceUpgradeKeys) {
+  const question = questionByKey.get(key);
+  assert.ok(question, `Text-choice response contract is missing ${key}`);
+  assert.notEqual(question.interaction, "fill-in", `${key} must not assess exact English wording`);
+}
 assert.equal(grade7To12CoreCoverage.length, 73, "The Common Core cluster contract must cover all Grade 7, Grade 8, and high-school clusters");
 for (const strand of grade7To12CoreCoverage) {
   assert.ok(strand.lessonSlugs.length > 0, `${strand.cluster} needs at least one mapped lesson`);
@@ -113,6 +121,7 @@ for (const lesson of lessons) {
     interactionCounts.set(question.interaction, (interactionCounts.get(question.interaction) ?? 0) + 1);
     if (question.interaction === "fill-in") {
       assert.equal(question.choices, undefined, `${lesson.id}/${question.id} cannot combine fill-in with choices`);
+      assert.ok(hasConstructibleMathAnswer(question.answer), `${lesson.id}/${question.id} must use authored choices for a word, phrase, classification, or direction`);
     } else if (!["coordinate-grid", "number-line"].includes(question.interaction)) {
       assert.ok(question.choices, `${lesson.id}/${question.id} must render selectable answers`);
     }

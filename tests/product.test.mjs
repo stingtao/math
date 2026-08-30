@@ -18,7 +18,8 @@ import { isThemeId, themeCatalog } from "../lib/themes.ts";
 import { frontierWorlds } from "../lib/frontier-worlds.ts";
 import { getLessonExperience } from "../lib/lesson-experience.ts";
 import { grade89VisualInteractionLessonSlugs } from "../lib/curriculum-enrichment.ts";
-import { isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-interactions.ts";
+import { textChoiceUpgradeKeys } from "../lib/curriculum-response-upgrades.ts";
+import { hasConstructibleMathAnswer, isResponseComplete, MULTI_SELECT_SEPARATOR } from "../lib/question-interactions.ts";
 import { chooseLearnerMode } from "../lib/learner-mode.ts";
 import { getXpGain, getXpProgress, XP_PER_LEVEL } from "../lib/xp-progression.ts";
 import { badgeReplayDestination, historyReplayDestination } from "../lib/progress-replay.ts";
@@ -110,6 +111,8 @@ test("models answer interactions before rendering all 1,346 questions", () => {
   const tableChoice = questions.filter((question) => question.interaction === "table-choice");
   const factorQuestions = questions.filter((question) => /^Factor(?: completely)?\b/i.test(question.prompt));
   const proportionalDecision = lessons.find((lesson) => lesson.slug === "g7-proportional-tables")?.practice[1];
+  const fractionMeaning = lessons.find((lesson) => lesson.slug === "fractions")?.practice[0];
+  const fillIn = questions.filter((question) => question.interaction === "fill-in");
 
   assert.equal(questions.length, 1346);
   assert.equal(yesNo.length, 110);
@@ -120,10 +123,15 @@ test("models answer interactions before rendering all 1,346 questions", () => {
   assert.equal(numberLine.length, 9);
   assert.equal(graphChoice.length, 16);
   assert.equal(tableChoice.length, 24);
+  assert.equal(fillIn.length, 760);
+  assert.ok(fillIn.every((question) => hasConstructibleMathAnswer(question.answer)));
+  assert.equal(textChoiceUpgradeKeys.length, 218);
   assert.ok(yesNo.every((question) => question.choices?.join("|") === "Yes|No"));
   assert.ok(trueFalse.every((question) => question.choices?.join("|") === "True|False"));
   assert.equal(proportionalDecision?.interaction, "yes-no");
   assert.deepEqual(proportionalDecision?.choices, ["Yes", "No"]);
+  assert.equal(fractionMeaning?.interaction, "four-choice");
+  assert.ok(fractionMeaning?.choices?.includes("the total number of equal parts"));
   assert.equal(factorQuestions.length, 18);
   assert.ok(factorQuestions.every((question) => question.interaction === "four-choice" && question.choices?.length === 4));
   assert.ok(ordering.every((question) => question.choices?.length === 5 && question.answer.split(" → ").length === 5));

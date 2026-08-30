@@ -7,6 +7,7 @@ import { applyCoverageExtensions } from "./curriculum-extensions.ts";
 import { buildPracticeQuestion, type QuestionInteraction, type QuestionInteractionConfig } from "./question-interactions.ts";
 import { enrichGrade79Curriculum } from "./curriculum-enrichment.ts";
 import { enrichGrade1012Curriculum } from "./curriculum-advanced-enrichment.ts";
+import { upgradeTextualResponses } from "./curriculum-response-upgrades.ts";
 
 export type Accent = "blue" | "teal" | "coral" | "violet" | "gold";
 
@@ -587,12 +588,12 @@ const regionSpecs: Array<Omit<RegionDefinition, "grade" | "order">> = [
 
 export const grade8Regions: RegionDefinition[] = regionSpecs.map((region, index) => ({ ...region, grade: 8, order: index + 1 }));
 
-const expandedGrade7Regions = enrichGrade79Curriculum(applyCoverageExtensions(grade7Regions));
-const expandedGrade8Regions = enrichGrade79Curriculum(applyCoverageExtensions(grade8Regions));
-const expandedGrade9Regions = enrichGrade79Curriculum(applyCoverageExtensions(grade9Regions));
-const expandedGrade10Regions = enrichGrade1012Curriculum(applyCoverageExtensions(grade10Regions));
-const expandedGrade11Regions = enrichGrade1012Curriculum(applyCoverageExtensions(grade11Regions));
-const expandedGrade12Regions = enrichGrade1012Curriculum(applyCoverageExtensions(grade12Regions));
+const expandedGrade7Regions = upgradeTextualResponses(enrichGrade79Curriculum(applyCoverageExtensions(grade7Regions)));
+const expandedGrade8Regions = upgradeTextualResponses(enrichGrade79Curriculum(applyCoverageExtensions(grade8Regions)));
+const expandedGrade9Regions = upgradeTextualResponses(enrichGrade79Curriculum(applyCoverageExtensions(grade9Regions)));
+const expandedGrade10Regions = upgradeTextualResponses(enrichGrade1012Curriculum(applyCoverageExtensions(grade10Regions)));
+const expandedGrade11Regions = upgradeTextualResponses(enrichGrade1012Curriculum(applyCoverageExtensions(grade11Regions)));
+const expandedGrade12Regions = upgradeTextualResponses(enrichGrade1012Curriculum(applyCoverageExtensions(grade12Regions)));
 export const gradeCurricula = [
   { grade: 7 as const, title: "Grade 7", subtitle: "Ratios, rational numbers, equations, geometry, statistics, and probability", regions: expandedGrade7Regions },
   { grade: 8 as const, title: "Grade 8", subtitle: "Real numbers, linear relationships, transformations, geometry, and data", regions: expandedGrade8Regions },

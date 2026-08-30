@@ -85,11 +85,24 @@ The answer interaction is part of the learning design, not a formatting decision
 - Use `graph-choice` when the learner must distinguish shape, intercept, vertex, center, radius, asymptote, phase, slope, concavity, or signed area. Render authored mini-graphs from structured data; a text label alone does not test graph reading.
 - Use `table-choice` when the learner must select a valid proof row, parameter set, conditional denominator, sequence rule, limit statement, probability model, or study design. Keep column meanings visible and make the entire row selectable by mouse, touch, and keyboard.
 - Use authored choices when equivalent symbolic forms are difficult to type or normalize reliably. Factoring prompts such as `Factor 6x + 12` use four mathematically plausible choices unless a purpose-built symbolic editor and equivalence checker exist.
+- Separate recognition from construction. If the learner is identifying a term, category, property, direction, relationship, label, or verbal explanation, use authored choices even when the expected response is only one English word. Free response is for constructing a number or mathematical notation, not reproducing the author's sentence.
+- Do not use a longer alias list as the primary repair for a verbal fill-in. It cannot anticipate every valid synonym, omitted article, plural, hyphen, spelling error, or equally correct paraphrase. Put the intended meanings into visible, parallel choices and let the learner make the mathematical distinction directly.
+- A phrase-sensitive audit must inspect the assembled question bank, not only source tuples. Any remaining `fill-in` question must have at least one accepted compact numeric or symbolic form that the checker can compare reliably.
 - Keep all options parallel in meaning, notation, unit, and precision. Distractors should expose a misconception, not a typing trap.
 - A new question family must define its data shape, answer control, keyboard and assistive behavior, validation, correct feedback, recovery path, and rendering on lesson, boss, and review surfaces before content is added.
 - For Grade 10–12, every region must include at least one visual-reasoning mission and every grade must use at least nine interaction families. Adding more fill-in calculations does not satisfy advanced representation coverage.
 
 The curriculum validator must reject Yes/No or True/False questions that fall back to text input, and reject known high-friction symbolic families that lack an appropriate answer control. The same shared response component must render each type everywhere.
+
+### Recognition-versus-construction review
+
+Ask what evidence the response is supposed to produce:
+
+- `In 3/5, what does 5 represent?` tests the meaning of a denominator. Use parallel meanings as choices; do not require the exact phrase `the total number of equal parts`.
+- `Which model fits constant ratios?`, `What is this property called?`, and `Does the parabola open up or down?` test classification. Use choices.
+- `Solve 3x + 7 = 22`, `write the equation`, or `plot (3, −2)` asks the learner to construct a mathematical object. A purpose-built control or fill-in may be appropriate when equivalent forms are accepted.
+
+Choices must still test understanding. Use plausible alternatives from the same semantic family, keep notation and grammatical form parallel, and include exactly one mathematically correct option. Avoid throwaway distractors whose length, detail, or absurdity reveals the answer.
 
 ### Representation coverage is a second coverage contract
 
