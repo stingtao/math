@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { getQuestionBank } from "../lib/curriculum-depth.ts";
+import { validateDepthCurriculum } from "./validate-depth.ts";
 import { curriculumStats, isAnswerCorrect, lessons, regions } from "../lib/curriculum.ts";
 import { algebraCourseCoverage, extendedProgramCoverage, grade7To12CoreCoverage } from "../lib/curriculum-coverage.ts";
 import { expandedCoverageLessonSlugs } from "../lib/curriculum-extensions.ts";
@@ -10,12 +12,19 @@ import { hasSpecificTopicIcon, topicIconVisuals } from "../lib/topic-icons.ts";
 import { getRegionLandmark, regionLandmarks } from "../lib/visual-landmarks.ts";
 
 function writtenUnit(choice: string) {
-  return choice.trim().match(/^[-+]?\$?\d+(?:\.\d+)?(?:\/\d+)?\s+([A-Za-z].*)$/)?.[1].trim().toLowerCase() ?? null;
+  // A prose conclusion ("4 rounds give ...") is not a quantity with a unit.
+  // Restrict this check to compact measures; number pairs and full sentences
+  // require their own mathematical validation rather than matching all text.
+  const suffix = choice.trim().match(/^[-+]?\$?\d+(?:\.\d+)?(?:\/\d+)?\s+([A-Za-z].*)$/)?.[1].trim().toLowerCase();
+  if (!suffix || /[\d.,;]|\b(?:and|by|to|give|gives|is|are|while|for)\b/.test(suffix)) return null;
+  return /^(?:(?:square|cubic|fuel) )?[a-z]+(?: per [a-z]+)?$/.test(suffix) ? suffix : null;
 }
 
 assert.equal(regions.length, 55, "Grades 7–12 must contain 55 regions");
 assert.equal(lessons.length, 253, "Grades 7–12 must contain 253 lessons");
-assert.equal(curriculumStats.questions, 1346, "The reviewed curriculum and Grade 7–12 interaction missions must remain complete");
+assert.equal(lessons.reduce((total, lesson) => total + lesson.practice.length, 0), 1346, "The legacy curriculum remains stable for saved runs");
+const depthStats = validateDepthCurriculum(lessons);
+assert.equal(curriculumStats.questions, 1346 + depthStats.questions, "Count the complete bank, including depth extensions");
 assert.ok(lessons.every((lesson) => lesson.practice.length >= 5), "Every lesson must contain at least five reviewed questions");
 assert.equal(lessons.filter((lesson) => lesson.grade >= 7 && lesson.grade <= 9 && lesson.practice.length > 5).length, 53, "Grade 7–9 must keep all 53 enriched interaction missions");
 assert.equal(lessons.filter((lesson) => lesson.grade >= 10 && lesson.practice.length > 5).length, 26, "Grade 10–12 must keep all 26 advanced visual-reasoning missions");
@@ -87,12 +96,13 @@ let factorChoiceChecks = 0;
 let orderingChecks = 0;
 const interactionCounts = new Map<QuestionInteraction, number>();
 for (const lesson of lessons) {
+  const questionBank = getQuestionBank(lesson);
   const instructionalCopy = [
     lesson.goal,
     lesson.keyIdea,
     lesson.example,
     ...lesson.exampleSteps,
-    ...lesson.practice.map((question) => question.prompt),
+    ...questionBank.map((question) => question.prompt),
   ].join("\n");
   assert.doesNotMatch(
     instructionalCopy,
@@ -109,9 +119,9 @@ for (const lesson of lessons) {
     /^\s*sides?\s+[\d, ]+\s+and\s+[\d, ]+\s+are\s+similar\b/im,
     `${lesson.id} must describe figures or triangles—not side-length lists—as similar`,
   );
-  assert.equal(new Set(lesson.practice.map((question) => question.id)).size, lesson.practice.length, `${lesson.id} has duplicate question IDs`);
-  assert.equal(new Set(lesson.practice.map((question) => question.prompt)).size, lesson.practice.length, `${lesson.id} has duplicate question prompts`);
-  for (const question of lesson.practice) {
+  assert.equal(new Set(questionBank.map((question) => question.id)).size, questionBank.length, `${lesson.id} has duplicate question IDs`);
+  assert.equal(new Set(questionBank.map((question) => question.prompt)).size, questionBank.length, `${lesson.id} has duplicate question prompts`);
+  for (const question of questionBank) {
     assert.ok(question.prompt.trim().length >= 3, `${lesson.id}/${question.id} needs a clear prompt`);
     assert.ok(question.hint.trim().length >= 3, `${lesson.id}/${question.id} needs a useful hint`);
     assert.ok(question.answer.split("|").every((answer) => answer.trim()), `${lesson.id}/${question.id} has an empty accepted answer`);
@@ -203,3 +213,4 @@ for (const [input, accepted] of [
 
 const interactionSummary = [...interactionCounts.entries()].map(([type, count]) => `${type}: ${count}`).join(", ");
 console.log(`Validated Grades 7–12: ${lessons.length} lessons, ${curriculumStats.questions} questions (${interactionSummary}), ${orderingChecks} ordering checks, ${factorChoiceChecks} factor-choice checks, ${multipleChoiceChecks} selectable questions, and ${propertyChecks} seeded answer checks.`);
+console.log(`Depth evidence: ${depthStats.lessons} lessons, ${depthStats.objectives} bounded objectives, ${depthStats.questions} new questions; remaining pathway gaps are tracked explicitly.`);

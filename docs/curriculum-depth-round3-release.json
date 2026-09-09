@@ -1,0 +1,374 @@
+{
+  "deployment": {
+    "site": "https://math.stingtao.info",
+    "worker": "math",
+    "versionId": "5b6bc598-24e9-4cfc-8724-14dde67d9653",
+    "previousVersionId": "62cc8141-e4b4-475e-b171-95070b365855",
+    "tag": "depth-v3-20260909",
+    "deployedAt": "2026-09-09T08:21:12.043Z",
+    "trafficPercent": 100,
+    "schemaMigrationsApplied": false
+  },
+  "tests": {
+    "passed": 176,
+    "failed": 0,
+    "contentQuestions": 1778,
+    "normalizationChecks": 177800
+  },
+  "http": {
+    "checkedAt": "2026-09-09T08:21:56.850Z",
+    "origin": "https://math.stingtao.info",
+    "pages": [
+      {
+        "path": "/",
+        "status": 200,
+        "bytes": 45271
+      },
+      {
+        "path": "/learn?demo=1",
+        "status": 200,
+        "bytes": 20068
+      },
+      {
+        "path": "/review?demo=1",
+        "status": 200,
+        "bytes": 19857
+      },
+      {
+        "path": "/boss/701?demo=1",
+        "status": 200,
+        "bytes": 41013
+      },
+      {
+        "path": "/learn/g7-scale-drawings?demo=1",
+        "status": 200,
+        "bytes": 27840,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g7-informal-inference?demo=1",
+        "status": 200,
+        "bytes": 29149,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g7-rational-word-problems?demo=1",
+        "status": 200,
+        "bytes": 28190,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g7-inequalities-g7?demo=1",
+        "status": 200,
+        "bytes": 27975,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/scientific-operations?demo=1",
+        "status": 200,
+        "bytes": 27743,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g8-composed-transformations?demo=1",
+        "status": 200,
+        "bytes": 28571,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/lines-of-fit?demo=1",
+        "status": 200,
+        "bytes": 27701,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/systems-algebra?demo=1",
+        "status": 200,
+        "bytes": 27786,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g9-correlation-residuals?demo=1",
+        "status": 200,
+        "bytes": 30114,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g9-systems-linear-inequalities?demo=1",
+        "status": 200,
+        "bytes": 29312,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g9-linear-vs-exponential?demo=1",
+        "status": 200,
+        "bytes": 30348,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g9-factoring-completely?demo=1",
+        "status": 200,
+        "bytes": 28319,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g10-modeling-with-geometry?demo=1",
+        "status": 200,
+        "bytes": 27781,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g10-triangle-congruence?demo=1",
+        "status": 200,
+        "bytes": 26974,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g10-coordinate-proofs?demo=1",
+        "status": 200,
+        "bytes": 28012,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g10-circle-theorem-proofs?demo=1",
+        "status": 200,
+        "bytes": 28035,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g11-matrix-systems?demo=1",
+        "status": 200,
+        "bytes": 27356,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g11-polynomial-roots?demo=1",
+        "status": 200,
+        "bytes": 26696,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g11-radians-unit-circle?demo=1",
+        "status": 200,
+        "bytes": 26949,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g11-infinite-geometric-series?demo=1",
+        "status": 200,
+        "bytes": 26394,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g12-optimization?demo=1",
+        "status": 200,
+        "bytes": 27550,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g12-study-design?demo=1",
+        "status": 200,
+        "bytes": 31232,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g12-limit-from-table-graph?demo=1",
+        "status": 200,
+        "bytes": 29086,
+        "newQuestions": 6
+      },
+      {
+        "path": "/learn/g12-fundamental-theorem?demo=1",
+        "status": 200,
+        "bytes": 27217,
+        "newQuestions": 6
+      }
+    ],
+    "assets": [
+      {
+        "path": "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
+        "status": 200,
+        "bytes": 694
+      },
+      {
+        "path": "/_next/static/chunks/framework-BgSIrAUN.js",
+        "status": 200,
+        "bytes": 190152
+      },
+      {
+        "path": "/_next/static/chunks/navigation-errors-Z9ybshnb.js",
+        "status": 200,
+        "bytes": 2085
+      },
+      {
+        "path": "/_next/static/chunks/index-tdFDcjMW.js",
+        "status": 200,
+        "bytes": 189656
+      }
+    ],
+    "privateEndpoints": [
+      {
+        "path": "/api/answer?lessonId=g7-scale-drawings",
+        "status": 401,
+        "cacheControl": "private, no-store, max-age=0"
+      },
+      {
+        "path": "/api/review?version=depth-v1",
+        "status": 401,
+        "cacheControl": "private, no-store, max-age=0"
+      },
+      {
+        "path": "/api/review?version=depth-v2",
+        "status": 401,
+        "cacheControl": "private, no-store, max-age=0"
+      },
+      {
+        "path": "/api/review?version=depth-v3",
+        "status": 401,
+        "cacheControl": "private, no-store, max-age=0"
+      },
+      {
+        "path": "/api/boss?regionId=701",
+        "status": 401,
+        "cacheControl": "private, no-store, max-age=0"
+      }
+    ]
+  },
+  "publishedAssets": {
+    "checkedAt": "2026-09-09T08:23:28.631Z",
+    "results": [
+      {
+        "path": "/_next/static/chunks/Header-BXJH0aMW.js",
+        "status": 200,
+        "bytes": 10070,
+        "sha256": "ebbf221963d9badd04b143290b4b3a5d230081cd3046625db7f9bdb9036eb334"
+      },
+      {
+        "path": "/_next/static/chunks/NavigationFeedback-BWkRepAq.js",
+        "status": 200,
+        "bytes": 2898,
+        "sha256": "065b2497eb26ec6c849fcbc4e8e1369126eb5fc8d8a8c4aa210030908640453c"
+      },
+      {
+        "path": "/_next/static/chunks/FrontierWorldExplorer-CQBezg3J.js",
+        "status": 200,
+        "bytes": 5283,
+        "sha256": "f926c893e4999cbaf2bcfa6e83006f095446450ae20909fdfc0aeec936bf1338"
+      },
+      {
+        "path": "/vinext-client-entry-manifest.json",
+        "status": 200,
+        "bytes": 65,
+        "sha256": "0c2372248831f0d215e4fda558eed1647d575c5063d8cca6b53d9f468abf9669"
+      },
+      {
+        "path": "/_next/static/chunks/LessonMissionStory-Bc6ZVi43.js",
+        "status": 200,
+        "bytes": 36864,
+        "sha256": "2dec2126d2f2abd99b205ebb5e264f4424f3bb58533e61dd9999388633ddb647"
+      },
+      {
+        "path": "/_next/static/chunks/QuestionExplanation-BhnstnDm.js",
+        "status": 200,
+        "bytes": 23686,
+        "sha256": "9649814d7f9a939b971a87f85ebe7cabf52b3f4b251af5196bc3704c27fad56b"
+      },
+      {
+        "path": "/_next/static/chunks/LessonPlayer-WsBCyI4R.js",
+        "status": 200,
+        "bytes": 425217,
+        "sha256": "cedb63984017a0c77ae31a64e52eba6760eefa53c809659b9db4a92a8185f917"
+      },
+      {
+        "path": "/_next/static/chunks/layout-segment-context-CiRgMWo_.js",
+        "status": 200,
+        "bytes": 534,
+        "sha256": "00782315ee14cae50c290d327482c4044f754f4d1ec2f4f6d214e883ad0bfe5b"
+      },
+      {
+        "path": "/_next/static/chunks/BadgeGallery-B2xQqyJG.js",
+        "status": 200,
+        "bytes": 5546,
+        "sha256": "f1d7fa23f18fe863e347934169c21af3cc78ebd0be8eceb2279d4c0673d3c554"
+      },
+      {
+        "path": "/_next/static/chunks/ProfileView-DNOF4fu4.js",
+        "status": 200,
+        "bytes": 23864,
+        "sha256": "5911a24747cbe1f52e77642eb39b03c897b880e65e5a1516954f013453a773fc"
+      },
+      {
+        "path": "/_next/static/chunks/ReviewPlayer-37Dpd_EA.js",
+        "status": 200,
+        "bytes": 10136,
+        "sha256": "6aa637ad7cfec8c0f27e3a2b4de0f3fb222161256ff46437d01e7355cbb183a3"
+      },
+      {
+        "path": "/_next/static/chunks/XpProgress-CMRF-3MD.js",
+        "status": 200,
+        "bytes": 2984,
+        "sha256": "281028e840a7625bc5f6f22961ccc321d462697cc964033396055a60abc28d28"
+      },
+      {
+        "path": "/_next/static/chunks/image-DrSb0eYp.js",
+        "status": 200,
+        "bytes": 46551,
+        "sha256": "4897563a3d8d051c2f2008bd98c812b6fea0df82b6fcdd09ab0c902152d01ab5"
+      },
+      {
+        "path": "/_next/static/css/index.B4_J6m90.css",
+        "status": 200,
+        "bytes": 467897,
+        "sha256": "20aef6abff28e25402b108c65179490619a662564bb8bec93cadf8add77738a3"
+      },
+      {
+        "path": "/_next/static/chunks/useEnterAction-D1clYHA_.js",
+        "status": 200,
+        "bytes": 683,
+        "sha256": "e0257a5e1f4e80b2f3df6a9aa2848a42ca1dd2ed5baa73bcf1f90bbbb5c97885"
+      },
+      {
+        "path": "/_next/static/chunks/progress-replay-DYEw6KW5.js",
+        "status": 200,
+        "bytes": 3171,
+        "sha256": "1482b9accc635341147424ed506ed1269037b401da9481d0926bfd2b1d55deb8"
+      },
+      {
+        "path": "/_next/static/chunks/index-tdFDcjMW.js",
+        "status": 200,
+        "bytes": 189656,
+        "sha256": "0caab81e1222a9e7cf95b7596fbab14dfec15ca0b4716b5e8b6458bb60fa09fc"
+      },
+      {
+        "path": "/_next/static/chunks/FeedbackBoard-Cqfa9GEN.js",
+        "status": 200,
+        "bytes": 7007,
+        "sha256": "44f2a910e8843d416652f0e8ed3b61da2a8324a2b729e49ef9e487b844bf2f76"
+      },
+      {
+        "path": "/_next/static/chunks/BossPlayer-B4RTZNy9.js",
+        "status": 200,
+        "bytes": 19576,
+        "sha256": "0e149fc6a6fcf612e3d5ff5f4984e150fee7a4ba9135140203f325eb297af41e"
+      },
+      {
+        "path": "/_next/static/chunks/LearningDashboard-V0bIR_av.js",
+        "status": 200,
+        "bytes": 25207,
+        "sha256": "72b8c76411a8900f12d6dea1b8eb21e668d41ac5522cfee4b7cd3ebfd4a50a80"
+      },
+      {
+        "path": "/_next/static/chunks/LearningGate-BEH49lzq.js",
+        "status": 200,
+        "bytes": 602805,
+        "sha256": "d2335ede59d58797d5e43782efa64ab0eea32166b38adfc8c2fa63682286ca87"
+      }
+    ]
+  },
+  "browserVerification": {
+    "local": "passed: coordinate, table, graph; mobile and desktop; keyboard correction and explanation",
+    "production": "partial: Demo preview opened; interaction tool hung before results returned",
+    "productionInteractionsVerified": false,
+    "cleanup": "isolated tab automatically closed, sessionStorage discarded with tab, viewport reset; no account writes or API interception"
+  }
+}

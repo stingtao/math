@@ -1,17 +1,38 @@
-import { isAnswerCorrect, lessonById } from "@/lib/curriculum";
+import { isAnswerCorrect, lessonById, lessons } from "@/lib/curriculum";
+import { buildReviewQuestions, isDepthVersion, type ReviewQuestion } from "@/lib/assessment-selection";
+import { getQuestionBank } from "@/lib/curriculum-depth";
+import { checkReviewSubmission, reviewAnswerKey, type ReviewAnswer } from "@/lib/review-assessment";
 import { privateJson, rejectCrossOriginMutation } from "@/lib/http";
 import { claimMutation, completeReviewSet, creditCorrectAnswer, getDueReviewItems, getLearnerState, learnerFromRequest, localDate } from "@/lib/store";
+
+async function reviewPlan(learnerId: string, version?: string): Promise<ReviewQuestion[]> {
+  if (version && !isDepthVersion(version)) throw new Error("That review version is unavailable. Reload to open the current review.");
+  const due = await getDueReviewItems(learnerId, isDepthVersion(version) ? 3 : 5);
+  if (isDepthVersion(version)) return buildReviewQuestions(due, lessons, version, version);
+  return due.flatMap((item) => {
+    const lesson = lessonById.get(item.lesson_id);
+    const question = lesson && getQuestionBank(lesson).find((entry) => entry.id === item.question_id);
+    if (!lesson || !question) return [];
+    const { id, ...content } = question;
+    return [{ ...content, lessonId: lesson.id, lessonTitle: lesson.title, questionId: id, sourceQuestionId: id, role: "repair" as const }];
+  });
+}
 
 export async function GET(request: Request) {
   const learner = await learnerFromRequest(request);
   if (!learner) return privateJson({ error: "Sign in to continue." }, { status: 401 });
-  const due = await getDueReviewItems(learner.id);
-  const questions = due.flatMap((item) => {
-    const lesson = lessonById.get(item.lesson_id);
-    const question = lesson?.practice.find((entry) => entry.id === item.question_id);
-    return lesson && question ? [{ lessonId: lesson.id, lessonTitle: lesson.title, questionId: question.id, prompt: question.prompt, hint: question.hint, interaction: question.interaction, interactionConfig: question.interactionConfig, choices: question.choices }] : [];
-  });
-  return privateJson({ questions });
+  try {
+    const plan = await reviewPlan(learner.id, new URL(request.url).searchParams.get("version") ?? undefined);
+    const questions = plan.map((question) => {
+      const { answer: _answer, explanation: _explanation, ...publicQuestion } = question;
+      void _answer;
+      void _explanation;
+      return publicQuestion;
+    });
+    return privateJson({ questions });
+  } catch (error) {
+    return privateJson({ error: error instanceof Error ? error.message : "Could not open the review." }, { status: 400 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -19,36 +40,24 @@ export async function POST(request: Request) {
   if (crossOrigin) return crossOrigin;
   const learner = await learnerFromRequest(request);
   if (!learner) return privateJson({ error: "Sign in to continue." }, { status: 401 });
-  const body = await request.json() as {
-    action?: "check" | "complete";
-    lessonId?: string;
-    questionId?: string;
-    answer?: string;
-    answers?: Array<{ lessonId: string; questionId: string; answer: string }>;
-  };
-  const due = await getDueReviewItems(learner.id);
-  if (body.action === "check") {
-    const dueItem = due.find((item) => item.lesson_id === body.lessonId && item.question_id === body.questionId);
-    const question = dueItem ? lessonById.get(dueItem.lesson_id)?.practice.find((item) => item.id === dueItem.question_id) : null;
-    if (!question || typeof body.answer !== "string") return privateJson({ error: "That review question is not due." }, { status: 400 });
-    const correct = isAnswerCorrect(body.answer, question.answer);
-    const badgeResult = correct
-      ? await creditCorrectAnswer(learner.id, `review:${localDate(learner.timezone)}:${body.lessonId}:${body.questionId}`, "review")
-      : { correctAnswers: undefined, badgeUnlocks: [] };
-    return privateJson({ correct, hint: correct ? null : question.hint, ...badgeResult });
+  try {
+    const body = await request.json() as Partial<ReviewAnswer> & { action?: "check" | "complete"; version?: string; answers?: ReviewAnswer[] };
+    const plan = await reviewPlan(learner.id, body.version);
+    if (body.action === "check") {
+      const question = plan.find((entry) => reviewAnswerKey(entry) === reviewAnswerKey({ lessonId: body.lessonId ?? "", questionId: body.questionId ?? "", sourceQuestionId: body.sourceQuestionId }));
+      if (!question || typeof body.answer !== "string") return privateJson({ error: "That review question is not due." }, { status: 400 });
+      const correct = isAnswerCorrect(body.answer, question.answer ?? "");
+      const badgeResult = correct
+        ? await creditCorrectAnswer(learner.id, `review:${localDate(learner.timezone)}:${question.lessonId}:${question.questionId}`, "review")
+        : { correctAnswers: undefined, badgeUnlocks: [] };
+      return privateJson({ correct, hint: correct ? null : question.hint, explanation: correct ? question.explanation : undefined, ...badgeResult });
+    }
+    if (body.action !== "complete" || !Array.isArray(body.answers)) return privateJson({ error: "No review answers were submitted." }, { status: 400 });
+    const results = checkReviewSubmission(plan, body.answers);
+    const isNew = await claimMutation(learner.id, request.headers.get("Idempotency-Key"), "review");
+    if (isNew) await completeReviewSet(learner.id, results, localDate(learner.timezone));
+    return privateJson({ results, state: await getLearnerState(learner.id) });
+  } catch (error) {
+    return privateJson({ error: error instanceof Error ? error.message : "That review could not be saved." }, { status: 400 });
   }
-  if (body.action !== "complete" || !body.answers?.length) return privateJson({ error: "No review answers were submitted." }, { status: 400 });
-  if (body.answers.length !== due.length) return privateJson({ error: "Complete every question in today’s review set." }, { status: 400 });
-  const dueKeys = new Set(due.map((item) => `${item.lesson_id}:${item.question_id}`));
-  if (body.answers.some((entry) => !dueKeys.has(`${entry.lessonId}:${entry.questionId}`))) {
-    return privateJson({ error: "The review set changed. Reload and try again." }, { status: 409 });
-  }
-  const results = body.answers.map((entry) => {
-    const question = lessonById.get(entry.lessonId)?.practice.find((item) => item.id === entry.questionId);
-    return { lessonId: entry.lessonId, questionId: entry.questionId, correct: Boolean(question && isAnswerCorrect(entry.answer, question.answer)) };
-  });
-  if (results.some((entry) => !entry.correct)) return privateJson({ error: "Correct each review question before finishing." }, { status: 400 });
-  const isNew = await claimMutation(learner.id, request.headers.get("Idempotency-Key"), "review");
-  if (isNew) await completeReviewSet(learner.id, results, localDate(learner.timezone));
-  return privateJson({ results, state: await getLearnerState(learner.id) });
 }

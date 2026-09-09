@@ -24,6 +24,8 @@ import { EnterActionButton } from "./EnterActionButton";
 import { ExperienceScene } from "./ExperienceScene";
 import { FamilyLearningCue } from "./FamilyLearningCue";
 import { useContentStart } from "./useContentStart";
+import { createAssessmentId, isDepthAssessment, selectBossQuestions, selectBossRepairQuestions } from "@/lib/assessment-selection";
+import { QuestionExplanation } from "./QuestionExplanation";
 
 type BossAttempt = {
   attemptId: string;
@@ -37,11 +39,11 @@ type BossAttempt = {
 
 export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: boolean }) {
   const { state, setState, loading, error, isDemo } = useLearner(demo);
-  const questions = useMemo(() => [...region.lessons.map((item) => ({ ...item.practice[0], lesson: item.title })), { ...region.lessons[0].practice[1], lesson: "Mixed check" }], [region]);
   const completed = new Set(state?.completedLessons.map((item) => item.id) ?? []);
   const unlocked = Boolean(state && region.lessons.every((item) => completed.has(item.id)));
   const learnerReady = Boolean(state);
-  const [attemptId, setAttemptId] = useState("");
+  const [attemptId, setAttemptId] = useState(createAssessmentId);
+  const questions = useMemo(() => selectBossQuestions(region, attemptId), [region, attemptId]);
   const [attemptReady, setAttemptReady] = useState(false);
   const [index, setIndex] = useState(0);
   const [nextQuestionIndex, setNextQuestionIndex] = useState<number | null>(null);
@@ -65,9 +67,13 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   const [syncMessage, setSyncMessage] = useState("");
   const [badgeUnlocks, setBadgeUnlocks] = useState<BadgeUnlock[]>([]);
   const question = questions[Math.min(index, questions.length - 1)];
-  const questionLesson = region.lessons[Math.min(index, region.lessons.length - 1)];
-  const repairLesson = region.lessons[Math.min(failedQuestion ?? index, region.lessons.length - 1)];
-  const repairQuestion = repairLesson.practice[Math.min(repair + 2, repairLesson.practice.length - 1)];
+  const questionLesson = region.lessons.find((lesson) => lesson.id === question.lessonId) ?? region.lessons[0];
+  const failedIndex = Math.min(failedQuestion ?? index, questions.length - 1);
+  const repairLesson = isDepthAssessment(attemptId)
+    ? region.lessons.find((lesson) => lesson.id === questions[failedIndex].lessonId) ?? region.lessons[0]
+    : region.lessons[Math.min(failedIndex, region.lessons.length - 1)];
+  const repairQuestions = useMemo(() => selectBossRepairQuestions(region, attemptId, failedIndex), [region, attemptId, failedIndex]);
+  const repairQuestion = repairQuestions[Math.min(repair, repairQuestions.length - 1)];
   const answerLocked = busy || feedback === "correct";
   const repairAnswerLocked = busy || repairFeedback === "correct";
   const responseReady = isResponseComplete(question, answer);
@@ -83,7 +89,6 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
   useEffect(() => {
     if (!learnerReady || !unlocked) return;
     if (isDemo) {
-      setAttemptId((value) => value || crypto.randomUUID());
       setAttemptReady(true);
       return;
     }
@@ -99,18 +104,19 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
       const attempt = body.attempt;
       if (attempt) {
         setAttemptId(attempt.attemptId);
-        setIndex(Math.min(attempt.questionIndex, questions.length - 1));
+        const restoredQuestions = selectBossQuestions(region, attempt.attemptId);
+        setIndex(Math.min(attempt.questionIndex, restoredQuestions.length - 1));
         setHearts(attempt.hearts);
         setFailed(attempt.failed);
         setFailedQuestion(attempt.failedQuestion);
         setRepair(attempt.repairStep);
-      } else setAttemptId(crypto.randomUUID());
+      }
       setAttemptReady(true);
     }).catch(() => {
       if (active) { setErrorMessage("We could not open this boss attempt."); setAttemptReady(true); }
     });
     return () => { active = false; };
-  }, [isDemo, questions.length, region.id, learnerReady, unlocked]);
+  }, [isDemo, region, learnerReady, unlocked]);
 
   if (loading || unlocked && !attemptReady) return <LearningLoading glyph="★" tone="gold" kicker="OPENING THE BOSS GATE" title="Preparing the check…" detail={`${questions.length} mixed challenges and three hearts are being set in place.`} />;
   if (!state || error) return <LearningSignInGate glyph="★" kicker="PRIVATE FAMILY CHALLENGE" title="A parent signs in to open this check." detail="Attempts and recovery practice stay inside one shared family learning record." />;
@@ -395,17 +401,17 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
         <div className="boss-title"><TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="lg" label={`${question.lesson} topic`} /><div><span className="section-kicker">GRADE {region.grade} · {index + 1} OF {questions.length}</span><h1>{region.title}</h1><p>{questions.length} links. No timer. Every miss can be repaired.</p></div></div>
         <ExperienceScene completedLessons={state.completedLessons.length} variant="boss" />
         <div className="boss-connection-map" aria-label={`${connectedLinks} of ${questions.length} boss connections complete`}>
-          <header><div><span>SKILL MAP</span><strong>{region.lessons.length} lesson moves + one mixed finish</strong></div><small>{connectedLinks}/{questions.length} linked</small></header>
+          <header><div><span>SKILL MAP</span><strong>{region.lessons.length} lesson moves + one deeper check</strong></div><small>{connectedLinks}/{questions.length} linked</small></header>
           <div className="boss-connection-nodes" role="list">
             {questions.map((item, round) => {
-              const linkLesson = region.lessons[Math.min(round, region.lessons.length - 1)];
+              const linkLesson = region.lessons.find((lesson) => lesson.id === item.lessonId) ?? region.lessons[0];
               const status = round < connectedLinks ? "done" : round === connectedLinks ? "current" : "upcoming";
-              return <div className={`${status} ${round === questions.length - 1 ? "mixed" : ""}`} role="listitem" aria-label={`${item.lesson}: ${status === "done" ? "connected" : status === "current" ? "current question" : "upcoming"}`} key={`${item.id}-connection`}><TopicIcon visual={linkLesson.visual} accent={linkLesson.accent} size="sm" label="" /><span aria-hidden="true">{status === "done" ? "✓" : round === questions.length - 1 ? "★" : round + 1}</span><small>{item.lesson}</small></div>;
+              return <div className={`${status} ${round === questions.length - 1 ? "mixed" : ""}`} role="listitem" aria-label={`${item.lesson}: ${status === "done" ? "connected" : status === "current" ? "current question" : "upcoming"}`} key={`${item.lessonId}-${item.id}-${round}-connection`}><TopicIcon visual={linkLesson.visual} accent={linkLesson.accent} size="sm" label="" /><span aria-hidden="true">{status === "done" ? "✓" : round === questions.length - 1 ? "★" : round + 1}</span><small>{item.lesson}</small></div>;
             })}
           </div>
           <p><span aria-hidden="true">◆</span>{connectedLinks === questions.length ? `All ${questions.length} ideas are connected.` : `${questions.length - connectedLinks} ${questions.length - connectedLinks === 1 ? "connection" : "connections"} left. A correction keeps the map moving.`}</p>
         </div>
-        <div ref={contentStartRef} className="boss-question-card learning-content-start" tabIndex={-1} aria-label={`Boss question ${index + 1} of ${questions.length}`} aria-busy={busy}>
+        <section ref={contentStartRef} className="boss-question-card learning-content-start" tabIndex={-1} aria-label={`Boss question ${index + 1} of ${questions.length}`} aria-busy={busy}>
           <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
           <span className="boss-topic">{question.lesson}</span>
           <h2 data-learning-heading>{question.prompt}</h2>
@@ -413,10 +419,11 @@ export function BossPlayer({ region, demo }: { region: RegionDefinition; demo: b
           {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
           {feedback === "incorrect" && <div id="boss-answer-feedback" className="feedback-card incorrect recovery-feedback boss-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—fix this move.</strong><p>{question.hint}</p><small>{hearts > 0 ? `${hearts} ${hearts === 1 ? "heart" : "hearts"} remain. Retry this same question.` : "Two focused repairs refill every heart."}</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`boss-${region.id}-${index}`} label="CONNECTION HIT" chain={index + 1} progress={connectedLinks} total={questions.length} tone={questionLesson.accent} experienceLevel={state.completedLessons.length} /><div id="boss-answer-feedback" className="feedback-card correct feedback-celebration boss-link-feedback" role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>Connection made.</strong><p>{question.lesson} is linked. {hearts === 3 ? "All three hearts remain." : `${hearts} ${hearts === 1 ? "heart remains" : "hearts remain"}.`}</p></div><span className="momentum-chip">Link +1</span></div></>}
+          {feedback === "correct" && <QuestionExplanation key={`${attemptId}:${index}`} explanation={question.explanation} />}
           {syncMessage && <div id="boss-sync-message" className="boss-sync-message" role="status"><span aria-hidden="true">↻</span><div><strong>You are back in the right place.</strong><p>{syncMessage}</p></div></div>}
           {errorMessage && <p id="boss-answer-error" className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions"><button className="hint-button" type="button" onClick={() => setShowHint(true)} disabled={busy || showHint || feedback === "correct"}>◇ {showHint ? "Hint open" : "Show hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`boss-${region.id}-${index}`} label={index === questions.length - 1 ? "Finish boss" : "Next question"} busy={busy} busyLabel="Saving boss…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter">{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
-        </div>
+        </section>
       </section>
     </main>
   );

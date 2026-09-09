@@ -3357,7 +3357,7 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .number-line-track button.selected { color: var(--blue); }
 .number-line-track button.selected i { transform: scale(1.22); border-color: white; background: var(--blue); box-shadow: 0 0 0 3px var(--blue); }
 .graph-choice-response, .table-choice-response { margin: 25px 0; }
-.graph-choice-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.graph-choice-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 315px), 1fr)); gap: 12px; }
 .graph-choice-options > button { min-width: 0; padding: 10px; display: grid; gap: 8px; border: 2px solid #cfdae2; border-radius: 17px; color: var(--navy); background: white; font-size: 17px; font-weight: 850; text-align: left; transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease; }
 .graph-choice-options > button:hover, .graph-choice-options > button:focus-visible { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 10px 24px rgb(23 54 75 / 10%); outline: none; }
 .graph-choice-options > button.selected { border-color: var(--blue); background: #edf4fe; box-shadow: inset 0 0 0 1px var(--blue); }
@@ -3365,6 +3365,8 @@ button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; 
 .graph-choice-board { fill: #f8fbfd; stroke: #d9e4eb; stroke-width: 2; }
 .graph-choice-grid line { stroke: #dfe8ed; stroke-width: 1; }
 .graph-choice-axes line { stroke: #17364b; stroke-width: 2.2; }
+.graph-choice-ticks { fill: var(--navy); font-size: 18px; font-weight: 650; }
+.graph-choice-scale { margin: 0 0 12px; color: var(--muted); font-size: 16px; line-height: 1.5; }
 .graph-choice-curve { fill: none; stroke: var(--accent, var(--blue)); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
 .graph-choice-area { fill: color-mix(in srgb, var(--accent, var(--blue)) 22%, transparent); stroke: none; }
 .graph-choice-response.invalid .graph-choice-options > button, .table-choice-response.invalid .table-choice-grid { border-color: var(--coral); }

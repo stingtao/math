@@ -165,13 +165,15 @@ export function creditDemoCorrectAnswer(state: LearnerState) {
   return { state: next, badgeUnlocks, correctAnswers };
 }
 
-export function completeDemoLesson(state: LearnerState, lessonId: string, stars: number, firstCorrectCount?: number): LearnerState {
+export function completeDemoLesson(state: LearnerState, lessonId: string, stars: number, firstCorrectCount?: number, questionCount?: number): LearnerState {
   const existing = state.completedLessons.find((item) => item.id === lessonId);
   const reward = calculateLessonReward(existing?.stars ?? 0, stars);
   const completedLessons = existing
     ? state.completedLessons.map((item) => item.id === lessonId ? { ...item, stars: Math.max(item.stars, stars) } : item)
     : [...state.completedLessons, { id: lessonId, stars }];
   const currentLesson = lessonById.get(lessonId);
+  const totalQuestions = questionCount ?? currentLesson?.practice.length ?? 5;
+  const correctQuestions = Math.min(totalQuestions, Math.max(0, firstCorrectCount ?? (stars === 3 ? totalQuestions : 0)));
   const gradeLessons = currentLesson ? getGradeLessons(currentLesson.grade) : [];
   const currentIndex = gradeLessons.findIndex((item) => item.id === lessonId);
   const followingLesson = gradeLessons[currentIndex + 1] ?? currentLesson;
@@ -185,8 +187,9 @@ export function completeDemoLesson(state: LearnerState, lessonId: string, stars:
         grade: currentLesson.grade,
         regionTitle: region?.title ?? entry.regionTitle,
         stars: Math.max(entry.stars ?? 0, stars),
-        firstCorrectCount: Math.max(entry.firstCorrectCount ?? 0, firstCorrectCount ?? (stars === 3 ? currentLesson.practice.length : 0)),
-        questionCount: currentLesson.practice.length,
+        ...(correctQuestions * (entry.questionCount ?? totalQuestions) >= (entry.firstCorrectCount ?? 0) * totalQuestions
+          ? { firstCorrectCount: correctQuestions, questionCount: totalQuestions }
+          : { firstCorrectCount: entry.firstCorrectCount, questionCount: entry.questionCount }),
       } : entry)
     : [{
         key: `lesson:${lessonId}`,
@@ -198,8 +201,8 @@ export function completeDemoLesson(state: LearnerState, lessonId: string, stars:
         regionTitle: region?.title ?? "Math route",
         completedAt: new Date().toISOString(),
         stars,
-        firstCorrectCount: firstCorrectCount ?? (stars === 3 ? currentLesson.practice.length : 0),
-        questionCount: currentLesson.practice.length,
+        firstCorrectCount: correctQuestions,
+        questionCount: totalQuestions,
       }, ...state.learningHistory];
   let next: LearnerState = {
     ...state,

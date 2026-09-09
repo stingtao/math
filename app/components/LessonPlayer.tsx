@@ -34,6 +34,8 @@ import { useEnterAction } from "./useEnterAction";
 import { isResponseComplete } from "@/lib/question-interactions";
 import { FamilyLearningCue } from "./FamilyLearningCue";
 import { useContentStart } from "./useContentStart";
+import { createAssessmentId, selectLessonQuestions } from "@/lib/assessment-selection";
+import { QuestionExplanation } from "./QuestionExplanation";
 
 const stageLabels = [
   { label: "Mission", icon: "◎" },
@@ -63,7 +65,13 @@ type LessonCompletionReward = {
   xpEarned: number;
 };
 
-export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo: boolean }) {
+type SavedLessonRun = {
+  runId: string;
+  attempts: Array<{ questionId: string; firstCorrect: boolean; corrected: boolean; attempts: number; hintsUsed: number }>;
+  mastery: Array<{ questionId: string; round: number; cleanCorrected: boolean; attempts: number; hintsUsed: number }>;
+};
+
+export function LessonPlayer({ lesson: sourceLesson, demo }: { lesson: LessonDefinition; demo: boolean }) {
   const { state, setState, loading, error, isDemo } = useLearner(demo);
   const [stage, setStage] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -87,7 +95,13 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   const [masteryRounds, setMasteryRounds] = useState<Record<string, number>>({});
   const [masteryTotal, setMasteryTotal] = useState(0);
   const [masteryLockedCount, setMasteryLockedCount] = useState(0);
-  const [runId] = useState(() => crypto.randomUUID());
+  const [runId, setRunId] = useState(createAssessmentId);
+  const [runReady, setRunReady] = useState(false);
+  const [runLoadError, setRunLoadError] = useState("");
+  const [runLoadAttempt, setRunLoadAttempt] = useState(0);
+  const [runConflict, setRunConflict] = useState(false);
+  const [savedMasteredIds, setSavedMasteredIds] = useState<string[]>([]);
+  const lesson = useMemo(() => ({ ...sourceLesson, practice: selectLessonQuestions(sourceLesson, runId) }), [sourceLesson, runId]);
   const inMemoryCheck = masteryQueue.length > 0;
   const masteryQuestionId = masteryQueue[0];
   const question = inMemoryCheck ? lesson.practice.find((item) => item.id === masteryQuestionId) ?? lesson.practice[questionIndex] : lesson.practice[questionIndex];
@@ -110,9 +124,108 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       : "Next question";
   const region = getRegion(lesson.regionId);
   const completeMap = useMemo(() => new Map(state?.completedLessons.map((item) => [item.id, item.stars]) ?? []), [state]);
+  const learnerReady = Boolean(state);
+  const gradeLessons = getGradeLessons(lesson.grade);
+  const lessonPosition = gradeLessons.findIndex((item) => item.id === lesson.id);
+  const gradeCurriculum = getGradeCurriculum(lesson.grade);
+  const regionPosition = gradeCurriculum.regions.findIndex((item) => item.id === lesson.regionId);
+  const regionAvailable = regionPosition === 0 || Boolean(state?.clearedBosses.some((item) => item.regionId === gradeCurriculum.regions[regionPosition - 1]?.id));
+  const priorLessonComplete = lesson.order === 1 || completeMap.has(gradeLessons[lessonPosition - 1]?.id);
+  const isAvailable = completeMap.has(lesson.id) || regionAvailable && priorLessonComplete;
   const lessonBadge = lessonBadgeByLessonId.get(lesson.id);
   const contentTransitionKey = finished ? "lesson-finished" : stage === 4 ? `lesson-stage-4-${attemptKey}` : `lesson-stage-${stage}`;
   const contentStartRef = useContentStart<HTMLElement>(contentTransitionKey);
+
+  useEffect(() => {
+    if (loading || !learnerReady || !isAvailable || runReady || isDemo) return;
+    let active = true;
+    fetch(`/api/answer?lessonId=${encodeURIComponent(sourceLesson.id)}`, { cache: "no-store" }).then(async (response) => {
+      const body = await response.json() as { run?: SavedLessonRun | null; error?: string };
+      if (!active) return;
+      if (!response.ok || body.run === undefined) {
+        setRunLoadError(body.error ?? "We could not restore your practice. Try again to keep your saved progress.");
+        return;
+      }
+      if (body.run) {
+        const saved = body.run;
+        const selected = selectLessonQuestions(sourceLesson, saved.runId);
+        const selectedIds = new Set(selected.map((item) => item.id));
+        const savedAttempts = saved.attempts.filter((item) => selectedIds.has(item.questionId));
+        const savedMastery = saved.mastery.filter((item) => selectedIds.has(item.questionId));
+        const restoredAttempts: Record<string, number> = {};
+        const restoredFirst: Record<string, boolean> = {};
+        const restoredHints: Record<string, boolean> = {};
+        const restoredRecovery: Record<string, boolean> = {};
+        const restoredRounds: Record<string, number> = {};
+        for (const entry of savedAttempts) {
+          restoredAttempts[entry.questionId] = entry.attempts;
+          restoredFirst[entry.questionId] = entry.firstCorrect;
+          restoredHints[entry.questionId] = entry.hintsUsed > 0;
+          restoredRecovery[entry.questionId] = !entry.firstCorrect || entry.hintsUsed > 0;
+        }
+        for (const entry of savedMastery) {
+          const key = `${entry.questionId}:memory:${entry.round}`;
+          restoredRounds[entry.questionId] = entry.round;
+          restoredAttempts[key] = entry.attempts;
+          restoredFirst[key] = entry.cleanCorrected;
+          restoredHints[key] = entry.hintsUsed > 0;
+        }
+        const corrected = new Set(savedAttempts.filter((entry) => entry.corrected).map((entry) => entry.questionId));
+        const firstUncorrected = selected.findIndex((item) => !corrected.has(item.id));
+        const recoveryIds = selected.filter((item) => restoredRecovery[item.id]).map((item) => item.id);
+        const masteredIds = new Set(savedMastery.filter((entry) => entry.cleanCorrected).map((entry) => entry.questionId));
+        const pendingMastery = recoveryIds.filter((id) => !masteredIds.has(id));
+        setRunId(saved.runId);
+        setAttempts(restoredAttempts);
+        setFirstCorrect(restoredFirst);
+        setHinted(restoredHints);
+        setRecoveryNeeded(restoredRecovery);
+        setMasteryRounds(restoredRounds);
+        setSavedMasteredIds([...masteredIds]);
+        setMasteryTotal(recoveryIds.length);
+        setMasteryLockedCount(recoveryIds.length - pendingMastery.length);
+        setQuestionIndex(firstUncorrected >= 0 ? firstUncorrected : selected.length - 1);
+        setMasteryQueue(firstUncorrected < 0 ? pendingMastery : []);
+        setAnswer("");
+        setFeedback("");
+        setShowHint(false);
+        setFocusStreak(0);
+        if (firstUncorrected >= 0 || pendingMastery.length) setStage(4);
+        else {
+          const cleanCount = savedAttempts.filter((entry) => entry.firstCorrect).length;
+          const anyHint = savedAttempts.some((entry) => entry.hintsUsed > 0);
+          setStars(recoveryIds.length ? 2 : cleanCount === selected.length && !anyHint ? 3 : cleanCount >= Math.ceil(selected.length * .8) ? 2 : 1);
+          setStage(5);
+        }
+      } else {
+        setRunId(createAssessmentId());
+        setStage(0);
+        setQuestionIndex(0);
+        setAttempts({});
+        setFirstCorrect({});
+        setHinted({});
+        setRecoveryNeeded({});
+        setMasteryQueue([]);
+        setMasteryRounds({});
+        setSavedMasteredIds([]);
+        setMasteryTotal(0);
+        setMasteryLockedCount(0);
+        setAnswer("");
+        setFeedback("");
+        setShowHint(false);
+        setFocusStreak(0);
+        setExampleReady(false);
+        setStars(1);
+      }
+      setRunLoadError("");
+      setRunConflict(false);
+      setErrorMessage("");
+      setRunReady(true);
+    }).catch(() => {
+      if (active) setRunLoadError("We could not restore your practice. Check your connection and try again.");
+    });
+    return () => { active = false; };
+  }, [loading, learnerReady, isAvailable, runReady, isDemo, sourceLesson, runLoadAttempt]);
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -126,49 +239,49 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
   if (loading) return <LearningLoading glyph="M" tone="blue" kicker="SETTING UP YOUR MISSION" title="Opening the lesson…" detail="Goal, example, and practice are almost ready." />;
   if (!state || error) return <LessonGate />;
   const activeState = state;
-  const gradeLessons = getGradeLessons(lesson.grade);
-  const lessonPosition = gradeLessons.findIndex((item) => item.id === lesson.id);
-  const gradeCurriculum = getGradeCurriculum(lesson.grade);
-  const regionPosition = gradeCurriculum.regions.findIndex((item) => item.id === lesson.regionId);
-  const regionAvailable = regionPosition === 0 || state.clearedBosses.some((item) => item.regionId === gradeCurriculum.regions[regionPosition - 1]?.id);
-  const priorLessonComplete = lesson.order === 1 || completeMap.has(gradeLessons[lessonPosition - 1]?.id);
-  const isAvailable = completeMap.has(lesson.id) || regionAvailable && priorLessonComplete;
   const trailUrl = `/learn?grade=${lesson.grade}${isDemo ? "&demo=1" : ""}`;
   const practiceProgress = inMemoryCheck ? .9 + .1 * (masteryLockedCount / Math.max(1, masteryTotal)) : .9 * correctedCount / lesson.practice.length;
   const lessonProgressPercent = stage === 5 ? 95 : Math.round(((stage + (stage === 4 ? practiceProgress : 0)) / stageLabels.length) * 100);
   const currentStageLabel = stage === 4 ? inMemoryCheck ? `Memory Check ${masteryLockedCount + 1} of ${masteryTotal}` : `Practice ${questionIndex + 1} of ${lesson.practice.length}` : stageLabels[stage].label;
   if (!isAvailable) return <main className="learner-shell"><LearnerHeader state={state} demo={isDemo} /><section className="locked-lesson"><span className="lock-large">·</span><span className="section-kicker">NEXT REGION LOCKED</span><h1>Clear the current lesson first.</h1><p>Your next route opens as soon as that step is complete.</p><a className="primary-button" href={trailUrl}>Show my next move <span>→</span></a></section></main>;
+  if (!isDemo && !runReady) {
+    if (!runLoadError) return <LearningLoading glyph="M" tone="blue" kicker="RESTORING YOUR PRACTICE" title="Opening your saved place…" detail="Your questions and corrected work are being restored." />;
+    return <main className="learner-shell"><LearnerHeader state={state} demo={isDemo} /><section className="locked-lesson"><h1>Let’s restore your practice.</h1><p className="form-error" role="alert">{runLoadError}</p><button className="primary-button" type="button" onClick={() => { setRunLoadError(""); setRunLoadAttempt((value) => value + 1); }}>Try again <span>→</span></button><a className="text-link" href={trailUrl}>Return to the learning map</a></section></main>;
+  }
 
   function advanceStage() { setStage((value) => Math.min(5, value + 1)); }
 
   async function submitAnswer() {
-    if (!responseReady || busy) return;
+    if (!responseReady || busy || !isDemo && !runReady) return;
     setBusy(true);
     setErrorMessage("");
     const priorAttempts = attempts[attemptKey] ?? 0;
     try {
       let correct = isAnswerCorrect(answer, question.answer);
+      let savedCleanCorrected: boolean | undefined;
       if (inMemoryCheck && !isDemo) {
         const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[attemptKey]), runId, mastery: true, masteryRound }) });
-        const body = await response.json() as { correct?: boolean; error?: string };
-        if (!response.ok) { setErrorMessage(body.error ?? "We could not check that Memory Check."); return; }
+        const body = await response.json() as { correct?: boolean; cleanCorrected?: boolean; error?: string; code?: string };
+        if (!response.ok) { setRunConflict(body.code === "lesson_run_conflict"); setErrorMessage(body.error ?? "We could not check that Memory Check."); return; }
         correct = Boolean(body.correct);
+        savedCleanCorrected = Boolean(body.cleanCorrected);
       } else if (isDemo && correct && !inMemoryCheck) {
         const badgeResult = creditDemoCorrectAnswer(activeState);
         setState(badgeResult.state);
         if (badgeResult.badgeUnlocks.length) setBadgeUnlocks(badgeResult.badgeUnlocks);
       } else if (!isDemo && !inMemoryCheck) {
         const response = await fetch("/api/answer", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ lessonId: lesson.id, questionId: question.id, answer, usedHint: Boolean(hinted[attemptKey]), runId }) });
-        const body = await response.json() as { correct?: boolean; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string };
-        if (!response.ok) { setErrorMessage(body.error ?? "We could not check that answer."); return; }
+        const body = await response.json() as { correct?: boolean; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string; code?: string };
+        if (!response.ok) { setRunConflict(body.code === "lesson_run_conflict"); setErrorMessage(body.error ?? "We could not check that answer."); return; }
         correct = Boolean(body.correct);
         if (correct && body.correctAnswers !== undefined) setState(applyBadgeProgress(activeState, body.correctAnswers, body.badgeUnlocks));
         if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
       }
       setAttempts((current) => ({ ...current, [attemptKey]: priorAttempts + 1 }));
-      if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [attemptKey]: correct }));
+      if (savedCleanCorrected !== undefined) setFirstCorrect((current) => ({ ...current, [attemptKey]: savedCleanCorrected }));
+      else if (priorAttempts === 0) setFirstCorrect((current) => ({ ...current, [attemptKey]: correct }));
       if (!correct && !inMemoryCheck) setRecoveryNeeded((current) => ({ ...current, [question.id]: true }));
-      const cleanFirstTry = correct && priorAttempts === 0 && !hinted[attemptKey];
+      const cleanFirstTry = correct && (savedCleanCorrected ?? (priorAttempts === 0 && !hinted[attemptKey]));
       setFocusStreak((current) => cleanFirstTry ? current + 1 : 0);
       setFeedback(correct ? "correct" : "incorrect");
     } catch {
@@ -204,11 +317,14 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
       return;
     }
     if (!inMemoryCheck) {
-      const queue = lesson.practice.filter((item) => recoveryNeeded[item.id]).map((item) => item.id);
+      const queue = lesson.practice.filter((item) => {
+        const memoryKey = `${item.id}:memory:${masteryRounds[item.id] ?? 0}`;
+        return recoveryNeeded[item.id] && !savedMasteredIds.includes(item.id) && !(firstCorrect[memoryKey] && !hinted[memoryKey]);
+      }).map((item) => item.id);
       if (queue.length) {
         setMasteryQueue(queue);
-        setMasteryTotal(queue.length);
-        setMasteryLockedCount(0);
+        setMasteryTotal(recoveryCount);
+        setMasteryLockedCount(recoveryCount - queue.length);
         setAnswer("");
         setFeedback("");
         setShowHint(false);
@@ -217,7 +333,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     }
     const correctFirst = lesson.practice.filter((item) => firstCorrect[item.id]).length;
     const usedAnyHint = lesson.practice.some((item) => hinted[item.id]);
-    const earnedStars = inMemoryCheck ? 2 : correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= Math.ceil(lesson.practice.length * .8) ? 2 : 1;
+    const earnedStars = inMemoryCheck || recoveryCount > 0 ? 2 : correctFirst === lesson.practice.length && !usedAnyHint ? 3 : correctFirst >= Math.ceil(lesson.practice.length * .8) ? 2 : 1;
     setStars(earnedStars);
     if (inMemoryCheck) setMasteryLockedCount(masteryTotal);
     setAnswer("");
@@ -235,7 +351,7 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
     setErrorMessage("");
     try {
       if (isDemo) {
-        const nextState = completeDemoLesson(activeState, lesson.id, stars, lesson.practice.filter((item) => firstCorrect[item.id]).length);
+        const nextState = completeDemoLesson(activeState, lesson.id, stars, lesson.practice.filter((item) => firstCorrect[item.id]).length, lesson.practice.length);
         const newlyEarned = nextState.badges.recent.filter((item) => !activeState.badges.earnedIds.includes(item.id));
         if (newlyEarned.length) setBadgeUnlocks(newlyEarned);
         setCompletionReward({
@@ -380,8 +496,10 @@ export function LessonPlayer({ lesson, demo }: { lesson: LessonDefinition; demo:
               <QuestionResponse question={question} choices={choiceOptions} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "lesson-answer-error" : feedback ? "lesson-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void submitAnswer()} />
               {showHint && feedback !== "incorrect" && <div className="hint-card"><span>HINT</span><p>{question.hint}</p></div>}
               {feedback === "incorrect" && <RecoveryCoach question={question} response={answer} failedAttempts={failedAttempts} memoryCheck={inMemoryCheck} />}
-              {feedback === "correct" && <><AnswerImpact eventKey={`${lesson.id}-${attemptKey}-chain-${focusStreak}`} label={inMemoryCheck ? currentFirstTry ? "RECALLED" : "CORRECTED" : currentFirstTry ? "CORRECT" : "CORRECTED"} chain={focusStreak} progress={inMemoryCheck ? masteryLockedCount + (currentFirstTry ? 1 : 0) : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} tone={lesson.accent} experienceLevel={state.completedLessons.length} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{inMemoryCheck ? currentFirstTry ? "Recalled correctly!" : "Correct—recall it once more later." : currentFirstTry ? focusStreak >= 3 ? `${focusStreak} correct in a row!` : "Correct!" : "Corrected!"}</strong><p>{inMemoryCheck ? currentFirstTry ? "You recalled the method on the first try. This idea is now secure for the lesson." : "This correct answer proves the repair worked. It will return after another idea so you can recall it cleanly." : `${practiceEncouragement[questionPosition]} Question ${questionPosition + 1} is corrected.${recoveryNeeded[question.id] ? " It will return in Memory Check." : ""}`}</p></div><span className="momentum-chip">{inMemoryCheck ? currentFirstTry ? "Recall complete" : "One more recall" : currentFirstTry && focusStreak > 1 ? `${focusStreak} in a row` : "Complete"}</span></div></>}
+              {feedback === "correct" && <><AnswerImpact eventKey={`${lesson.id}-${attemptKey}-chain-${focusStreak}`} label={inMemoryCheck ? currentFirstTry ? "RECALLED" : "CORRECTED" : currentFirstTry ? "CORRECT" : "CORRECTED"} chain={focusStreak} progress={inMemoryCheck ? masteryLockedCount + (currentFirstTry ? 1 : 0) : correctedCount} total={inMemoryCheck ? masteryTotal : lesson.practice.length} tone={lesson.accent} experienceLevel={state.completedLessons.length} /><div id="lesson-answer-feedback" className={`feedback-card correct feedback-celebration ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{inMemoryCheck ? currentFirstTry ? "Recalled correctly!" : "Correct—recall it once more later." : currentFirstTry ? focusStreak >= 3 ? `${focusStreak} correct in a row!` : "Correct!" : "Corrected!"}</strong><p>{inMemoryCheck ? currentFirstTry ? "You recalled the method on the first try. This idea is now secure for the lesson." : "This correct answer proves the repair worked. It will return after another idea so you can recall it cleanly." : `${practiceEncouragement[questionPosition] ?? practiceEncouragement[practiceEncouragement.length - 1]} Question ${questionPosition + 1} is corrected.${recoveryNeeded[question.id] ? " It will return in Memory Check." : ""}`}</p></div><span className="momentum-chip">{inMemoryCheck ? currentFirstTry ? "Recall complete" : "One more recall" : currentFirstTry && focusStreak > 1 ? `${focusStreak} in a row` : "Complete"}</span></div></>}
+              {feedback === "correct" && <QuestionExplanation key={attemptKey} explanation={question.explanation} />}
               {errorMessage && <p id="lesson-answer-error" className="form-error" role="alert">{errorMessage}</p>}
+              {runConflict && <button className="secondary-button" type="button" onClick={() => { setRunReady(false); setRunLoadError(""); setRunLoadAttempt((value) => value + 1); }}>Resume saved practice <span>→</span></button>}
               <div className="practice-actions"><button className="hint-button" type="button" onClick={useHint} disabled={showHint || busy}>◇ {showHint ? "Hint open" : inMemoryCheck ? "Use a repair hint" : "Show a hint"}</button>{feedback === "correct" ? <AutoAdvanceButton eventKey={`${lesson.id}-${attemptKey}`} label={nextActionLabel} busy={busy} onAdvance={continuePractice} /> : <button className="primary-button" type="button" disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter" onClick={submitAnswer}>{busy ? "Checking…" : inMemoryCheck ? "Check recall" : "Check answer"} <span>→</span></button>}</div>
             </div>
           )}

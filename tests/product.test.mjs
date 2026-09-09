@@ -178,7 +178,8 @@ test("keeps the audited Algebra I scope tied to dedicated lessons and teaching v
   const repairedSlugs = ["g9-interpret-linear-models", "g10-geometric-constructions", "g10-similarity-proofs", "g10-laws-of-sines-and-cosines", "g10-cross-sections-and-rotations", "g11-complex-arithmetic", "g11-complex-polynomial-solutions", "g11-polynomial-identities", "g12-decision-strategies"];
   const repairedLessons = repairedSlugs.map((slug) => lessons.find((lesson) => lesson.slug === slug));
   assert.ok(repairedLessons.every(Boolean));
-  assert.equal(new Set(repairedLessons.flatMap((lesson) => lesson.exampleSteps)).size, 27);
+  assert.ok(repairedLessons.every((lesson) => lesson.exampleSteps.length >= 3));
+  assert.equal(new Set(repairedLessons.flatMap((lesson) => lesson.exampleSteps)).size, repairedLessons.flatMap((lesson) => lesson.exampleSteps).length);
   assert.match(icons, /venn: \{ kind: "chance", glyph: "∪" \}/);
 });
 
@@ -958,7 +959,7 @@ test("keeps progression and boss hearts server-authoritative", async () => {
   assert.match(bossPlayer, /No XP or completed repair is lost/);
   assert.match(bossPlayer, /body\.resynced/);
   assert.match(bossPlayer, /nextQuestionIndex/);
-  assert.match(bossPlayer, /\[isDemo, questions\.length, region\.id, learnerReady, unlocked\]/);
+  assert.match(bossPlayer, /\[isDemo, region, learnerReady, unlocked\]/);
   assert.match(bossPlayer, /No heart was lost/);
   assert.match(bossPlayer, /aria-valuenow=\{repair\}/);
   assert.match(css, /\.repair-answer-feedback/);
@@ -1089,7 +1090,7 @@ test("does not send review answers to authenticated clients", async () => {
   const getHandler = route.slice(route.indexOf("export async function GET"), route.indexOf("export async function POST"));
   assert.doesNotMatch(getHandler, /answer:\s*question\.answer/);
   assert.match(route, /action === "check"/);
-  assert.match(route, /results\.some\(\(entry\) => !entry\.correct\)/);
+  assert.match(route, /checkReviewSubmission\(plan, body\.answers\)/);
 });
 
 test("ships five extensible success patterns and reduced-motion handling", async () => {
@@ -1641,7 +1642,7 @@ test("ships a visual topic system across home, trail, lessons, and rewards", asy
   assert.doesNotMatch(css, /\.settlement-save-note/);
   assert.match(css, /\.settlement-landmark/);
   assert.match(review, /review-finish-emblem/);
-  assert.match(review, /skills back online/);
+  assert.match(review, /questions completed/);
   assert.match(review, /<TopicIcon visual=\{questionLesson\.visual\}/);
   assert.match(review, /<TaskProgress label="Review progress"/);
   assert.doesNotMatch(review, /review-memory-meter|RECALL STATUS/);

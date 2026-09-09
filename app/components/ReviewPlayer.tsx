@@ -15,13 +15,13 @@ import { AnswerImpact } from "./AnswerImpact";
 import { AutoAdvanceButton } from "./AutoAdvanceButton";
 import { TaskProgress } from "./TaskProgress";
 import { QuestionResponse } from "./QuestionResponse";
-import { isResponseComplete, type QuestionInteraction, type QuestionInteractionConfig } from "@/lib/question-interactions";
+import { isResponseComplete } from "@/lib/question-interactions";
 import { EnterActionLink } from "./EnterActionLink";
 import { XpProgress } from "./XpProgress";
 import { FamilyLearningCue } from "./FamilyLearningCue";
 import { useContentStart } from "./useContentStart";
-
-type ReviewQuestion = { lessonId: string; lessonTitle: string; questionId: string; prompt: string; answer?: string; hint: string; interaction: QuestionInteraction; interactionConfig?: QuestionInteractionConfig; choices?: string[] };
+import { ASSESSMENT_VERSION, buildDemoReviewQuestions, createAssessmentId, type ReviewQuestion } from "@/lib/assessment-selection";
+import { QuestionExplanation } from "./QuestionExplanation";
 
 export function ReviewPlayer({ demo }: { demo: boolean }) {
   const { state, setState, loading, error, isDemo } = useLearner(demo);
@@ -31,7 +31,8 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<"" | "correct" | "incorrect">("");
   const [attempts, setAttempts] = useState<Record<string, number>>({});
-  const [answers, setAnswers] = useState<Array<{ lessonId: string; questionId: string; answer: string }>>([]);
+  const [answers, setAnswers] = useState<Array<{ lessonId: string; questionId: string; sourceQuestionId: string; answer: string }>>([]);
+  const [reviewSeed] = useState(createAssessmentId);
   const [finished, setFinished] = useState(false);
   const [recallStreak, setRecallStreak] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -45,7 +46,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   const savedGrade = suggestedLesson?.grade ?? savedNextLesson?.grade ?? 8;
   const trailHref = `/learn?grade=${savedGrade}${isDemo ? "&demo=1" : ""}`;
   const suggestedHref = suggestedLesson ? `/learn/${suggestedLesson.slug}?grade=${suggestedLesson.grade}${isDemo ? "&demo=1" : ""}` : trailHref;
-  const questionKey = question ? `${question.lessonId}:${question.questionId}` : "";
+  const questionKey = question ? `${question.lessonId}:${question.sourceQuestionId}:${question.questionId}` : "";
   const answerLocked = busy || feedback === "correct";
   const responseReady = question ? isResponseComplete(question, answer) : false;
   const recalledCount = index + (feedback === "correct" ? 1 : 0);
@@ -55,21 +56,21 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
 
   const demoQuestions = useMemo(() => {
     if (!state) return [];
-    const sourceLessons = state.completedLessons.map((entry) => lessonById.get(entry.id)).filter(Boolean);
-    const pool = (sourceLessons.length ? sourceLessons : [lessons[0]]).flatMap((lesson) => lesson!.practice.slice(0, 2).map((item) => ({ lessonId: lesson!.id, lessonTitle: lesson!.title, questionId: item.id, prompt: item.prompt, answer: item.answer, hint: item.hint, interaction: item.interaction, interactionConfig: item.interactionConfig, choices: item.choices })));
-    return Array.from({ length: Math.min(5, Math.max(3, state.dueReview)) }, (_, i) => pool[i % pool.length]);
-  }, [state]);
+    const sourceLessons = state.completedLessons.map((entry) => lessonById.get(entry.id)).filter((lesson) => lesson !== undefined);
+    const startingLesson = lessonById.get(state.nextLessonId) ?? lessons[0];
+    return buildDemoReviewQuestions(sourceLessons.length ? sourceLessons : [startingLesson], reviewSeed);
+  }, [state, reviewSeed]);
 
   useEffect(() => {
     if (!state || ready) return;
     if (isDemo) { setQuestions(demoQuestions); setReady(true); return; }
-    fetch("/api/review").then(async (response) => {
+    fetch(`/api/review?version=${ASSESSMENT_VERSION}`).then(async (response) => {
       const body = await response.json() as { questions?: ReviewQuestion[] };
       setQuestions(body.questions ?? []); setReady(true);
     }).catch(() => setReady(true));
   }, [isDemo, demoQuestions, ready, state]);
 
-  if (loading || !ready) return <LearningLoading glyph="◇" tone="teal" kicker="BUILDING A QUICK RECALL" title="Choosing today’s ideas…" detail="Up to five skills are coming back at the right time." />;
+  if (loading || !ready) return <LearningLoading glyph="◇" tone="teal" kicker="BUILDING A QUICK RECALL" title="Choosing today’s ideas…" detail="Up to five questions are coming back at the right time." />;
   if (!state || error) return <LearningSignInGate glyph="◇" kicker="PRIVATE RECALL" title="Sign in to open your review." detail="Only you can see which skills are ready to practice again." />;
   const activeState = state;
   if (!questions.length) return (
@@ -113,13 +114,14 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       const response = await fetch("/api/review", {
         method: "POST",
         headers: mutationHeaders(),
-        body: JSON.stringify({ action: "check", lessonId: question.lessonId, questionId: question.questionId, answer }),
+        body: JSON.stringify({ action: "check", version: ASSESSMENT_VERSION, lessonId: question.lessonId, questionId: question.questionId, sourceQuestionId: question.sourceQuestionId, answer }),
       });
-      const body = await response.json() as { correct?: boolean; hint?: string; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string };
+      const body = await response.json() as { correct?: boolean; hint?: string; explanation?: string; correctAnswers?: number; badgeUnlocks?: BadgeUnlock[]; error?: string };
       if (!response.ok) setErrorMessage(body.error ?? "We could not check that review answer.");
       else {
         if (body.correct && body.correctAnswers !== undefined) setState(applyBadgeProgress(activeState, body.correctAnswers, body.badgeUnlocks));
         if (body.badgeUnlocks?.length) setBadgeUnlocks(body.badgeUnlocks);
+        if (body.correct && typeof body.explanation === "string") setQuestions((current) => current.map((item, position) => position === index ? { ...item, explanation: body.explanation } : item));
         recordAnswerResult(Boolean(body.correct));
       }
     } catch {
@@ -130,7 +132,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
   }
   async function next() {
     if (busy) return;
-    const submitted = [...answers, { lessonId: question.lessonId, questionId: question.questionId, answer }];
+    const submitted = [...answers, { lessonId: question.lessonId, questionId: question.questionId, sourceQuestionId: question.sourceQuestionId, answer }];
     if (index < questions.length - 1) { setAnswers(submitted); setIndex((value) => value + 1); setAnswer(""); setFeedback(""); return; }
     setBusy(true);
     setErrorMessage("");
@@ -139,7 +141,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
         const nextState: LearnerState = { ...activeState, dueReview: 0, totalXp: activeState.totalXp + 20, weeklyXp: activeState.weeklyXp + 20 };
         saveDemoState(nextState); setState(nextState);
       } else {
-        const response = await fetch("/api/review", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "complete", answers: submitted }) });
+        const response = await fetch("/api/review", { method: "POST", headers: mutationHeaders(), body: JSON.stringify({ action: "complete", version: ASSESSMENT_VERSION, answers: submitted }) });
         const body = await response.json() as { state?: LearnerState; error?: string };
         if (!response.ok) { setErrorMessage(body.error ?? "We could not finish today’s review."); return; }
         if (body.state) setState(body.state);
@@ -161,7 +163,7 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       <section ref={contentStartRef} className="review-finish learning-content-start" tabIndex={-1}>
         {reviewAnchorLesson && <div className="review-finish-emblem"><TopicIcon visual={reviewAnchorLesson.visual} accent={reviewAnchorLesson.accent} size="xl" label="Daily Review completed" /><span aria-hidden="true">✓</span></div>}
         <span className="section-kicker">DAILY REVIEW COMPLETE</span>
-        <h1>{questions.length} skills back online.</h1>
+        <h1>{questions.length} questions completed.</h1>
         <p>They will return again when another quick recall will help them stick.</p>
         <div className="review-finish-reward"><span><strong>+20</strong> XP</span></div>
         <XpProgress totalXp={state.totalXp} previousXp={state.totalXp - 20} theme={state.profile.theme} completedLessons={state.completedLessons.length} variant="reward" />
@@ -181,15 +183,16 @@ export function ReviewPlayer({ demo }: { demo: boolean }) {
       </div>
       <section className="review-layout">
         <aside><span className="section-kicker">5-MINUTE REVIEW</span><h1>Keep it ready.</h1><p>Skills return after 1, 3, 7, and 14 days.</p><div className="review-schedule"><span className="done">1 day</span><i /><span>3 days</span><i /><span>7 days</span><i /><span>14 days</span></div><TaskProgress label="Review progress" completed={recalledCount} total={questions.length} accent="teal" /></aside>
-        <div ref={contentStartRef} className="review-card learning-content-start" tabIndex={-1} aria-label={`Review question ${index + 1} of ${questions.length}`} aria-busy={busy}>
+        <section ref={contentStartRef} className="review-card learning-content-start" tabIndex={-1} aria-label={`Review question ${index + 1} of ${questions.length}`} aria-busy={busy}>
           <FamilyLearningCue moment={feedback === "incorrect" ? "retry" : feedback === "correct" ? "success" : "practice"} />
-          <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()}</span><h2 data-learning-heading>{question.prompt}</h2></div></div></header>
+          <header><div className="review-question-heading">{questionLesson && <TopicIcon visual={questionLesson.visual} accent={questionLesson.accent} size="md" label={`${question.lessonTitle} review topic`} />}<div><span className="section-kicker">{question.lessonTitle.toUpperCase()} · {question.role === "transfer" ? "NEW CHALLENGE" : "RECALL"}</span><h2 data-learning-heading>{question.prompt}</h2></div></div></header>
           <QuestionResponse question={question} value={answer} disabled={answerLocked} invalid={feedback === "incorrect"} describedBy={errorMessage ? "review-answer-error" : feedback ? "review-answer-feedback" : undefined} onChange={(value) => { setAnswer(value); setFeedback(""); setErrorMessage(""); }} onSubmit={() => void check()} />
           {feedback === "incorrect" && <div id="review-answer-feedback" className="feedback-card incorrect recovery-feedback review-recovery" role="status"><span className="recovery-symbol" aria-hidden="true">↻</span><div><strong>Not yet—use the clue and retry.</strong><p>{question.hint}</p><small>A corrected answer earns the same review credit.</small></div></div>}
           {feedback === "correct" && <><AnswerImpact eventKey={`review-${question.lessonId}-${question.questionId}-chain-${recallStreak}`} label={currentFirstTry ? "RECALLED" : "CORRECTED"} chain={recallStreak} progress={recalledCount} total={questions.length} tone={questionLesson?.accent ?? "teal"} experienceLevel={state.completedLessons.length} /><div id="review-answer-feedback" className={`feedback-card correct feedback-celebration review-feedback ${currentFirstTry ? "first-try" : "recovered"}`} role="status"><span className="feedback-symbol" aria-hidden="true">✓</span><div><strong>{currentFirstTry ? recallStreak >= 3 ? `${recallStreak} correct in a row!` : "Recalled correctly!" : "Corrected!"}</strong><p>{index + 1} of {questions.length} complete.</p></div><span className="momentum-chip">{currentFirstTry && recallStreak > 1 ? `${recallStreak} in a row` : "Complete"}</span></div></>}
+          {feedback === "correct" && <QuestionExplanation key={questionKey} explanation={question.explanation} />}
           {errorMessage && <p id="review-answer-error" className="form-error" role="alert">{errorMessage}</p>}
           <div className="practice-actions review-actions">{feedback === "correct" ? <AutoAdvanceButton eventKey={`review-${question.lessonId}-${question.questionId}-${index}`} label={index === questions.length - 1 ? "Finish review" : "Next question"} busy={busy} busyLabel="Saving review…" onAdvance={next} /> : <button className="primary-button" type="button" onClick={check} disabled={!responseReady || busy} aria-busy={busy} aria-keyshortcuts="Enter">{busy ? "Checking…" : "Check answer"} <span>→</span></button>}</div>
-        </div>
+        </section>
       </section>
     </main>
   );

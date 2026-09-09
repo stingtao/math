@@ -2,11 +2,11 @@
 
 Math is a parent-guided English learning site for Grades 7–12. Sting built it as a parent who likes math and wanted a quiet place to sit beside his child, ask useful questions, practice together, and return for review.
 
-The site includes 55 regions, 253 lessons, 1,346 reviewed practice questions, mixed boss checks, spaced review, private family progress, and in-lesson prompts that help a parent listen before explaining. Only an adult parent or legal guardian signs in; a child does not receive an account. Public rankings, public posts, and advertising are disabled. A reviewed feedback area lets signed-in parents send corrections and ideas to the site owner without creating parent-to-parent messaging. Grade 8–12 includes graph-choice, table-choice, coordinate, number-line, and multi-select reasoning missions across every region. A public Linear Graph Lab lets a family type `y = mx + b` equations and see the graph, slope, intercept, nearby coordinates, and point table update without signing in or saving the input.
+The site includes 55 regions, 253 lessons, 1,778 reviewed practice questions, mixed boss checks, spaced review, private family progress, and in-lesson prompts that help a parent listen before explaining. Only an adult parent or legal guardian signs in; a child does not receive an account. Public rankings, public posts, and advertising are disabled. A reviewed feedback area lets signed-in parents send corrections and ideas to the site owner without creating parent-to-parent messaging. Grade 8–12 includes graph-choice, table-choice, coordinate, number-line, and multi-select reasoning missions across every region. A public Linear Graph Lab lets a family type `y = mx + b` equations and see the graph, slope, intercept, nearby coordinates, and point table update without signing in or saving the input.
 
 ## Local development
 
-Requirements: Node.js 22.13 or newer.
+Requirements: Node.js 22.15 or newer (the store regression tests use the built-in module-hook and SQLite APIs).
 
 ```bash
 npm install
@@ -37,4 +37,18 @@ npx wrangler types --check
 npx wrangler deploy --dry-run
 ```
 
-`npm test` builds the production app, validates all 253 lessons and 1,346 reviewed questions, runs 134,600 seeded answer checks, confirms the Grade 8 Quick Sheets, checks all 73 Grade 7, Grade 8, and high-school Common Core clusters plus the Algebra, state, AP, and Kang Chiao/IB extensions, verifies privacy boundaries, and exercises mutation, recovery-mastery, reward, responsive-layout, and security controls.
+`npm test` builds the production app, validates all 253 lessons and 1,778 reviewed questions, runs 177,800 answer-normalization checks plus independent calculations for the new content, confirms the Grade 8 Quick Sheets, checks all 73 Grade 7, Grade 8, and high-school Common Core clusters plus the Algebra, state, AP, and Kang Chiao/IB extensions, verifies privacy boundaries, and exercises mutation, recovery-mastery, reward, responsive-layout, and security controls.
+
+
+## Topic and assessment depth
+
+Three depth expansions add 432 questions across 72 lessons and 216 bounded objectives. The third round adds 24 lessons and 144 questions focused on scale, algebraic reasoning, geometry proofs, model evaluation, and calculus applications. Each objective has two authored variants, specific hints, and a worked explanation. The complete bank is separate from a short lesson session: upgraded lessons select six questions while preserving three distinct new objectives. Boss checks now include visual/reasoning questions; spaced review keeps the original due question and adds a same-objective transfer question when available.
+
+Saved lesson runs and Boss attempts keep their question sequence. Unfinished lesson runs can resume after reload; legacy run IDs retain the original question sequence. First-round `d1-` runs retain the first-round bank and selection; `d2-` runs retain both earlier rounds; new `d3-` runs can use all three rounds. Review keeps explicit `depth-v1`, `depth-v2`, and `depth-v3` contracts. Catalog and question IDs remain stable, with no database schema migration required.
+
+See [the generated coverage report](docs/curriculum-depth-report.md) and [full lesson matrix](docs/curriculum-depth-matrix.json) for evidence and remaining gaps. The other 181 lessons retain cluster-level coverage but await individual-objective auditing; this release does not claim complete AP or IB coverage.
+
+```bash
+npm run report:coverage
+node --experimental-strip-types scripts/report-curriculum-depth.ts --check
+```

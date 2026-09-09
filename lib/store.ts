@@ -1,4 +1,5 @@
 import { ensureSchema, getStore } from "@/db/bootstrap";
+import { selectBossQuestions, selectBossRepairQuestions, selectLessonQuestions } from "@/lib/assessment-selection";
 import { getGradeCurriculum, isAnswerCorrect, lessons, regions } from "@/lib/curriculum";
 import { getCookie, randomToken, sha256 } from "@/lib/security";
 import { getAvatarFrame } from "@/lib/avatar-frames";
@@ -290,33 +291,50 @@ function validateLessonRunId(runId: string) {
 async function activateLessonRun(learnerId: string, lessonId: string, runId: string) {
   validateLessonRunId(runId);
   const db = getStore();
-  const active = await db.prepare("SELECT run_id FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
-    .bind(learnerId, lessonId).first<{ run_id: string }>();
-  if (active?.run_id === runId) return;
+  const active = await db.prepare("SELECT run_id, completed FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
+    .bind(learnerId, lessonId).first<{ run_id: string; completed: number }>();
+  if (active?.run_id === runId && !active.completed) return;
+  if (active && (!active.completed || active.run_id === runId)) throw new Error("Reload to continue the saved lesson run.");
   const now = new Date().toISOString();
   await db.batch([
-    db.prepare("DELETE FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ?").bind(learnerId, lessonId),
-    db.prepare("DELETE FROM lesson_mastery_checks WHERE learner_id = ? AND lesson_id = ?").bind(learnerId, lessonId),
-    db.prepare("INSERT INTO lesson_runs (learner_id, lesson_id, run_id, completed, started_at, updated_at) VALUES (?, ?, ?, 0, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET run_id = excluded.run_id, completed = 0, started_at = excluded.started_at, updated_at = excluded.updated_at")
+    db.prepare("DELETE FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND EXISTS (SELECT 1 FROM lesson_runs WHERE learner_id = ? AND lesson_id = ? AND completed = 1 AND run_id != ?)").bind(learnerId, lessonId, learnerId, lessonId, runId),
+    db.prepare("DELETE FROM lesson_mastery_checks WHERE learner_id = ? AND lesson_id = ? AND EXISTS (SELECT 1 FROM lesson_runs WHERE learner_id = ? AND lesson_id = ? AND completed = 1 AND run_id != ?)").bind(learnerId, lessonId, learnerId, lessonId, runId),
+    db.prepare("INSERT INTO lesson_runs (learner_id, lesson_id, run_id, completed, started_at, updated_at) VALUES (?, ?, ?, 0, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET run_id = excluded.run_id, completed = 0, started_at = excluded.started_at, updated_at = excluded.updated_at WHERE lesson_runs.completed = 1 AND lesson_runs.run_id != excluded.run_id")
       .bind(learnerId, lessonId, runId, now, now),
   ]);
+  const saved = await db.prepare("SELECT run_id, completed FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?").bind(learnerId, lessonId).first<{ run_id: string; completed: number }>();
+  if (saved?.run_id !== runId || saved.completed) throw new Error("Reload to continue the saved lesson run.");
+}
+
+export async function getActiveLessonRun(learnerId: string, lessonId: string) {
+  await assertLessonUnlocked(learnerId, lessonId);
+  const db = getStore();
+  const run = await db.prepare("SELECT run_id FROM lesson_runs WHERE learner_id = ? AND lesson_id = ? AND completed = 0").bind(learnerId, lessonId).first<{ run_id: string }>();
+  if (!run) return null;
+  const [attempts, mastery] = await Promise.all([
+    db.prepare("SELECT question_id, first_correct, corrected, attempts, hints_used FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ?").bind(learnerId, lessonId).all<{ question_id: string; first_correct: number; corrected: number; attempts: number; hints_used: number }>(),
+    db.prepare("SELECT question_id, round, clean_corrected, attempts, hints_used FROM lesson_mastery_checks WHERE learner_id = ? AND lesson_id = ? AND run_id = ?").bind(learnerId, lessonId, run.run_id).all<{ question_id: string; round: number; clean_corrected: number; attempts: number; hints_used: number }>(),
+  ]);
+  return {
+    runId: run.run_id,
+    attempts: attempts.results.map((row) => ({ questionId: row.question_id, firstCorrect: Boolean(row.first_correct), corrected: Boolean(row.corrected), attempts: row.attempts, hintsUsed: row.hints_used })),
+    mastery: mastery.results.map((row) => ({ questionId: row.question_id, round: row.round, cleanCorrected: Boolean(row.clean_corrected), attempts: row.attempts, hintsUsed: row.hints_used })),
+  };
 }
 
 export async function recordAnswer(learnerId: string, lessonId: string, questionId: string, correct: boolean, usedHint: boolean, runId: string) {
   await ensureSchema();
-  await assertLessonUnlocked(learnerId, lessonId);
+  const lesson = await assertLessonUnlocked(learnerId, lessonId);
+  if (!selectLessonQuestions(lesson, runId).some((question) => question.id === questionId)) throw new Error("That question is not in this lesson run.");
   await activateLessonRun(learnerId, lessonId, runId);
   const db = getStore();
   const now = new Date();
-  const current = await db.prepare("SELECT first_correct, corrected, attempts, hints_used FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-    .bind(learnerId, lessonId, questionId).first<{ first_correct: number; corrected: number; attempts: number; hints_used: number }>();
-  if (!current) {
-    await db.prepare("INSERT INTO lesson_attempts (learner_id, lesson_id, question_id, first_correct, corrected, hints_used, attempts, updated_at) VALUES (?, ?, ?, ?, ?, ?, 1, ?)")
-      .bind(learnerId, lessonId, questionId, correct ? 1 : 0, correct ? 1 : 0, usedHint ? 1 : 0, now.toISOString()).run();
-  } else {
-    await db.prepare("UPDATE lesson_attempts SET corrected = ?, attempts = attempts + 1, hints_used = hints_used + ?, updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-      .bind(current.corrected || correct ? 1 : 0, usedHint ? 1 : 0, now.toISOString(), learnerId, lessonId, questionId).run();
-  }
+  const written = await db.prepare(`INSERT INTO lesson_attempts (learner_id, lesson_id, question_id, first_correct, corrected, hints_used, attempts, updated_at)
+    SELECT ?, ?, ?, ?, ?, ?, 1, ? WHERE EXISTS (SELECT 1 FROM lesson_runs WHERE learner_id = ? AND lesson_id = ? AND run_id = ? AND completed = 0)
+    ON CONFLICT(learner_id, lesson_id, question_id) DO UPDATE SET corrected = MAX(lesson_attempts.corrected, excluded.corrected),
+      attempts = lesson_attempts.attempts + 1, hints_used = lesson_attempts.hints_used + excluded.hints_used, updated_at = excluded.updated_at`)
+    .bind(learnerId, lessonId, questionId, correct ? 1 : 0, correct ? 1 : 0, usedHint ? 1 : 0, now.toISOString(), learnerId, lessonId, runId).run();
+  if (!written.meta.changes) throw new Error("Reload to continue the saved lesson run.");
   if (!correct || usedHint) {
     const due = new Date(now.getTime() + 86_400_000).toISOString();
     await db.prepare("INSERT INTO review_items (learner_id, lesson_id, question_id, stage, due_at) VALUES (?, ?, ?, 0, ?) ON CONFLICT(learner_id, lesson_id, question_id) DO UPDATE SET due_at = excluded.due_at")
@@ -333,31 +351,43 @@ export async function recordMasteryCheck(learnerId: string, lessonId: string, qu
   validateLessonRunId(runId);
   if (!Number.isInteger(round) || round < 0 || round > 20) throw new Error("Memory Check round is invalid.");
   const db = getStore();
-  const activeRun = await db.prepare("SELECT run_id, completed FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
-    .bind(learnerId, lessonId).first<{ run_id: string; completed: number }>();
-  if (!activeRun || activeRun.run_id !== runId || activeRun.completed) throw new Error("Finish the active lesson run before the Memory Check.");
-  const original = await db.prepare("SELECT corrected FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-    .bind(learnerId, lessonId, questionId).first<{ corrected: number }>();
-  if (!original?.corrected) throw new Error("Correct the practice question before its Memory Check.");
-  const current = await db.prepare("SELECT run_id, round, attempts, hints_used, clean_corrected FROM lesson_mastery_checks WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-    .bind(learnerId, lessonId, questionId).first<{ run_id: string; round: number; attempts: number; hints_used: number; clean_corrected: number }>();
-  if (current && current.run_id === runId && (round < current.round || round > current.round + 1)) throw new Error("Continue the current Memory Check round.");
-  if (!current && round !== 0) throw new Error("Start with the first Memory Check round.");
-  const sameRound = Boolean(current && current.run_id === runId && current.round === round);
-  const priorAttempts = sameRound ? current!.attempts : 0;
-  const cleanCorrected = correct && priorAttempts === 0 && !usedHint;
   const now = new Date().toISOString();
-  if (!current) {
-    await db.prepare("INSERT INTO lesson_mastery_checks (learner_id, lesson_id, question_id, run_id, round, attempts, hints_used, clean_corrected, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)")
-      .bind(learnerId, lessonId, questionId, runId, round, usedHint ? 1 : 0, cleanCorrected ? 1 : 0, now).run();
-  } else if (sameRound) {
-    await db.prepare("UPDATE lesson_mastery_checks SET attempts = attempts + 1, hints_used = hints_used + ?, clean_corrected = MAX(clean_corrected, ?), updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-      .bind(usedHint ? 1 : 0, cleanCorrected ? 1 : 0, now, learnerId, lessonId, questionId).run();
-  } else {
-    await db.prepare("UPDATE lesson_mastery_checks SET run_id = ?, round = ?, attempts = 1, hints_used = ?, clean_corrected = ?, updated_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-      .bind(runId, round, usedHint ? 1 : 0, cleanCorrected ? 1 : 0, now, learnerId, lessonId, questionId).run();
+  // The round transition and first-attempt decision share one database write.
+  // A second page arriving in the same round must increment its existing row.
+  const written = await db.prepare(`INSERT INTO lesson_mastery_checks
+      (learner_id, lesson_id, question_id, run_id, round, attempts, hints_used, clean_corrected, updated_at)
+    SELECT ?, ?, ?, ?, ?, 1, ?, ?, ?
+    WHERE EXISTS (SELECT 1 FROM lesson_runs WHERE learner_id = ? AND lesson_id = ? AND run_id = ? AND completed = 0)
+      AND EXISTS (SELECT 1 FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND question_id = ? AND corrected = 1)
+      AND (? = 0 OR EXISTS (SELECT 1 FROM lesson_mastery_checks
+        WHERE learner_id = ? AND lesson_id = ? AND question_id = ? AND run_id = ? AND round IN (?, ?)))
+    ON CONFLICT(learner_id, lesson_id, question_id) DO UPDATE SET
+      attempts = CASE WHEN lesson_mastery_checks.round = excluded.round THEN lesson_mastery_checks.attempts + 1 ELSE 1 END,
+      hints_used = CASE WHEN lesson_mastery_checks.round = excluded.round THEN lesson_mastery_checks.hints_used + excluded.hints_used ELSE excluded.hints_used END,
+      clean_corrected = CASE WHEN lesson_mastery_checks.round = excluded.round THEN lesson_mastery_checks.clean_corrected ELSE excluded.clean_corrected END,
+      round = excluded.round, updated_at = excluded.updated_at
+    WHERE lesson_mastery_checks.run_id = excluded.run_id
+      AND excluded.round BETWEEN lesson_mastery_checks.round AND lesson_mastery_checks.round + 1
+      AND (excluded.round = lesson_mastery_checks.round OR lesson_mastery_checks.clean_corrected = 0)
+    RETURNING attempts, clean_corrected`)
+    .bind(learnerId, lessonId, questionId, runId, round, usedHint ? 1 : 0, correct && !usedHint ? 1 : 0, now,
+      learnerId, lessonId, runId, learnerId, lessonId, questionId,
+      round, learnerId, lessonId, questionId, runId, round, round - 1)
+    .first<{ attempts: number; clean_corrected: number }>();
+  if (!written) {
+    const activeRun = await db.prepare("SELECT run_id, completed FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
+      .bind(learnerId, lessonId).first<{ run_id: string; completed: number }>();
+    if (!activeRun || activeRun.run_id !== runId || activeRun.completed) throw new Error("Reload to continue the saved lesson run.");
+    const original = await db.prepare("SELECT corrected FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
+      .bind(learnerId, lessonId, questionId).first<{ corrected: number }>();
+    if (!original?.corrected) throw new Error("Correct the practice question before its Memory Check.");
+    const current = await db.prepare("SELECT run_id, round FROM lesson_mastery_checks WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
+      .bind(learnerId, lessonId, questionId).first<{ run_id: string; round: number }>();
+    if (!current && round !== 0) throw new Error("Start with the first Memory Check round.");
+    if (current?.run_id === runId && round > current.round + 1) throw new Error("Continue the current Memory Check round.");
+    throw new Error("Reload to continue the saved lesson run.");
   }
-  return { cleanCorrected };
+  return { cleanCorrected: correct && !usedHint && written.attempts === 1 && Boolean(written.clean_corrected) };
 }
 
 export async function claimMutation(learnerId: string, key: string | null, route: string) {
@@ -404,11 +434,27 @@ export async function creditCorrectAnswer(learnerId: string, creditKey: string, 
   return { correctAnswers, badgeUnlocks };
 }
 
-export async function getDueReviewItems(learnerId: string) {
+export async function getDueReviewItems(learnerId: string, limit = 5) {
   await ensureSchema();
-  const result = await getStore().prepare("SELECT lesson_id, question_id, stage FROM review_items WHERE learner_id = ? AND due_at <= ? ORDER BY due_at LIMIT 5")
+  if (limit === 5) {
+    const legacy = await getStore().prepare("SELECT lesson_id, question_id, stage FROM review_items WHERE learner_id = ? AND due_at <= ? ORDER BY due_at LIMIT 5")
+      .bind(learnerId, new Date().toISOString()).all<{ lesson_id: string; question_id: string; stage: number }>();
+    return legacy.results;
+  }
+  const result = await getStore().prepare("SELECT lesson_id, question_id, stage FROM review_items WHERE learner_id = ? AND due_at <= ? ORDER BY due_at, lesson_id, question_id LIMIT 30")
     .bind(learnerId, new Date().toISOString()).all<{ lesson_id: string; question_id: string; stage: number }>();
-  return result.results;
+  const count = Math.max(1, Math.min(5, limit));
+  const selected: typeof result.results = [];
+  // Keep the oldest item, then give other lessons a turn before filling spare slots.
+  for (const item of result.results) {
+    if (selected.length >= count) break;
+    if (!selected.some((entry) => entry.lesson_id === item.lesson_id)) selected.push(item);
+  }
+  for (const item of result.results) {
+    if (selected.length >= count) break;
+    if (!selected.includes(item)) selected.push(item);
+  }
+  return selected;
 }
 
 export async function completeReviewSet(learnerId: string, results: Array<{ lessonId: string; questionId: string; correct: boolean }>, rewardDate: string) {
@@ -417,16 +463,16 @@ export async function completeReviewSet(learnerId: string, results: Array<{ less
   const now = new Date();
   const intervals = [1, 3, 7, 14];
   for (const result of results) {
-    const row = await db.prepare("SELECT stage FROM review_items WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-      .bind(learnerId, result.lessonId, result.questionId).first<{ stage: number }>();
+    const row = await db.prepare("SELECT stage FROM review_items WHERE learner_id = ? AND lesson_id = ? AND question_id = ? AND due_at <= ?")
+      .bind(learnerId, result.lessonId, result.questionId, now.toISOString()).first<{ stage: number }>();
     if (!row) continue;
     if (result.correct && row.stage >= 3) {
-      await db.prepare("DELETE FROM review_items WHERE learner_id = ? AND lesson_id = ? AND question_id = ?").bind(learnerId, result.lessonId, result.questionId).run();
+      await db.prepare("DELETE FROM review_items WHERE learner_id = ? AND lesson_id = ? AND question_id = ? AND stage = ? AND due_at <= ?").bind(learnerId, result.lessonId, result.questionId, row.stage, now.toISOString()).run();
     } else {
       const nextStage = result.correct ? row.stage + 1 : 0;
       const days = result.correct ? intervals[Math.min(nextStage, intervals.length - 1)] : intervals[0];
-      await db.prepare("UPDATE review_items SET stage = ?, due_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ?")
-        .bind(nextStage, new Date(now.getTime() + days * 86_400_000).toISOString(), learnerId, result.lessonId, result.questionId).run();
+      await db.prepare("UPDATE review_items SET stage = ?, due_at = ? WHERE learner_id = ? AND lesson_id = ? AND question_id = ? AND stage = ? AND due_at <= ?")
+        .bind(nextStage, new Date(now.getTime() + days * 86_400_000).toISOString(), learnerId, result.lessonId, result.questionId, row.stage, now.toISOString()).run();
     }
   }
   await awardXp(learnerId, "review", rewardDate, 20);
@@ -435,14 +481,17 @@ export async function completeReviewSet(learnerId: string, results: Array<{ less
 export async function completeLesson(learnerId: string, lessonId: string, runId: string) {
   await ensureSchema();
   const db = getStore();
-  const lesson = await assertLessonUnlocked(learnerId, lessonId);
+  const sourceLesson = await assertLessonUnlocked(learnerId, lessonId);
+  const lesson = { ...sourceLesson, practice: selectLessonQuestions(sourceLesson, runId) };
   validateLessonRunId(runId);
   const activeRun = await db.prepare("SELECT run_id, completed FROM lesson_runs WHERE learner_id = ? AND lesson_id = ?")
     .bind(learnerId, lessonId).first<{ run_id: string; completed: number }>();
   if (!activeRun || activeRun.run_id !== runId || activeRun.completed) throw new Error("Finish the active lesson run before saving it.");
-  const summary = await db.prepare("SELECT COUNT(*) AS total, SUM(first_correct) AS first_correct, SUM(hints_used) AS hints FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND corrected = 1")
-    .bind(learnerId, lessonId).first<{ total: number; first_correct: number; hints: number }>();
-  if (Number(summary?.total ?? 0) < lesson.practice.length) throw new Error("Correct every practice question before completing the lesson.");
+  const attempts = await db.prepare("SELECT question_id, first_correct, hints_used FROM lesson_attempts WHERE learner_id = ? AND lesson_id = ? AND corrected = 1")
+    .bind(learnerId, lessonId).all<{ question_id: string; first_correct: number; hints_used: number }>();
+  const byQuestion = new Map(attempts.results.map((entry) => [entry.question_id, entry]));
+  if (lesson.practice.some((question) => !byQuestion.has(question.id))) throw new Error("Correct every practice question before completing the lesson.");
+  const summary = lesson.practice.reduce((sum, question) => ({ first_correct: sum.first_correct + Number(byQuestion.get(question.id)!.first_correct), hints: sum.hints + Number(byQuestion.get(question.id)!.hints_used) }), { first_correct: 0, hints: 0 });
   const recovery = await db.prepare(`SELECT COUNT(*) AS total, SUM(CASE WHEN m.clean_corrected = 1 THEN 1 ELSE 0 END) AS mastered
     FROM lesson_attempts a
     LEFT JOIN lesson_mastery_checks m ON m.learner_id = a.learner_id AND m.lesson_id = a.lesson_id AND m.question_id = a.question_id AND m.run_id = ?
@@ -456,7 +505,9 @@ export async function completeLesson(learnerId: string, lessonId: string, runId:
   const firstCorrect = Number(summary?.first_correct ?? 0);
   const stars = firstCorrect === lesson.practice.length && Number(summary?.hints ?? 0) === 0 ? 3 : firstCorrect >= Math.ceil(lesson.practice.length * 0.8) || recoveryTotal > 0 && recoveryMastered === recoveryTotal ? 2 : 1;
   const reward = calculateLessonReward(Number(previous?.stars ?? 0), stars);
-  await db.prepare("INSERT INTO lesson_progress (learner_id, lesson_id, stars, first_correct_count, question_count, completed_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET stars = MAX(stars, excluded.stars), first_correct_count = MAX(first_correct_count, excluded.first_correct_count), question_count = excluded.question_count")
+  await db.prepare(`INSERT INTO lesson_progress (learner_id, lesson_id, stars, first_correct_count, question_count, completed_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(learner_id, lesson_id) DO UPDATE SET stars = MAX(stars, excluded.stars),
+    first_correct_count = CASE WHEN excluded.first_correct_count * question_count >= first_correct_count * excluded.question_count THEN excluded.first_correct_count ELSE first_correct_count END,
+    question_count = CASE WHEN excluded.first_correct_count * question_count >= first_correct_count * excluded.question_count THEN excluded.question_count ELSE question_count END`)
     .bind(learnerId, lessonId, stars, firstCorrect, lesson.practice.length, new Date().toISOString()).run();
   let baseXp = 0;
   let starXp = 0;
@@ -565,7 +616,7 @@ async function getOrCreateBossAttempt(learnerId: string, regionId: number, attem
 
 export async function checkBossAnswer(learnerId: string, regionId: number, attemptId: string, questionIndex: number, answer: string) {
   const region = await assertBossUnlocked(learnerId, regionId);
-  const questions = [...region.lessons.map((item) => item.practice[0]), region.lessons[0].practice[1]];
+  const questions = selectBossQuestions(region, attemptId);
   if (!Number.isInteger(questionIndex) || questionIndex < 0 || questionIndex >= questions.length) throw new Error("Boss question not found.");
   const attempt = await getOrCreateBossAttempt(learnerId, regionId, attemptId);
   if (attempt.cleared) return { resynced: true, hint: null, ...publicBossAttempt(attempt) };
@@ -598,8 +649,7 @@ export async function checkBossRepairAnswer(learnerId: string, regionId: number,
     FROM boss_attempts WHERE learner_id = ? AND region_id = ? AND attempt_id = ?`).bind(learnerId, regionId, attemptId).first<BossAttemptRow>();
   if (!attempt || !attempt.failed || attempt.failed_question === null) throw new Error("This boss attempt does not need repair.");
   if (repairIndex !== attempt.repair_step || repairIndex < 0 || repairIndex > 1) throw new Error("Complete the repair questions in order.");
-  const lesson = region.lessons[Math.min(attempt.failed_question, region.lessons.length - 1)];
-  const question = lesson.practice[repairIndex + 2];
+  const question = selectBossRepairQuestions(region, attemptId, attempt.failed_question)[repairIndex];
   const correct = isAnswerCorrect(answer, question.answer);
   if (!correct) return { correct: false, hint: question.hint, ...publicBossAttempt(attempt), repaired: false };
   const repaired = repairIndex === 1;

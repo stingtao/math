@@ -1,0 +1,5580 @@
+{
+  "version": "depth-v3",
+  "statistics": {
+    "grades": 6,
+    "regions": 55,
+    "lessons": 253,
+    "bosses": 55,
+    "questions": 1778,
+    "auditedLessons": 72,
+    "auditedObjectives": 216,
+    "addedQuestions": 432
+  },
+  "rounds": {
+    "depth-v1": {
+      "lessons": 24,
+      "objectives": 72,
+      "questions": 144
+    },
+    "depth-v2": {
+      "lessons": 24,
+      "objectives": 72,
+      "questions": 144
+    },
+    "depth-v3": {
+      "lessons": 24,
+      "objectives": 72,
+      "questions": 144
+    }
+  },
+  "lessons": [
+    {
+      "lessonId": "g7-r701-l1",
+      "lessonSlug": "g7-unit-rates",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r701-l2",
+      "lessonSlug": "g7-proportional-tables",
+      "grade": 7,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-proportional-tables:complete-ratio",
+          "description": "Find a unit ratio and use it to complete a proportional relationship.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-proportional-tables:read-ratio-table",
+          "description": "Distinguish constant ratios from constant differences in a numerical table.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-proportional-tables:test-proportional-model",
+          "description": "Decide whether a contextual rule is proportional, including the effect of a fixed fee.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Graphs of proportional relationships with fractional and negative coordinates.",
+        "Learner-designed proportional models with explicit limitations and measurement uncertainty."
+      ]
+    },
+    {
+      "lessonId": "g7-r701-l3",
+      "lessonSlug": "g7-proportional-graphs",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r701-l4",
+      "lessonSlug": "g7-scale-drawings",
+      "grade": 7,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-scale-drawings:d3:scale-rectangular-area",
+          "description": "Convert both scaled side lengths to real units before calculating a rectangular area.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-scale-drawings:d3:audit-plan-dimensions",
+          "description": "Read proposed drawing dimensions and check both against a specified real rectangle and scale.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-scale-drawings:d3:revise-resized-map-scale",
+          "description": "Determine the real distance per drawing unit after a map is enlarged or reduced uniformly.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Constructing a scale drawing interactively and checking angles or irregular shapes.",
+        "Area comparisons for composite scale drawings and interpreting inaccurate or distorted maps."
+      ]
+    },
+    {
+      "lessonId": "g7-r702-l1",
+      "lessonSlug": "g7-add-rational-numbers",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r702-l2",
+      "lessonSlug": "g7-subtract-rational-numbers",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r702-l3",
+      "lessonSlug": "g7-multiply-divide-rationals",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r702-l4",
+      "lessonSlug": "g7-rational-word-problems",
+      "grade": 7,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-rational-word-problems:d3:recover-signed-start",
+          "description": "Recover a starting quantity by reversing a sequence of positive and negative decimal changes.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-rational-word-problems:d3:trace-signed-ledger",
+          "description": "Read a sequence of signed changes and locate the first running value crossing a stated threshold.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-rational-word-problems:d3:distinguish-net-and-travel",
+          "description": "Distinguish signed displacement from total distance across a two-stage route with a reversal.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Longer rational-number models combining fractional rates, repeated changes, and unknown durations.",
+        "Drawing a complete signed route and distinguishing distance, speed, and signed velocity."
+      ]
+    },
+    {
+      "lessonId": "g7-r703-l1",
+      "lessonSlug": "g7-equivalent-expressions",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r703-l2",
+      "lessonSlug": "g7-multi-step-equations-g7",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r703-l3",
+      "lessonSlug": "g7-inequalities-g7",
+      "grade": 7,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-inequalities-g7:d3:interpret-integer-bound",
+          "description": "Solve a two-step contextual bound and choose the feasible whole-number minimum or maximum.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-inequalities-g7:d3:read-dual-bound-data",
+          "description": "Read option measurements and apply both inclusive and strict constraints to select a feasible option.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-inequalities-g7:d3:justify-negative-division",
+          "description": "Explain the sign reversal needed when solving a two-step inequality with a negative coefficient.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Constructing complete shaded solution rays with open and closed endpoints.",
+        "Writing and comparing multi-constraint models from longer contexts with rational coefficients."
+      ]
+    },
+    {
+      "lessonId": "g7-r703-l4",
+      "lessonSlug": "g7-equation-word-models",
+      "grade": 7,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-equation-word-models:solve-fee-model",
+          "description": "Translate and solve a fixed amount plus equal groups equation.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-equation-word-models:read-budget-table",
+          "description": "Use a cost table to identify the greatest affordable whole-number quantity.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-equation-word-models:round-feasible-count",
+          "description": "Interpret fractional solutions under at-least and at-most whole-number constraints.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Multi-step models with variables on both sides and negative contextual quantities.",
+        "Student-authored equations and critique of assumptions in an unfamiliar story."
+      ]
+    },
+    {
+      "lessonId": "g7-r704-l1",
+      "lessonSlug": "g7-percent-change",
+      "grade": 7,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-percent-change:d2:recover-original",
+          "description": "Recover an original amount by dividing the final amount by its percentage multiplier.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-percent-change:d2:compare-relative-changes",
+          "description": "Compare percentage increases across a table with different starting amounts.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-percent-change:d2:compose-percent-changes",
+          "description": "Explain why equal percentage increases and decreases do not cancel when the base changes.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Percent-error models with measured reference values.",
+        "Comparing long sequences of percentage changes and interpreting rounded published rates."
+      ]
+    },
+    {
+      "lessonId": "g7-r704-l2",
+      "lessonSlug": "g7-discount-markup",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r704-l3",
+      "lessonSlug": "g7-tax-tip-commission",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r704-l4",
+      "lessonSlug": "g7-simple-interest",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r704-l5",
+      "lessonSlug": "g7-percent-decision-chains",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r705-l1",
+      "lessonSlug": "g7-constructing-triangles",
+      "grade": 7,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-constructing-triangles:d2:count-valid-sides",
+          "description": "Use both strict triangle-inequality bounds to count possible positive integer third-side lengths.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-constructing-triangles:d2:audit-triangle-designs",
+          "description": "Read proposed side measurements and check both triangle validity and a material budget.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-constructing-triangles:d2:decide-triangle-uniqueness",
+          "description": "Distinguish conditions fixing one triangle up to congruence from conditions allowing different sizes.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Interactive compass-and-straightedge construction and checking the resulting figure.",
+        "Included-angle and ambiguous side-angle conditions, with geometric explanations of uniqueness."
+      ]
+    },
+    {
+      "lessonId": "g7-r705-l2",
+      "lessonSlug": "g7-angle-equations",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r705-l3",
+      "lessonSlug": "g7-circle-measures",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r705-l4",
+      "lessonSlug": "g7-scale-area",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r706-l1",
+      "lessonSlug": "g7-composite-area",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r706-l2",
+      "lessonSlug": "g7-prism-volume",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r706-l3",
+      "lessonSlug": "g7-surface-area",
+      "grade": 7,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-surface-area:sum-prism-faces",
+          "description": "Calculate the surface area of a closed rectangular prism from its dimensions.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-surface-area:audit-face-table",
+          "description": "Match a face-area table to the dimensions of a rectangular prism.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-surface-area:remove-exposed-face",
+          "description": "Adjust a surface-area model when a box has no lid and explain which face is removed.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Triangular prisms and compound solids with hidden shared faces.",
+        "Building and comparing actual nets, including tabs, waste, and unit conversions."
+      ]
+    },
+    {
+      "lessonId": "g7-r706-l4",
+      "lessonSlug": "g7-cross-sections",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r707-l1",
+      "lessonSlug": "g7-random-samples",
+      "grade": 7,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-random-samples:d2:allocate-sample",
+          "description": "Calculate a group's sample allocation when groups are sampled in proportion to population size.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-random-samples:d2:compare-sample-estimates",
+          "description": "Read sample counts of different sizes and compare their proportions with a known population proportion.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-random-samples:d2:evaluate-response-bias",
+          "description": "Evaluate whether selection and response mechanisms support generalizing a survey result.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Running repeated-sampling simulations and describing the resulting sampling distribution.",
+        "Unequal selection probabilities, weighting, and formal uncertainty intervals."
+      ]
+    },
+    {
+      "lessonId": "g7-r707-l2",
+      "lessonSlug": "g7-center-spread",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r707-l3",
+      "lessonSlug": "g7-compare-distributions",
+      "grade": 7,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-compare-distributions:compute-mean-mad",
+          "description": "Calculate a mean and mean absolute deviation for a small data set.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-compare-distributions:compare-data-table",
+          "description": "Use numerical data in a table to compare both typical value and variability.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-compare-distributions:qualify-group-claim",
+          "description": "Make a group comparison without assuming every individual follows the group center.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Comparisons based on actual dot plots and box plots, including outliers and skew.",
+        "Repeated-sample simulations and separation of group means measured in multiples of MAD."
+      ]
+    },
+    {
+      "lessonId": "g7-r707-l4",
+      "lessonSlug": "g7-informal-inference",
+      "grade": 7,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-informal-inference:d3:compare-projected-counts",
+          "description": "Estimate a difference between population counts using proportions from random samples of different sizes.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-informal-inference:d3:read-repeated-sample-variation",
+          "description": "Compare the observed ranges of estimates across repeated random samples without treating those ranges as guarantees.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-informal-inference:d3:qualify-threshold-claim",
+          "description": "Check whether a stated plausible sampling-variation range supports a claim that a population proportion is above or below one half.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Creating repeated-sampling simulations and interpreting their full distributions.",
+        "Formal interval procedures, confidence levels, and unequal population sizes or sampling weights."
+      ]
+    },
+    {
+      "lessonId": "g7-r708-l1",
+      "lessonSlug": "g7-probability-scale",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r708-l2",
+      "lessonSlug": "g7-experimental-probability",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g7-r708-l3",
+      "lessonSlug": "g7-compound-events",
+      "grade": 7,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g7-compound-events:d2:update-without-replacement",
+          "description": "Calculate two same-color draws without replacement by updating both the favorable count and total.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-compound-events:d2:read-joint-outcomes",
+          "description": "Read recorded two-stage outcome frequencies and compare the outcomes satisfying an exactly-one condition.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g7-compound-events:d2:justify-complement",
+          "description": "Use the complement of no successes to calculate at least one success in independent trials.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Constructing full probability trees and systematic sample-space diagrams.",
+        "Longer dependent sequences and comparisons between empirical and theoretical probabilities."
+      ]
+    },
+    {
+      "lessonId": "g7-r708-l4",
+      "lessonSlug": "g7-sample-spaces",
+      "grade": 7,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r1-l1",
+      "lessonSlug": "math-symbols",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r1-l2",
+      "lessonSlug": "signed-numbers",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r1-l3",
+      "lessonSlug": "sign-rules",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r1-l4",
+      "lessonSlug": "order-of-operations",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r2-l1",
+      "lessonSlug": "fractions",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r2-l2",
+      "lessonSlug": "adding-fractions",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r2-l3",
+      "lessonSlug": "decimals",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r2-l4",
+      "lessonSlug": "percent",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r3-l1",
+      "lessonSlug": "algebra-language",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r3-l2",
+      "lessonSlug": "substitution",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r3-l3",
+      "lessonSlug": "one-step-equations",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r3-l4",
+      "lessonSlug": "two-step-equations",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r4-l1",
+      "lessonSlug": "powers",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r4-l2",
+      "lessonSlug": "exponent-rules",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r4-l3",
+      "lessonSlug": "distributive-property",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r4-l4",
+      "lessonSlug": "negative-distribution",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r5-l1",
+      "lessonSlug": "repeating-decimals",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r5-l2",
+      "lessonSlug": "rational-irrational",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r5-l3",
+      "lessonSlug": "square-cube-roots",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r5-l4",
+      "lessonSlug": "approximating-irrationals",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r6-l1",
+      "lessonSlug": "exponents-parentheses",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r6-l2",
+      "lessonSlug": "zero-negative-exponents",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r6-l3",
+      "lessonSlug": "scientific-notation",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r6-l4",
+      "lessonSlug": "scientific-operations",
+      "grade": 8,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "scientific-operations:d3:align-scientific-powers",
+          "description": "Add or subtract quantities with different powers of ten and express the result in normalized scientific notation.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "scientific-operations:d3:compare-scientific-totals",
+          "description": "Read scientific-notation measurements and counts to compare total quantities across rows.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "scientific-operations:d3:calculate-scientific-duration",
+          "description": "Divide a scientific-notation quantity by a compatible rate and interpret the resulting duration and units.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Mixed-operation expressions with several normalization steps and significant-figure constraints.",
+        "Scientific notation in measured data with uncertainty and cross-unit rate conversions."
+      ]
+    },
+    {
+      "lessonId": "g8-r7-l1",
+      "lessonSlug": "combining-like-terms",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r7-l2",
+      "lessonSlug": "multi-step-equations",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r7-l3",
+      "lessonSlug": "solution-types",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r7-l4",
+      "lessonSlug": "coordinate-plane",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r8-l1",
+      "lessonSlug": "slope-rate",
+      "grade": 8,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "slope-rate:calculate-signed-slope",
+          "description": "Calculate a signed rate from two points with a consistent subtraction order.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "slope-rate:match-slope-graph",
+          "description": "Match a numerical relationship to a line graph using both slope and intercept.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "slope-rate:interpret-signed-rate",
+          "description": "Interpret a signed rate in context and distinguish rate from starting amount.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Estimating slopes from noisy observations and nonlinear intervals.",
+        "Explaining slope invariance with similar triangles and handling vertical lines in contextual data."
+      ]
+    },
+    {
+      "lessonId": "g8-r8-l2",
+      "lessonSlug": "graphing-lines",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r8-l3",
+      "lessonSlug": "systems-graphing",
+      "grade": 8,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "systems-graphing:calculate-intersection",
+          "description": "Calculate and verify the common point of two nonparallel lines.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "systems-graphing:plot-common-point",
+          "description": "Place a point satisfying two line equations on a coordinate grid.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "systems-graphing:explain-solution-count",
+          "description": "Use slopes and intercepts to justify no, one, or infinitely many solutions.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Reading approximate intersections of two simultaneously drawn graphs.",
+        "Systems with rational intersection coordinates and graph-window limitations."
+      ]
+    },
+    {
+      "lessonId": "g8-r8-l4",
+      "lessonSlug": "systems-algebra",
+      "grade": 8,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "systems-algebra:d3:solve-scaled-elimination",
+          "description": "Solve a two-variable system by scaling equations before eliminating one variable.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "systems-algebra:d3:plot-algebraic-system-solution",
+          "description": "Solve a two-equation system and locate its common ordered-pair solution on a coordinate grid.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "systems-algebra:d3:classify-expanded-systems",
+          "description": "Expand and compare equations to distinguish an inconsistent system from equivalent equations.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Choosing efficient algebraic methods across systems with fractional coefficients.",
+        "Contextual systems with physical restrictions and comparisons between exact and graph-estimated solutions."
+      ]
+    },
+    {
+      "lessonId": "g8-r9-l1",
+      "lessonSlug": "function-rules",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r9-l2",
+      "lessonSlug": "function-representations",
+      "grade": 8,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "function-representations:d2:recover-linear-intercept",
+          "description": "Recover the initial value of a linear function from two observations with nonzero inputs.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "function-representations:d2:match-nonlinear-data-graph",
+          "description": "Match a displayed graph to several tabulated outputs, distinguishing a parabola from an absolute-value graph.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "function-representations:d2:restrict-context-domain",
+          "description": "Choose a model's input domain using both contextual bounds and whether the input is discrete or continuous.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Constructing a complete graph from a table rather than selecting a provided graph.",
+        "Matching piecewise functions across graphs, tables, and verbal rules."
+      ]
+    },
+    {
+      "lessonId": "g8-r9-l3",
+      "lessonSlug": "comparing-functions",
+      "grade": 8,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "comparing-functions:d2:solve-function-crossover",
+          "description": "Find the input at which two linear functions with different initial values have equal outputs.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "comparing-functions:d2:compare-graph-rate-start",
+          "description": "Read a graph's slope and intercept to compare both rate and initial value with a specified function.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "comparing-functions:d2:compare-cost-ranges",
+          "description": "Use a crossover and the direction of each rate to identify the range where one cost model is cheaper.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Comparisons involving piecewise pricing or nonlinear functions.",
+        "Estimating and checking a crossover from a graph with measurement uncertainty."
+      ]
+    },
+    {
+      "lessonId": "g8-r9-l4",
+      "lessonSlug": "linear-nonlinear",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r10-l1",
+      "lessonSlug": "rigid-transformations",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r10-l2",
+      "lessonSlug": "coordinate-transformations",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r10-l3",
+      "lessonSlug": "congruence",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r10-l4",
+      "lessonSlug": "dilations-similarity",
+      "grade": 8,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "dilations-similarity:calculate-scale",
+          "description": "Find an image-to-original scale factor and calculate another corresponding length.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "dilations-similarity:plot-dilation",
+          "description": "Apply a dilation centered at the origin to a point on a coordinate grid.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "dilations-similarity:test-similar-shapes",
+          "description": "Check whether corresponding lengths all share one scale factor in a contextual enlargement.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Dilations about centers other than the origin and compositions with rigid motions.",
+        "Constructing and justifying similarity transformations for complete figures."
+      ]
+    },
+    {
+      "lessonId": "g8-r10-l5",
+      "lessonSlug": "g8-composed-transformations",
+      "grade": 8,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g8-composed-transformations:d3:undo-transformation-sequence",
+          "description": "Recover a preimage by undoing a translation and then a reflection or rotation in reverse order.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g8-composed-transformations:d3:plot-composed-image",
+          "description": "Apply two specified rigid transformations in order and plot the final image of a point.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g8-composed-transformations:d3:compare-transformation-order",
+          "description": "Calculate both orders of a transformation pair to demonstrate when the final images differ.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Transforming entire figures with connected edges and describing orientation changes visually.",
+        "Classifying general compositions and proving equivalence beyond checking a single point."
+      ]
+    },
+    {
+      "lessonId": "g8-r11-l1",
+      "lessonSlug": "angle-relationships",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r11-l2",
+      "lessonSlug": "triangle-angles",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r11-l3",
+      "lessonSlug": "pythagorean-theorem",
+      "grade": 8,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "pythagorean-theorem:d2:calculate-space-diagonal",
+          "description": "Apply the Pythagorean theorem twice to find a right rectangular box's space diagonal.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "pythagorean-theorem:d2:compare-box-measurements",
+          "description": "Read three-dimensional measurements in a table and identify a box with a specified space diagonal.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "pythagorean-theorem:d2:check-right-angle-model",
+          "description": "Decide whether a context supplies the right angle required by a proposed Pythagorean calculation.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Constructing or reading a three-dimensional diagram with hidden edges rather than a measurement table.",
+        "Geometric proofs and applications to coordinates with irrational distances."
+      ]
+    },
+    {
+      "lessonId": "g8-r11-l4",
+      "lessonSlug": "coordinate-distance",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r12-l1",
+      "lessonSlug": "cylinder-volume",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r12-l2",
+      "lessonSlug": "cone-volume",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r12-l3",
+      "lessonSlug": "sphere-volume",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r12-l4",
+      "lessonSlug": "mixed-volume",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g8-r13-l1",
+      "lessonSlug": "scatter-plots",
+      "grade": 8,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "scatter-plots:quantify-pattern-departure",
+          "description": "Calculate how far a plotted observation lies vertically from a stated linear pattern.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "scatter-plots:read-coordinate-data",
+          "description": "Use actual paired coordinate data to identify direction and relative strength of association.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "scatter-plots:limit-association-claim",
+          "description": "Distinguish an observational association from a causal claim when another factor could affect both variables.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Direct reading and creation of actual scatter-plot graphics, including clusters and nonlinear form.",
+        "Comparing line fits and outlier influence using larger realistic data sets."
+      ]
+    },
+    {
+      "lessonId": "g8-r13-l2",
+      "lessonSlug": "lines-of-fit",
+      "grade": 8,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "lines-of-fit:d3:derive-representative-line",
+          "description": "Construct a line through two specified representative points and use it to interpolate another output.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "lines-of-fit:d3:compare-record-residuals",
+          "description": "Read observed coordinates and compare signed residuals relative to a supplied model.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "lines-of-fit:d3:compare-total-absolute-error",
+          "description": "Compare two proposed lines using an explicitly specified sum of absolute residuals across every observation.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Reading or drawing an actual scatter plot and fitted line with residual segments.",
+        "Least-squares fitting, influential observations, and checking predictions on new data."
+      ]
+    },
+    {
+      "lessonId": "g8-r13-l3",
+      "lessonSlug": "two-way-tables",
+      "grade": 8,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "two-way-tables:d2:recover-conditional-proportion",
+          "description": "Recover a missing joint count from group totals, then use the correct group denominator for a conditional proportion.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "two-way-tables:d2:rank-within-group-rates",
+          "description": "Read two-way count tables and compare within-group rates rather than raw favorable counts.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "two-way-tables:d2:evaluate-rate-association",
+          "description": "Explain why different favorable counts do not show a rate difference when group sizes differ.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Creating and completing an interactive two-way table with marginal totals.",
+        "Distinguishing association from causation and investigating confounding across a third variable."
+      ]
+    },
+    {
+      "lessonId": "g8-r13-l4",
+      "lessonSlug": "probability",
+      "grade": 8,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r901-l1",
+      "lessonSlug": "g9-algebraic-structure",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r901-l2",
+      "lessonSlug": "g9-evaluate-formulas",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r901-l3",
+      "lessonSlug": "g9-properties-real-numbers",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r901-l4",
+      "lessonSlug": "g9-literal-equations",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r901-l5",
+      "lessonSlug": "g9-quantities-units-precision",
+      "grade": 9,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-quantities-units-precision:d2:convert-rate-time-units",
+          "description": "Calculate a quantity from rate and time after converting incompatible units.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-quantities-units-precision:d2:compare-mixed-unit-data",
+          "description": "Read measurements expressed in different units and compare their actual magnitudes.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-quantities-units-precision:d2:interpret-rounding-interval",
+          "description": "Translate a rounded measurement into the interval of values consistent with its stated precision.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Propagating measurement bounds through products and quotients.",
+        "Choosing a defensible precision from instrument resolution and source uncertainty in a full modeling task."
+      ]
+    },
+    {
+      "lessonId": "g9-r902-l1",
+      "lessonSlug": "g9-multi-step-linear-equations",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r902-l2",
+      "lessonSlug": "g9-equation-solution-cases",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r902-l3",
+      "lessonSlug": "g9-linear-inequalities-g9",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r902-l4",
+      "lessonSlug": "g9-absolute-value-equations",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r902-l5",
+      "lessonSlug": "g9-absolute-value-functions",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r902-l6",
+      "lessonSlug": "g9-absolute-value-inequalities",
+      "grade": 9,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-absolute-value-inequalities:d2:count-scaled-distance-solutions",
+          "description": "Solve a scaled absolute-value inequality and count all integer solutions, respecting strict endpoints.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-absolute-value-inequalities:d2:plot-distance-endpoint",
+          "description": "Translate a distance bound into its endpoints and place a requested endpoint on a number line.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-absolute-value-inequalities:d2:reason-nonnegative-bound",
+          "description": "Use nonnegativity of absolute value to identify impossible or always-true inequalities after isolating the absolute value.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Constructing complete shaded intervals and two-ray solution graphs with open or closed endpoints.",
+        "Comparing two variable absolute-value expressions and modeling tolerances from data."
+      ]
+    },
+    {
+      "lessonId": "g9-r903-l1",
+      "lessonSlug": "g9-slope-from-points",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r903-l2",
+      "lessonSlug": "g9-linear-equation-forms",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r903-l3",
+      "lessonSlug": "g9-graph-linear-functions",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r903-l4",
+      "lessonSlug": "g9-arithmetic-sequences",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r904-l1",
+      "lessonSlug": "g9-systems-by-graphing-g9",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r904-l2",
+      "lessonSlug": "g9-systems-substitution-g9",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r904-l3",
+      "lessonSlug": "g9-systems-elimination-g9",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r904-l4",
+      "lessonSlug": "g9-system-models",
+      "grade": 9,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-system-models:solve-count-resource",
+          "description": "Use a count condition and a weighted total to solve for two contextual quantities.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-system-models:translate-two-conditions",
+          "description": "Match a contextual count and weighted total to two equations in a structured table.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-system-models:check-contextual-feasibility",
+          "description": "Check that a system's solution meets both totals and the whole-number restrictions of the context.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Mixture and rate models with rational quantities, and three-variable systems.",
+        "Dependent or inconsistent contextual constraints and student selection of an efficient solution method."
+      ]
+    },
+    {
+      "lessonId": "g9-r904-l5",
+      "lessonSlug": "g9-graph-linear-inequalities",
+      "grade": 9,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-graph-linear-inequalities:calculate-feasible-y",
+          "description": "Substitute a fixed x-value and find the greatest integer y satisfying a linear inequality.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-graph-linear-inequalities:match-boundary-graph",
+          "description": "Rearrange a two-variable inequality and identify its boundary line on a graph.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-graph-linear-inequalities:test-boundary-inclusion",
+          "description": "Test points in a half-plane and distinguish strict boundaries from included boundaries.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Direct construction of dashed or solid boundaries and shaded half-planes.",
+        "Vertical boundaries, compound constraints, and optimization over feasible regions."
+      ]
+    },
+    {
+      "lessonId": "g9-r904-l6",
+      "lessonSlug": "g9-systems-linear-inequalities",
+      "grade": 9,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-systems-linear-inequalities:d3:count-feasible-integer-pairs",
+          "description": "Enumerate nonnegative or positive integer pairs satisfying a shared linear resource bound.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-systems-linear-inequalities:d3:compare-feasible-plans",
+          "description": "Read candidate plans, enforce two resource constraints, and choose the greatest stated objective among feasible rows.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-systems-linear-inequalities:d3:reason-shared-boundaries",
+          "description": "Use strictness and equality to distinguish an empty overlap from a shared boundary line.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Constructing and shading a full feasible region with solid and dashed boundaries.",
+        "Finding an optimum over an entire continuous feasible region rather than comparing provided plans."
+      ]
+    },
+    {
+      "lessonId": "g9-r904-l7",
+      "lessonSlug": "g9-linear-quadratic-systems",
+      "grade": 9,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-linear-quadratic-systems:d2:solve-all-intersection-pairs",
+          "description": "Solve a linear–quadratic system and return all ordered-pair solutions with both coordinates checked.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-linear-quadratic-systems:d2:plot-tangent-intersection",
+          "description": "Solve a system with a repeated root and plot its single intersection on a coordinate grid.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-linear-quadratic-systems:d2:count-intersections-from-extremum",
+          "description": "Use a parabola's minimum or maximum to classify horizontal-line systems as having zero, one, or two real solutions.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Estimating intersections from supplied line-and-parabola graphs and checking numerical approximations.",
+        "Nonfactorable intersection equations, modeling constraints, and interpreting extraneous contextual solutions."
+      ]
+    },
+    {
+      "lessonId": "g9-r905-l1",
+      "lessonSlug": "g9-integer-exponents-g9",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r905-l2",
+      "lessonSlug": "g9-rational-exponents",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r905-l3",
+      "lessonSlug": "g9-simplify-radicals",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r905-l4",
+      "lessonSlug": "g9-radical-operations",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r906-l1",
+      "lessonSlug": "g9-polynomial-vocabulary",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r906-l2",
+      "lessonSlug": "g9-add-subtract-polynomials",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r906-l3",
+      "lessonSlug": "g9-multiply-monomials",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r906-l4",
+      "lessonSlug": "g9-multiply-binomials",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r907-l1",
+      "lessonSlug": "g9-greatest-common-factor",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r907-l2",
+      "lessonSlug": "g9-factor-trinomials",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r907-l3",
+      "lessonSlug": "g9-difference-squares",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r907-l4",
+      "lessonSlug": "g9-factoring-completely",
+      "grade": 9,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-factoring-completely:d3:repeat-factoring-patterns",
+          "description": "Factor a fourth-degree difference of squares completely over the integers after removing a greatest common factor.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-factoring-completely:d3:plot-factored-intercepts",
+          "description": "Use complete factorization and the zero-product property to locate a requested polynomial x-intercept on a grid.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-factoring-completely:d3:preserve-zero-factor-solutions",
+          "description": "Explain why division by a variable factor can remove valid zero solutions from a factored equation.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Factoring by grouping, nonmonic trinomials inside higher-degree expressions, and rational coefficients.",
+        "Constructing complete polynomial graphs and interpreting repeated-root behavior at intercepts."
+      ]
+    },
+    {
+      "lessonId": "g9-r908-l1",
+      "lessonSlug": "g9-solve-by-square-roots",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r908-l2",
+      "lessonSlug": "g9-solve-by-factoring",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r908-l3",
+      "lessonSlug": "g9-quadratic-formula",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r908-l4",
+      "lessonSlug": "g9-quadratic-graphs",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r908-l5",
+      "lessonSlug": "g9-build-quadratic-models",
+      "grade": 9,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-build-quadratic-models:calculate-quadratic-scale",
+          "description": "Use two zeros and another point to determine the coefficient of a quadratic model.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-build-quadratic-models:match-vertex-model",
+          "description": "Use a vertex and another point to identify the correctly scaled parabola graph.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-build-quadratic-models:interpret-physical-parabola",
+          "description": "Interpret zeros and a maximum within the physically relevant domain of a quadratic model.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Fitting a quadratic to three arbitrary observations and comparing model errors.",
+        "Deriving area, revenue, and projectile models from contextual relationships rather than supplied features."
+      ]
+    },
+    {
+      "lessonId": "g9-r909-l1",
+      "lessonSlug": "g9-geometric-sequences",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r909-l2",
+      "lessonSlug": "g9-exponential-growth",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r909-l3",
+      "lessonSlug": "g9-exponential-decay",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r909-l4",
+      "lessonSlug": "g9-linear-vs-exponential",
+      "grade": 9,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-linear-vs-exponential:d3:recover-multiperiod-factor",
+          "description": "Recover a positive per-period exponential multiplier from observations separated by two equal time periods.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-linear-vs-exponential:d3:match-uneven-time-data",
+          "description": "Choose a graph that matches all observations at unequally spaced times, accounting for the elapsed-time gaps.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-linear-vs-exponential:d3:locate-integer-model-crossover",
+          "description": "Compare linear and exponential predictions successively to find the first nonnegative integer input where the exponential model is larger.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Estimating noninteger crossover times and proving eventual exponential dominance under stated assumptions.",
+        "Fitting competing models to noisy observations and testing the constant-factor assumption."
+      ]
+    },
+    {
+      "lessonId": "g9-r910-l1",
+      "lessonSlug": "g9-one-variable-data",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r910-l2",
+      "lessonSlug": "g9-scatter-models-g9",
+      "grade": 9,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g9-r910-l3",
+      "lessonSlug": "g9-correlation-residuals",
+      "grade": 9,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-correlation-residuals:d3:calculate-residual-squares",
+          "description": "Compute residuals from observed points and a model, then sum their squares without canceling signs.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-correlation-residuals:d3:compare-residual-records",
+          "description": "Read recorded residuals for competing models and select the smallest sum of squared residuals.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-correlation-residuals:d3:interpret-zero-linear-correlation",
+          "description": "Explain why zero linear correlation can coexist with a deterministic nonlinear relationship in symmetric data.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Interpreting actual residual and scatter plots, including influential observations.",
+        "Comparing model complexity and predictive performance on observations excluded from fitting."
+      ]
+    },
+    {
+      "lessonId": "g9-r910-l4",
+      "lessonSlug": "g9-modeling-decisions",
+      "grade": 9,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-modeling-decisions:d2:extend-quadratic-differences",
+          "description": "Use constant second differences at equally spaced inputs to extend an explicitly assumed quadratic model.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-modeling-decisions:d2:identify-exponential-data",
+          "description": "Read tables to distinguish a constant multiplicative factor from constant additive changes or constant values.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-modeling-decisions:d2:qualify-model-prediction",
+          "description": "Distinguish a prediction conditional on an assumed model from a conclusion forced by a finite data set.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Fitting competing models with residuals and evaluating predictions on held-out observations.",
+        "Student-created modeling reports that justify assumptions, constraints, and revisions."
+      ]
+    },
+    {
+      "lessonId": "g9-r910-l5",
+      "lessonSlug": "g9-interpret-linear-models",
+      "grade": 9,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "g9-interpret-linear-models:calculate-prediction-residual",
+          "description": "Calculate a model prediction and its signed residual as observed minus predicted.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-interpret-linear-models:match-model-table",
+          "description": "Match a linear model to a table of predictions, keeping slope and intercept distinct.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "g9-interpret-linear-models:bound-data-claims",
+          "description": "Distinguish interpolation from extrapolation and association from causation in an observational model.",
+          "requiredDemands": [
+            "reasoning",
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Reading actual residual plots and comparing competing fitted models.",
+        "Calculating correlation from data and explaining uncertainty rather than treating predictions as exact."
+      ]
+    },
+    {
+      "lessonId": "g10-r1001-l1",
+      "lessonSlug": "g10-logic-and-conditionals",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1001-l2",
+      "lessonSlug": "g10-definitions-and-postulates",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1001-l3",
+      "lessonSlug": "g10-angle-proofs",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1001-l4",
+      "lessonSlug": "g10-proof-structure",
+      "grade": 10,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "proof-given-equation",
+          "description": "Translate a midpoint given into an equation and solve for the unknown.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "proof-chain-table",
+          "description": "Select a complete statement-and-reason chain establishing segment congruence.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "proof-circular-argument",
+          "description": "Identify circular reasoning and replace it with a valid congruence argument.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Student-authored multi-step proofs with feedback on each reason.",
+        "Proofs involving parallel lines, quadrilaterals, contradiction, and counterexamples."
+      ]
+    },
+    {
+      "lessonId": "g10-r1001-l5",
+      "lessonSlug": "g10-geometric-constructions",
+      "grade": 10,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "construction-arc-distance",
+          "description": "Calculate where equal-radius construction arcs intersect using half the segment and a right triangle.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "construction-coordinate-bisector",
+          "description": "Read coordinate construction data to identify the midpoint and perpendicular-bisector line.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "construction-angle-justification",
+          "description": "Justify an angle-bisector construction using three congruent side pairs.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Executing compass-and-straightedge constructions interactively and checking the resulting geometry.",
+        "Copying angles, constructing parallels and perpendiculars from external points, and constructing regular polygons."
+      ]
+    },
+    {
+      "lessonId": "g10-r1002-l1",
+      "lessonSlug": "g10-rigid-transformations",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1002-l2",
+      "lessonSlug": "g10-triangle-congruence",
+      "grade": 10,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "congruence-corresponding-equation",
+          "description": "Use the vertex order of a congruence statement to solve a corresponding-side equation.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "congruence-sas-measurements",
+          "description": "Compare side-and-included-angle measurement records to identify an SAS-congruent triangle.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "congruence-aaa-counterexample",
+          "description": "Use scaled side lengths to explain why equal corresponding angles do not ensure congruence.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Building ASA/AAS/HL proofs from diagrams, analyzing SSA ambiguity, and student-authored congruence arguments.",
+        "Using triangle congruence to derive new quadrilateral or circle properties."
+      ]
+    },
+    {
+      "lessonId": "g10-r1002-l3",
+      "lessonSlug": "g10-cpctc",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1002-l4",
+      "lessonSlug": "g10-isosceles-triangles",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1003-l1",
+      "lessonSlug": "g10-similarity-transformations",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1003-l2",
+      "lessonSlug": "g10-triangle-similarity",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1003-l3",
+      "lessonSlug": "g10-right-triangle-trig",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1003-l4",
+      "lessonSlug": "g10-special-right-triangles",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1003-l5",
+      "lessonSlug": "g10-similarity-proofs",
+      "grade": 10,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "similarity-parallel-length",
+          "description": "Use the small-to-whole side ratio in a triangle with an interior parallel segment.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "similarity-candidate-sides",
+          "description": "Compare a table of candidate triangle side lengths using the SSS similarity criterion.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "similarity-converse-parallel",
+          "description": "Decide whether a side-dividing segment is parallel by comparing corresponding part ratios.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Student-authored angle-to-ratio proofs, similarity with overlapping triangles, and indirect measurement with uncertainty.",
+        "Similarity-derived area/volume relationships and right-triangle geometric-mean proofs."
+      ]
+    },
+    {
+      "lessonId": "g10-r1003-l6",
+      "lessonSlug": "g10-laws-of-sines-and-cosines",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1004-l1",
+      "lessonSlug": "g10-distance-midpoint",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1004-l2",
+      "lessonSlug": "g10-parallel-perpendicular",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1004-l3",
+      "lessonSlug": "g10-coordinate-proofs",
+      "grade": 10,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "coordinate-fourth-vertex",
+          "description": "Calculate the fourth consecutive vertex of a parallelogram using matching displacements.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "coordinate-perpendicular-records",
+          "description": "Use run-and-rise records to identify perpendicular adjacent sides of a parallelogram.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "coordinate-diagonal-counterexample",
+          "description": "Check coordinate evidence showing that equal diagonals alone do not prove a rectangle.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "General coordinate proofs with variables, vertical-side slope cases, and sufficient conditions for squares and rhombi.",
+        "Choosing coordinates strategically to simplify a proof."
+      ]
+    },
+    {
+      "lessonId": "g10-r1004-l4",
+      "lessonSlug": "g10-partition-segments",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1005-l1",
+      "lessonSlug": "g10-circle-angle-theorems",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1005-l2",
+      "lessonSlug": "g10-chords-and-tangents",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1005-l3",
+      "lessonSlug": "g10-arc-length-sector-area",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1005-l4",
+      "lessonSlug": "g10-circle-equations",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1005-l5",
+      "lessonSlug": "g10-circle-theorem-proofs",
+      "grade": 10,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "circle-tangent-length",
+          "description": "Use the radius–tangent right angle to calculate an external tangent length.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "circle-angle-records",
+          "description": "Compare central and inscribed angle records that intercept the same minor arc.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "circle-equal-tangents-proof",
+          "description": "Complete an equal-tangents proof using radii, a shared hypotenuse, and HL congruence.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Proving the inscribed-angle theorem itself, intersecting chord/secant relationships, and cyclic quadrilateral proofs.",
+        "Diagram construction and choosing auxiliary radii in unfamiliar configurations."
+      ]
+    },
+    {
+      "lessonId": "g10-r1006-l1",
+      "lessonSlug": "g10-area-and-similarity",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1006-l2",
+      "lessonSlug": "g10-volume-and-scaling",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1006-l3",
+      "lessonSlug": "g10-density-and-units",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1006-l4",
+      "lessonSlug": "g10-modeling-with-geometry",
+      "grade": 10,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "geometry-composite-volume",
+          "description": "Calculate a cylinder-plus-hemisphere volume without counting the shared interface twice.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "geometry-capacity-records",
+          "description": "Convert internal rectangular-container dimensions from cubic centimeters to liters.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "geometry-radius-sensitivity",
+          "description": "Explain the squared effect of a radius change on cylindrical volume when height stays fixed.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Surface-area/material estimates, packing inefficiency, measurement uncertainty, and selecting a model from real images.",
+        "Geometric optimization under cost or capacity constraints."
+      ]
+    },
+    {
+      "lessonId": "g10-r1006-l5",
+      "lessonSlug": "g10-cross-sections-and-rotations",
+      "grade": 10,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "solid-rotation-volume",
+          "description": "Calculate a solid's volume by relating the rotation axis to its radius and height.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "solid-sphere-slice-table",
+          "description": "Read cross-section data using r²=R²−d² for a spherical slice.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "solid-axis-comparison",
+          "description": "Compare volumes formed by rotating a rectangle about different sides.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Oblique cross-sections, noncentral cuts of cones and pyramids, and rotating regions around external axes.",
+        "Manipulating a 3D model to trace a plane or an axis of rotation."
+      ]
+    },
+    {
+      "lessonId": "g10-r1007-l1",
+      "lessonSlug": "g10-sets-and-sample-spaces",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1007-l2",
+      "lessonSlug": "g10-addition-rule",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1007-l3",
+      "lessonSlug": "g10-conditional-probability",
+      "grade": 10,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "conditional-without-replacement",
+          "description": "Update favorable and total counts after a known draw without replacement.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "conditional-count-table",
+          "description": "Compare conditional probabilities computed from group-count table rows.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "conditional-reverse-counts",
+          "description": "Reverse a condition by restricting to a known outcome across two sources.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Three-stage conditional trees, algebraic Bayes calculations from rates, and conditions with zero probability.",
+        "Distinguishing observed conditional association from causal effects."
+      ]
+    },
+    {
+      "lessonId": "g10-r1007-l4",
+      "lessonSlug": "g10-independence",
+      "grade": 10,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "independent-union-calculation",
+          "description": "Combine the product rule and addition rule to calculate a union of independent events.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "independent-probability-table",
+          "description": "Test candidate probability-table rows against the independence product criterion.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "independent-versus-disjoint",
+          "description": "Use positive probabilities to explain why disjoint events are not independent.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Independence from two-way count data, multiple-event independence, and sampling with versus without replacement.",
+        "The zero-probability exception to the statement about disjoint events."
+      ]
+    },
+    {
+      "lessonId": "g10-r1007-l5",
+      "lessonSlug": "g10-sets-and-venn-diagrams",
+      "grade": 10,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "venn-inclusion-exclusion",
+          "description": "Calculate union and neither counts without counting the overlap twice.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "venn-region-table",
+          "description": "Translate set totals and an intersection into all four disjoint Venn regions.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "venn-conditional-denominator",
+          "description": "Use the correct set as the denominator in a conditional probability.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Three-set inclusion–exclusion, De Morgan's laws, and direct diagram shading.",
+        "Comparing independence with disjointness from Venn-region data."
+      ]
+    },
+    {
+      "lessonId": "g10-r1008-l1",
+      "lessonSlug": "g10-function-notation-review",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1008-l2",
+      "lessonSlug": "g10-piecewise-functions",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1008-l3",
+      "lessonSlug": "g10-data-displays",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1008-l4",
+      "lessonSlug": "g10-regression-and-residuals",
+      "grade": 10,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g10-r1008-l5",
+      "lessonSlug": "g10-categorical-data",
+      "grade": 10,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "categorical-rate-difference",
+          "description": "Calculate a signed percentage-point difference between conditional rates in unequal-sized groups.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "categorical-count-comparison",
+          "description": "Compare within-group rates using a table of favorable and unfavorable counts.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "categorical-association-limit",
+          "description": "Interpret an observational difference in categorical rates without inferring causation.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Marginal and joint relative-frequency conversions, segmented bar charts, and Simpson's paradox.",
+        "Formal inference about population associations, including chi-square procedures."
+      ]
+    },
+    {
+      "lessonId": "g11-r1101-l1",
+      "lessonSlug": "g11-polynomial-features",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1101-l2",
+      "lessonSlug": "g11-polynomial-division",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1101-l3",
+      "lessonSlug": "g11-remainder-factor-theorems",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1101-l4",
+      "lessonSlug": "g11-polynomial-roots",
+      "grade": 11,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "polynomial-root-parameter",
+          "description": "Use a specified zero to determine an unknown coefficient by substitution.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "polynomial-factor-records",
+          "description": "Match factored-polynomial records to required root signs and multiplicities.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "polynomial-conjugate-factor",
+          "description": "Derive the real quadratic factor forced by a nonreal zero of a real-coefficient polynomial.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Rational-root candidates, synthetic division, graph crossing/touching behavior, and numerical root location.",
+        "Higher-degree root counts with nonreal roots and repeated factors."
+      ]
+    },
+    {
+      "lessonId": "g11-r1101-l5",
+      "lessonSlug": "g11-complex-arithmetic",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1101-l6",
+      "lessonSlug": "g11-complex-polynomial-solutions",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1101-l7",
+      "lessonSlug": "g11-polynomial-identities",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1102-l1",
+      "lessonSlug": "g11-rational-expressions",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1102-l2",
+      "lessonSlug": "g11-rational-equations",
+      "grade": 11,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "rational-lcd-solution",
+          "description": "Solve a multi-term rational equation by clearing denominators and checking restrictions.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "rational-candidate-record",
+          "description": "Audit candidate solution records for nonzero denominators and equality in the original equation.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "rational-excluded-root",
+          "description": "Explain why an algebraic root produced after cancellation may leave the original equation with no solution.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Rational equations with two distinct variable denominators and multiple permitted roots.",
+        "Rate/work word problems and distinguishing identities from inconsistent rational equations."
+      ]
+    },
+    {
+      "lessonId": "g11-r1102-l3",
+      "lessonSlug": "g11-radical-functions",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1102-l4",
+      "lessonSlug": "g11-radical-equations",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1102-l5",
+      "lessonSlug": "g11-rational-function-models",
+      "grade": 11,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "rational-average-cost",
+          "description": "Evaluate average cost as fixed cost per item plus variable cost per item.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "rational-rate-table",
+          "description": "Identify a table satisfying a fixed-distance reciprocal speed–time model.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "rational-target-domain",
+          "description": "Solve a rational-model target inequality within a positive integer domain.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Rational graphs with holes, multiple asymptotes, sign changes, and constrained input intervals.",
+        "Building models from empirical data and checking model error."
+      ]
+    },
+    {
+      "lessonId": "g11-r1103-l1",
+      "lessonSlug": "g11-exponential-models",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1103-l2",
+      "lessonSlug": "g11-logarithm-meaning",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1103-l3",
+      "lessonSlug": "g11-log-properties",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1103-l4",
+      "lessonSlug": "g11-exponential-log-equations",
+      "grade": 11,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "exponential-log-isolation",
+          "description": "Isolate time in an exponential equation using a natural logarithm and a stated rounding rule.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "log-candidate-domain-table",
+          "description": "Inspect candidate arguments and products to retain valid roots of a sum-of-logarithms equation.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "log-sum-counterexample",
+          "description": "Reject a false logarithm-of-a-sum rule with a concrete positive-input counterexample.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Equations requiring numerical root finding, substitutions that create quadratic exponentials, and changing logarithm bases.",
+        "Model fitting, half-life/doubling-time comparisons, and extraneous roots from more complex log transformations."
+      ]
+    },
+    {
+      "lessonId": "g11-r1104-l1",
+      "lessonSlug": "g11-arithmetic-sequences",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1104-l2",
+      "lessonSlug": "g11-geometric-sequences",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1104-l3",
+      "lessonSlug": "g11-finite-series",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1104-l4",
+      "lessonSlug": "g11-infinite-geometric-series",
+      "grade": 11,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "geometric-signed-sum",
+          "description": "Identify a geometric ratio, including a negative one, and calculate the convergent infinite sum.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "geometric-parameter-records",
+          "description": "Compare first-term and ratio records against both convergence and a target sum.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "geometric-bounce-distance",
+          "description": "Model an ideal infinite bounce distance with one initial drop and paired rebound journeys.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Finite partial sums and error targets, repeating-decimal conversions, and models with nonconstant ratios.",
+        "Explaining how finite observations support or fail to support an infinite-process model."
+      ]
+    },
+    {
+      "lessonId": "g11-r1105-l1",
+      "lessonSlug": "g11-radians-unit-circle",
+      "grade": 11,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "radians-arc-length",
+          "description": "Calculate arc length from radius and a radian angle.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "radians-coordinate-records",
+          "description": "Match a radian angle to its signed unit-circle coordinate record.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "radians-coterminal-justification",
+          "description": "Reduce positive or negative angles by complete turns while preserving their unit-circle point.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Angular and linear speed, sector areas, arbitrary-angle coordinates, and dynamic rotation interaction.",
+        "Linking coterminal angles to graph periodicity and inverse-trigonometric principal ranges."
+      ]
+    },
+    {
+      "lessonId": "g11-r1105-l2",
+      "lessonSlug": "g11-exact-trig-values",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1105-l3",
+      "lessonSlug": "g11-trig-graphs",
+      "grade": 11,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "trig-frequency-from-period",
+          "description": "Calculate positive angular frequency B from a desired sine/cosine period.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "trig-graph-features",
+          "description": "Compare plotted sinusoidal candidates by amplitude, midline, period, and initial direction.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "trig-model-extremum-time",
+          "description": "Determine the first minimum time in a positive-amplitude cosine model starting at a maximum.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Phase-shifted models, negative angular frequencies, tangent graphs, and fitting sinusoidal data.",
+        "Interactions that let learners drag a graph and observe parameter changes."
+      ]
+    },
+    {
+      "lessonId": "g11-r1105-l4",
+      "lessonSlug": "g11-trig-identities-equations",
+      "grade": 11,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "trig-all-interval-solutions",
+          "description": "Solve a scaled sine or cosine equation and retain all solutions in [0,2π).",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "trig-signed-ratio-table",
+          "description": "Reconstruct a complete signed trigonometric-ratio row from one ratio and a quadrant.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "trig-identity-domain",
+          "description": "Simplify a trigonometric quotient while retaining its original domain restrictions.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Double-angle and sum/difference identities, equations with multiple frequencies, and extraneous roots introduced by squaring.",
+        "Graph-based comparison of identities and numerical roots."
+      ]
+    },
+    {
+      "lessonId": "g11-r1105-l5",
+      "lessonSlug": "g11-inverse-trigonometric-functions",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1106-l1",
+      "lessonSlug": "g11-parabolas-as-conics",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1106-l2",
+      "lessonSlug": "g11-ellipses",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1106-l3",
+      "lessonSlug": "g11-hyperbolas",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1106-l4",
+      "lessonSlug": "g11-conic-classification",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1107-l1",
+      "lessonSlug": "g11-matrix-operations",
+      "grade": 11,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "matrix-row-column-product",
+          "description": "Compute every entry of a 2-by-2 matrix product using row-by-column multiplication.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "matrix-model-table",
+          "description": "Translate a quantity matrix and price vector into a table of total costs.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "matrix-order-reasoning",
+          "description": "Use computed products to explain why matrix multiplication depends on order.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Products of nonsquare numerical matrices and multistep transformation compositions.",
+        "Connecting products to inverse matrices and solving larger systems."
+      ]
+    },
+    {
+      "lessonId": "g11-r1107-l2",
+      "lessonSlug": "g11-determinants-inverses",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1107-l3",
+      "lessonSlug": "g11-matrix-systems",
+      "grade": 11,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "matrix-system-solve-pair",
+          "description": "Solve both coordinates of a nonsingular two-equation linear system.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "matrix-system-augmented-records",
+          "description": "Translate equations into ordered coefficient-and-constant row records.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "matrix-system-singular-classification",
+          "description": "Use augmented-row elimination to distinguish inconsistent and infinitely-many-solution singular systems.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Inverse-matrix and row-reduction methods, three-variable systems, and rank-based classifications.",
+        "Building matrix systems from constraints and analyzing sensitivity to coefficient changes."
+      ]
+    },
+    {
+      "lessonId": "g11-r1107-l4",
+      "lessonSlug": "g11-vectors",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1108-l1",
+      "lessonSlug": "g11-normal-distributions",
+      "grade": 11,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "normal-inverse-standardize",
+          "description": "Recover a raw measurement from a supplied z-score, mean, and standard deviation.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "normal-parameter-records",
+          "description": "Compare model-parameter table rows by standardizing their cutoff values.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "normal-interval-probability",
+          "description": "Calculate a normal interval probability from standardized endpoints and supplied cumulative areas.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Finding unsupplied percentile cutoffs, normal-model diagnostics, and tail probabilities from technology.",
+        "Comparing individual-value distributions with sampling distributions of statistics."
+      ]
+    },
+    {
+      "lessonId": "g11-r1108-l2",
+      "lessonSlug": "g11-sampling-and-bias",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g11-r1108-l3",
+      "lessonSlug": "g11-confidence-intervals",
+      "grade": 11,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "ci-estimate-critical-se",
+          "description": "Calculate an interval from an estimate, supplied critical multiplier, and standard error.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "ci-endpoint-table",
+          "description": "Recover an interval's midpoint and margin of error from its endpoints.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "ci-sample-size-planning",
+          "description": "Use inverse-square-root scaling to plan sample sizes at fixed confidence and variability.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Long-run confidence interpretation, coverage simulations, and diagnosing invalid intervals from biased samples.",
+        "Deriving critical values and standard errors rather than using supplied values.",
+        "Reading original sample-data tables and full statistical-software output, beyond matching interval representations."
+      ]
+    },
+    {
+      "lessonId": "g11-r1108-l4",
+      "lessonSlug": "g11-statistical-decisions",
+      "grade": 11,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1201-l1",
+      "lessonSlug": "g12-function-composition",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1201-l2",
+      "lessonSlug": "g12-inverse-functions",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1201-l3",
+      "lessonSlug": "g12-function-transformations-g12",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1201-l4",
+      "lessonSlug": "g12-model-selection-g12",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1202-l1",
+      "lessonSlug": "g12-limit-from-table-graph",
+      "grade": 12,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "limit-nearby-output",
+          "description": "Evaluate a punctured function at nearby inputs to build numerical limit evidence.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "limit-two-sided-records",
+          "description": "Compare nearby-output records from both sides to select a supported finite-limit estimate.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "limit-isolated-value",
+          "description": "Distinguish exact nearby behavior from an isolated function value when determining a limit.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Actual graph features with open/closed points, unbounded and oscillating limits, and asymmetric one-sided approaches.",
+        "Choosing enough numerical evidence to avoid misleading finite-table extrapolation."
+      ]
+    },
+    {
+      "lessonId": "g12-r1202-l2",
+      "lessonSlug": "g12-limit-laws",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1202-l3",
+      "lessonSlug": "g12-indeterminate-limits",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1202-l4",
+      "lessonSlug": "g12-continuity",
+      "grade": 12,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "continuity-piecewise-parameter",
+          "description": "Solve for a parameter that makes two piecewise formulas agree at their joining point.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "continuity-profile-table",
+          "description": "Compare one-sided-limit and function-value profiles against all continuity conditions.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "continuity-ivt-conclusion",
+          "description": "Apply the Intermediate Value Theorem without claiming a unique root or its exact location.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Continuity from actual graphs, infinite and removable discontinuities, and endpoint one-sided continuity.",
+        "Continuity of composites and selecting intervals on which IVT hypotheses hold."
+      ]
+    },
+    {
+      "lessonId": "g12-r1203-l1",
+      "lessonSlug": "g12-derivative-meaning",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1203-l2",
+      "lessonSlug": "g12-basic-derivative-rules",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1203-l3",
+      "lessonSlug": "g12-product-quotient-rules",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1203-l4",
+      "lessonSlug": "g12-chain-rule",
+      "grade": 12,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "chain-polynomial-point",
+          "description": "Differentiate a polynomial composition and evaluate the derivative at a specified input.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "chain-derivative-table",
+          "description": "Combine inner-derivative and outer-derivative entries in a composition table.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "chain-linked-rate-units",
+          "description": "Calculate a rate through two linked physical quantities and report its resulting units.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Three-layer compositions, logarithmic/trigonometric outer functions, and implicit differentiation.",
+        "Reading inner/outer derivatives from actual graphs and combining chain with product/quotient rules."
+      ]
+    },
+    {
+      "lessonId": "g12-r1203-l5",
+      "lessonSlug": "g12-implicit-differentiation",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1204-l1",
+      "lessonSlug": "g12-tangent-lines",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1204-l2",
+      "lessonSlug": "g12-motion",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1204-l3",
+      "lessonSlug": "g12-increasing-extrema-concavity",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1204-l4",
+      "lessonSlug": "g12-optimization",
+      "grade": 12,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "optimization-three-side-fence",
+          "description": "Maximize a rectangle's area using a fixed fence length on three sides.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "optimization-candidate-table",
+          "description": "Compare a complete endpoint-and-critical-point table to locate an absolute extremum.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "optimization-open-box",
+          "description": "Optimize an open box's cut size while respecting its geometric domain.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Optimization with nonpolynomial objectives, multiple constraints, and discrete design choices.",
+        "Sensitivity of an optimum to uncertain measurements and costs."
+      ]
+    },
+    {
+      "lessonId": "g12-r1204-l5",
+      "lessonSlug": "g12-related-rates",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1205-l1",
+      "lessonSlug": "g12-antiderivatives",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1205-l2",
+      "lessonSlug": "g12-definite-integrals",
+      "grade": 12,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "integral-polynomial-evaluation",
+          "description": "Evaluate a definite polynomial integral as an antiderivative difference with signed results.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "integral-rate-interval-table",
+          "description": "Compare signed accumulated contributions from piecewise-constant rate and interval records.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "integral-displacement-distance",
+          "description": "Distinguish net displacement from total distance when a velocity changes sign.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Integrals from curved graphs, Riemann sums, reversed bounds, and integral properties across adjacent intervals.",
+        "Total geometric area requiring root finding and splitting a sign-changing continuous integrand."
+      ]
+    },
+    {
+      "lessonId": "g12-r1205-l3",
+      "lessonSlug": "g12-fundamental-theorem",
+      "grade": 12,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "ftc-variable-upper-bound",
+          "description": "Differentiate an accumulation function with a composite upper bound using FTC and the chain rule.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "ftc-endpoint-records",
+          "description": "Use antiderivative endpoint-value records to identify a definite integral.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "ftc-integrand-sign-extremum",
+          "description": "Use a continuous integrand's sign change to justify a local extremum of its accumulation function.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Both bounds varying, accumulation from graph areas, and differentiability hypotheses at discontinuous integrands.",
+        "Global extrema and concavity of accumulation functions from integrand graphs."
+      ]
+    },
+    {
+      "lessonId": "g12-r1205-l4",
+      "lessonSlug": "g12-integral-applications",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1205-l5",
+      "lessonSlug": "g12-numerical-integration",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1205-l6",
+      "lessonSlug": "g12-differential-equations",
+      "grade": 12,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "differential-exponential-ivp",
+          "description": "Solve a separable exponential differential equation and apply its initial condition.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "differential-slope-table",
+          "description": "Evaluate a slope rule across coordinate data to identify a valid slope table.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "differential-euler-steps",
+          "description": "Apply two Euler steps using updated coordinates and slopes (BC extension).",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Actual graphical slope fields and matching entire solution curves rather than local numerical slopes.",
+        "Nonlinear separable equations, solution-domain restrictions, equilibrium solutions, and logistic models.",
+        "Justifying whether Euler approximations overestimate or underestimate from concavity."
+      ]
+    },
+    {
+      "lessonId": "g12-r1205-l7",
+      "lessonSlug": "g12-infinite-series",
+      "grade": 12,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "series-maclaurin-approximation",
+          "description": "Build and evaluate the degree-three Maclaurin polynomial for eˣ.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "series-geometric-interval-table",
+          "description": "Connect a shifted geometric power series to its radius, interval, and endpoint behavior.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "series-alternating-error",
+          "description": "Justify an alternating-series approximation error using the first omitted term.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "The AP Calculus BC series unit has 15 topics; six questions do not establish full unit coverage.",
+        "Integral, direct/limit comparison, ratio, p-series, and absolute-versus-conditional convergence tests.",
+        "General Taylor centers and functions, Lagrange remainder bounds, power-series differentiation/integration, and nongeometric endpoint tests.",
+        "Choosing among competing convergence tests and writing a complete free-response justification."
+      ]
+    },
+    {
+      "lessonId": "g12-r1206-l1",
+      "lessonSlug": "g12-vector-dot-product",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1206-l2",
+      "lessonSlug": "g12-parametric-equations",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1206-l3",
+      "lessonSlug": "g12-polar-coordinates",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1206-l4",
+      "lessonSlug": "g12-complex-plane",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1206-l5",
+      "lessonSlug": "g12-parametric-polar-calculus",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1207-l1",
+      "lessonSlug": "g12-random-variables",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1207-l2",
+      "lessonSlug": "g12-expected-value",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1207-l3",
+      "lessonSlug": "g12-binomial-distribution",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1207-l4",
+      "lessonSlug": "g12-sampling-distributions",
+      "grade": 12,
+      "introducedIn": "depth-v2",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "sampling-mean-center-se",
+          "description": "Compute the center and standard error of a mean from independent observations.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d2-q1",
+            "d2-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "sampling-design-precision-table",
+          "description": "Compare population SD and sample-size table rows against a target mean standard error.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d2-q3",
+            "d2-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "sampling-mean-tail-probability",
+          "description": "Calculate a normal sample-mean probability using the statistic's SE rather than the individual SD.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d2-q5",
+            "d2-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Central Limit Theorem conditions for skewed populations, sampling distributions of proportions and differences, and finite-population corrections.",
+        "Simulation of repeated samples and distinguishing random sampling from independence assumptions."
+      ]
+    },
+    {
+      "lessonId": "g12-r1207-l5",
+      "lessonSlug": "g12-decision-strategies",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1207-l6",
+      "lessonSlug": "g12-study-design",
+      "grade": 12,
+      "introducedIn": "depth-v3",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "study-block-allocation",
+          "description": "Calculate whole-number treatment allocations within blocks at a specified random-assignment ratio.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d3-q1",
+            "d3-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "study-protocol-comparison",
+          "description": "Compare concrete recruitment and assignment protocols for population and causal inference.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d3-q3",
+            "d3-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "study-confounding-repair",
+          "description": "Identify a treatment-confounded factor and repair the design through randomized assignment within blocks.",
+          "requiredDemands": [
+            "reasoning"
+          ],
+          "questionIds": [
+            "d3-q5",
+            "d3-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Cluster/stratified/systematic sampling, nonresponse, blinding/placebos, and the unit of randomization.",
+        "Writing investigative questions, ethical constraints, and assessing interaction effects across blocks."
+      ]
+    },
+    {
+      "lessonId": "g12-r1208-l1",
+      "lessonSlug": "g12-hypothesis-testing",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1208-l2",
+      "lessonSlug": "g12-compound-interest",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1208-l3",
+      "lessonSlug": "g12-loans-and-annuities",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1208-l4",
+      "lessonSlug": "g12-networks-and-algorithms",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    },
+    {
+      "lessonId": "g12-r1208-l5",
+      "lessonSlug": "g12-inference-for-proportions",
+      "grade": 12,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "proportion-null-z",
+          "description": "Calculate a one-proportion z statistic using the null proportion in the standard error.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "proportion-output-decision",
+          "description": "Translate a supplied test result into a coherent p-value, decision, and contextual conclusion.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "proportion-difference-ci",
+          "description": "Construct and interpret a confidence interval for a difference of population proportions.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "Student-led verification of randomization, 10% and large-count conditions; one-proportion interval standard-error derivation.",
+        "Two-proportion hypothesis tests with pooled standard errors, power, and Type I/II errors.",
+        "Reading full statistical-software output and source-data tables rather than selecting structured report rows.",
+        "Chi-square homogeneity and independence remain in AP Statistics 2026–27 and require separate coverage; goodness of fit and geometric distributions are extension/older-framework topics."
+      ]
+    },
+    {
+      "lessonId": "g12-r1208-l6",
+      "lessonSlug": "g12-inference-for-means",
+      "grade": 12,
+      "introducedIn": "depth-v1",
+      "status": "audited-slice",
+      "objectives": [
+        {
+          "id": "mean-t-statistic",
+          "description": "Calculate a one-sample t statistic from a sample mean, sample SD, sample size, and null mean.",
+          "requiredDemands": [
+            "procedure"
+          ],
+          "questionIds": [
+            "d1-q1",
+            "d1-q2"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "mean-design-table",
+          "description": "Choose the inference unit and t-procedure from a study's paired or independent data structure.",
+          "requiredDemands": [
+            "representation"
+          ],
+          "questionIds": [
+            "d1-q3",
+            "d1-q4"
+          ],
+          "status": "practiced"
+        },
+        {
+          "id": "mean-paired-interval",
+          "description": "Construct and interpret a paired t confidence interval for a defined mean difference.",
+          "requiredDemands": [
+            "application"
+          ],
+          "questionIds": [
+            "d1-q5",
+            "d1-q6"
+          ],
+          "status": "practiced"
+        }
+      ],
+      "remainingGaps": [
+        "One- and two-sample t intervals and hypothesis tests with student-derived conditions and p-values.",
+        "Welch standard errors/degrees of freedom, outlier sensitivity, study design limitations, and power."
+      ]
+    },
+    {
+      "lessonId": "g12-r1208-l7",
+      "lessonSlug": "g12-regression-inference",
+      "grade": 12,
+      "introducedIn": null,
+      "status": "baseline-only",
+      "objectives": [],
+      "remainingGaps": [
+        "Individual objectives and question evidence have not yet been audited for this lesson."
+      ]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { isResponseComplete, MULTI_SELECT_SEPARATOR, ORDERING_SEPARATOR, type GraphChoicePlot, type QuestionInteraction, type QuestionInteractionConfig } from "@/lib/question-interactions";
 import { mathInputMode } from "@/lib/math-input";
 
@@ -209,8 +210,8 @@ function CoordinateGridResponse({ config, value, disabled, invalid, describedBy,
             onClick={() => !disabled && choose(x, y)}
             onKeyDown={(event) => {
               if (disabled || event.nativeEvent.isComposing) return;
-              if (event.key === " " || event.key === "Enter" && !selected) { event.preventDefault(); choose(x, y); return; }
-              if (event.key === "Enter" && selected) { event.preventDefault(); onSubmit(); }
+              if (event.key === " " || event.key === "Enter" && !selected) { event.preventDefault(); event.stopPropagation(); choose(x, y); return; }
+              if (event.key === "Enter" && selected) { event.preventDefault(); event.stopPropagation(); onSubmit(); }
             }}
           />;
         }))}
@@ -260,10 +261,26 @@ function graphValue(plot: GraphChoicePlot, x: number) {
   return 0;
 }
 
+function graphAxisLabel(value: number) {
+  if (Math.abs(value) < 1e-10) return "0";
+  for (const denominator of [1, 2, 4]) {
+    const numerator = Math.round(value / Math.PI * denominator);
+    if (numerator && Math.abs(numerator) <= 8 && Math.abs(value - numerator * Math.PI / denominator) < 1e-9) {
+      return `${numerator < 0 ? "−" : ""}${Math.abs(numerator) === 1 ? "" : Math.abs(numerator)}π${denominator === 1 ? "" : `/${denominator}`}`;
+    }
+  }
+  return String(Number(value.toPrecision(4))).replace("-", "−");
+}
+
+function graphAxisTicks(min: number, max: number) {
+  return [min, min < 0 && max > 0 ? 0 : (min + max) / 2, max];
+}
+
 function GraphPreview({ plot, xMin, xMax, yMin, yMax }: { plot: GraphChoicePlot; xMin: number; xMax: number; yMin: number; yMax: number }) {
-  const width = 240;
-  const height = 150;
-  const pad = 18;
+  const clipId = useId();
+  const width = 320;
+  const height = 210;
+  const pad = 44;
   const xPosition = (x: number) => pad + ((x - xMin) / (xMax - xMin)) * (width - pad * 2);
   const yPosition = (y: number) => height - pad - ((y - yMin) / (yMax - yMin)) * (height - pad * 2);
   const samples = Array.from({ length: 81 }, (_, index) => xMin + (index / 80) * (xMax - xMin));
@@ -276,16 +293,25 @@ function GraphPreview({ plot, xMin, xMax, yMin, yMax }: { plot: GraphChoicePlot;
   const axisX = yMin <= 0 && yMax >= 0 ? yPosition(0) : height - pad;
   const axisY = xMin <= 0 && xMax >= 0 ? xPosition(0) : pad;
   return <svg viewBox={`0 0 ${width} ${height}`} aria-hidden="true" focusable="false">
+    <defs><clipPath id={clipId}><rect x={pad} y={pad} width={width - pad * 2} height={height - pad * 2} /></clipPath></defs>
     <rect x="1" y="1" width={width - 2} height={height - 2} rx="15" className="graph-choice-board" />
     <g className="graph-choice-grid" aria-hidden="true">
       {[.25, .5, .75].map((ratio) => <line key={`v-${ratio}`} x1={pad + ratio * (width - pad * 2)} y1={pad} x2={pad + ratio * (width - pad * 2)} y2={height - pad} />)}
       {[.25, .5, .75].map((ratio) => <line key={`h-${ratio}`} x1={pad} y1={pad + ratio * (height - pad * 2)} x2={width - pad} y2={pad + ratio * (height - pad * 2)} />)}
     </g>
     <g className="graph-choice-axes" aria-hidden="true"><line x1={pad} y1={axisX} x2={width - pad} y2={axisX} /><line x1={axisY} y1={pad} x2={axisY} y2={height - pad} /></g>
-    {area && <path d={area} className="graph-choice-area" />}
-    {plot.kind === "circle" || plot.kind === "ellipse"
-      ? <ellipse cx={xPosition(plot.h ?? 0)} cy={yPosition(plot.k ?? 0)} rx={Math.abs(xPosition((plot.h ?? 0) + (plot.kind === "ellipse" ? plot.rx ?? 2 : plot.r ?? 1)) - xPosition(plot.h ?? 0))} ry={Math.abs(yPosition((plot.k ?? 0) + (plot.kind === "ellipse" ? plot.ry ?? 1 : plot.r ?? 1)) - yPosition(plot.k ?? 0))} className="graph-choice-curve" />
-      : <path d={curve} className="graph-choice-curve" />}
+    <g clipPath={`url(#${clipId})`}>
+      {area && <path d={area} className="graph-choice-area" />}
+      {plot.kind === "circle" || plot.kind === "ellipse"
+        ? <ellipse cx={xPosition(plot.h ?? 0)} cy={yPosition(plot.k ?? 0)} rx={Math.abs(xPosition((plot.h ?? 0) + (plot.kind === "ellipse" ? plot.rx ?? 2 : plot.r ?? 1)) - xPosition(plot.h ?? 0))} ry={Math.abs(yPosition((plot.k ?? 0) + (plot.kind === "ellipse" ? plot.ry ?? 1 : plot.r ?? 1)) - yPosition(plot.k ?? 0))} className="graph-choice-curve" />
+        : <path d={curve} className="graph-choice-curve" />}
+    </g>
+    <g className="graph-choice-ticks">
+      {graphAxisTicks(xMin, xMax).map((x) => <text key={`x-${x}`} x={xPosition(x)} y={height - pad + 25} textAnchor="middle">{graphAxisLabel(x)}</text>)}
+      {graphAxisTicks(yMin, yMax).map((y) => <text key={`y-${y}`} x={pad - 7} y={yPosition(y) + 6} textAnchor="end">{graphAxisLabel(y)}</text>)}
+      <text x={width - 15} y={height - pad + 25} textAnchor="middle">x</text>
+      <text x={pad - 7} y={pad - 19} textAnchor="end">y</text>
+    </g>
   </svg>;
 }
 
@@ -298,7 +324,9 @@ function GraphChoiceResponse({ config, value, disabled, invalid, describedBy, on
   onChange: (value: string) => void;
   onSubmit: () => void;
 }) {
+  const selectedPlot = config.plots.find((plot) => plot.value === value);
   return <div className={`graph-choice-response question-response ${invalid ? "invalid" : ""}`} data-question-type="graph-choice" aria-describedby={describedBy}>
+    <p className="graph-choice-scale">x: {graphAxisLabel(config.xMin)} to {graphAxisLabel(config.xMax)} · y: {graphAxisLabel(config.yMin)} to {graphAxisLabel(config.yMax)}</p>
     <div className="graph-choice-options" role="group" aria-label="Choose the graph that matches the prompt.">
       {config.plots.map((plot) => {
         const selected = value === plot.value;
@@ -312,7 +340,7 @@ function GraphChoiceResponse({ config, value, disabled, invalid, describedBy, on
         </button>;
       })}
     </div>
-    <p className="plot-selection" aria-live="polite">{value ? `Selected ${config.plots.find((plot) => plot.value === value)?.label ?? value}` : "Choose one graph."}</p>
+    <p className="plot-selection" aria-live="polite">{value ? `Selected ${selectedPlot?.optionLabel ?? selectedPlot?.label ?? value}` : "Choose one graph."}</p>
   </div>;
 }
 

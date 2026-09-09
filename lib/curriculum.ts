@@ -8,6 +8,8 @@ import { buildPracticeQuestion, type QuestionInteraction, type QuestionInteracti
 import { enrichGrade79Curriculum } from "./curriculum-enrichment.ts";
 import { enrichGrade1012Curriculum } from "./curriculum-advanced-enrichment.ts";
 import { upgradeTextualResponses } from "./curriculum-response-upgrades.ts";
+import { applyDepthPacks } from "./curriculum-depth.ts";
+import type { QuestionEvidence } from "./curriculum-depth-types.ts";
 
 export type Accent = "blue" | "teal" | "coral" | "violet" | "gold";
 
@@ -19,6 +21,8 @@ export type PracticeQuestion = {
   interaction: QuestionInteraction;
   interactionConfig?: QuestionInteractionConfig;
   choices?: string[];
+  evidence?: QuestionEvidence;
+  explanation?: string;
 };
 
 export type LessonDefinition = {
@@ -37,6 +41,8 @@ export type LessonDefinition = {
   visual: string;
   quickSheet?: string;
   practice: PracticeQuestion[];
+  /** Full authored bank. practice is the stable pre-expansion sequence for old runs. */
+  questionBank?: PracticeQuestion[];
 };
 
 export type RegionDefinition = {
@@ -602,6 +608,7 @@ export const gradeCurricula = [
   { grade: 11 as const, title: "Grade 11", subtitle: "Algebra II and precalculus: polynomial, rational, logarithmic, trigonometric, conic, matrix, and statistical models", regions: expandedGrade11Regions },
   { grade: 12 as const, title: "Grade 12", subtitle: "Advanced functions, calculus, vectors, probability distributions, inference, finance, and discrete models", regions: expandedGrade12Regions },
 ];
+for (const curriculum of gradeCurricula) curriculum.regions = applyDepthPacks(curriculum.regions);
 export const regions: RegionDefinition[] = gradeCurricula.flatMap((curriculum) => curriculum.regions);
 export const lessons: LessonDefinition[] = regions.flatMap((region) => region.lessons);
 
@@ -680,5 +687,5 @@ export const curriculumStats = {
   regions: regions.length,
   lessons: lessons.length,
   bosses: regions.length,
-  questions: lessons.reduce((total, item) => total + item.practice.length, 0),
+  questions: lessons.reduce((total, item) => total + (item.questionBank ?? item.practice).length, 0),
 };

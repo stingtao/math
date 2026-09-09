@@ -124,3 +124,14 @@ The repair changes the definition of coverage:
 ## Maintenance gate
 
 When adding or reorganizing curriculum, review standards at the cluster and individual-standard level, then test concept, representation, procedure, modeling, and interpretation separately. Do not count a neighboring topic, repeated title, or broad domain code as complete coverage.
+
+
+## Objective-level depth expansions
+
+The three expansions add 432 reviewed questions across 72 lessons and explicitly map 216 bounded objectives to paired question IDs. The [generated report](curriculum-depth-report.md) records per-lesson evidence and remaining gaps; the [machine-readable matrix](curriculum-depth-matrix.json) includes all 253 lessons and labels the other 181 `baseline-only`, rather than inferring individual-standard coverage from their cluster labels.
+
+The original 1,346-question practice sequences are retained for legacy runs. New assessments use a separate full bank: upgraded lessons stay at six questions, Boss checks sample available visual/reasoning evidence, and review preserves the original missed question before adding a same-objective variant. `d1-` identifies the immutable first assessment version; `d2-` preserves the first two rounds; `d3-` opens all three rounds. The first two versions remain covered by separate captured question-content and selection fixtures. Review accepts all three version names and preserves each version’s bank and seed. Future pool or selection changes must use a new version.
+
+AP Statistics scope must use the 2026–27 revision. Existing regression-inference material remains an extension; its presence does not count toward the revised required course. Missing geometric-distribution or chi-square goodness-of-fit lessons are not mandatory gaps in that version. The revised course still requires a separate outcome-level audit.
+
+Review retains its existing dynamic due queue. If another page changes that queue, or a completion succeeds but its response is lost, retry can require reloading the current set. This expansion does not add a persistent Review-run snapshot or promise network-retry recovery for Review. Lesson-run restoration is covered separately.
